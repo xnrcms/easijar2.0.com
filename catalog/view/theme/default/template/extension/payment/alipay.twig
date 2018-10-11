@@ -1,0 +1,28 @@
+<form id="alipaysubmit" name="alipaysubmit" action="{{ action }}" method="POST">
+  {% for key, value in form_params %}
+    <input type="hidden" name="{{ key }}" value="{{ value }}"/>
+  {% endfor %}
+</form>
+<div class="buttons">
+  <div class="pull-right">
+    <input type="button" value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary" />
+  </div>
+</div>
+
+<script>
+  var btn = document.querySelector("#button-confirm");
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    var queryParam = '';
+    Array.prototype.slice.call(document.querySelectorAll("#alipaysubmit input[type=hidden]")).forEach(function (ele) {
+      queryParam += '&' + ele.name + "=" + encodeURIComponent(ele.value);
+    });
+    var gotoUrl = document.querySelector("#alipaysubmit").getAttribute('action') + '?' + queryParam;
+    location.href = "{{ pay_url }}" + "&goto=" + _AP.pay(gotoUrl);
+
+    return false;
+  }, false);
+</script>

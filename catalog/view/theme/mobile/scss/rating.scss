@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-01-22 10:24:19
+// @modified         2018-01-22 10:24:21
+//
+
+.rating {
+  .fa-stack {
+    font-size: 28px;
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+
+    .fa-star {
+      color: #ffcc00;
+      font-size: 14px;
+
+      &.off {
+        color: #d2d2d2;
+        font-size: 14px;
+      }
+    }
+  }
+}

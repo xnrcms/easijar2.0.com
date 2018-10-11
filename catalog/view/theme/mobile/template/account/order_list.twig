@@ -1,0 +1,80 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-sm-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+      {% if helper.is_pro() %}
+      <div class="row widget order-type-widget">
+        <div class="col-sm-12">
+          <div class="order-button-group">
+            <div {{ type is empty ? 'class="active"' }}><a href="{{ order }}">{{ text_order_all }}</a></div>
+            <div {{ type == 'unpaid' ? 'class="active"' }}><a href="{{ order_unpaid }}">{{ text_order_unpaid }}</a></div>
+            <div {{ type == 'unshipped' ? 'class="active"' }}><a href="{{ order_unshipped }}">{{ text_order_unshipped }}</a></div>
+            <div {{ type == 'shipped' ? 'class="active"' }}><a href="{{ order_shipped }}">{{ text_order_shipped }}</a></div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if orders %}
+      {% for order in orders %}
+      <div class="row widget">
+        <div class="col-xs-12">
+          <div class="order-item-wrapper">
+            <div class="order-info-top">
+              <div class="info">
+                <a href="{{ order.view }}">{{ column_order_id }}: #{{ order.order_id }}</a>
+                <a class="text-right" href="{{ order.view }}">{{ column_status }}: {{ order.status }}</a>
+              </div>
+            </div>
+            <div class="products">
+              <a href="{{ order.view }}">
+                {% for product in order.product_list %}
+                  <div class="product-item">
+                    <div class="image"><img src="{{ product.image }}" class="img-responsive" alt=""></div>
+                    <div class="info">
+                      <div class="name">{{ product.name }}</div>
+                      <div class="price">{{ product.total }}</div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </a>
+            </div>
+            <div class="order-info-bottom">
+              <a href="{{ order.view }}">
+                <div class="total">{{ column_total }}: {{ order.total }}</div>
+                <div class="date">{{ column_date_added }}: {{ order.date_added }}</div>
+              </a>
+            </div>
+            {% if helper.is_pro() and (order.status == text_order_not_pay_status or order.cancel or order.confirm) %}
+            <div class="order-info-action">
+              {% if order.status == text_order_not_pay_status %}
+                <a href="{{ order.view }}" class="btn btn-info">{{ button_continue_payment }}</a>
+              {% endif %}
+              {% if order.cancel %}
+                <a href="{{ order.cancel }}" class="btn btn-info">{{ button_cancel }}</a>
+              {% endif %}
+              {% if order.confirm %}
+                <a href="{{ order.confirm }}" class="btn btn-info">{{ button_complate }}</a>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="col-sm-12 text-center">{{ pagination }}</div>
+      {% else %}
+      <div class="row widget">
+        <div class="col-xs-12">
+          <div class="no-items">
+            <div class="icon"><i class="iconfont">&#xe61a;</i></div>
+            <div class="msg">{{ text_no_results }}</div>
+            <a class="btn btn-default btn-block" href="{{ home }}">{{ button_continue }}</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    </div>
+</div>
+{{ footer }}

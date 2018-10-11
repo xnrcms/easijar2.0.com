@@ -1,0 +1,41 @@
+{% if currencies|length > 1 %}
+  {% for currency in currencies %}
+    {% if currency.code == code %}
+    <a href="#" id="switch-currency">
+      {{ currency.symbol_left }} {{ currency.symbol_right }} {{ currency.title }}
+    </a>
+    {% endif %}
+  {% endfor %}
+
+  <script type="text/javascript">
+  $('#switch-currency').click(function (e) {
+    e.preventDefault();
+    layer.open({
+      type: 1,
+      title: '{{ text_currency }}',
+      closeBtn: 1,
+      anim: 2,
+      shadeClose: true,
+      scrollbar: false,
+      area: ['80%'],
+      content: currency_modal_content()
+    });
+  });
+
+  function currency_modal_content() {
+    var html = '';
+    html += '<div class="p-2">';
+    html += '<form action="{{ action }}" method="post" enctype="multipart/form-data" id="currency">';
+    html += '<input type="hidden" name="code" value="" />';
+    html += '<input type="hidden" name="redirect" value="{{ redirect }}" />';
+    html += '<div class="list-group mb-0">';
+    {% for currency in currencies %}
+    html += '<a href="{{ currency.code }}" class="list-group-item">{{ currency.symbol_left }}{{ currency.symbol_right }} {{ currency.title }}</a>';
+    {% endfor %}
+    html += '</div>';
+    html += '</form>';
+    html += '</div>';
+    return html;
+  }
+  </script>
+{% endif %}

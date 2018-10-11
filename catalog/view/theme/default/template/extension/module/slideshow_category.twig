@@ -1,0 +1,100 @@
+<div class="swiper-viewport module-slideshow slideshow-category mb-3">
+  {% if categories|length %}
+  <div class="container">
+    <div class="category-wrapper" style="height: {{ height }}px">
+      <ul>
+        {% for category in categories %}
+          <li class="category-item">
+            <a href="{{ category.href }}" class="{{ category.children|length ? 'children-arrows' }}">
+              <div class="title">{{ category.name }}</div>
+              {% if category.description %}
+              <div class="description">{{ category.description }}</div>
+              {% endif %}
+            </a>
+            {% if category.children|length %}
+            <div class="category-info">
+              <div class="category-title"><h3 class="mb-0"><b>{{ category.name }}</b></h3></div>
+              {% if category.children|length %}
+              <ul class="children">
+                {% for child in category.children %}
+                <li><a href="{{ child.href }}">{{ child.name }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+              {% if category.products|length %}
+              <ul class="products">
+                {% for product in category.products %}
+                <li>
+                  <a href="{{ product.href }}">
+                    <img src="{{ product.thumb }}" class="img-responsive">
+                    <p class="name">{{ product.name }}</p>
+                    {% if product.price %}
+                      <p class="price">
+                        {% if not product.special %}
+                        {{ product.price }}
+                        {% else %}
+                        <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+                        {% endif %}
+                      </p>
+                      {% if product.tax %}
+                      <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
+                      {% endif %}
+                    {% endif %}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+  <div id="category-slideshow-{{ module_id }}" class="swiper-container">
+    <div class="swiper-wrapper">
+      {% for banner in banners %}
+      <div class="swiper-slide">
+          <a href="{{ banner.href ?: 'javascript:void(0);' }}" style="background-image:url({{ banner.image }});height: {{ height }}px;">
+            <img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />
+          </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="swiper-pagination category-slideshow"></div>
+</div>
+<script type="text/javascript"><!--
+
+$(document).ready(function() {
+  var slideshow_category_{{ module_id }} = new Swiper('#category-slideshow-{{ module_id }}', {
+    effect : 'fade',
+    slidesPerView: 1,
+    pagination: {
+      el: '.category-slideshow',
+      clickable: true
+    },
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false
+    }
+  });
+
+  for ( i = 0; i < slideshow_category_{{ module_id }}.pagination.bullets.length; i++ ) {
+    slideshow_category_{{ module_id }}.pagination.bullets[i].index = i;
+    slideshow_category_{{ module_id }}.pagination.bullets[i].onmouseover = function() {
+      slideshow_category_{{ module_id }}.slideTo(this.index);
+    };
+  }
+
+  $('#category-slideshow-{{ module_id }}').hover(function() {
+    slideshow_category_{{ module_id }}.autoplay.stop();
+  }, function() {
+    slideshow_category_{{ module_id }}.autoplay.start();
+  });
+})
+--></script>
+
+

@@ -1,0 +1,739 @@
+{{ header }}{{ column_left }}
+<div id="content" class="catalog-product-list-page">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="button" data-toggle="tooltip" title="{{ button_filter }}" onclick="$('#filter-product').toggleClass('hidden-sm hidden-xs');" class="btn btn-default hidden-md hidden-lg"><i class="fa fa-filter"></i></button>
+        <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+        <button type="submit" form="form-product" formaction="{{ copy }}" data-toggle="tooltip" title="{{ button_copy }}" class="btn btn-default"><i class="fa fa-copy"></i></button>
+        <button type="button" form="form-product" formaction="{{ delete }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-product').submit() : false;"><i class="fa fa-trash-o"></i></button>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">{% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="row">
+      <div id="filter-product" class="col-sm-12 hidden-sm hidden-xs">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-name">{{ entry_name }}</label> <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-model">{{ entry_model }}</label> <input type="text" name="filter_model" value="{{ filter_model }}" placeholder="{{ entry_model }}" id="input-model" class="form-control"/>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-sku">{{ entry_sku }}</label> <input type="text" name="filter_sku" value="{{ filter_sku }}" placeholder="{{ entry_sku }}" id="input-sku" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-price">{{ entry_price }}</label> <input type="text" name="filter_price" value="{{ filter_price }}" placeholder="{{ entry_price }}" id="input-price" class="form-control"/>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-quantity">{{ entry_quantity }}</label> <input type="text" name="filter_quantity" value="{{ filter_quantity }}" placeholder="{{ entry_quantity }}" id="input-quantity" class="form-control"/>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-stock-quantity">{{ entry_stock_quantity }}</label> <input type="text" name="filter_stock_quantity" value="{{ filter_stock_quantity }}" placeholder="10-20" id="input-stock-quantity" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-status">{{ entry_status }}</label> <select name="filter_status" id="input-status" class="form-control">
+                    <option value="">{{ text_all }}</option>
+                    {% if filter_status == '1' %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                    {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                    {% endif %}
+                    {% if filter_status == '0' %}
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% else %}
+                      <option value="0">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-category">{{ entry_category }}</label> <select name="filter_category" id="input-category" class="form-control">
+                    <option value="">{{ text_all }}</option>
+                    {% for category in categories %}
+                        <option value="{{ category.category_id }}" {% if filter_category == category.category_id %}selected="selected"{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-image">{{ entry_image }}</label> <select name="filter_image" id="input-image" class="form-control">
+                    <option value="">{{ text_all }}</option>
+                    {% if filter_image == '1' %}
+                      <option value="1" selected="selected">{{ text_image_yes }}</option>
+                    {% else %}
+                      <option value="1">{{ text_image_yes }}</option>
+                    {% endif %}
+                    {% if filter_image == '0' %}
+                      <option value="0" selected="selected">{{ text_image_no }}</option>
+                    {% else %}
+                      <option value="0">{{ text_image_no }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-show-variant">{{ entry_show_variant }}</label> <select name="filter_show_variant" id="input-show-variant" class="form-control">
+                    {% if filter_show_variant == '1' %}
+                      <option value="1" selected="selected">{{ text_show_variant }}</option>
+                    {% else %}
+                      <option value="1">{{ text_show_variant }}</option>
+                    {% endif %}
+                    {% if filter_show_variant == '0' %}
+                      <option value="0" selected="selected">{{ text_hide_variant }}</option>
+                    {% else %}
+                      <option value="0">{{ text_hide_variant }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+                <div class="form-group text-right">
+                  <div class="btn-group">
+                    <button disabled class="dropdown-toggle btn btn-success" id="batch-edit" type="button" data-toggle="dropdown">{{ text_batch_edit }}
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu batch-edit-item" role="menu">
+                      <li>
+                        <a href="javascript:void(0)" data-type="price">{{ text_product_price }}</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" data-type="quantity">{{ text_product_quantity }}</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" data-type="status">{{ text_product_down }}</a>
+                      </li>
+                    </ul>
+                  </div>
+                  <button type="button" id="button-filter" class="btn btn-default"><i class="fa fa-filter"></i> {{ button_filter }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+          </div>
+          <div class="panel-body">
+            <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-product">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').trigger('click');" id="all-selected" /></td>
+                      <td class="text-left">{% if sort == 'p.product_id' %}<a href="{{ sort_id }}" class="{{ order|lower }}">{{ column_id }}</a>{% else %}<a href="{{ sort_id }}">{{ column_id }}</a> {% endif %}</td>
+                      <td class="text-center">{{ column_image }}</td>
+                      <td class="text-left">{% if sort == 'pd.name' %}<a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>{% else %}<a href="{{ sort_name }}">{{ column_name }}</a> {% endif %}</td>
+                      <td class="text-left">{% if sort == 'p.model' %}<a href="{{ sort_model }}" class="{{ order|lower }}">{{ column_model }}</a>{% else %}<a href="{{ sort_model }}">{{ column_model }}</a> {% endif %}</td>
+                      <td class="text-right">{% if sort == 'p.price' %}<a href="{{ sort_price }}" class="{{ order|lower }}">{{ column_price }}</a>{% else %}<a href="{{ sort_price }}">{{ column_price }}</a> {% endif %}</td>
+                      <td class="text-right">{% if sort == 'p.quantity' %}<a href="{{ sort_quantity }}" class="{{ order|lower }}">{{ column_quantity }}</a>{% else %}<a href="{{ sort_quantity }}">{{ column_quantity }}</a> {% endif %}</td>
+                      <td class="text-left">{% if sort == 'p.status' %}<a href="{{ sort_status }}" class="{{ order|lower }}">{{ column_status }}</a>{% else %}<a href="{{ sort_status }}">{{ column_status }}</a> {% endif %}</td>
+                      <td class="text-right">{{ column_action }}</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% if products %}
+                      {% set selected = selected ? selected|split('.') %}
+                      {% for product in products %}
+                        <tr>
+                          <td class="text-center selected-item">{% if product.product_id in selected %}
+                            <input type="checkbox" name="selected[]" value="{{ product.product_id }}" checked="checked" onchange="isChecked();" />
+                            {% else %}
+                            <input type="checkbox" name="selected[]" value="{{ product.product_id }}" onchange="isChecked();" />
+                            {% endif %}</td>
+                          <td class="text-center">
+                            <span>{{ product.product_id }}</span>
+                          </td>
+                          <td class="text-center">{% if product.image %}<img src="{{ product.image }}" alt="{{ product.name }}" class="img-thumbnail"/>{% else %}<span class="img-thumbnail list"><i class="fa fa-camera fa-2x"></i></span>{% endif %}</td>
+                          <td class="text-left name-editor">
+                            <span>{{ product.name }}</span>
+                            <i class="fa fa-pencil edit" aria-hidden="true" data-product-id="{{ product.product_id }}"></i>
+                          </td>
+                          <td class="text-left model-editor" data-item="model">
+                            <span>{{ product.model }}</span>
+                            <i class="fa fa-pencil edit" aria-hidden="true" data-product-id="{{ product.product_id }}"></i>
+                          </td>
+                          <td class="text-right price-editor" data-item="price">
+                            <i class="fa fa-pencil edit" aria-hidden="true" data-product-id="{{ product.product_id }}" data-price="{{ product.original_price|round(2) }}"></i>
+                            {% if product.special %}
+                            <span style="text-decoration: line-through;">{{ product.price }}</span>
+                            <br/>
+                            <div class="text-danger special">{{ product.special }}</div>
+                            {% else %}
+                            <span>{{ product.price }}</span>
+                            {% endif %}
+                          </td>
+                          <td class="text-right quantity-editor" data-item="quantity">
+                            {% if product.quantity <= 0 %}<span class="label label-warning">{{ product.quantity }}</span>{% elseif product.quantity <= 5 %}<span class="label label-danger">{{ product.quantity }}</span>{% else %}<span class="label label-success">{{ product.quantity }}</span>{% endif %}
+                            <i class="fa fa-pencil edit" aria-hidden="true" data-product-id="{{ product.product_id }}"></i>
+                          </td>
+                          <td class="text-left">
+                            <input type="checkbox" name="product-status-toggle" data-id="{{ product.product_id }}" {{ product.status ? 'checked' }}>
+                          </td>
+                          <td class="text-right">
+                            <div class="btn-group" style="min-width: 65px;">
+                              <a href="{{ product.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary">
+                                <i class="fa fa-pencil"></i>
+                              </a>
+                              <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+                                <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-right">
+                                <li>
+                                  <a href="javascript:void(0);" class="btn-variant" data-id="{{ product.product_id }}">
+                                    <i class="fa fa-cog"></i> {{ button_edit_child_product }}
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="{{ product.view }}" target="_blank">
+                                    <i class="fa fa-search"></i> {{ button_view }}
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                      <tr>
+                        <td class="text-center" colspan="9">{{ text_no_results }}</td>
+                      </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </form>
+            <div class="row">
+              <div class="col-sm-6 text-left">{{ pagination }}</div>
+              <div class="col-sm-6 text-right">{{ results }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-filter').on('click', function() {
+	var url = '';
+
+	var filter_name = $('input[name=\'filter_name\']').val();
+
+	if (filter_name) {
+		url += '&filter_name=' + encodeURIComponent(filter_name);
+	}
+
+	var filter_model = $('input[name=\'filter_model\']').val();
+
+	if (filter_model) {
+		url += '&filter_model=' + encodeURIComponent(filter_model);
+	}
+
+	var filter_sku = $('input[name=\'filter_sku\']').val();
+	if (filter_sku) {
+		url += '&filter_sku=' + encodeURIComponent(filter_sku);
+		$('select[name=\'filter_show_variant\']').val(1)
+	}
+
+	var filter_price = $('input[name=\'filter_price\']').val();
+
+	if (filter_price) {
+		url += '&filter_price=' + encodeURIComponent(filter_price);
+	}
+
+	var filter_quantity = $('input[name=\'filter_quantity\']').val();
+
+	if (filter_quantity) {
+		url += '&filter_quantity=' + encodeURIComponent(filter_quantity);
+	}
+
+	var filter_status = $('select[name=\'filter_status\']').val();
+
+  if (filter_status !== '') {
+    url += '&filter_status=' + encodeURIComponent(filter_status);
+  }
+
+  var filter_category = $('select[name=\'filter_category\']').val();
+
+  if (filter_category !== '') {
+    url += '&filter_category=' + encodeURIComponent(filter_category);
+  }
+
+  var filter_image = $('select[name=\'filter_image\']').val();
+
+	if (filter_image !== '') {
+		url += '&filter_image=' + encodeURIComponent(filter_image);
+	}
+
+	var filter_show_variant = $('select[name=\'filter_show_variant\']').val();
+	if (filter_show_variant !== '') {
+		url += '&filter_show_variant=' + filter_show_variant;
+	}
+
+	var filter_stock_quantity = $('input[name=\'filter_stock_quantity\']').val();
+	if (filter_stock_quantity !== '') {
+		url += '&filter_stock_quantity=' + filter_stock_quantity;
+	}
+
+	location = 'index.php?route=catalog/product&user_token={{ user_token }}' + url;
+});
+//--></script>
+<script type="text/javascript"><!--
+// IE and Edge fix!
+$('button[form=\'form-product\']').on('click', function(e) {
+	$('#form-product').attr('action', $(this).attr('formaction'));
+});
+
+$('input[name=\'filter_name\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_name\']').val(item['label']);
+	}
+});
+
+$('input[name=\'filter_model\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_model=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['model'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_model\']').val(item['label']);
+	}
+});
+
+$('input[name=\'filter_sku\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_sku=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					if (item.sku != '') {
+						return {
+							label: item['sku'],
+							value: item['product_id']
+						}
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_sku\']').val(item['label']);
+	}
+});
+
+$("[name='product-status-toggle']").bootstrapSwitch({
+  onText: '{{ text_enabled }}',
+  offText: '{{ text_disabled }}',
+  labelText: '{{ entry_status }}',
+  size: 'mini',
+});
+
+$('input[name="product-status-toggle"]').on('switchChange.bootstrapSwitch', function(event, state) {
+  var switcher = $(this);
+  $.ajax({
+    url: 'index.php?route=catalog/product/edit_status&user_token={{ user_token }}&product_id=' + $(this).data('id') + '&status=' + (state ? 1 : 0),
+    dataType: 'json',
+    beforeSend: function () {
+      switcher.bootstrapSwitch('toggleReadonly', true);
+    },
+    success: function (json) {
+      switcher.bootstrapSwitch('toggleReadonly', false);
+      if (json['status'] !== 1) {
+        switcher.bootstrapSwitch('state', !state, true);
+        layer.msg(json.message);
+      }
+    },
+    error: function () {
+      switcher.bootstrapSwitch('toggleReadonly', false);
+      switcher.bootstrapSwitch('state', !state, true);
+    }
+  });
+});
+//--></script>
+
+<script type="text/javascript"><!--
+  (function() {
+    // name editor
+    $('.name-editor > i.edit').on('click', function(event) {
+      {% if permission_modify %}
+        var productId = $(this).data('product-id'), _this = $(this);
+        loadProductName(productId, _this);
+      {% else %}
+        layer.msg('{{ error_permission }}');
+      {% endif %}
+    });
+
+    {% if permission_modify %}
+    var loadProductName = function (productId, _this) {
+      var _load = layer.load(1, {shade: [0.5,'#fff']});
+
+      $.ajax({
+        url: 'index.php?route=catalog/product/get_names&product_id=' + productId + '&user_token={{ user_token }}',
+        type: 'post',
+        dataType: 'json',
+        success: function (json) {
+          var _html = '';
+          if ( json.status == 1 ) {
+            _html += '<form id="product-edit-form" action method="post">';
+            {% for language in languages %}
+              _html += ' <div class="input-group">';
+              _html += '   <span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/></span>';
+              _html += '   <input type="text" class="form-control" value="' + json.data['{{ language.language_id }}'] + '" name="name[{{ language.language_id }}]" placeholder="{{ language.name }}">';
+              _html += ' </div>';
+            {% endfor %}
+            _html += '</form>';
+
+            layer.open({
+              type: 1,
+              title: "{{ entry_name }}",
+              skin: 'quick-product-name-edit-modal',
+              shadeClose: false,
+              btn: ['{{ button_save }}', '{{ button_cancel }}'],
+              content: _html,
+              yes: function(index, layero) {
+                editProductName(productId, _this);
+              }
+            });
+          } else {
+            layer.alert(json.message);
+          }
+        },
+        error: function () {
+          layer.alert('{{ error_network }}');
+        },
+        complete: function () {
+          layer.close(_load);
+        }
+      })
+    }
+
+    var editProductName = function (productId, _this) {
+      var _load = layer.load(1, {shade: [0.5,'#fff']});
+      $.ajax({
+        url: 'index.php?route=catalog/product/edit_names&product_id=' + productId + '&user_token={{ user_token }}',
+        type: 'post',
+        data: $('#product-edit-form').serialize(),
+        dataType: 'json',
+        success: function (json) {
+          if ( json.status == 1 ) {
+            _this.siblings('span').html(json.data);
+            layer.closeAll();
+            layer.msg(json.message);
+          } else {
+            layer.msg(json.message);
+          }
+        },
+        error: function () {
+          layer.msg('{{ error_network }}', {time: 1000});
+        },
+        complete: function () {
+          layer.close(_load);
+        }
+      })
+    }
+    {% endif %}
+
+    // model/quantity/price editor
+    $('.model-editor > i, .quantity-editor > i, .price-editor > i').on('click', function(event) {
+      {% if not permission_modify %}
+        layer.msg('{{ error_permission }}');
+      {% else %}
+        var _titles = {model: '{{ entry_model }}', quantity: '{{ entry_quantity }}', price: '{{ entry_price }}' };
+        var _this = $(this);
+        var _id = _this.data('product-id');
+        var _key = _this.parent().data('item');
+
+        if (_key == 'price') {
+          var _value = _this.data('price');
+        } else {
+          var _value = _this.siblings('span').text();
+        }
+
+        layer.prompt({
+          formType: 0,
+          value: _value,
+          title: _titles[_key],
+        }, function(value, index, elem) {
+          if (_key == 'quantity') {
+            if (isNaN(value) || parseInt(value) < 0) {
+              return layer.msg('{{ error_number_quantity }}');
+            }
+          }
+
+          if (_key == 'price') {
+            if (isNaN(value) || parseFloat(value) < 0) {
+              return layer.msg('{{ error_number_quantity }}');
+            }
+          }
+
+          $.ajax({
+            url: 'index.php?route=catalog/product/edit_' + _key + '&product_id=' + _id + '&user_token={{ user_token }}',
+            type: 'post',
+            dataType: 'json',
+            data: _key + '=' + value,
+            success: function(json) {
+              if (json['status'] == 1) {
+                _this.siblings('span').html(json.data);
+                if (_key == 'price') {
+                  _this.data('price', value);
+                }
+                layer.closeAll();
+                layer.msg(json.message);
+              } else {
+                layer.msg(json.message);
+              }
+            },
+            error: function () {
+              layer.msg('{{ error_network }}', {time: 1000});
+            }
+          });
+        });
+      {% endif %}
+    });
+  }());
+//--></script>
+
+<script type="text/javascript"><!--
+  var batchProductIds = new Array(), checkedProductCount; // 全局初始化商品选中ID数组与选中length
+
+  function isChecked() {
+    batchProductIds = [];
+    checkedProductCount = $(".selected-item input:checked").length;
+    var
+      _trLength = $('.table-responsive tbody tr').length,
+      _btnAlls = document.getElementById('all-selected'),
+      _btnBatch = document.getElementById('batch-edit');
+
+    checkedProductCount == _trLength ? _btnAlls.checked = true : _btnAlls.checked = false;
+    checkedProductCount ? _btnBatch.disabled = false : _btnBatch.disabled = true;
+
+    $('input[name="selected[]"]:checked').each(function() {
+      batchProductIds.push($(this).val())
+    });
+  }
+  isChecked();
+
+  $('.batch-edit-item a').on('click', function(event) {
+    var
+      _item = $(this).data('type'),
+      _name = $(this).children('span').text();
+
+    layer.open({
+      type: 1,
+      title: "{{ text_batch_edit }}" + _name,
+      skin: 'batch-edit-item-layer',
+      area: ['500px', ''],
+      btn: ['{{ button_save }}', '{{ button_cancel }}'],
+      content: editWrapperHtml(_item, _name),
+      yes: function(index, layero) {
+        batchEditProduct(_item, _name);
+      }
+    });
+  });
+
+  var editWrapperHtml = function(_item, _name) {
+    var html = '';
+
+    if ( _item == 'status') {
+      html +=  '<h4> {{ text_batch_number }} </h4>'
+    } else {
+      html +=  '<p>{{ text_batch_setting_title }}：</p>'
+      html +=  '<div class="batch-edit-item-wrapper">'
+      html +=    '<div class="input-group active">'
+      html +=      '<label class="input-group-addon" id="basic-addon1"><input name="reset" type="checkbox" checked> {{ text_batch_reset }}' + _name + '</label>'
+      html +=      '<div class="inner"><input type="number" name="value" class="value"></div>'
+      html +=    '</div>'
+      html +=    '<div class="input-group">'
+      html +=      '<label class="input-group-addon" id="basic-addon1"><input name="raise" type="checkbox"> {{ text_batch_add }}' + _name + '</label>'
+      html +=      '<div class="inner">'
+      if ( _item != 'quantity' ) {
+        html +=        '<select><option value="price">{{ text_sale_price }}</option><option value="pct">{{ text_percent }}</option></select>'
+      }
+      html +=        '<input type="number" name="value" class="value">'
+      html +=      '</div>'
+      html +=    '</div>'
+      html +=    '<div class="input-group">'
+      html +=      '<label class="input-group-addon" id="basic-addon1"><input name="reduce" type="checkbox"> {{ text_batch_down }}' + _name + '</label>'
+      html +=      '<div class="inner">'
+      if ( _item != 'quantity' ) {
+        html +=        '<select><option value="price">{{  text_sale_price }}</option><option value="pct">{{ text_percent }}</option></select>'
+      }
+      html +=        '<input type="number" name="value" class="value">'
+      html +=      '</div>'
+      html +=    '</div>'
+      html +=  '</div>'
+    }
+
+    return html;
+  }
+
+  var batchEditProduct = function(_item, _name) {
+    var
+      _actives = $('.batch-edit-item-wrapper .active'),
+      _value = _actives.find('input[name="value"]').val(),
+      _type = _actives.find('input[type="checkbox"]').prop('name'),
+      _key = _actives.find('option:selected').val();
+
+    if ( _value == '' ) return layer.tips('{{ error_content_required }}', _actives.find('.value'), {tips:3});
+    if ( _value <= 0 ) return layer.tips('{{ error_number_quantity }}', _actives.find('.value'), {tips:3});
+    if ( _key == 'pct' ) {
+      if ( _value < 0 || _value > 100 ) return layer.tips('{{ error_number_scope }}', _actives.find('.value'), {tips:3});
+    }
+
+    var filter = '';
+
+    var filter_name = $('input[name=\'filter_name\']').val();
+
+    if (filter_name) {
+        filter += '&filter_name=' + encodeURIComponent(filter_name);
+    }
+
+    var filter_model = $('input[name=\'filter_model\']').val();
+
+    if (filter_model) {
+        filter += '&filter_model=' + encodeURIComponent(filter_model);
+    }
+
+    var filter_price = $('input[name=\'filter_price\']').val();
+
+    if (filter_price) {
+        filter += '&filter_price=' + encodeURIComponent(filter_price);
+    }
+
+    var filter_quantity = $('input[name=\'filter_quantity\']').val();
+
+    if (filter_quantity) {
+        filter += '&filter_quantity=' + encodeURIComponent(filter_quantity);
+    }
+
+    var filter_status = $('select[name=\'filter_status\']').val();
+
+    if (filter_status !== '') {
+        filter += '&filter_status=' + encodeURIComponent(filter_status);
+    }
+
+    var filter_category = $('select[name=\'filter_category\']').val();
+
+    if (filter_category !== '') {
+        filter += '&filter_category=' + encodeURIComponent(filter_category);
+    }
+
+    var filter_image = $('select[name=\'filter_image\']').val();
+
+    if (filter_image !== '') {
+        filter += '&filter_image=' + encodeURIComponent(filter_image);
+    }
+
+    if ({{ sort != null}}) {
+        filter += '&sort={{ sort }}';
+    }
+
+    if ({{ order != null}}) {
+        filter += '&order={{ order }}';
+    }
+
+    if ({{ page != null}}) {
+        filter += '&page={{ page }}';
+    }
+
+    $.ajax({
+      url: 'index.php?route=catalog/product/update' + _item + '&user_token={{ user_token }}' + filter,
+      type: 'post',
+      dataType: 'json',
+      data: {'product_id': batchProductIds, 'type': _type, 'key': _key, 'value': _value},
+      success: function(json) {
+        if (json['status'] == 1) {
+          layer.msg(json.message, {icon:1, time: 500}, function() {
+            layer.load(2, {shade: [0.2,'#fff']});
+            location.href = json['link'];
+          });
+        } else {
+          layer.msg(json.message);
+        }
+      },
+      error: function () {
+        layer.msg('{{ error_network }}', {time: 1000});
+      }
+    });
+  }
+
+  $(document).on('click', '.batch-edit-item-wrapper .input-group label', function(event) {
+    $(this).parent().addClass('active').siblings().removeClass('active');
+    $(this).parent().siblings().find('input').prop("checked", false);
+  });
+
+  $(document).on('change', '.batch-edit-item-wrapper select', function(event) {
+    $(this).siblings('input').val('');
+  });
+//--></script>
+
+<script type="text/javascript"><!--
+  $('.btn-variant').click(function () {
+    let product_id = $(this).data('id');
+    layer.open({
+      type: 2,
+      title: '{{ text_edit_child_product }}',
+      shadeClose: false,
+      shade: 0.8,
+      scrollbar: false,
+      area: ['95%', '90%'],
+      content: '{{ helper.url.link('catalog/product/variant') }}&product_id=' + product_id,
+      end: function () {
+        layer.load(1, { shade: [0.5, '#fff'] });
+        location.reload();
+      }
+    });
+  });
+//--></script>
+{{ footer }}

@@ -1,0 +1,59 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-sm-12">{{ content_top }}
+
+      <div class="row balance-widget">
+        <div class="col-xs-12">
+          <div class="nav-bar">{{ heading_title }}
+            {% if helper.is_pro() %}
+            <a href="{{ recharge }}" class="btn btn-default btn-right">{{ button_recharge }}</a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <div class="balance-number">
+            {{ total }}
+          </div>
+        </div>
+        <div class="account-bg-bg">
+          <img src="{{ helper.url().fullPathLink('catalog/view/theme/mobile/image/account-bg-bg.png') }}" class="img-responsive">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          {% if transactions %}
+            {% for transaction in transactions %}
+              <div class="list-two-column-justified row widget">
+                <div class="col-xs-12">
+                <dl>
+                  <dt>{{ column_date_added }}</dt>
+                  <dd>{{ transaction.date_added }}</dd>
+                </dl>
+                <dl>
+                  <dt>{{ column_description }}</dt>
+                  <dd>{{ transaction.description }}</dd>
+                </dl>
+                <dl>
+                  <dt>{{ column_amount }}</dt>
+                  <dd>{{ transaction.amount }}</dd>
+                </dl>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="row widget">
+              <div class="col-xs-12 text-center">
+                  <dd class="msg">{{ text_no_results }}</dd>
+              </div>
+            </div>
+          {% endif %}
+          <div class="row">
+            <div class="col-sm-12 text-center">{{ pagination }}</div>
+          </div>
+        </div>
+      </div>
+      {{ content_bottom }}</div>
+    </div>
+</div>
+{{ footer }}

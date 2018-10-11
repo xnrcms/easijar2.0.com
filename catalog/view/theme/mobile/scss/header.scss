@@ -1,0 +1,118 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-07-25 10:26:41
+//
+
+// Back to top and go home button style
+.go-top, .btn-meiqia {
+  display: none;
+  position: fixed;
+  bottom: 63px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  line-height: 30px;
+  z-index: 9999;
+  text-align: center;
+  background-color: rgba(0,0,0,.6);
+
+  &:active {
+    background-color: #bbb;
+  }
+
+  i {
+    font-size: 20px;
+    color: #fff;
+  }
+}
+
+// .go-home {
+//   bottom: 90px;
+//   line-height: 28px;
+// }
+
+.btn-meiqia {
+  bottom: 94px;
+  i {
+    font-size: 18px;
+  }
+}
+
+.nav-bar {
+  margin: 0 -10px;
+  height: 45px;
+  line-height: 45px;
+  background: #f9f9f9;
+  color: $nav_bar_color;
+  font-size: 16px;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+
+  .btn {
+    position: absolute;
+    padding: 0 8px;
+    height: 30px;
+    top: 50%;
+    margin-top: -15px;
+    line-height: 30px;
+
+    &.active {
+      background-color: #888;
+      border-color: #888;
+      color: #fff;
+    }
+  }
+
+  .btn-right {
+    right: $gutter;
+  }
+
+  .btn-left {
+    left: $gutter;
+  }
+
+  &:after {
+    height: 1px;
+    content: '';
+    width: 100%;
+    border-top: 1px solid #ccc;
+    position: absolute;
+    bottom: -1px;
+    right: 0;
+    transform: scaleY(0.5);
+    -webkit-transform: scaleY(0.5);
+    z-index: 10;
+  }
+}
+
+// top style
+.topbar {
+  display: block;
+  overflow: hidden;
+  margin: 10px 5px 5px 5px;
+  clear: both;
+  text-align: center;
+}
+
+.top-logo {
+  img {
+    max-height: 30px;
+  }
+}
+
+.lang-select {
+  margin-right: 10px;
+  line-height: 30px;
+}
+
+.currency-select {
+  margin-right: 10px;
+  line-height: 30px;
+}

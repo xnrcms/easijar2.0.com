@@ -1,0 +1,8 @@
+<div class="checkout-process-wrapper">
+  <h1>{{ heading_title }}{% if weight %}&nbsp;({{ weight }}){% endif %}</h1>
+  <ul class="process-list">
+    <li class="{{ process == 'cart' ? 'active' : 'old' }}"><div>1</div><span>{{ text_step_1 }}</span></li>
+    <li class="{{ process == 'checkout' ? 'active' }}{{ process == 'success' ? 'old' }}"><div>2</div><span>{{ text_step_2 }}</span></li>
+    <li class="{{ process == 'success' ? 'active' }}"><div>3</div><span>{{ text_step_3 }}</span></li>
+  </ul>
+</div>

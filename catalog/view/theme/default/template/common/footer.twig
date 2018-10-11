@@ -1,0 +1,111 @@
+{% if not modal %}
+<footer {{ not services ? 'class="pt-3"' }}>
+  {% if services %}
+  <div class="module-customer-service mb-2 pt-3">
+    <div class="container">
+      <div class="row">
+        {% set class = "col-md-#{12 / services|length} col-sm-#{12 / services|length} col-xs-12" %}
+        {% for service in services %}
+        <div class="{{ class }} item">
+          <div class="icon"><img src="{{ helper.image_resize(service.image, 55, 55) }}" class="img-responsive"></div>
+          <div class="text">
+            <div class="title">{{ service.title }}</div>
+            <div class="sub-title">{{ service.subtitle }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9">
+        {% if informations %}
+        <div class="col-sm-3 col-xs-6">
+          <h5>{{ text_information }}</h5>
+          <ul class="list-unstyled">
+           {% for information in informations %}
+            <li><a href="{{ information.href }}">{{ information.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        <div class="col-sm-3 col-xs-6">
+          <h5>{{ text_service }}</h5>
+          <ul class="list-unstyled">
+            <li><a href="{{ contact }}">{{ text_contact }}</a></li>
+            <li><a href="{{ return }}">{{ text_return }}</a></li>
+            <li><a href="{{ sitemap }}">{{ text_sitemap }}</a></li>
+            <!--<li><a href="{{ voucher }}">{{ text_voucher }}</a></li>-->
+            <li><a href="{{ faq }}">{{ text_faq }}</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-3 col-xs-6">
+          <h5>{{ text_account }}</h5>
+          <ul class="list-unstyled">
+            <li><a href="{{ account }}">{{ text_account }}</a></li>
+            <li><a href="{{ order }}">{{ text_order }}</a></li>
+            <li><a href="{{ wishlist }}">{{ text_wishlist }}</a></li>
+            <!--<li><a href="{{ newsletter }}">{{ text_newsletter }}</a></li>-->
+          </ul>
+        </div>
+        <div class="visible-xs col-xs-12"></div>
+        <div class="col-sm-3 col-xs-6">
+          <h5>{{ text_extra }}</h5>
+          <ul class="list-unstyled">
+            <li><a href="{{ special }}">{{ text_special }}</a></li>
+            <li><a href="{{ latest }}">{{ text_latest }}</a></li>
+            <!--
+            <li><a href="{{ manufacturer }}">{{ text_manufacturer }}</a></li>
+            <li><a href="{{ affiliate }}">{{ text_affiliate }}</a></li>
+            -->
+          </ul>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <h5 class="telephone-wrapper">
+          <i class="fa fa-volume-control-phone" aria-hidden="true"></i> {{ helper.config('config_telephone') }}
+        </h5>
+        <ul class="list-unstyled address-wrapper">
+          {% if helper.config('config_address') %}
+          <li><i class="fa fa-map-marker"></i> {{ helper.config('config_address') }}</li>
+          {% endif %}
+          <li><i class="fa fa-envelope"></i> {{ helper.config('config_email') }}</li>
+          <li class="contact-btn">
+            <a class="btn btn-default" href="{{ helper.url.link('information/contact') }}"><i class="fa fa-commenting-o" aria-hidden="true"></i>{{ text_contact }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">{{ powered }}</div>
+  <div class="fixed-shortcut-wrapper hidden-xs">
+    {{ include(helper.template('extension/module/chat')) }}
+    <div class="item sidebar-text">
+      <a href="{{ helper.url.link("checkout/cart") }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i>
+        <span>{{ text_cart }}</span>
+      </a>
+    </div>
+    <div class="item sidebar-text">
+      <a href="{{ account }}"><i class="fa fa-user-circle-o" aria-hidden="true"></i>
+        <span>{{ text_account }}</span>
+      </a>
+    </div>
+    <div class="item sidebar-text">
+      <a href="{{ wishlist }}"><i class="fa fa-heart" aria-hidden="true"></i>
+        <span>{{ text_wishlist }}</span>
+      </a>
+    </div>
+    <div class="item"><a href="#" class="scroll-top"><i class="fa fa-angle-up" aria-hidden="true"></i></a></div>
+  </div>
+</footer>
+{% endif %}
+
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+<!-- OpenCart v3.0 专业版主题模板由 www.opencart.cn 荣耀出品 2018 (c) 成都光大网络科技有限公司 版权所有 -->
+{{ helper.debug_bar.render }}
+</body>
+</html>

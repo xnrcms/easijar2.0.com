@@ -1,0 +1,218 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    {% if success %}
+      <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="row">
+      <div id="filter-product" class="col-sm-12 hidden-sm hidden-xs">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-user">{{ entry_user }}</label>
+                  <input type="text" name="filter_user" value="{{ filter_user }}" placeholder="{{ entry_user }}"
+                         id="input-user" class="form-control"/>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-table">{{ entry_table }}</label>
+                  <input type="text" name="filter_table" value="{{ filter_table }}" placeholder="{{ entry_table }}"
+                         id="input-table" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-action">{{ entry_action }}</label>
+                  <select name="filter_action" id="input-action" class="form-control">
+                    <option value="" {% if filter_action == '' %}selected="selected"{% endif %} >
+                    </option>
+                    <option value="insert" {% if filter_action == 'insert' %}selected="selected"{% endif %} >
+                      {{ text_insert }}
+                    </option>
+                    <option value="update" {% if filter_action == 'update' %}selected="selected"{% endif %} >
+                      {{ text_update }}
+                    </option>
+                    <option value="delete" {% if filter_action == 'delete' %}selected="selected"{% endif %} >
+                      {{ text_delete }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="control-label" for="input-sql">{{ entry_sql }}</label>
+                  <input type="text" name="filter_sql" value="{{ filter_sql }}" placeholder="{{ entry_sql }}"
+                         id="input-sql" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-ip">{{ entry_ip }}</label>
+                  <input type="text" name="filter_ip" value="{{ filter_ip }}" placeholder="{{ entry_ip }}"
+                         id="input-ip" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group date">
+                  <label class="control-label" for="input-date-added">{{ entry_date_added }}</label>
+                  <input type="text" name="filter_date_added" value="{{ filter_date_added }}"
+                         placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD"
+                         id="input-date-added" class="form-control"/>
+                </div>
+                <div class="form-group text-right">
+                  <button type="button" id="button-filter" class="btn btn-default">
+                    <i class="fa fa-filter"></i> {{ button_filter }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-list"></i>{{ text_list }}</h3>
+          </div>
+          <div class="panel-body">
+            <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-action-log">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <td style="width: 1px;" class="text-center">ID
+                    </td>
+                    <td class="text-left">{{ column_user }}</td>
+                    <td class="text-left">{{ column_table }}</td>
+                    <td class="text-left">{{ column_method }}</td>
+                    <td class="text-left">{{ column_sql }}</td>
+                    <td class="text-left">{{ column_request_key }}</td>
+                    <td class="text-left">{{ column_date_added }}</td>
+                    <td class="text-right">{{ column_action }}</td>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% if action_logs %}
+                    {% for item in action_logs %}
+                      <tr>
+                        <td class="text-center">{{ item.id }}</td>
+                        <td class="text-left">
+                          <a href="{{ item.user_link }}" target="_blank">{{ item.user }}</a>
+                        </td>
+                        <td class="text-left">{{ item.table }}</td>
+                        <td class="text-left">{{ item.action }}</td>
+                        <td class="text-left">{{ item.sql }}</td>
+                        <td class="text-left">{{ item.request_key }}</td>
+                        <td class="text-left">{{ item.date_added }}</td>
+                        <td class="text-right">
+                          <a href="{{ item.edit }}" data-toggle="tooltip" title="{{ button_edit }}"
+                             class="btn btn-primary"><i class="fa fa-search"></i></a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                    </tr>
+                  {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </form>
+            <div class="row">
+              <div class="col-sm-6 text-left">{{ pagination }}</div>
+              <div class="col-sm-6 text-right">{{ results }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+  $('#button-filter').on('click', function () {
+    var url = '';
+
+    var filter_user = $('input[name=\'filter_user\']').val();
+    if (filter_user) {
+      url += '&filter_user=' + encodeURIComponent(filter_user);
+    }
+
+    var filter_action = $('select[name=\'filter_action\']').val();
+    if (filter_action) {
+      url += '&filter_action=' + encodeURIComponent(filter_action);
+    }
+
+    var filter_ip = $('input[name=\'filter_ip\']').val();
+    if (filter_ip) {
+      url += '&filter_ip=' + encodeURIComponent(filter_ip);
+    }
+
+    var filter_quantity = $('input[name=\'filter_quantity\']').val();
+    if (filter_quantity) {
+      url += '&filter_quantity=' + encodeURIComponent(filter_quantity);
+    }
+
+    var filter_date_added = $('input[name=\'filter_date_added\']').val();
+    if (filter_date_added !== '') {
+      url += '&filter_date_added=' + encodeURIComponent(filter_date_added);
+    }
+
+    var filter_table = $('input[name=\'filter_table\']').val();
+    if (filter_table !== '') {
+      url += '&filter_table=' + encodeURIComponent(filter_table);
+    }
+
+    var filter_sql = $('input[name=\'filter_sql\']').val();
+    if (filter_sql !== '') {
+      url += '&filter_sql=' + encodeURIComponent(filter_sql);
+    }
+
+    location = 'index.php?route=tool/action_log&user_token={{ user_token }}' + url;
+  });
+
+  $('.date').datetimepicker({
+    language: '{{ datepicker }}',
+    pickTime: false
+  });
+
+  $('input[name=\'filter_user\']').autocomplete({
+    'source': function (request, response) {
+      $.ajax({
+        url: 'index.php?route=user/user/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+        dataType: 'json',
+        success: function (json) {
+          response($.map(json, function (item) {
+            return {
+              label: item['fullname'],
+              value: item['user_id']
+            }
+          }));
+        }
+      });
+    },
+    'select': function (item) {
+      $('input[name=\'filter_user\']').val(item['label']);
+    }
+  });
+  //--></script>
+{{ footer }}

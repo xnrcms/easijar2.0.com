@@ -1,0 +1,614 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-flex" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    {% if success %}
+      <div class="alert alert-success"><i class="fa fa-exclamation-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ text_shipping_address }} <a href="{{ express }}" class="alert-link">{{ text_express }}</a>！</div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-shipping" class="form-horizontal">
+          <div class="row">
+            <div class="col-sm-3">
+              <ul id="method-list" class="nav nav-pills nav-stacked">
+                <li id="general-li" class="active"><a href="#tab-general" class="global" data-toggle="tab">{{ tab_general }}</a></li>
+                {% set info_index = 0 %}
+                {% if shipping_flex_info %}
+                  {% for key, info_item in shipping_flex_info %}
+                    <li id="shipping-li-{{ info_index }}" {% if error_display[key] %} class="warning" {% endif %}>
+                      <a class="tab{{ info_index }}" href="#shipping-{{ info_index }}" data-toggle="tab">
+                        {% if info_item.display %}
+                          {{ info_item.display }}
+                        {% else %}
+                          Untitled Method {{ info_index }}
+                        {% endif %}
+                      </a>
+                    </li>
+                    {% set info_index = info_index + 1 %}
+                  {% endfor %}
+                {% endif %}
+              </ul>
+              <button class="btn btn-success add-new" data-toggle="tooltip" type="button" data-placement="bottom">
+                <i class="fa fa-plus"></i> {{ text_add }}
+              </button>
+            </div>
+            <div class="col-sm-9">
+              <div id="shipping-container" class="tab-content">
+                <div class="tab-pane global-tab-content active" id="tab-general">
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="global-general">
+                      <div class="form-group required">
+                        <label class="col-sm-2 control-label" for="input-cost"><span data-toggle="tooltip"
+                                                                                      title="{{ help_cost }}">{{ entry_cost }}</span></label>
+                        <div class="col-sm-10">
+                          <input type="text" name="shipping_flex_cost" value="{{ shipping_flex_cost }}"
+                                 placeholder="{{ entry_total }}" id="input-cost" class="form-control"/>
+                          {% if error_cost %}
+                            <div class="text-danger">{{ error_cost }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label"
+                               for="input-tax-class">{{ entry_tax_class }}</label>
+                        <div class="col-sm-10">
+                          <select name="shipping_flex_tax_class_id" id="input-tax-class" class="form-control">
+                            <option value="0">{{ text_select }}</option>
+                            {% for tax_class in tax_classes %}
+                              <option value="{{ tax_class.tax_class_id }}" {% if tax_class.tax_class_id == shipping_flex_tax_class_id %}selected="selected"{% endif %}>{{ tax_class.title }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-free">{{ entry_free }}</label>
+                        <div class="col-sm-10">
+                          <select name="shipping_flex_free" id="input-free" class="form-control">
+                            <option value="">{{ text_select }}</option>
+                            {% if geo_zones %}
+                              {% for geo_zone in geo_zones %}
+                                <option value="{{ geo_zone.geo_zone_id }}" {% if shipping_flex_free == geo_zone.geo_zone_id %}selected{% endif %}>{{ geo_zone.name }}</option>
+                              {% endfor %}
+                            {% endif %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label"
+                               for="input-sort-order">{{ entry_sort_order }}</label>
+                        <div class="col-sm-10">
+                          <input type="text" name="shipping_flex_sort_order" value="{{ shipping_flex_sort_order }}"
+                                 placeholder="{{ entry_sort_order }}" id="input-sort-order"
+                                 class="form-control"/>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                        <div class="col-sm-10">
+                          <select name="shipping_flex_status" id="input-status" class="form-control">
+                            {% if shipping_flex_status %}
+                              <option value="1" selected="selected">{{ text_enabled }}</option>
+                              <option value="0">{{ text_disabled }}</option>
+                            {% else %}
+                              <option value="1">{{ text_enabled }}</option>
+                              <option value="0" selected="selected">{{ text_disabled }}</option>
+                            {% endif %}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% if shipping_flex_info %}
+                  {% set content_index = 0 %}
+                  {% for key, item in shipping_flex_info %}
+                    <div id="shipping-{{ content_index }}" class="tab-pane shipping">
+                      <div class="tab-content">
+                        <div class="form-group display-name-row required">
+                          <label class="col-sm-2 control-label" for="input-shipping-name">
+                            <span data-toggle="tooltip" title="" data-original-title="{{ help_shipping_display }}">{{ entry_shipping_display }}</span>
+                          </label>
+                          <div class="col-sm-10">
+                            <input style="width:250px" name="shipping_flex_info[{{ key }}][display]"
+                                   value="{{ item.display }}" class="form-control display-name"
+                                   id="input-display{{ content_index }}" type="text">
+                            <div class="action-btn">
+                              <button class="btn btn-danger btn-delete" tid="{{ content_index }}"
+                                      data-toggle="tooltip" type="button"
+                                      data-original-title="{{ btn_method_delete }}">
+                                <i class="fa fa-trash-o"></i>
+                              </button>
+                            </div>
+                            {% if error_display[key] %}
+                              <div class="text-danger">{{ error_display[key] }}</div>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-geo-zone">
+                            <a href="{{ geo_zone_list_link }}" target="_blank">{{ entry_geo_zone }}</a>
+                          </label>
+                          <div class="col-sm-7">
+                            <select name="shipping_flex_info[{{ key }}][geo_zone_id]"
+                                    id="input-geo-zone-{{ content_index }}" class="form-control">
+                              <option value="0">{{ text_all_zones }}</option>
+                              {% for geo_zone in geo_zones %}
+                                <option value="{{ geo_zone.geo_zone_id }}" {% if item.geo_zone_id == geo_zone.geo_zone_id %}selected="selected"{% endif %}>{{ geo_zone.name }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          <div class="col-sm-3 pull-right">
+                            <a class="btn btn-success col-sm-12" href="{{ add_geo_zone_link }}" target="_blank">
+                              {{ entry_add_geo_zone }}
+                            </a>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-rate">
+                            <a href="{{ express_list_link }}" target="_blank">{{ entry_express }}</a>
+                          </label>
+                          <div class="col-sm-7">
+                            <select name="shipping_flex_info[{{ key }}][express_id]" id="input-express-{{ key }}" class="form-control">
+                              {% for express in expresses %}
+                                <option value="{{ express.express_id }}" {% if item.express_id == express.express_id %}selected="selected"{% endif %}>{{ express.title }}</option>
+                              {% endfor %}
+                            </select>
+                            {% if error_express[key] %}
+                              <div class="text-danger">{{ error_express.key }}</div>
+                            {% endif %}
+                          </div>
+                          <div class="col-sm-3 pull-right">
+                            <a class="btn btn-success col-sm-12" href="{{ add_express_link }}" target="_blank">
+                              {{ entry_add_express }}
+                            </a>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-delivery-time-{{ content_index }}">{{ text_delivery_time }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="shipping_flex_info[{{ key }}][delivery_time]" value="{{ item.delivery_time }}" placeholder="{{ text_delivery_time }}" id="input-delivery-time-{{ key }}" class="form-control">
+                          </div>
+                        </div>
+                        <div class="form-group"  row_id="{{ key }}">
+                          <label class="col-sm-2 control-label" for="input-rate">
+                            {{ entry_weight_type }}
+                          </label>
+                          <div class="col-sm-10">
+                            <label class="radio-inline">
+                              <input type="radio" class="calculate_type" name="shipping_flex_info[{{ key }}][calculate_type]" value="0" {% if item.calculate_type == false %}checked="checked"{% endif %}>
+                              {{ text_by_weight }}
+                            </label>
+                            <label class="radio-inline">
+                              <input type="radio" class="calculate_type" name="shipping_flex_info[{{ key }}][calculate_type]" value="1" {% if item.calculate_type == 1 %}checked="checked"{% endif %}>
+                              {{ text_by_volume }}
+                            </label>
+                            <label class="radio-inline">
+                              <input type="radio" class="calculate_type" name="shipping_flex_info[{{ key }}][calculate_type]" value="2" {% if item.calculate_type == 2 %}checked="checked"{% endif %}>
+                              {{ text_by_heavier }}
+                            </label>
+                          </div>
+                        </div>
+                        <div class="form-group"  row_id="{{ key }}">
+                          <label class="col-sm-2 control-label" for="input-rate">
+                            {{ entry_fee_type }}
+                          </label>
+                          <div class="col-sm-10">
+                            <label class="radio-inline">
+                              <input type="radio" class="fee_type" name="shipping_flex_info[{{ key }}][weight_type]" value="0" {% if item.weight_type == false %}checked="checked"{% endif %}>
+                              {{ text_weight_price }}
+                            </label>
+                            <label class="radio-inline">
+                              <input type="radio" class="fee_type" name="shipping_flex_info[{{ key }}][weight_type]" value="1" {% if item.weight_type %}checked="checked"{% endif %}>
+                              {{ text_top_added }}
+                            </label>
+                          </div>
+                        </div>
+                        {% if error_rate[key] %}
+                        <div id="weight-rate-{{ key }}" class="form-group">
+                        {% else %}
+                        <div id="weight-rate-{{ key }}" class="form-group {% if item.weight_type %}hidden{% endif %}">
+                        {% endif %}
+                        <?php if (isset($error_rate[$key])) : ?>
+                        <label class="col-sm-2 control-label" for="input-rate-{{ content_index }}">
+                          <span data-toggle="tooltip" title=""
+                            data-original-title="{{ help_rate }}">{{ entry_rate }}
+                          </span>
+                        </label>
+                        <div class="col-sm-10">
+                          <textarea name="shipping_flex_info[{{ key }}][rate]" rows="5"
+                                placeholder="{{ entry_rate }}" id="input-rate' + current_tab + '"
+                                class="form-control">{{ item.rate }}</textarea>
+                            {% if error_rate[key] %}
+                              <div class="text-danger">{{ error_rate[key] }}</div>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div id="additional-rate-{{ key }}" class="form-group {% if item.weight_type == false %}hidden{% endif %}">
+                          <label class="col-sm-2 control-label" for="input-rate-{{ content_index }}">{{ entry_rate }}</label>
+                          <div class="col-sm-10">
+                            <div class="col-sm-12">
+                              <label class="control-label" style="display: inline-block;">{{ text_initial_weight }}</label>
+                              <input type="text" name="shipping_flex_info[{{ key }}][top_weight]" value="{{ item.top_weight }}" placeholder="{{ text_initial_weight_placeholder }}" id="input-initial-weight-{{ content_index }}" class="form-control number-input top-weight">
+                              <label class="control-label" style="display: inline-block;">{{ text_initial_fee }}</label>
+                              <input type="text" name="shipping_flex_info[{{ key }}][top_price]" value="{{ item.top_price }}" placeholder="{{ text_initial_fee_format }}" id="input-initial-fee-{{ content_index }}" class="form-control number-input top-price">
+                              <button content-index-id="{{ content_index }}" class="btn btn-success shipping-add-new" data-toggle="tooltip" type="button" data-placement="bottom"
+                                      data-original-title="{{ text_add_new_shipping }}" style="float: right; margin-right: 9px;">
+                                <i class="fa fa-plus"></i>
+                              </button>
+                            </div>
+                            <div class="col-sm-12 shipping-price-unit">
+                              {% if item.top_prices %}
+                                {% for price_key, top_price in item.top_prices %}
+                                  <div class="row per-shipping" price-key="{{ price_key }}">
+                                    <div class="col-sm-5">
+                                      <label class="control-label" style="display: inline-block;">{{ text_additional_scope }}</label>
+                                      <input type="text" name="shipping_flex_info[{{ key }}][top_prices][{{ price_key }}][unit_weight_min]" value="{{ item.top_prices[price_key].unit_weight_min }}" placeholder="{{ text_initial_fee_placeholder }}" class="form-control number-input unit-weight-min" readonly>
+                                      <?php echo $item['top_prices'][$price_key]['unit_weight_max'];?>
+                                      <label class="control-label" style="display: inline-block;">&nbsp;~&nbsp;</label>
+                                      <input type="text" name="shipping_flex_info[{{ key }}][top_prices][{{ price_key }}][unit_weight_max]" value="{{ item.top_prices[price_key].unit_weight_max }}" placeholder="{{ text_initial_weight_placeholder }}"
+                                             class="form-control number-input unit-weight-max">
+                                    </div>
+                                    <div class="col-sm-6">
+                                      <label class="control-label" style="display: inline-block;">{{ text_additional_rate }}</label>
+                                      <input type="text" name="shipping_flex_info[{{ key }}][top_prices][{{ price_key }}][unit_per_weight]"
+                                             value="{{ item.top_prices[price_key].unit_per_weight }}" placeholder="{{ text_initial_weight_placeholder }}"
+                                             class="form-control number-input unit-per-weight">
+                                      <label class="control-label" style="display: inline-block;">{{ text_additional_rate_unit }}</label>
+                                      <input type="text" name="shipping_flex_info[{{ key }}][top_prices][{{ price_key }}][unit_per_price]"
+                                             value="{{ item.top_prices[price_key].unit_per_price }}" placeholder="{{ text_initial_fee_format }}"
+                                             class="form-control number-input unit-per-price">
+                                    </div>
+                                    <div class="col-sm-1">
+                                      <div class="shipping-action-btn">
+                                        <button class="btn btn-danger btn-shipping-delete" data-toggle="tooltip" type="button" data-original-title="{{ btn_shipping_delete }}">
+                                          <i class="fa fa-trash-o"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                {% endfor %}
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% set content_index = content_index + 1 %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var current_tab = {{ shipping_count }};
+  var num_preg = /^([1-9]+\.?\d*|0\.\d*[1-9]+|[1-9]+\.\d*)$/i;
+  $(document).on('click', '.add-new', function () {
+    $('#shipping-container').find('#tab-general').removeClass('active');
+    $('#shipping-container').find('.shipping').removeClass('active');
+    $('#method-list').find('li').removeClass('active');
+    var method_html = '';
+    method_html += '<div id="shipping-' + current_tab + '" class="tab-pane shipping active">';
+    method_html += '    <div class="tab-content">';
+    method_html += '        <div class="form-group display-name-row">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-shipping-name">';
+    method_html += '                <span data-toggle="tooltip" title="" data-original-title="{{ help_shipping_display }}">{{ entry_shipping_display }}</span>';
+    method_html += '            </label>';
+    method_html += '            <div class="col-sm-10">';
+    method_html += '                <input style="width:250px" name="shipping_flex_info[' + current_tab + '][display]" value="" class="form-control display-name" id="input-display' + current_tab + '" type="text">';
+    method_html += '                <div class="action-btn">';
+    method_html += '                    <button class="btn btn-danger btn-delete" tid="' + current_tab + '" data-toggle="tooltip" type="button" data-original-title="<?php echo $btn_method_delete;?>">';
+    method_html += '                        <i class="fa fa-trash-o"></i>';
+    method_html += '                    </button>';
+    method_html += '                </div>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-geo-zone"><a href="{{ geo_zone_list_link }}" target="_blank">{{ entry_geo_zone }}</a></label>';
+    method_html += '            <div class="col-sm-7">';
+    method_html += '                <select name="shipping_flex_info[' + current_tab + '][geo_zone_id]" id="input-geo-zone-' + current_tab + '" class="form-control">';
+    method_html += '                    <option value="0">{{ text_all_zones }}</option>';
+    {% for zone in geo_zones %}
+    method_html += '                    <option value="{{ zone.geo_zone_id }}">{{ zone.name }}</option>';
+    {% endfor %}
+    method_html += '                </select>';
+    method_html += '            </div>';
+    method_html += '            <div class="col-sm-3 pull-right">';
+    method_html += '              <a class="btn btn-success col-sm-12" href="{{ add_geo_zone_link }}" target="_blank">{{ entry_add_geo_zone }}</a>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-rate">';
+    method_html += '                <a href="{{ express_list_link }}" target="_blank">{{ entry_express }}</a>';
+    method_html += '            </label>';
+    method_html += '            <div class="col-sm-7">';
+    method_html += '                <select name="shipping_flex_info[' + current_tab + '][express_id]" id="input-express-' + current_tab + '" class="form-control">';
+    {% for express in expresses %}
+    method_html += '                    <option value="{{ express.express_id }}">{{ express.title }}</option>';
+    {% endfor %}
+    method_html += '                </select>';
+    method_html += '            </div>';
+    method_html += '            <div class="col-sm-3 pull-right">';
+    method_html += '              <a class="btn btn-success col-sm-12" href="{{ add_express_link }}" target="_blank">{{ entry_add_express }}</a>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-delivery-time-' + current_tab + '">{{ text_delivery_time }}</label>';
+    method_html += '            <div class="col-sm-10"><input type="text" name="shipping_flex_info[' + current_tab + '][delivery_time]" value="" placeholder="{{ text_delivery_time }}" id="input-delivery-time-' + current_tab + '" class="form-control"></div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group"  row_id="' + current_tab + '">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-rate">{{ entry_weight_type }}</label>';
+    method_html += '            <div class="col-sm-10">';
+    method_html += '                <label class="radio-inline">';
+    method_html += '                    <input type="radio" class="calculate_type" name="shipping_flex_info[' + current_tab + '][calculate_type]" value="0" checked> {{ text_by_weight }}';
+    method_html += '                </label>';
+    method_html += '                <label class="radio-inline">';
+    method_html += '                    <input type="radio" class="calculate_type" name="shipping_flex_info[' + current_tab + '][calculate_type]" value="1" checked> {{ text_by_volume }}';
+    method_html += '                </label>';
+    method_html += '                <label class="radio-inline">';
+    method_html += '                    <input type="radio" class="calculate_type" name="shipping_flex_info[' + current_tab + '][calculate_type]" value="2"> {{ text_by_heavier }}';
+    method_html += '                </label>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group"  row_id="' + current_tab + '">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-rate">{{ entry_fee_type }}</label>';
+    method_html += '            <div class="col-sm-10">';
+    method_html += '                <label class="radio-inline">';
+    method_html += '                    <input type="radio" class="fee_type" name="shipping_flex_info[' + current_tab + '][weight_type]" value="0" checked>{{ text_weight_price }}';
+    method_html += '                </label>';
+    method_html += '                <label class="radio-inline">';
+    method_html += '                    <input type="radio" class="fee_type" name="shipping_flex_info[' + current_tab + '][weight_type]" value="1">{{ text_top_added }}';
+    method_html += '                </label>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div id="additional-rate-' + current_tab + '" class="form-group hidden">';
+    method_html += '            <label class="col-sm-2 control-label">{{ entry_rate }}</label>';
+    method_html += '            <div class="col-sm-10">';
+    method_html += '                <div class="col-sm-12">';
+    method_html += '                    <label class="control-label" style="display: inline-block;">{{ text_initial_weight }}</label>';
+    method_html += '                    <input type="text" name="shipping_flex_info[' + current_tab + '][top_weight]" value="" placeholder="{{ text_initial_weight }}" class="form-control number-input top-weight">';
+    method_html += '                    <label class="control-label" style="display: inline-block;">{{ text_initial_fee }}</label>';
+    method_html += '                    <input type="text" name="shipping_flex_info[' + current_tab + '][top_price]" value="" placeholder="{{ text_initial_fee_placeholder }}" class="form-control number-input top-price">';
+    method_html += '                    <button content-index-id="' + current_tab + '" class="btn btn-success shipping-add-new" data-toggle="tooltip" type="button" data-placement="bottom" data-original-title="{{ text_add_new_shipping }}" style="float: right; margin-right: 9px;"><i class="fa fa-plus"></i></button>';
+    method_html += '                </div>';
+    method_html += '                <div class="col-sm-12 shipping-price-unit">';
+    method_html += '                </div>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group" id="weight-rate-' + current_tab + '">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-rate' + current_tab + '">';
+    method_html += '                <span data-toggle="tooltip" title="" data-original-title="{{ help_rate }}">{{ entry_rate }}</span>';
+    method_html += '            </label>';
+    method_html += '            <div class="col-sm-10">';
+    method_html += '                <textarea name="shipping_flex_info[' + current_tab + '][rate]" rows="5" placeholder="{{ entry_rate }}" id="input-rate' + current_tab + '" class="form-control"></textarea>';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '        <div class="form-group">';
+    method_html += '            <label class="col-sm-2 control-label" for="input-sort-order' + current_tab + '">Sort Order</label>';
+    method_html += '            <div class="col-sm-10">';
+    method_html += '                <input type="text" name="shipping_flex_info[' + current_tab + '][sort_order]" value="" placeholder="Sort Order" id="input-sort-order' + current_tab + '" class="form-control">';
+    method_html += '            </div>';
+    method_html += '        </div>';
+    method_html += '    </div>';
+    method_html += '</div>';
+    $('#shipping-container').append(method_html);
+    $('#method-list').append('<li id="shipping-li-' + current_tab + '" class="active"><a class="tab' + current_tab + '" href="#shipping-' + current_tab + '"  data-toggle="tab">Untitled Method ' + current_tab + '</a></li>');
+    $("[data-toggle='tooltip']").tooltip();
+    current_tab++;
+  });
+
+  $(document).on('click', '.btn-shipping-delete', function(){
+    if(confirm('确定要删除该条记录吗？')){
+      var shipping_item = $(this).parent('div').parent('div').parent('div');
+      if(typeof(shipping_item.next('.per-shipping').html()) != 'undefined' && shipping_item.next('.per-shipping').html()){
+        var max_price = shipping_item.find('.unit-weight-max').val();
+        if(typeof(shipping_item.prev('.per-shipping').html()) != 'undefined' && shipping_item.prev('.per-shipping').html()){
+          shipping_item.prev('.per-shipping').find('.unit-weight-max').val(max_price);
+        }else{
+          $('.top-weight').val(max_price);
+        }
+      }
+      $(this).parent('div').parent('div').parent('div').remove();
+    }
+  });
+
+  $(document).on('click', '.shipping-add-new', function(){
+    var $this = $(this);
+    var content_index_id = $this.attr('content-index-id');
+    var top_weight = $this.parent('div').find('.top-weight').val();
+    var top_price = $this.parent('div').find('.top-price').val();
+    var shipping_price_unit = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping').length;
+    var price_key;
+    if(!parseInt(shipping_price_unit)){
+      price_key = 0;
+    }else{
+      price_key = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping:last-child').attr('price-key');
+      top_weight = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping:last-child').find('.unit-weight-max').val();
+      var weight_min = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping:last-child').find('.unit-weight-min').val();
+      var weight_max = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping:last-child').find('.unit-weight-max').val();
+      if(parseFloat(weight_min) >= parseFloat(weight_max)){
+        alert('重量范围最大值不能低于最小值');
+        return false;
+      }
+      if(!parseFloat(weight_min) || !parseFloat(weight_max)){
+        alert('重量范围最大值或最小值输入错误');
+        return false;
+      }
+      var unit_per_weight = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping:last-child').find('.unit-per-weight').val();
+      var unit_per_price = $this.parent('div').parent('div').find('.shipping-price-unit').find('.per-shipping:last-child').find('.unit-per-price').val();
+      console.log(num_preg.test(unit_per_weight));
+      console.log(num_preg.test(unit_per_price));
+      console.log(unit_per_price);
+      console.log(unit_per_weight);
+      if(!parseFloat(unit_per_weight) || !parseFloat(unit_per_price)){
+        alert('增量重量或重量费用设置错误');
+        console.log('no');
+        return false;
+      }
+    }
+    price_key = parseInt(price_key) + 1;
+    if(!parseFloat(top_weight) || !parseFloat(top_price)){
+      alert('{{ error_empty_top }}');
+      return false;
+    }
+    var shipping_html = '<div class="row per-shipping" price-key="' + price_key + '">';
+    shipping_html     +=    '<div class="col-sm-5">';
+    shipping_html     +=        '<label class="control-label" style="display: inline-block;">{{ text_additional_scope }}</label>';
+    shipping_html     +=        '&nbsp;<input type="text" name="shipping_flex_info[' + content_index_id + '][top_prices][' + price_key + '][unit_weight_min]" value="' + top_weight + '" placeholder="{{ text_initial_fee_placeholder }}" class="form-control number-input unit-weight-min" readonly>&nbsp;';
+    shipping_html     +=        '<label class="control-label" style="display: inline-block;">&nbsp;~&nbsp;</label>';
+    shipping_html     +=        '&nbsp;<input type="text" name="shipping_flex_info[' + content_index_id + '][top_prices][' + price_key + '][unit_weight_max]" value="" placeholder="{{ text_initial_weight_placeholder }}" class="form-control number-input unit-weight-max">';
+    shipping_html     +=    '</div>';
+    shipping_html     +=    '<div class="col-sm-6">';
+    shipping_html     +=        '<label class="control-label" style="display: inline-block;">{{ text_additional_rate }}</label>&nbsp;';
+    shipping_html     +=        '<input type="text" name="shipping_flex_info[' + content_index_id + '][top_prices][' + price_key + '][unit_per_weight]" value="" placeholder="{{ text_initial_weight_placeholder }}" class="form-control number-input unit-per-weight">&nbsp;';
+    shipping_html     +=        '<label class="control-label unit-title" style="display: inline-block;">{{ text_additional_rate_unit }}</label>';
+    shipping_html     +=        '&nbsp;<input type="text" name="shipping_flex_info[' + content_index_id + '][top_prices][' + price_key + '][unit_per_price]" value="" placeholder="{{ text_initial_fee_format }}" class="form-control number-input unit-per-price">';
+    shipping_html     +=    '</div>';
+    shipping_html     +=    '<div class="col-sm-1">';
+    shipping_html     +=        '<div class="shipping-action-btn"><button class="btn btn-danger btn-shipping-delete" data-toggle="tooltip" type="button" data-original-title="<?php echo $btn_shipping_delete;?>"><i class="fa fa-trash-o"></i></button></div>';
+    shipping_html     +=    '</div>';
+    shipping_html     += '</div>';
+    $this.parent('div').parent('div').find('.shipping-price-unit').append(shipping_html);
+  });
+
+  $("#shipping-container").on('keyup','input.display-name', function() {
+    var current_function_row = $(this).parent('div').parent('div').parent('div').parent('div').attr('id');
+    current_function_row = current_function_row.replace('shipping-', '');
+    var method_name=$(this).val();
+    if(method_name=='') method_name='Untitled Method ' + (parseInt(current_function_row) + 1);
+    $('a.tab' + current_function_row).html(method_name);
+  });
+
+  $(document).on('click', '.btn-delete', function(){
+    $('#shipping-li-' + $(this).attr('tid')).remove();
+    $('#shipping-container').find('#shipping-' + $(this).attr('tid')).remove();
+    if(!$('#tab-general').hasClass('active')){
+      $('#tab-general').addClass('active');
+    }
+    if(!$('#general-li').hasClass('.active')){
+      $('#general-li').addClass('active');
+    }
+  });
+
+  $(document).on('change', '.fee_type', function(){
+    var fee_type_val = $(this).parent('label').parent('div').find('.fee_type:checked').val();
+    var row_id = $(this).parent('label').parent('div').parent('div').attr('row_id');
+    console.log(fee_type_val);
+    if(!parseInt(fee_type_val)){
+      $('#weight-rate-' + row_id).prop('class', 'form-group');
+      $('#additional-rate-' + row_id).prop('class', 'form-group hidden');
+    }else{
+      $('#weight-rate-' + row_id).prop('class', 'form-group hidden');
+      $('#additional-rate-' + row_id).prop('class', 'form-group');
+    }
+  });
+
+</script>
+<style type="text/css">
+  #method-list > li.active a.global {
+    background-color: #ff5722;
+  }
+
+  #shipping-container {
+    border: 1px solid #ddd;
+    padding: 0 15px 15px;
+  }
+
+  .global-tab-content {
+    margin-top: 15px;
+  }
+
+  .global-heading {
+    border-bottom: 1px solid #efefef;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+  }
+
+  button.add-new {
+    margin-top: 10px;
+  }
+
+  #method-list > li > a {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-top: 1px solid #ddd;
+    margin-bottom: 2px;
+  }
+
+  #method-list > li > a.global {
+    background-color: #c7c7c7;
+    color: #555;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  #method-list > li.active > a, #method-list > li > a:hover {
+    background-color: #1e91cf;
+    color: #fff;
+  }
+
+  div.shipping {
+    position: relative;
+  }
+
+  .display-name-row {
+    background: #f7f7f7 none repeat scroll 0 0;
+    border-bottom: 1px solid #d7d7d7;
+    margin-bottom: 11px;
+  }
+
+  .action-btn,  .shipping-action-btn{
+    position: absolute;
+    right: 23px;
+    top: 0;
+  }
+  .number-input{
+    max-width: 75px;
+    display: inline-block;
+  }
+  .per-shipping{
+    margin-top: 15px;
+  }
+  .title-label{
+    margin-right: 10px;
+  }
+  .unit-title{
+    /*margin-left: 20px;*/
+  }
+  #method-list li.warning a {
+    border-color: red;
+    color: red;
+  }
+</style>
+{{ footer }}

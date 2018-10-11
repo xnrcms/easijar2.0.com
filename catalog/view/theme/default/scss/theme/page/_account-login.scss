@@ -1,0 +1,138 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2017-12-08 15:07:18
+// @modified         2018-02-07 14:45:08
+//
+
+body.account-login {
+  #input-pre-telephone {
+    height: 48px;
+  }
+  .login-bg-wrapper {
+    margin: 0 0 -20px;
+    width: 100%;
+    background-color: #fff;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    @media (min-width: 992px) {
+      min-height: 600px;
+    }
+
+    .alert {
+      margin-top: $gutter;
+    }
+
+    .login-wrapper {
+      @media (min-width: 768px) {
+        width: 420px;
+      }
+      padding: 30px 30px;
+      margin: 78px auto;
+      background-color: #fff;
+      margin-right: 0;
+      -webkit-box-shadow: 0 1px 14px 0 rgba(0,0,0,.2);
+      box-shadow: 0 1px 14px 0 rgba(0,0,0,.2);
+      border: none;
+      border-radius: 2px;
+
+      @media (max-width: 768px) {
+        margin: 30px auto;
+        padding: 10px;
+      }
+
+      h2 {
+        text-align: center;
+        padding-bottom: 16px;
+        font-size: 24px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid #eee;
+      }
+
+      label {
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      input {
+        height: 48px;
+        @media (max-width: 768px) {
+          height: 40px;
+        }
+      }
+
+      .register-box {
+        overflow: hidden;
+      }
+
+      input[type='submit'] {
+        width: 100%;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.omni-auth-wrapper {
+  margin-top: 24px;
+  p {
+    color: #7d8092;
+    position: relative;
+    text-align: center;
+    margin-bottom: 10px;
+
+    span {
+      background-color: #fff;
+      position: relative;
+      padding: 0 10px;
+    }
+
+    &:before {
+      background-image: linear-gradient(to right, #ffffff 0%, #7b8090 53%, #ffffff 100%);
+      content: "";
+      height: 1px;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 100%;
+    }
+  }
+
+  .icons {
+    text-align: center;
+
+    a {
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      text-align: center;
+      display: inline-block;
+      border-radius: 50%;
+      background-color: #a7afb9;
+      margin: 0 12px;
+      color: #fff;
+      &:hover {
+        background-color: $brand-primary;
+      }
+
+      i {
+        font-size: 17px;
+      }
+    }
+  }
+}
+
+.account-register .omni-auth-wrapper {
+  .icons {
+    text-align: left;
+
+    a {
+      margin: 0 12px 0 0;
+    }
+  }
+}

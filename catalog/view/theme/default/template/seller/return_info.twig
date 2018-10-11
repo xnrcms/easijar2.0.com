@@ -1,0 +1,257 @@
+{% extends helper.template("seller/_partial/layout") %}
+
+{% block content %}
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+  {% endif %}
+  <div id="content" class="col-sm-12">
+    <div class="content-wrapper">
+      <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-eye"></i> {{ text_return }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+          <li><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="tab-general">
+            <fieldset>
+              <legend>{{ text_order }}</legend>
+              <div class="row">
+                <label class="col-sm-2 text-right">{{ entry_order_id }}</label>
+                <div class="col-sm-10">{{ order_id }}</div>
+              </div>
+              <div class="row">
+                <label class="col-sm-2 text-right">{{ entry_date_ordered }}</label>
+                <div class="col-sm-10">{{ date_ordered }}</div>
+              </div>
+              <div class="row">
+                <label class="col-sm-2 text-right">{{ entry_customer }}</label>
+                <div class="col-sm-10">{{ customer }}</div>
+              </div>
+              <div class="row">
+                <label class="col-sm-2 text-right">{{ entry_fullname }}</label>
+                <div class="col-sm-10">{{ fullname }}</div>
+              </div>
+              <div class="row">
+                <label class="col-sm-2 text-right">{{ entry_email }}</label>
+                <div class="col-sm-10">{{ email }}</div>
+              </div>
+              <div class="row">
+                <label class="col-sm-2 text-right">{{ entry_telephone }}</label>
+                <div class="col-sm-10">{{ telephone }}</div>
+              </div>
+            </fieldset>
+            <fieldset>
+                <legend>{{ text_product_info }}</legend>
+                <div class="row">
+                  <label class="col-sm-2 text-right"><span data-toggle="tooltip" title="{{ help_product }}">{{ entry_product }}</span></label>
+                  <div class="col-sm-10">{{ product }}</div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_model }}</label>
+                  <div class="col-sm-10">{{ model }}</div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_quantity }}</label>
+                  <div class="col-sm-10">{{ quantity }}</div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_return_reason }}</label>
+                  <div class="col-sm-10">
+                    {% for return_reason in return_reasons %}
+                      {% if return_reason.return_reason_id == return_reason_id %}
+                        {{ return_reason.name }}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_opened }}</label>
+                  <div class="col-sm-10">
+                    {% if opened %}
+                      {{ text_opened }}
+                    {% else %}
+                      {{ text_unopened }}
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_comment }}</label>
+                  <div class="col-sm-10">{{ comment }}</div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_return_action }}</label>
+                  <div class="col-sm-10">
+                      {% for return_action in return_actions %}
+                        {% if return_action.return_action_id == return_action_id %}
+                          {{ return_action.name }}
+                        {% endif %}
+                      {% endfor %}
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-2 text-right">{{ entry_return_status }}</label>
+                  <div class="col-sm-10">
+                      {% for return_status in return_statuses %}
+                        {% if return_status.return_status_id == return_status_id %}
+                          {{ return_status.name }}
+                        {% endif %}
+                      {% endfor %}
+                  </div>
+                </div>
+              </fieldset>
+          </div>
+          <div class="tab-pane" id="tab-history">
+              <fieldset>
+                <legend>{{ text_history }}</legend>
+                <div id="history"></div>
+              </fieldset>
+              <br/>
+              <fieldset>
+                <legend>{{ text_history_add }}</legend>
+                <form class="form-horizontal">
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-return-status">{{ entry_return_status }}</label>
+                    <div class="col-sm-10">
+                      <select name="return_status_id" id="input-return-status" class="form-control">
+                        {% for return_status in return_statuses %}
+                          {% if return_status.return_status_id == return_status_id %}
+                            <option value="{{ return_status.return_status_id }}" selected="selected">{{ return_status.name }}</option>
+                          {% else %}
+                            <option value="{{ return_status.return_status_id }}">{{ return_status.name }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group hidden">
+                    <label class="col-sm-2 control-label" for="input-notify">{{ entry_notify }}</label>
+                    <div class="col-sm-10">
+                      <input type="checkbox" name="notify" value="1" id="input-notify"/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-history-comment">{{ entry_comment }}</label>
+                    <div class="col-sm-10">
+                      <textarea name="comment" rows="8" id="input-history-comment" class="form-control"></textarea>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <button id="button-history" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+                  </div>
+                </form>
+              </fieldset>
+            </div>
+        </div>
+      </div>
+    </div>
+      <div class="buttons clearfix  mb-1">
+        <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript"><!--
+$('input[name=\'customer\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=customer/customer/autocomplete&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						category: item['customer_group'],
+						label: item['name'],
+						value: item['customer_id'],
+						fullname: item['fullname'],
+						email: item['email'],
+						telephone: item['telephone']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'customer\']').val(item['label']);
+		$('input[name=\'customer_id\']').val(item['value']);
+		$('input[name=\'fullname\']').val(item['fullname']);
+		$('input[name=\'email\']').val(item['email']);
+		$('input[name=\'telephone\']').val(item['telephone']);
+	}
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'product\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id'],
+						model: item['model']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'product\']').val(item['label']);
+		$('input[name=\'product_id\']').val(item['value']);
+		$('input[name=\'model\']').val(item['model']);
+	}
+});
+
+$('#history').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+
+	$('#history').load(this.href);
+});
+
+$('#history').load('index.php?route=seller/return/history&return_id={{ return_id }}');
+
+$('#button-history').on('click', function(e) {
+	e.preventDefault();
+
+	$.ajax({
+		url: 'index.php?route=seller/return/addhistory&return_id={{ return_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: 'return_status_id=' + encodeURIComponent($('#tab-history select[name=\'return_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('#tab-history textarea[name=\'comment\']').val()),
+		beforeSend: function() {
+			$('#button-history').button('loading');
+		},
+		complete: function() {
+			$('#button-history').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#tab-history').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#history').load('index.php?route=seller/return/history&return_id={{ return_id }}');
+
+				$('#tab-history').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+				$('#tab-history textarea[name=\'comment\']').val('');
+			}
+		}
+	});
+});
+//--></script>
+<script type="text/javascript"><!--
+$('.date').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+//--></script>
+{% endblock %}

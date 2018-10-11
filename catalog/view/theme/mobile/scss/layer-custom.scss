@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pushuo <pushuo@opencart.cn>
+// @created          2017-08-24 15:09:17
+// @modified         2018-02-02 15:58:02
+//
+
+.layui-layer {
+	.layui-layer-setwin {
+		cursor: pointer;
+	}
+}
+
+.layer-toast {
+	.layui-m-layercont {
+		a {
+			color: #fff;
+      text-decoration: underline;
+		}
+	}
+}
+
+.layer-toast {
+  //
+}

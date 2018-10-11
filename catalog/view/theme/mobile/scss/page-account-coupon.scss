@@ -1,0 +1,75 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-02-01 10:32:00
+//
+
+.account-coupons {
+	.coupon-wrapper {
+		margin: 10px 0;
+		padding: 0;
+		text-align: center;
+		@include border-radius(7px);
+		@include box-shadow(1px, 1px, 3px, #b5b5b5);
+
+		&.expired {
+			.coupons-name {
+				color: #555 !important;
+
+			}
+			.right-group {
+				position: relative;
+				@include bg-gradient(135deg, #ddd, #999);
+
+				&:before {
+					position: absolute;
+					top: 0;
+					left: 50%;
+					margin-left: -45px;
+					color: #888;
+					font-size: 90px;
+					content: '\e60e';
+					font-family: 'iconfont';
+				}
+			}
+		}
+
+		.left-group {
+			float: left;
+			width: 62%;
+			background: #fff;
+
+			.coupons-name {
+				line-height: 50px;
+				font-size: 18px;
+				height: 50px;
+				overflow: hidden;
+			}
+
+			.coupons-name {
+				color: $main_color;
+			}
+
+			p {
+				line-height: 20px;
+			}
+		}
+
+		.right-group {
+			float: right;
+			width: 100% - 62%;
+			@include bg-gradient(135deg, #fb9678, $main_color);
+			line-height: 100px;
+			color: white;
+			font-size: 25px;
+		}
+	}
+
+	.buttons {
+		margin-top:30px;
+	}
+}

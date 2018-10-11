@@ -1,0 +1,60 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      {% set post_desc = post.localizedDescription() %}
+      <h1>{{ post_desc.name }}</h1>
+      <div class="info">
+        <p><i class="fa fa-calendar-check-o" aria-hidden="true"></i> {{ post.date_added|date(date_format_short) }} {{ author }}</p>
+        <div class="share">
+          {% set share_url = post.href('show') %}
+          {{ include(helper.template('_partial/share')) }}
+        </div>
+      </div>
+      <hr>
+      {% if post_desc.description %}
+      <div class="description small">
+        {{ post_desc.description }}
+      </div>
+      <hr>
+      {% endif %}
+      <div class="post-body">
+        {{ post_desc.html('content') }}
+      </div>
+      <hr>
+      <div class="seo">
+        <ul class="list-unstyled">
+          <li>{{ text_title }}{{ post_desc.name }}</li>
+          <li>{{ text_permalink }}<a href="{{ post.href('show') }}">{{ post.href('show') }}</a></li>
+          {% if post.categories.count() %}
+          <li>{{ text_category }}
+            {% for category in post.categories %}
+            <a href="{{ category.href('show') }}">{{ category.localizedDescription().name }}</a>
+            {% endfor %}
+          </li>
+          <li>{{ text_view_count }}{{ post.viewed|number_format }}</li>
+          {% endif %}
+        </ul>
+      </div>
+    {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+<script>
+  $(document).ready(function() {
+    var post_body_width = $('.post-body').width();
+    $('#content .post-body img').each(function() {
+      if($(this).width() > post_body_width) {
+        $(this).removeClass('img-responsive').addClass('img-responsive');
+      }
+    });
+  })
+</script>
+{{ footer }}

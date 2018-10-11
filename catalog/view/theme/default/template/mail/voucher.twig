@@ -1,0 +1,46 @@
+{% set global_style = "font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #444; line-height: 2em;" %}
+{% set table_style = "border-collapse: collapse; width: 100%; margin: 35px 0;" %}
+{% set thead_td_style = "border: 1px solid #eee; text-align: left; padding: 7px; font-size: 12px; background-color: #f5f5f5; font-weight: bold; color: #222;" %}
+{% set td_style = "border: 1px solid #eee; text-align: left; padding: 7px; font-size: 12px;" %}
+{% set main_color = "#fd7533" %}
+{% set border_color = "#eee" %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{{ title }}</title>
+</head>
+<body style="{{ global_style }}">
+  <div style="width: 600px; margin: 40px auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);">
+    <div style="border-bottom: 1px solid {{ border_color }};">
+      {% if logo is empty %}
+        <a href="{{ store_url }}" style="display: block; padding: 30px 0; padding-left: 25px; text-decoration: none; color: {{ main_color }}; font-size: 20px;">{{ store_name }}</a>
+      {% else %}
+        <a href="{{ store_url }}" style="display:block; padding: 15px 0; text-align: center;"><img src="{{ logo }}" alt="{{ store_name }}" title="{{ store_name }}" style="max-width: 180px !important;" /></a>
+      {% endif %}
+    </div>
+    <div style="padding: 25px;">
+      <p>{{ text_greeting }}</p>
+      <p>{{ text_from }}</p>
+      {% if message %}
+      <table style="{{ table_style }}">
+        <thead>
+          <tr>
+            <td style="{{ thead_td_style }}">{{ text_message }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="{{ td_style }}">{{ message }}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% endif %}
+      <p>{{ text_redeem }}</p>
+      <p><a href="{{ store_url }}" title="{{ store_name }}" style="color: {{ main_color }}">{{ store_url }}</a></p>
+      <p style="color: #999; border-top: 1px solid {{ border_color }}; padding-top: 13px;">{{ text_footer }}</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{% extends helper.template("seller/_partial/layout") %}
+{% block content %}
+    <div id="content" class="col-sm-12">
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+    {% endif %}
+    {% if error_warning %}
+    <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+    {% endif %}
+      <div class="content-wrapper">
+        {% if shipping_costs %}
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+              <td class="text-left">{{ entry_title }}</td>
+              <td class="text-left">{{ entry_type }}</td>
+              <td class="text-right">{{ entry_initial }}</td>
+              <td class="text-right">{{ entry_initial_cost }}</td>
+              <td class="text-right">{{ entry_continue }}</td>
+              <td class="text-right">{{ entry_continue_cost }}</td>
+              <td class="text-right"></td>
+              </tr>
+            </thead>
+            {% for result in shipping_costs %}
+            <tr>
+              <td class="text-left">{{ result.title }}</td>
+              <td class="text-left">{{ result.type }}</td>
+              <td class="text-right">{{ result.initial }}</td>
+              <td class="text-right">{{ result.initial_cost }}</td>
+              <td class="text-right">{{ result.continue }}</td>
+              <td class="text-right">{{ result.continue_cost }}</td>
+              <td class="text-right">
+                <a href="{{ result.update }}" class="btn btn-default">{{ button_edit }}</a>
+                <a href="{{ result.delete }}" class="btn btn-danger">{{ button_delete }}</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+        {% else %}
+        <div class="no-items">
+          <img src="catalog/view/theme/default/image/no_items.png" class="img-responsive">
+          <span>{{ text_no_results }}</span>
+        </div>
+        {% endif %}
+        <div class="buttons clearfix  mb-1">
+          <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
+          <div class="pull-right"><a href="{{ add }}" class="btn btn-primary">{{ button_add }}</a></div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

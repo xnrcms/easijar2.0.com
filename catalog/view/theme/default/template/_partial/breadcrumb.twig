@@ -1,0 +1,9 @@
+{% if not helper.config('is_mobile') %}
+<div class="breadcrumb-wrapper">
+  <ul class="breadcrumb container">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

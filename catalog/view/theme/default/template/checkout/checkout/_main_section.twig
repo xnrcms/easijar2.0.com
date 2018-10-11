@@ -1,0 +1,44 @@
+<div class="main-section-wrapper">
+  {% if if_pickup_section %}
+    <div class="row">
+      <div class="col-md-12">
+        {{ if_pickup_section }}
+      </div>
+    </div>
+  {% endif %}
+  {% if pickup_section %}
+  <div class="row">
+    <div class="col-md-12">
+      {{ pickup_section }}
+    </div>
+  </div>
+  {% endif %}
+  {% if shipping_address_section %}
+  <div class="row">
+    <div class="col-md-12">
+      {{ shipping_address_section }}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if payment_address_section %}
+    <div class="row">
+      <div class="col-md-12">
+        {{ payment_address_section }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-md-12">
+      {{ payment_method_section }}
+    </div>
+    <div class="col-md-12 hidden">
+      {{ shipping_method_section }}
+    </div>
+  </div>
+  {{ cart_section }}
+  {{ comment_section }}
+  {{ agree_section }}
+  <input type="button" value="{{ text_checkout_confirm }}" id="button-submit" data-loading-text="{{ text_loading }}" class="btn btn-primary pull-right btn-lg" />
+</div>

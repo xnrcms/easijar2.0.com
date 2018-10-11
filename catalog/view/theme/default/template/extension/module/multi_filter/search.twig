@@ -1,0 +1,42 @@
+<div class="sidebar-widget">
+  <div class="sidebar-widget-title">Browse by category</div>
+  <div class="sidebar-widget-content">
+    <ul class="list-unstyled category-list">
+      <li><span></span><a href="/">Home</a></li>
+      {% for category in categories %}
+      <li><span></span><a href="{{ category.href }}">{{ category.name }} ({{ category.total }})</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% if brands %}
+  <div class="sidebar-widget-title">Filter Brands</div>
+  <div class="sidebar-widget-content filter-brands-wrap">
+    <div class="filter-pro-section">
+      <div class="brand-wrapper">
+        <ul class="list-unstyled">
+          {% for index, brand in brands %}
+          <li {{ index > 14 ? 'class="hidden"' }}>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" value="{{ brand.manufacturer_id }}" {{ in_array(brand.manufacturer_id, selected_brands) ? 'checked' }}>
+                {{ brand.name }} ({{ brand.total }})
+              </label>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% if brands|length > 15 %}
+      <div class="filter-more" data-count="14">More</div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+{% if isset(filter) %}
+<script type="text/javascript">
+  var filter = {{ json_encode($filter) }};
+</script>
+{% endif %}

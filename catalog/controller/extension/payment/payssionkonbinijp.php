@@ -1,0 +1,6 @@
+<?php
+
+require_once(realpath(dirname(__FILE__)) . "/payssion.php");
+class ControllerExtensionPaymentPayssionKonbiniJP extends ControllerExtensionPaymentPayssion {
+	protected $pm_id = 'konbini_jp';
+}

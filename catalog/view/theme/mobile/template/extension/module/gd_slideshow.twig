@@ -1,0 +1,24 @@
+<div class="row widget owl-carousel-widget">
+  <div class="col-xs-12">
+    <div id="owlcarousel-slideshow" class="owl-carousel owl-carousel2 owl-theme" style="">
+      {% for banner in banners %}
+      <div class="item">
+        {% if banner.link %}
+        <a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>
+        {% else %}
+        <img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <script type="text/javascript"><!--
+    $('#owlcarousel-slideshow').owlCarousel({
+      items: 1,
+      loop: true,
+      autoplay: true,
+      nav: false,
+      dots: true,
+    });
+    --></script>
+  </div>
+</div>

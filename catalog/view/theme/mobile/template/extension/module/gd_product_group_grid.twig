@@ -1,0 +1,29 @@
+{% if title %}
+<div class="module-title"><span>{{ title }}</span></div>
+{% endif %}
+<div class="row product-list-item-style product-grid-box">
+  {% for product in products %}
+  <div class="col-xs-6 product-item">
+    <div class="product-item-wrapper">
+      <div class="image">
+      <a href="{{ product.href }}"><img data-src="{{ product.thumb }}" src="{{ placeholder }}" class="lazy img-responsive"></a>
+      </div>
+      <div class="info">
+        <a href="{{ product.href }}">{{ product.name }}</a>
+        {% if product.price %}
+        <div class="price">
+          {% if not product.special %}
+          <span class="price-new">{{ product.price }}</span>
+          {% else %}
+          <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if add_to_cart_button_status %}
+        <div class="add-cart" onclick="cart.add('{{ product.product_id }}')"><i class="iconfont">&#xe634;</i></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

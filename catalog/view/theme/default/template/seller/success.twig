@@ -1,0 +1,13 @@
+{% extends helper.template("seller/_partial/layout") %}
+{% block content %}
+  <div id="content" class="col-sm-12">
+    <div class="content-wrapper">
+      <div class="no-items">
+        <img src="catalog/view/theme/default/image/success_items.png" class="img-responsive">
+        <span>{{ heading_title }}</span><br>
+        <span>{{ text_message }}</span>
+        <div><a href="{{ continue }}" class="btn btn-primary btn-lg">{{ button_continue }}</a></div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

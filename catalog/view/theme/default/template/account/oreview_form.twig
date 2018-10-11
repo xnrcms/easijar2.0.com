@@ -1,0 +1,161 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  {% if error.warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error.warning }}</div>
+  {% endif %}
+  <div class="row"> {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}"> {{ content_top }}
+      <div id="review"></div>
+      <form id="form-oreview" class="form-horizontal" action="{{ action }}" method="post">
+        <div id="oreview"></div>
+        <h2>{{ text_write }}</h2>
+        <div class="form-group required {{ additional ? 'hidden' : '' }}">
+          <div class="col-sm-12 rating-star-box">
+            <span class="control-label">{{ entry_rating }}</span>
+            <div class="star-box">
+              {% for i in 5..1 %}
+                <input type="radio" id="star-{{ i }}" class="hidden" value="{{ i }}" name="rating" {{ helper.old('rating', 5) == i ? 'checked' }}>
+                <label for="star-{{ i }}"></label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="form-group required">
+          <div class="col-sm-12">
+            <label class="control-label" for="input-oreview">{{ entry_oreview }} <span>（{{ text_note }}）</span></label>
+            <textarea name="text" rows="7" id="input-oreview" class="form-control">{{ helper.old('text', '') }}</textarea>
+            {% if error.text %}
+              <div class="text-danger">{{ error.text }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group up-btn">
+          <div class="col-sm-12">
+            <button type="button" id="button-upload" data-loading-text="{{ text_loading }}" class="btn btn-default">
+              <i class="fa fa-picture-o" aria-hidden="true"></i> {{ button_upload }}（<span>{{ text_upload_size }}</span>）</button>
+          </div>
+        </div>
+        {{ captcha }}
+        <div class="row">
+          <div class="col-sm-12 img-up-box">
+            {% set codes = helper.old('code') %}
+            {% if codes %}
+            {% for code in codes %}
+            <div class="upload-img">
+              <button class="btn btn-primary"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+              <a href="image/{{ code }}" target="_blank">
+                <img src="{{ helper.image_resize(code, 100, 100) }}" />
+              </a>
+              <input type="hidden" name="code[]" value="{{ code }}"/>
+            </div>
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="buttons clearfix">
+          <div class="pull-right">
+            <button type="submit" id="button-oreview" data-loading-text="{{ text_loading }}" class="btn btn-primary">{{ button_submit }}</button>
+          </div>
+        </div>
+      </form>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+<script type="text/javascript"><!--
+function verifyFileSize(file_el) {
+  var filepath = file_el.val();
+  var extStart = filepath.lastIndexOf(".");
+  var ext = filepath.substring(extStart, filepath.length).toUpperCase();
+  if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") {
+    alert("{{ text_image_type }}");
+    return false;
+  }
+  var file_size = 0;
+
+  file_size = file_el[0].files[0].size;
+  var size = file_size / 1024;
+  if (size > 1024) {
+    alert("{{ text_upload_size }}");
+    return false;
+  }
+
+  return true;
+}
+
+$(document).on('click', '.upload-img button', function(event) {
+  $(this).parent().remove();
+});
+
+$('#button-upload').on('click', function() {
+  if ($('.img-up-box > .upload-img').length >= 6 ) {
+    layer.alert('{{ text_image_max_5 }}');
+    return;
+  }
+
+  var node = this;
+
+  $('#form-upload').remove();
+
+  $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+  $('#form-upload input[name=\'file\']').trigger('click');
+
+  if (typeof timer != 'undefined') {
+      clearInterval(timer);
+  }
+
+  timer = setInterval(function() {
+    if ($('#form-upload input[name=\'file\']').val() != '') {
+      clearInterval(timer);
+
+      if (!verifyFileSize($('#form-upload input[name=\'file\']'))) {
+        return;
+      }
+
+      $.ajax({
+        url: 'index.php?route=tool/upload_img',
+        type: 'post',
+        dataType: 'json',
+        data: new FormData($('#form-upload')[0]),
+        cache: false,
+        contentType: false,
+        processData: false,
+        beforeSend: function() {
+          $(node).button('loading');
+        },
+        complete: function() {
+          $(node).button('reset');
+        },
+        success: function(json) {
+          $(node).parent().parent().find('.text-danger').remove();
+
+          if (json['error']) {
+            $(node).parent().parent().prepend('<div class="text-danger">' + json['error'] + '</div>');
+          }
+
+          if (json['success']) {
+            html  = '  <div class="upload-img">'
+            html += '    <button class="btn btn-primary"><i class="fa fa-trash-o" aria-hidden="true"></i></button>'
+            html += '    <a href="' + json['imgurl'] + '" target="_blank"><img src="' + json['imgurl'] + '"></img></a>'
+            html += '  </div>'
+            html += '  <input type="hidden" name="code[]" value="' + json['code'] + '"/>'
+            $('.img-up-box').prepend(html);
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    }
+  }, 500);
+});
+//--></script>
+{{ footer }}

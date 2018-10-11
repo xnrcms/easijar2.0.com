@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-01-29 14:11:33
+// @modified         2018-02-08 16:56:27
+//
+body.account-order {
+	.order-wrapper {
+		thead td {
+			background-color: #f5f5f5 !important;
+		}
+
+		td {
+			vertical-align: top !important;
+		}
+		.sep-row {
+			height: 20px;
+		}
+
+		.heading {
+			padding: 0;
+
+			td {
+				background-color: #f5f5f5 !important;
+			}
+		}
+
+		.product {
+			overflow: hidden;
+
+			.image {
+				float: left;
+				width: 60px;
+				border: 1px solid #efefef;
+		    margin-right: 14px;
+
+		    img {
+		    	width: 60px;
+		    }
+			}
+		}
+	}
+}
+
+body.account-order-info {
+	.payment-wrapper {
+		.buttons {
+			clear: both;
+			overflow: hidden;
+		}
+	}
+}

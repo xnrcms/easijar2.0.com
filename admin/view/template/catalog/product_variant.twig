@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ text_edit_child_product }}</title>
+  <script type="text/javascript" src="view/javascript/jquery/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="view/javascript/jquery/jquery-ui/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="view/javascript/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="view/javascript/vue/vue.min.js"></script>
+  <script type="text/javascript" src="view/javascript/layer/layer.js"></script>
+  <script type="text/javascript" src="view/javascript/ckfinder/ckfinder.js"></script>
+  <script type="text/javascript" src="view/javascript/common.js"></script>
+  <link href="view/stylesheet/bootstrap.css" type="text/css" rel="stylesheet"/>
+  <link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+  <link type="text/css" href="view/stylesheet/stylesheet.css" rel="stylesheet" media="screen"/>
+  <style> [v-cloak] { display: none; } </style>
+</head>
+<body>
+  <div id="product-variant-app" v-cloak>
+    <div class="container-fluid">
+      <div class="editor" style="padding: 50px 0;">
+        <!-- v-bind:class="{ 'hidden': currentStep != 1 }" -->
+        <div :class="{ 'hidden': currentStep != 1 }" id="tab-variant">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span>{{ text_variant_step_1 }}</span>
+              <a class="btn btn-primary btn-xs pull-right" href="{{ helper.url.link('catalog/variant') }}" target="_black">{{ text_manage_variants }} <i class="fa fa-external-link" aria-hidden="true"></i></a>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="variant-group-section">
+                    <h4>{{ text_saved_variants }}</h4>
+                    <div class="clearfix">
+                      <div class="variant-group" v-on:click="checkAllVariantButtonClicked()">
+                        {{ text_select_all }}
+                      </div>
+                      <div class="variant-group" v-for="(group, row) in variant_groups">
+                        <span v-on:click="variantGroupButtonclicked(group.variants)">
+                          <i class="fa fa-tags" aria-hidden="true"></i> {{ '{{ group.name }}' }}
+                        </span>&nbsp;
+                        <span class="delete" v-on:click="removeVariantGroupButtonclicked(group.group_id, row)">
+                          <i class="fa fa-times" aria-hidden="true"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-9">
+                  <div class="variant-list-section">
+                    <h4>{{ text_all_variants }}</h4>
+                    <span class="text-muted">{{ help_select_variants }}</span>
+                    <br>
+                    <br>
+
+                    <div v-if="!variants.length">
+                      {{ text_no_variants }} <a href="{{ helper.url.link('catalog/variant') }}" target="_blank">{{ button_create_variant }}</a>
+                    </div>
+
+                    <div class="row" v-else>
+                      <div class="col-sm-2" v-for="type in variants">
+                        <div class="checkbox">
+                          <label>
+                            <input type="checkbox" v-bind:value="type.id" v-model="selected_variants"> {{ '{{ type.name }}' }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="selected-variant-section">
+                    <h4>{{ text_selected_variants }}</h4>
+                    <ol>
+                      <li v-for="name in selectedVariantNames">
+                        <span>{{ "{{ name }}" }}</span>
+                      </li>
+                    </ol>
+                    <p v-if="!selected_variants.length">{{ help_no_variants_selected }}</p>
+                    <button class="btn btn-default" v-if="selected_variants.length" v-on:click="saveAsGroupButtonClicked()">
+                    {{ button_save_variant_group }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-footer text-right">
+              <span v-if="!selected_variants.length">{{ error_no_variants_selected }}</span>
+              <button type="button" class="btn btn-primary" v-on:click="typeSelectButtonClicked" :disabled="!variants.length || !selected_variants.length">{{ button_next_step }} <i class="fa fa-angle-double-right" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+        {# <pre>{{ '{{ data.selectedVariantsFormatted }}' }}</pre> #}
+        <!-- :class="{ 'hidden': currentStep != 2 }" -->
+        <div :class="{ 'hidden': currentStep != 2 }" id="tab-variant-custom">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span>{{ text_step2_rename_value }}</span>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="variant-custom-wrapper">
+                    <!-- v-show="variants[variantId-1].allow_rename" -->
+                    <div v-for="(variantId, variant_index) in selected_variants" class="variant-list" v-show="isVariantList(variantId)">
+                      <ul class="list-group">
+                        <label>{{ '{{ getVariantTypeName(variantId) }}' }}</label>
+                        <div>
+                          <li v-for="value in getVariantValues(variantId)" @click="addVariantValueToSelectVariant(value, variantId)" v-bind:value="value.variant_value_id" :class="{ 'active': isVariantSelected(value.variant_value_id, variantId) }"><i class="fa fa-square-o" aria-hidden="true"></i>{{ '{{ value.name }}' }}</li>
+                        </div>
+                      </ul>
+                      <div class="select-wrapper">
+                        <label>{{ text_rename }} - {{ '{{ getVariantTypeName(variantId) }}' }}</label>
+                        <div class="select-box">
+                          <ul class="list-group">
+                            <div>
+                              <li v-for="(value, index) in getFormattedVariantValues(variantId)" class="">
+                                <span>{{ '{{ value.name }}' }}</span>
+                                <div class="row" style="margin-top: 4px;">
+                                  <div class="col-sm-7">
+                                    <input type="text" v-model="value.name"  class="form-control" placeholder="{{ text_rename_name }}" style="margin-top: 8px;" >
+                                  </div>
+                                  <div class="col-sm-5">
+                                    <a href="#" :id="'thumb-image' + variant_index + '-' + index" data-toggle="image" class="img-thumbnail" style="width: 50px; padding: 1px;">
+                                      <img :src="imageSrc(value.image)" alt="" title="" data-placeholder="{{ helper.image_resize() }}" style="width: 100%;">
+                                    </a>
+                                    <input type="hidden" v-model="value.image" :id="'thumb-image' + variant_index + '-' + index"/>
+                                  </div>
+                                </div>
+                              </li>
+                            </div>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-footer text-right">
+              <button type="button" class="btn btn-primary pull-left" v-on:click="currentStep = 1">
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i> {{ button_select_variants }}
+              </button>
+              <button type="button" class="btn btn-primary" @click="currentStep = 3" :disabled="!isAllFormattedVariantsHaveValues">{{ button_next_step }} <i class="fa fa-angle-double-right" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+        <!-- v-bind:class="{ 'hidden': currentStep != 3 }" -->
+        <div :class="{ 'hidden': currentStep != 3 }" id="tab-product">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span>{{ text_variant_step_2 }}</span>
+            </div>
+            <div class="panel-body">
+              <div class="table-responsive" v-if="products.length">
+                <table class="table table-hover" id="table-product">
+                  <thead>
+                    <tr>
+                      <th style="width: 1px;">#</th>
+                      <th style="width: 100px;">{{ column_id }}</th>
+                      <th v-for="variantId in selected_variants">
+                        {{ '{{ getVariantTypeName(variantId) }}' }}
+                      </th>
+                      <th style="width: 150px;">SKU</th>
+                      <th style="width: 100px;">{{ column_price }}</th>
+                      <th style="width: 100px;">{{ entry_quantity }}</th>
+                      <th style="width: 120px;">{{ entry_status }}</th>
+                      <th style="width: 1px;"></th>
+                      <th class="text-right" style="width: 200px;">{{ column_action }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(product, index) in products" v-bind:class="{ 'bg-info': index == 0 }">
+                      <td>{{ '{{ index + 1 }}' }}</td>
+                      <td>
+                        <span class="product-id-label label" v-bind:class="[ index == 0 ? 'label-success' : 'label-info' ]">
+                          {{ '{{' }} product.product_id || "{{ text_none }}" {{ '}}' }} {{ '{{' }} index == 0 ? "{{ text_master }}" : "" {{ '}}' }}
+                        </span>
+                      </td>
+                      <td v-for="(variantId, variant_index) in selected_variants">
+                        <select class="form-control" v-model="product.variants[variantId]">
+                          <option v-for="value in getFormattedVariantValues(variantId)" v-if="getFormattedVariantValues(variantId).length" v-bind:value="value.variant_value_id">{{ '{{ value.name }}' }}</option>
+                        </select>
+                      </td>
+                      <td><input type="text" class="form-control" v-model="product.sku"></td>
+                      <td><input type="text" class="form-control" v-model="product.price"></td>
+                      <td><input type="text" class="form-control" v-model="product.quantity"></td>
+                      <td>
+                        <select class="form-control" v-model.number="product.status">
+                          <option value="0">{{ text_disabled }}</option>
+                          <option value="1">{{ text_enabled }}</option>
+                        </select>
+                      </td>
+                      <td>
+                        <i v-show="!product.validated" class="fa fa-exclamation-triangle" style="color: red" aria-hidden="true" data-toggle="tooltip" v-bind:title="product.error"></i>
+                      </td>
+                      <td class="text-right">
+                        <button v-if="index > 0" class="btn-link" v-on:click="setAsParentProductButtonClicked(index)">{{ button_make_master }}</button>
+
+                        <a class="btn-link" v-if="product.product_id" v-bind:href="'{{ helper.url.link('catalog/product/edit') }}' + '&amp;product_id=' + product.product_id" target="_black">{{ button_edit }}</a>
+                        <span v-else class="text-muted" data-toggle="tooltip" title="{{ help_save_to_edit }}">{{ button_edit }}</span>
+
+                        <button v-if="index == 0" class="btn-link" :disabled="products.length > 1" data-toggle="tooltip" v-bind:title="products.length > 1 ? '{{ error_delete_child_product }}' : '{{ button_delete_master }}'" v-on:click="deleteButtonClicked(index)">{{ button_remove }}</button>
+                        <button v-else class="btn-link" v-on:click="deleteButtonClicked(index)">{{ button_remove }}</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="text-center">{{ error_no_variant_product }}</div>
+            </div>
+            <div class="panel-footer text-right">
+            {# v-on:click="currentStep = 2" #}
+              <button type="button" class="btn btn-primary pull-left" @click="isCurrentStep() ? currentStep = 2 : currentStep = 1">
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                <span v-text="isCurrentStep() ? '{{ text_rename_value }}' : '{{ button_select_variants }}'"></span>
+              </button>
+              <span v-if="products.length > maxVariantPossibilities">variant value {{ help_max_combo_prefix }} {{ '{{ maxVariantPossibilities }}' }} {{ help_max_combo_suffix }} {{ error_max_combo }}</span>
+              <span v-else>{{ help_max_combo_prefix }} {{ '{{ maxVariantPossibilities }}' }} {{ help_max_combo_suffix }}</span>
+              <button type="button" class="btn btn-success" v-on:click="addProductButtonClicked" v-bind:class="{'disabled': !addProductButtonEnabled}" :disabled="!addProductButtonEnabled">{{ "{{" }} products.length > 0 ? '{{ button_add_child }}' : '{{ button_add_master }}' {{ "}}" }}</button>
+
+              <button v-if="products.length > 1" type="button" class="btn btn-danger" v-on:click="deleteAllButtonClicked">{{ button_delete_all }}</button>
+
+              <button type="button" class="btn btn-primary" v-on:click="saveProductButtonClicked">{{ button_save }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+var data = {{ json|json_encode() }};
+var user_token = '{{ user_token }}';
+var i18n = {
+  group_name: '{{ text_group_name }}',
+  error_sku: '{{ error_sku }}',
+  error_variant_required: '{{ error_variant_required }}',
+  error_price: '{{ error_price }}',
+  error_quantity: '{{ error_quantity }}',
+  error_no_variants_selected: '{{ error_no_variants_selected }}',
+  help_delete_master: '{{ help_delete_master }}',
+  button_confirm_delete: '{{ button_confirm_delete }}',
+  button_cancel: '{{ button_cancel }}',
+  text_confirm_delete: '{{ text_confirm_delete }}',
+  text_confirm_delete_all: '{{ text_confirm_delete_all }}',
+  button_make_master: '{{ button_make_master }}',
+  text_confirm_make_master: '{{ text_confirm_make_master }}',
+  error_form_error: '{{ error_form_error }}',
+  error_sku_duplicated: '{{ error_sku_duplicated }}',
+  error_variant_duplicated: '{{ error_variant_duplicated }}',
+  text_confirm_save: '{{ text_confirm_save }}',
+  button_save_changes: '{{ button_save_changes }}',
+  text_save_success: '{{ text_save_success }}',
+  error_network: '{{ error_network }}',
+  text_confirm_delete_group: '{{ text_confirm_delete_group }}',
+  text_delete_success: '{{ text_delete_success }}',
+};
+
+$(function () {
+  $('body').tooltip({
+    selector: '[data-toggle="tooltip"]'
+  });
+});
+</script>
+<script type="text/javascript" src="view/javascript/variant.js"></script>
+</html>

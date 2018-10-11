@@ -1,0 +1,37 @@
+{% if variants %}
+<div id="product-variant-wrapper">
+  {% for variant in variants %}
+    <div class="variant-group">
+      <h5>{{ variant.name }}</h5>
+      {% for value in variant.values %}
+      {% set selected = value.variant_value_id == product_variants[variant.variant_id] %}
+      <div class="button btn-variant {{ selected ? 'selected' : 'disabled' }}" data-variant="{{ variant.variant_id ~ ':' ~ value.variant_value_id }}">
+        {% if value.image %}
+        <img src="{{ value.image }}">
+        {% endif %}
+        <span>{{ value.name }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+  $('#product-variant-wrapper').ProductVariant({
+    button: '.btn-variant',
+    state: {
+      selected: 'selected',
+      disabled: 'disabled',
+      disabled_selected: 'disabled-selected'
+    },
+    {% if quantity > 0 %}
+    action_buttons: ['.button-add-to-cart', '.button-buy-now'],
+    {% endif %}
+    key: '{{ keys }}',
+    variant_group_count: {{ variants|length }},
+    skus: {{ skus|json_encode }}
+  });
+});
+</script>
+{% endif %}

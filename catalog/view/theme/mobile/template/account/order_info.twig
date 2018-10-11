@@ -1,0 +1,178 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-sm-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+      {% if success %}
+      <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+      {% endif %}
+      {% if error_warning %}
+      <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+      {% endif %}
+      <div class="row widget">
+        <div class="col-xs-12">
+          <div class="list-two-column-justified">
+            {% if invoice_no %}
+            <dl>
+              <dt>{{ text_invoice_no }}</dt>
+              <dd>{{ invoice_no }}</dd>
+            </dl>
+            {% endif %}
+            <dl>
+              <dt>{{ text_order_id }}</dt>
+              <dd>#{{ order_id }}</dd>
+            </dl>
+            <dl>
+              <dt>{{ text_date_added }}</dt>
+              <dd>{{ date_added }}</dd>
+            </dl>
+            {% if payment_method %}
+            <dl>
+              <dt>{{ text_payment_method }}</dt>
+              <dd>{{ payment_method }}</dd>
+            </dl>
+            {% endif %}
+            {% if shipping_method %}
+            <dl>
+              <dt>{{ text_shipping_method }}</dt>
+              <dd>{{ shipping_method }}</dd>
+            </dl>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% if is_pickup %}
+      <div class="row widget">
+        <div class="col-sm-12">
+          <strong>{{ text_pickup_info }}</strong> <br/>
+          <b>{{ text_pickup_name }}</b>{{ pickup_name }}<br/>
+          <b>{{ text_pickup_telephone }}</b>{{ pickup_telephone }}<br/>
+          <b>{{ text_pickup_address }}</b>{{ pickup_address }}<br/>
+          <b>{{ text_pickup_open }}</b>{{ pickup_open }}<br/>
+          <b>{{ text_pickup_comment }}</b>{{ pickup_comment }}
+        </div>
+      </div>
+      {% endif %}
+      {% if shipping_address %}
+      <div class="row widget">
+        <div class="col-sm-12">
+          <strong>{{ text_shipping_address }}</strong> <br/>
+          {{ shipping_address }}
+        </div>
+      </div>
+      {% endif %}
+      {% if not payment is empty %}
+        <div class="row widget">
+          <div class="col-xs-12">
+            <div id="checkout-payment" class="clearfix">{{ payment }}</div>
+          </div>
+        </div>
+      {% endif %}
+      <div class="row widget">
+        <div class="col-xs-12">
+          {% for product in products %}
+          <div class="product-item">
+            <div class="image"><img src="{{ product.image }}" alt="" class="img-responsive"></div>
+            <div class="info">
+              <div class="name"><a href="{{ product.product_link }}">{{ product.name }}</a></div>
+              {% if product.option %}
+              <div class="option">
+                {% for option in product.option %}
+                &nbsp;{{ option.name }}: {{ option.value }}
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="data">
+                <div class="model"><b>{{ column_model }}</b>: {{ product.model }}</div>
+                <div class="total">{{ product.price }} x {{ product.quantity }} = <strong>{{ product.total }}</strong></div>
+              </div>
+              <div class="action pull-right">
+                {% if product.reorder %}
+                <a href="{{ product.reorder }}" class="btn btn-default">{{ button_reorder }}</a>
+                {% endif %}
+                {% if product.return %}
+                <a href="{{ product.return }}" class="btn btn-default">{{ button_return }}</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% for voucher in vouchers %}
+          <div class="product-item">
+            <div class="name">{{ voucher.description }}</div>
+            <div class="product-data">
+              <div class="total">{{ voucher.amount }} x 1 = <strong>{{ voucher.amount }}</strong></div>
+            </div>
+          </div>
+          {% endfor %}
+          {% for recharge in recharges %}
+          <div class="product-item">
+            <div class="name">{{ recharge.description }}</div>
+            <div class="product-data">
+              <div class="total">{{ recharge.amount }} x 1 = <strong>{{ recharge.amount }}</strong></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row widget">
+        <div class="col-xs-12">
+          <div class="list-two-column-justified">
+            {% for total in totals %}
+            <dl>
+              <dt>{{ total.title }}</dt>
+              <dd>{{ total.text }}</dd>
+            </dl>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% if comment %}
+      <div class="row widget">
+        <h2>{{ text_comment }}</h2>
+        <div class="col-xs-12">
+          {{ comment }}
+        </div>
+      </div>
+      {% endif %}
+      {% if order_express and kd_tracking_status %}
+      <div class="row widget">
+        <div class="col-xs-12">
+          <!-- 快递单详情 -->
+          {% for express in order_express %}
+            <h3>{{ text_express }} {{ express.kd_express_name }} ({{ express.tracking_number }})</h3>
+            {{ express.kd_comment ? text_kd_comment }}{{ express.kd_comment ? express.kd_comment }}
+            <div id="express_order_{{ express.tracking_code }}">
+              <button onClick="$(this).parent().load('index.php?route=extension/module/express_tracking/getTrace&com={{ express.tracking_code }}&nu={{ express.tracking_number }}')"> {{ button_view }}</button>
+            </div>
+          {% endfor %}
+          <!-- 快递单详情 -->
+        </div>
+      </div>
+      {% endif %}
+      {% if histories %}
+      <div class="row widget">
+        <h2>{{ text_history }}</h2>
+        <div class="col-xs-12">
+          <div class="list-two-column-justified">
+            {% for history in histories %}
+            <dl><dt>{{ column_date_added }}</dt><dd>{{ history.date_added }}</dd></dl>
+            <dl><dt>{{ column_status }}</dt><dd>{{ history.status }}</dd></dl>
+            {% if history.comment %}
+            <dl><dt>{{ column_comment }}</dt><dd>{{ history.comment }}</dd></dl>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <!-- .buttons.clearfix is required to display shipping tracking block from vqmod -->
+      <div class="buttons clearfix"></div>
+    {{ content_bottom }}</div>
+  </div>
+</div>
+{{ footer }}

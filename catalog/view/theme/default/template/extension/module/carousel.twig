@@ -1,0 +1,64 @@
+{% if helper.is_home_page() %}
+<div class="bg-gray pb-3"><div class="container"><div class="row"><div class="col-sm-12">
+{% endif %}
+
+<div class="swiper-viewport module-carousel">
+  <div id="carousel{{ module }}" class="swiper-container">
+    <div class="swiper-wrapper">
+      {% for banner in banners %}
+        <div class="swiper-slide">
+          <div class="swiper-slide text-center">
+            {% if banner.link %}
+              <a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>
+            {% else %}
+              <img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="swiper-pager">
+    <div class="swiper-button-next carousel{{ module }}-next"></div>
+    <div class="swiper-button-prev carousel{{ module }}-prev"></div>
+  </div>
+</div>
+
+{% if helper.is_home_page() %}
+</div></div></div></div>
+{% endif %}
+
+<script type="text/javascript"><!--
+var carousel{{ module }}_swiper = new Swiper('#carousel{{ module }}', {
+  slidesPerView: 6,
+  navigation: {
+    nextEl: '.carousel{{ module }}-next',
+    prevEl: '.carousel{{ module }}-prev',
+  },
+  autoplay: {
+    delay: 3000,
+    disableOnInteraction: false
+  },
+  breakpoints: {
+    480: {
+      slidesPerView: 2,
+      spaceBetween: 10
+    },
+    640: {
+      slidesPerView: 3,
+    },
+    768: {
+      slidesPerView: 4,
+    }
+  },
+  spaceBetween: 20,
+  autoplayDisableOnInteraction: true,
+  loop: true
+});
+
+$('.module-carousel').hover(function() {
+  carousel{{ module }}_swiper.autoplay.stop();
+}, function() {
+  carousel{{ module }}_swiper.autoplay.start();
+});
+//--></script>

@@ -1,0 +1,10 @@
+<div class="row widget quick-icon-link-widget">
+  <div class="col-xs-12">
+    {% for image in items %}
+    <a href="{{ image.href }}">
+      <img data-src="{{ image.image }}" src="{{ helper.image_resize() }}" class="lazy img-responsive">
+      <span>{{ image.title }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>

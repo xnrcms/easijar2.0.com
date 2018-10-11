@@ -1,0 +1,65 @@
+{% if helper.is_home_page() %}
+<div class="bg-gray pb-4"><div class="container"><div class="row"><div class="col-sm-12">
+{% endif %}
+
+{% if heading_title %}
+<h3 class="widget-title">
+  <span>{{ heading_title }}</span>
+  <div class="title-pager"></span><span class="blog-prev"></span><span class="blog-next"></div>
+</h3>
+{% endif %}
+
+<div class="module-blog-latest grid">
+  <div class="swiper-container" id="blog-swiper-wrapper">
+    <div class="swiper-wrapper">
+      {% for post in posts %}
+      {% set post_description = post.localizedDescription() %}
+      <div class="swiper-slide">
+        <div class="blog-latest-wrapper bg-white">
+          <a class="thumb" href="{{ post.href('show') }}" title="{{ post_description.name }}">
+            <img src="{{ helper.image_resize(post_description.image, 400, 300) }}" class="img-responsive">
+          </a>
+          <div class="info">
+            <a href="{{ post.href('show') }}" title="{{ post_description.name }}">
+              {{ post_description.name }}
+            </a>
+            {% set description = (post_description.html('description') ?: post_description.html('content')) %}
+            {% set description = description|striptags %}
+            <p>{{ description|length > 50 ? description|slice(0, 50) ~ '...' : description  }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if helper.is_home_page() %}
+</div></div></div></div>
+{% endif %}
+
+<script type="text/javascript"><!--
+$(document).ready(function() {
+  var blog_swiper = new Swiper('#blog-swiper-wrapper', {
+    slidesPerView: 4,
+    navigation: {
+      nextEl: '.blog-next',
+      prevEl: '.blog-prev',
+    },
+    spaceBetween: 15,
+    breakpoints: {
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 6
+      },
+      768: {
+        slidesPerView: 2,
+        spaceBetween: 15
+      },
+      992: {
+        slidesPerView: 3,
+      }
+    }
+  });
+})
+--></script>

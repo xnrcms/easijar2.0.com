@@ -1,0 +1,29 @@
+<div class="bg-white mt-3">
+  {% if helper.is_home_page() %}
+  <div class="container"><div class="row"><div class="col-sm-12">
+  {% endif %}
+
+  {% if style != 'one_left_two_right' %}
+    <div class="row">
+      {% for item in items %}
+        <div class="{{ class }}">
+          <div class="item module-banner-wrapper">
+            <a href="{{ item.href ?: 'javascript:void(0);'  }}"><img src="{{ item.image }}" class="img-responsive"></a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="module-transverse mb-2">
+      <div class="inner-list">
+        {% for item in items %}
+        <a href="{{ item.href ?: 'javascript:void(0);'  }}"><img src="{{ item.image }}" class="img-responsive"></a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if helper.is_home_page() %}
+  </div></div></div>
+  {% endif %}
+</div>

@@ -1,0 +1,9 @@
+<div class="alert alert-info">
+	<h3>{{ text_instruction }}</h3>
+	<p><b>{{ text_description }}</b></p>
+	<p>{{ bank }}</p>
+	<p><b>{{ text_payment }}</b></p>
+</div>
+{% if href %}
+	<a class="btn btn-primary" href="{{ href }}">{{ button_continue }}</a>
+{% endif %}

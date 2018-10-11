@@ -1,0 +1,316 @@
+{{ header }}
+<div class="container">
+  <div class="notice"></div>
+    <div class="row">
+      <div id="content" class="col-sm-12 product-details-page">{{ content_top }}
+        <!--Slide start-->
+        {% if images %}
+        <div class="row">
+          <div class="product-iamge">
+            <div class="page-back"><a href="javascript:window.history.back(-1);"><i class="iconfont">&#xe622;</i></a></div>
+            <div id="product-slides" class="swiper-container">
+              <div class="swiper-wrapper">
+                {% if thumb %}
+                <div class="item">
+                  <div class="popups" href="{{ thumb }}"><img src="{{ thumb }}" alt="" class="img-responsive" /></div>
+                </div>
+                {% endif %}
+                {% for image in images %}
+                <div class="swiper-slide">
+                  <img src="{{ image.popup }}" alt="" class="img-responsive" />
+                </div>
+                {% endfor %}
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+        </div>
+        {% if show_flash_sale %}
+          <div class="flash-price-wrap">
+            {% if price %}
+            <div class="product-price-wrapper">
+              {% if flash %}
+                <span class="price-new">{{ flash }}</span>
+              {% elseif special %}
+                <span class="price-new">{{ special }}</span>
+              {% else %}
+                <span class="price-new">{{ price }}</span>
+              {% endif %}
+              <div class="special-points">
+                <div class="table-cell">
+                  {% if special or flash %}
+                  <span class="price-old">{{ price }}</span>
+                  {% endif %}
+                  {% if points %}
+                  <span class="points">{{ text_points }} {{ points }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% if date_end != '0000-00-00' and date_end is not null and seconds > 0 and show_flash_sale %}
+              <div class="product-countdown">
+                <span class="text">{{ text_flash_end }}</span>
+                <ul class="countdown" data-countdown="{{ seconds }}"></ul>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        <script type="text/javascript"><!--
+          var productSlides = new Swiper ('#product-slides', {
+            loop: true,
+            autoplay: {
+              delay: 5000,
+            },
+            pagination: {
+              el: '.swiper-pagination',
+            },
+          });
+        //--></script>
+        {% endif %}
+        <!--Slide end-->
+        <!--Price start-->
+        <div class="row widget">
+          <div class="col-xs-12">
+            <span class="product-name">{{ heading_title }}</span>
+            {% if not show_flash_sale %}
+              {% if price %}
+              <div class="product-price-wrapper">
+                {% if not special %}
+                <span class="price-new">{{ price }}</span>
+                {% else %}
+                <span class="price-new">{{ special }}</span>
+                <span class="price-old">{{ price }}</span>
+                {% endif %}
+                {% if points %}
+                <span class="points">{{ text_points }} {{ points }}</span>
+                {% endif %}
+              </div>
+              {% endif %}
+            {% endif %}
+            <ul class="list-unstyled product-attribute mb-0">
+              {% if manufacturer %}
+              <li class="product-info-list-item"><b class="title">{{ text_manufacturer }}</b> <a href="{{ manufacturers }}"><span>{{ manufacturer }}</span></a></li>
+              {% endif %}
+              <li class="product-info-list-item"><b class="title">{{ text_model }}</b> <span>{{ model }}</span></li>
+              {% if reward %}
+              <li class="product-info-list-item"><b class="title">{{ text_reward }}</b> <span>{{ reward }}</span></li>
+              {% endif %}
+              <li class="product-info-list-item"><b class="title">{{ text_stock }}</b> <span>{{ stock }}</span></li>
+              {% if sales %}
+              <li class="product-info-list-item"><b class="title">{{ text_sales }}</b> <span>{{ sales|number_format }}</span></li>
+              {% endif %}
+            </ul>
+            {% if tags|length %}
+            <div class="tags"><b>{{ text_tags }}</b>
+              {% for tag in tags %}
+              <a href="{{ tag.href }}">{{ tag.tag }}</a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <!--Price end-->
+
+        {% set share_url = share %}
+        {{ include(helper.template('_partial/share')) }}
+
+        <!--Option Start-->
+        {% if quantity > 0 %}
+        <div class="row widget product-options">
+          <div class="col-xs-12">
+            <span class="title">{{ text_option }}</span>
+            {{ include(helper.template('_partial/product/variant')) }}
+            {{ include(helper.template('_partial/product/options')) }}
+          </div>
+        </div>
+        {% endif %}
+        <!--Option end-->
+
+        <!--Tabs start-->
+        <div class="row widget">
+          <div class="col-xs-12">
+            <!--Tab nav start-->
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#tab-description" data-toggle="tab">{{ tab_description }}</a></li>
+              {% if attribute_groups %}
+              <li><a href="#tab-specification" data-toggle="tab">{{ tab_attribute }}</a></li>
+              {% endif %}
+              {% if review_status %}
+              <li><a href="#tab-review" data-toggle="tab">{{ tab_review }}</a></li>
+              {% endif %}
+              <!--
+              {% if tab_product_question is defined %}
+              <li><a href="#tab-question" data-toggle="tab">{{ tab_product_question }}</a></li>
+              {% endif %}
+              -->
+            </ul>
+            <!--Tab nav end-->
+
+            <!--Tab content start-->
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab-description">{{ description }}</div>
+              {% if tab_product_question is defined %}
+                {{ include(helper.template('_partial/product/question_form')) }}
+              {% endif %}
+              {% if attribute_groups %}
+              <div class="tab-pane" id="tab-specification">
+                <table class="table table-striped">
+                  {% for attribute_group in attribute_groups %}
+                  <thead>
+                    <tr><td colspan="2"><strong>{{ attribute_group.name }}</strong></td></tr>
+                  </thead>
+                  <tbody>
+                    {% for attribute in attribute_group['attribute'] %}
+                    <tr><td>{{ attribute.name }}</td><td>{{ attribute.text }}</td></tr>
+                    {% endfor %}
+                  </tbody>
+                  {% endfor %}
+                </table>
+              </div>
+              {% endif %}
+              {% if review_status %}
+              <div class="tab-pane" id="tab-review"><div id="review"></div></div>
+              {% endif %}
+            </div>
+            <!--Tab content end-->
+          </div>
+        </div>
+        <!--Tabs end-->
+
+        {% if products %}
+        <!--Related products start-->
+        <div class="row widget product-list-item-style grid">
+          <h2>{{ text_related }}</h2>
+          {% for product in products %}
+          <div class="col-xs-6">
+            <div class="product-item-wrapper">
+              <div class="image">
+              <a href="{{ product.href }}"><img src="{{ product.thumb }}" class="img-responsive"></a>
+              </div>
+              <div class="info">
+                <a href="{{ product.href }}">{{ product.name }}</a>
+                {% if product['price'] %}
+                <div class="price">
+                  {% if not product.special %}
+                  <span class="price-new">{{ product.price }}</span>
+                  {% else %}
+                  <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+                  {% endif %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <!--Related products end-->
+        {% endif %}
+        {{ content_bottom }}
+      </div>
+    </div>
+</div>
+
+<script type="text/javascript"><!--
+$(document).ready(function() {
+  // Make description large image responsive
+  $('#tab-description img').not('.img-responsive').imagesLoaded().progress(function(instance, image) {
+    if (image.img.width > $(image.img).parent().width()) {
+      $(image.img).addClass('img-responsive');
+    }
+  });
+
+  $(document).on('click', '#button-add-to-wishlist', function(event) {
+    if ($('#button-add-to-wishlist i').hasClass('active')) {
+      wishlist.remove({{ product_id }});
+    } else {
+      wishlist.add({{ product_id }});
+    }
+  });
+
+  var cartData = [
+    'input[name=\'product_id\']',
+    '#options input[type=\'text\']',
+    '#options input[type=\'hidden\']',
+    '#options input[type=\'radio\']:checked',
+    '#options input[type=\'checkbox\']:checked',
+    '#options select, #options textarea'
+  ]
+
+  $('.button-add-to-cart').productInfoToCart({
+    data: cartData,
+    messages: {
+      error_msg: '{{ text_option_required }}',
+      success_msg: '{{ text_added_to_cart }}'
+    }
+  });
+
+  $('.button-buy-now').productInfoToCart({
+    data: cartData,
+    messages: {
+      error_msg: '{{ text_option_required }}',
+      success_msg: '{{ text_added_to_cart_redirect }}'
+    },
+    cartSuccessFn: function(e) {
+      location = 'index.php?route=checkout/cart';
+    }
+  });
+
+  $('#input-quantity').blur(function() {
+    if ( $(this).val() < 1 ) $(this).val(1);
+
+    {% if show_flash_sale %}
+    limitProductCount();
+    {% endif %}
+  })
+
+  $('#product-quantity span').click(function(e) {
+    if( $(this).hasClass('quantity-up')) {
+      $('#input-quantity').val( parseInt($('#input-quantity').val()) + 1 );
+    } else {
+      if( parseInt($('#input-quantity').val())  > {{ minimum }} ) {
+        $('#input-quantity').val( parseInt($('#input-quantity').val()) - 1 );
+      }
+    }
+
+    {% if show_flash_sale %}
+    limitProductCount();
+    {% endif %}
+  });
+
+  function limitProductCount() {
+    var $this = $('#input-quantity');
+    var limit = $this.attr('limit');
+    if ( typeof(limit) != 'undefined' && parseInt($this.val()) > parseInt(limit) ) {
+      $this.val(parseInt(limit));
+      layer.msg("{{ text_limit }}");
+    }
+  }
+
+  $('#review').on('click', '.pagination a', function(e) {
+    e.preventDefault();
+    $('#review').load(this.href);
+  });
+
+  $('#review').load('index.php?route=account/oreview/review&product_id={{ product_id }}')
+
+  {% if flash_sale_status == 1 %}
+    $('[data-countdown]').each(function() {
+      var $this = $(this), end = moment().add($(this).data('countdown'), 'seconds').toDate();
+      $this.countdown(end, function(event) {
+        var _itemEnd = event.strftime('%D,%H,%M,%S');
+        if ( _itemEnd == '00,00,00,00' ) {
+          dateDnd($this);
+        }
+        $this.html(event.strftime('<li><span>%D</span></li> <li><span>%H</span></li> <li><span>%M</span></li> <li><span>%S</span></li>'))
+      });
+    });
+    var dateDnd = function (item) {
+      item.hide();
+      $('.end-img').show();
+    }
+  {% endif %}
+});
+//--></script>
+
+{{ footer }}

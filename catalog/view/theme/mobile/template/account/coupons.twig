@@ -1,0 +1,37 @@
+{{ header }}
+<div id="account-account" class="container">
+  {{ include(helper.template('_partial/breadcrumb')) }}
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+      {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+      {% endif %}
+      {% if coupons %}
+        {% for coupon in coupons %}
+          <div class="coupon-wrapper row widget {{ not coupon.valid_icon ? 'expired'}}">
+            <div class="left-group">
+              <div class="coupons-name">{{ coupon.name }}</div>
+              <p>{{ text_coupon_code }}: {{ coupon.code }}<br>{{ coupon.date_start }} ~ {{ coupon.date_end }}</p>
+            </div>
+            <div class="right-group">{{ coupon.discount }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="row widget">
+          <div class="col-xs-12">
+            <div class="no-items">
+              <div class="icon">
+                <i class="iconfont">&#xe620;</i>
+              </div>
+              <dd class="msg">{{ text_no_results }}</dd>
+              <a href="{{ back }}" class="btn btn-primary">{{ button_back }}</a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{{ footer }}

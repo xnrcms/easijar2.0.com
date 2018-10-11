@@ -1,0 +1,93 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-02-01 14:32:43
+//
+
+.account-order-info {
+  b {
+    color: #999;
+    font-weight: normal;
+  }
+
+  .order-info {
+    // margin-bottom: $gutter;
+  }
+
+  // Force continue to may button 100% with
+  #checkout-payment {
+    .btn {
+      width: 100%;
+      clear: both;
+    }
+  }
+
+  .product-item {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    position: relative;
+    border-bottom: 1px solid #eaeaea;
+    overflow: hidden;
+
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .image {
+      width: 80px;
+      float: left;
+    }
+
+    .info {
+      margin-left: 90px;
+
+      .name {
+        font-size: 12px;
+        // font-weight: bold;
+        // color: $main_color;
+      }
+
+      .option {
+        font-style: italic;
+        color: #999;
+        // font-size: 12px;
+      }
+
+      .action {
+        // position: absolute;
+        // right: 0;
+        // bottom: $gutter;
+        // float: right;
+
+        .btn {
+          font-size: 11px;
+          padding: 3px 10px;
+          border-color: #eaeaea;
+        }
+      }
+    }
+  }
+
+  .general-list-group {
+    dl {
+      margin: 0;
+      padding: 2px 0;
+
+      dt {
+        display: inline-block;
+        width: 60%;
+      }
+
+      dd {
+        display: inline-block;
+        width: 39%;
+        text-align: right;
+      }
+    }
+  }
+}

@@ -1,0 +1,404 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-theme" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error.warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error.warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-theme" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+            <li><a href="#tab-global" data-toggle="tab">{{ tab_global }}</a></li>
+            <li><a href="#tab-footer" data-toggle="tab">{{ tab_footer }}</a></li>
+            <li><a href="#tab-popup-ad" data-toggle="tab">{{ tab_popup_ad }}</a></li>
+            <li><a href="#tab-homepage" data-toggle="tab">{{ tab_homepage }}</a></li>
+            <li><a href="#tab-category-page" data-toggle="tab">{{ tab_category_page }}</a></li>
+	    <li><a href="#tab-css" data-toggle="tab">{{ tab_css }}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+              <fieldset>
+                <legend>{{ text_general }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="theme_mobile_status" id="input-status" class="form-control">
+                      {% if helper.old('theme_mobile_status', setting.theme_mobile_status) %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                      {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_product }}</legend>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-catalog-limit"><span data-toggle="tooltip" title="{{ help_product_limit }}">{{ entry_product_limit }}</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" name="theme_mobile_product_limit" value="{{ helper.old('theme_mobile_product_limit', setting.theme_mobile_product_limit ?? 15) }}" placeholder="{{ entry_product_limit }}" id="input-catalog-limit" class="form-control" />
+                    {% if error.product_limit %}
+                    <div class="text-danger">{{ error.product_limit }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-description-limit"><span data-toggle="tooltip" title="{{ help_product_description_length }}">{{ entry_product_description_length }}</span></label>
+                  <div class="col-sm-10">
+                    <input type="text" name="theme_mobile_product_description_length" value="{{ helper.old('theme_mobile_product_description_length', setting.theme_mobile_product_description_length ?? 100) }}" placeholder="{{ entry_product_description_length }}" id="input-description-limit" class="form-control" />
+                    {% if error.product_description_length %}
+                    <div class="text-danger">{{ error.product_description_length }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>{{ text_image }}</legend>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-category-width">{{ entry_image_category }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_category_width" value="{{ helper.old('theme_mobile_image_category_width', setting.theme_mobile_image_category_width ?? 80) }}" placeholder="{{ entry_width }}" id="input-image-category-width" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_category_height" value="{{ helper.old('theme_mobile_image_category_height', setting.theme_mobile_image_category_height ?? 80) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_category %}
+                    <div class="text-danger">{{ error.image_category }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-thumb-width">{{ entry_image_thumb }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_thumb_width" value="{{ helper.old('theme_mobile_image_thumb_width', setting.theme_mobile_image_thumb_width ?? 228) }}" placeholder="{{ entry_width }}" id="input-image-thumb-width" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_thumb_height" value="{{ helper.old('theme_mobile_image_thumb_height', setting.theme_mobile_image_thumb_height ?? 228) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_thumb %}
+                    <div class="text-danger">{{ error.image_thumb }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-preview-width">{{ entry_image_preview }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_preview_width" value="{{ helper.old('theme_mobile_image_preview_width', setting.theme_mobile_image_preview_width ?? 500) }}" placeholder="{{ entry_width }}" id="input-image-preview-width" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_preview_height" value="{{ helper.old('theme_mobile_image_preview_height', setting.theme_mobile_image_preview_height ?? 500) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_preview %}
+                    <div class="text-danger">{{ error.image_preview }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-popup-width">{{ entry_image_popup }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_popup_width" value="{{ helper.old('theme_mobile_image_popup_width', setting.theme_mobile_image_popup_width ?? 500) }}" placeholder="{{ entry_width }}" id="input-image-popup-width" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_popup_height" value="{{ helper.old('theme_mobile_image_popup_height', setting.theme_mobile_image_popup_height ?? 500) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_popup %}
+                    <div class="text-danger">{{ error.image_popup }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-product-width">{{ entry_image_product }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_product_width" value="{{ helper.old('theme_mobile_image_product_width', setting.theme_mobile_image_product_width ?? 228) }}" placeholder="{{ entry_width }}" id="input-image-product-width" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_product_height" value="{{ helper.old('theme_mobile_image_product_height', setting.theme_mobile_image_product_height ?? 228) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_product %}
+                    <div class="text-danger">{{ error.image_product }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-additional-width">{{ entry_image_additional }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_additional_width" value="{{ helper.old('theme_mobile_image_additional_width', setting.theme_mobile_image_additional_width ?? 74) }}" placeholder="{{ entry_width }}" id="input-image-additional-width" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_additional_height" value="{{ helper.old('theme_mobile_image_additional_height', setting.theme_mobile_image_additional_height ?? 74) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_additional %}
+                    <div class="text-danger">{{ error.image_additional }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-related">{{ entry_image_related }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_related_width" value="{{ helper.old('theme_mobile_image_related_width', setting.theme_mobile_image_related_width ?? 80) }}" placeholder="{{ entry_width }}" id="input-image-related" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_related_height" value="{{ helper.old('theme_mobile_image_related_height', setting.theme_mobile_image_related_height ?? 80) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_related %}
+                    <div class="text-danger">{{ error.image_related }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-compare">{{ entry_image_compare }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_compare_width" value="{{ helper.old('theme_mobile_image_compare_width', setting.theme_mobile_image_compare_width ?? 90) }}" placeholder="{{ entry_width }}" id="input-image-compare" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_compare_height" value="{{ helper.old('theme_mobile_image_compare_height', setting.theme_mobile_image_compare_height ?? 90) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_compare %}
+                    <div class="text-danger">{{ error.image_compare }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-wishlist">{{ entry_image_wishlist }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_wishlist_width" value="{{ helper.old('theme_mobile_image_wishlist_width', setting.theme_mobile_image_wishlist_width ?? 47) }}" placeholder="{{ entry_width }}" id="input-image-wishlist" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_wishlist_height" value="{{ helper.old('theme_mobile_image_wishlist_height', setting.theme_mobile_image_wishlist_height ?? 47) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_wishlist %}
+                    <div class="text-danger">{{ error.image_wishlist }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-cart">{{ entry_image_cart }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_cart_width" value="{{ helper.old('theme_mobile_image_cart_width', setting.theme_mobile_image_cart_width ?? 50) }}" placeholder="{{ entry_width }}" id="input-image-cart" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_cart_height" value="{{ helper.old('theme_mobile_image_cart_height', setting.theme_mobile_image_cart_height ?? 50) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_cart %}
+                    <div class="text-danger">{{ error.image_cart }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group required">
+                  <label class="col-sm-2 control-label" for="input-image-location">{{ entry_image_location }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_location_width" value="{{ helper.old('theme_mobile_image_location_width', setting.theme_mobile_image_location_width ?? 268) }}" placeholder="{{ entry_width }}" id="input-image-location" class="form-control" />
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="text" name="theme_mobile_image_location_height" value="{{ helper.old('theme_mobile_image_location_height', setting.theme_mobile_image_location_height ?? 50) }}" placeholder="{{ entry_height }}" class="form-control" />
+                      </div>
+                    </div>
+                    {% if error.image_location %}
+                    <div class="text-danger">{{ error.image_location }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="tab-pane" id="tab-global">
+              <fieldset>
+                <legend>{{ text_popup_image_ad }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-gd-mobile-add-to-cart-button-status">{{ entry_add_to_cart_button }}</label>
+                  <div class="col-sm-10">
+                    <select name="theme_mobile_add_to_cart_button_status" id="input-gd-mobile-add-to-cart-button-status" class="form-control">
+                      {% if helper.old('theme_mobile_add_to_cart_button_status', setting.theme_mobile_add_to_cart_button_status ?? 1) %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                      {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="tab-pane" id="tab-footer">
+              <fieldset>
+                <legend>{{ text_copyright }}</legend>
+                <ul class="nav nav-tabs" id="copyright">
+                  {% for language in languages %}
+                  <li><a href="#copyright{{ language.language_id }}" data-toggle="tab"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}</a></li>
+                  {% endfor %}
+                </ul>
+                <div class="tab-content">
+                  {% for language in languages %}
+                  <div class="tab-pane" id="copyright{{ language.language_id }}">
+                    <div class="form-group">
+                      <div class="col-sm-12">
+                        <textarea name="theme_mobile_copyright[{{ language.language_id }}]" placeholder="{{ entry_copyright }}" id="input-copyright{{ language.language_id }}" class="form-control tinymce">{{ helper.old("theme_mobile_copyright.#{language.language_id}", setting.theme_mobile_copyright[language.language_id]) }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </fieldset>
+            </div>
+            <div class="tab-pane" id="tab-popup-ad">
+              <fieldset>
+                <legend>{{ text_popup_image_ad }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="theme_mobile_popup_image_ad_status" id="input-status" class="form-control">
+                      {% if helper.old('theme_mobile_popup_image_ad_status', setting.theme_mobile_popup_image_ad_status) %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                      {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-status">{{ entry_select_image }}</label>
+                  <div class="col-sm-10">
+                    <a href="" id="thumb-popup-image-ad" data-toggle="image" class="img-thumbnail"><img src="{{ helper.image_resize(helper.old('theme_mobile_popup_image_ad_image', setting.theme_mobile_popup_image_ad_image)) }}" alt="" title="" data-placeholder="{{ helper.image_resize() }}" /></a>
+                    <input type="hidden" name="theme_mobile_popup_image_ad_image" value="{{ helper.old('theme_mobile_popup_image_ad_image', setting.theme_mobile_popup_image_ad_image) }}" id="input-popup-image-ad" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-popup-image-ad-href">{{ entry_url }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="theme_mobile_popup_image_ad_href" id="input-popup-image-ad-href" class="form-control" value="{{ helper.old('theme_mobile_popup_image_ad_href', setting.theme_mobile_popup_image_ad_href) }}" placeholder="{{ entry_url }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-homepage-only">{{ entry_homepage_only }}</label>
+                  <div class="col-sm-10">
+                    <select name="theme_mobile_popup_image_ad_home_only" id="input-homepage-only" class="form-control">
+                      {% if helper.old('theme_mobile_popup_image_ad_home_only', setting.theme_mobile_popup_image_ad_home_only) %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                      {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="tab-pane" id="tab-homepage">
+              <fieldset>
+                <legend>{{ text_homepage_search }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-status">{{ entry_homepage_search_bar_position }}</label>
+                  <div class="col-sm-10">
+                    {% set theme_mobile_homepage_search_bar_position = helper.old('theme_mobile_homepage_search_bar_position', setting.theme_mobile_homepage_search_bar_position ?? 'normal') %}
+                    <select name="theme_mobile_homepage_search_bar_position" id="input-search-bar-position" class="form-control">
+                      <option value="fixed" {% if theme_mobile_homepage_search_bar_position == 'fixed' %}selected="selected"{% endif %}>{{ text_fixed }}</option>
+                      <option value="normal"{% if theme_mobile_homepage_search_bar_position == 'normal' %}selected="selected"{% endif %}>{{ text_normal }}</option>
+                      <option value="none"{% if theme_mobile_homepage_search_bar_position == 'none' %}selected="selected"{% endif %}>{{ text_hide }}</option>
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="tab-pane" id="tab-category-page">
+              <fieldset>
+                <legend>{{ entry_category_style }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-category-style">{{ entry_category_style }}</label>
+                  <div class="col-sm-10">
+                    {% set theme_mobile_category_page_style = helper.old('theme_mobile_category_page_style', setting.theme_mobile_category_page_style ?? 'flat') %}
+                    <select name="theme_mobile_category_page_style" id="input-search-bar-position" class="form-control">
+                      <option value="flat"{% if theme_mobile_category_page_style == 'flat' %}selected="selected"{% endif %}>{{ text_flat }}</option>
+                      <option value="sidebar" {% if theme_mobile_category_page_style == 'sidebar' %}selected="selected"{% endif %}>{{ text_sidebar }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-category-brand-link-status">{{ entry_category_brand_link_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="theme_mobile_category_brand_link_status" id="input-category-brand-link-status" class="form-control">
+                      {% if helper.old('theme_mobile_category_brand_link_status', setting.theme_mobile_category_brand_link_status ?? 1) %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                      {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="tab-pane" id="tab-css">
+              <fieldset>
+                <legend>{{ tab_css }}</legend>
+                <textarea name="theme_mobile_css" placeholder="{{ entry_css }}" id="input-css" class="form-control" rows="30">{{ helper.old('theme_mobile_css', setting.theme_mobile_css) }}</textarea>
+              </fieldset>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$('#copyright a:first').tab('show');
+//--></script>
+{{ footer }}

@@ -1,0 +1,511 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2017-12-05 17:11:30
+// @modified         2018-07-13 16:02:21
+//
+
+$control_height: 34px;
+
+body.checkout-checkout {
+  .quick-checkout-wrapper {
+    margin-bottom: 20px;
+
+    .checkout-section {
+      margin-bottom: 20px;
+      padding: 8px;
+      position: relative;
+      border: $default-border;
+
+      h2 {
+        padding: 12px;
+        margin: -8px -8px 10px -8px;
+        background: #eee;
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      legend {
+        font-size: 14px;
+      }
+
+      .radio {
+        position: relative;
+        display: inline-block;
+        border: 1px solid #d2d2d2;
+
+        &:after {
+          display: none;
+          content: '';
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          width: 12px;
+          height: 12px;
+          overflow: hidden;
+          background: url('../image/selected-icon.png') no-repeat;
+        }
+
+        &:hover {
+          border: 2px solid $brand-primary;
+          background-color: #fff3f3;
+          label {
+            padding: 7px 10px;
+          }
+        }
+
+        label {
+          padding-left: 0;
+          padding: 8px 11px;
+          display: block;
+        }
+        input {
+          display: none;
+        }
+
+        &.active {
+          border: 2px solid $brand-primary;
+
+          label {
+            padding: 7px 10px;
+          }
+
+          &:after {
+            display: block;
+          }
+        }
+      }
+    }
+
+    #login-section, #payment-address-section, #shipping-address-section {
+      .form-group {
+        overflow: hidden;
+        display: block;
+        clear: both;
+
+        label.control-label {
+          display: block;
+          float: left;
+          width: 35%;
+          padding: 0;
+          margin-bottom: 0;
+          min-height: $control_height;
+          line-height: $control_height;
+        }
+
+        input, select {
+          width: 65%;
+          float: left;
+        }
+      }
+    }
+
+    #shipping-address-section, #payment-address-section {
+      .form-group {
+        .col-sm-10 {
+          float: left;
+          width: 65%;
+          padding: 0;
+
+          input, select {
+            width: 100%;
+            float: none;
+          }
+        }
+      }
+
+      .title-wrapper {
+        overflow: hidden;
+        margin: -8px -8px 10px -8px;
+
+        h2 {
+          margin: 0 0 10px !important;
+
+          .btn-new-address {
+            float: right;
+            color: #005ea7;
+            font-weight: 500;
+            cursor: pointer;
+            &:hover {
+              color: red;
+            }
+          }
+        }
+
+        .title-radio {
+          float: right;
+          margin-top: 0;
+          cursor: pointer;
+          color: #005ea7 !important;
+          font-weight: 500 !important;
+          &:hover {
+            color: red !important;
+          }
+
+          label {
+            padding-left: 0;
+          }
+
+          input {
+            display: none;
+          }
+        }
+      }
+
+      #payment-existing, #shipping-existing {
+        ul {
+          padding-left: 3px;
+          list-style: none;
+
+          li {
+            position: relative;
+            padding: 0 10px 0 0;
+            margin-bottom: 5px;
+            cursor: pointer;
+            overflow: hidden;
+            display: none;
+            border: 1px solid transparent;
+
+            .item {
+              float: left;
+              width: 92%;
+              padding: 7px;
+            }
+
+            .address-action {
+              float: right;
+              width: 7%;
+              padding: 7px 0;
+              text-align: right;
+              @media (min-width: 768px) {
+                display: none;
+              }
+
+              @media (max-width: 768px) {
+                position: absolute;
+                width: 32px;
+                right: 0;
+                top: 1px;
+              }
+
+              span {
+                color: #005ea7;
+                margin-left: 6px;
+
+                &:hover {
+                  color: red;
+                }
+              }
+            }
+
+            .name {
+              display: inline-block;
+              margin: -7px 0;
+              padding: 7px;
+              position: relative;
+              border: 2px solid transparent;
+              @media (max-width: 768px) {
+                margin: -7px 0 0;
+              }
+
+              &:after {
+                display: none;
+                content: '';
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                width: 12px;
+                height: 12px;
+                overflow: hidden;
+                background: url('../image/selected-icon.png') no-repeat;
+              }
+            }
+
+            &.active {
+              display: block;
+              background-color: #fff3f3;
+              border-color: #ffe5e5;
+
+              i {
+                margin: 0 10px;
+                font-size: 18px;
+                color: $brand-primary;
+              }
+            }
+
+            &.block {
+              display: block;
+            }
+
+            &:hover {
+              background-color: #fff3f3;
+              border-color: #ffe5e5;
+
+              .address-action {
+                display: block;
+              }
+            }
+          }
+
+          .show-more {
+            margin-top: 5px;
+            cursor: pointer;
+            display: inline-block;
+
+            &.active i:before {
+              content: "\f102";
+            }
+
+            &:hover {
+              color: red;
+            }
+          }
+        }
+      }
+
+      &.no-addresses {
+        border: 2px dashed #ddd;
+        text-align: center;
+        background-color: #f7f7f7;
+        padding: 0;
+        cursor: pointer;
+        @include transition(all .3s ease-in-out);
+
+        &.border-red {
+          border-color: red;
+        }
+
+        &:hover {
+          border-color: $brand-primary;
+          color: $brand-primary;
+        }
+
+        .btn-new-address {
+          display: block;
+          padding: 20px 0;
+          font-size: 18px;
+        }
+      }
+    }
+
+    #payment-confirm-wrapper {
+      .buttons, #button-confirm {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .left-section-wrapper {
+        #shipping-new {
+          .form-group {
+            margin-bottom: 10px;
+            label {
+              min-height: 24px;
+              line-height: 24px;
+              width: 100%;
+              font-weight: bold;
+              padding-top: 0 !important;
+              margin-bottom: 5px !important;
+              text-align: left !important;
+            }
+            .col-sm-10 {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+
+    .product-wrapper {
+      .product-list table {
+        border-bottom: $default-border;
+      }
+
+      .table-total {
+        margin-bottom: 0;
+        td {
+          border: none;
+        }
+      }
+
+      img {
+        max-width: 60px;
+        margin-bottom: 0;
+      }
+    }
+
+    .checkout-total-wrapper {
+      td {
+        padding: 8px;
+      }
+
+      tr:last-of-type {
+        color: $brand-primary;
+        font-weight: bold;
+      }
+    }
+
+    .text-danger {
+      padding: 0 5px;
+      margin-left: 5px;
+      background: #a94442;
+      color: #fff;
+      display: inline-block;
+    }
+  }
+}
+
+#payment-confirm-wrapper {
+  .stripe-payment-wrapper {
+    padding: 10px 26px;
+    background-color: #fff;
+  }
+}
+
+#quick-checkout-connect {
+  .quick-checkout-connect-wrapper {
+    background-color: #f3fcee;
+    border-top: 2px solid #4cb64c;
+    padding: 20px;
+    overflow: hidden;
+
+    .order-info {
+      overflow: hidden;
+      margin: 0 auto;
+      @media (min-width: 992px) {
+        max-width: 740px;
+      }
+
+      .row {
+        margin-bottom: 6px;
+      }
+
+      .icon-wrapper {
+        float: left;
+        margin-right: 15px;
+        i {
+          font-size: 66px;
+          color: $brand-success;
+          @media (min-width: 992px) {
+            margin-top: 8px;
+          }
+        }
+      }
+
+      .inner-wrapper {
+        float: left;
+
+        h2.title {
+          color: #219a21;
+        }
+      }
+
+      .color-red {
+        color: #d20505;
+      }
+    }
+
+    #payment-confirm-wrapper {
+      margin-top: $gutter * 1.5;
+
+      hr {
+        border-color: $brand-success + 20;
+      }
+      p {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}
+
+.checkout-process-wrapper {
+  padding: 14px 0 68px;
+
+  h1 {
+    @media (min-width: 768px) {
+      float: left;
+      margin: 4px 0 10px;
+    }
+  }
+
+  .process-list {
+    padding-left: 0;
+    list-style: none;
+    margin-top: 2px;
+    @media (min-width: 768px) {
+      width: 500px;
+      float: right;
+    }
+
+    li {
+      float: left;
+      width: 33.33333%;
+      text-align: center;
+      position: relative;
+      height: 6px;
+      border-top: 6px solid #ccc;
+
+      &:first-of-type {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+
+      &:last-of-type {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+
+      &.active {
+        border-color: $brand-primary;
+        div {
+          background-color: $brand-primary;
+        }
+        span {
+          color: $brand-primary;
+        }
+      }
+
+      &.old {
+        border-color: #ffb97d;
+        div {
+          background-color: #ffb97d;
+        }
+        span {
+          color: #ffb97d;
+        }
+      }
+
+      div {
+        width: 23px;
+        height: 23px;
+        margin: -15px auto 4px;
+        line-height: 23px;
+        color: #fff;
+        background-color: #ccc;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.address-form-modal {
+  @media (max-width: 768px) {
+    width: 90% !important;
+  }
+}
+
+
+body.checkout-checkout-connect {
+  // Force button float left
+  #payment-confirm-wrapper {
+    .buttons {
+      .pull-right {
+        float: left !important;
+      }
+    }
+  }
+}

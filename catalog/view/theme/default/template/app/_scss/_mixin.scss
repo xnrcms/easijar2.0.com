@@ -1,0 +1,29 @@
+@mixin box-shadow-none() {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+@mixin box-shadow($h, $v, $blur, $color) {
+  -webkit-box-shadow: $h $v $blur $color;
+  -moz-box-shadow: $h $v $blur $color;
+  box-shadow: $h $v $blur $color;
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin transform-border-x {
+  -webkit-transform: scaleX(0.5);
+  -moz-transform: scaleX(0.5);
+  transform: scaleX(0.5);
+}
+@mixin transform-border-y {
+  -webkit-transform: scaleY(0.5);
+  -moz-transform: scaleY(0.5);
+  transform: scaleY(0.5);
+}

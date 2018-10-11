@@ -1,0 +1,212 @@
+{% extends helper.template("seller/_partial/layout") %}
+
+{% block content %}
+  <div id="content" class="col-sm-12">
+    <div class="content-wrapper">
+      {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+      {% endif %}
+      <h1>{{ heading_title }}</h1>
+      <p>{{ text_seller_add }}</p>
+      <p>{{ text_signup }}</p>
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
+        <fieldset id="seller">
+          <legend>{{ text_your_seller }}</legend>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-store-name">{{ entry_store_name }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="store_name" value="{{ store_name }}" placeholder="{{ entry_store_name }}" id="input-store-name" class="form-control" />
+              {% if error_store_name %}
+              <div class="text-danger">{{ error_store_name }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-company">{{ entry_company }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="company" value="{{ company }}" placeholder="{{ entry_company }}" id="input-company" class="form-control" />
+              {% if error_company %}
+              <div class="text-danger">{{ error_company }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-country">{{ entry_country }}</label>
+            <div class="col-sm-10">
+              <select name="country_id" id="input-country" class="form-control">
+                {% for country in countries %}
+                  {% if country.country_id == country_id %}
+                    <option value="{{ country.country_id }}" selected="selected">{{ country.name }}</option>
+                  {% else %}
+                    <option value="{{ country.country_id }}">{{ country.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-zone">{{ entry_zone }}</label>
+            <div class="col-sm-10">
+              <select name="zone_id" id="input-zone" class="form-control">
+              </select>
+              {% if error_zone %}
+                <div class="text-danger">{{ error_zone }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-city">{{ entry_city }}</label>
+            <div class="col-sm-10">
+              <select name="city_id" id="input-city" class="form-control">
+              </select>
+              {% if error_city %}
+                <div class="text-danger">{{ error_city }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-county">{{ entry_county }}</label>
+            <div class="col-sm-10">
+              <select name="county_id" id="input-county" class="form-control">
+              </select>
+              {% if error_county %}
+                <div class="text-danger">{{ error_county }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label">{{ entry_alipay }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="alipay" value="{{ alipay }}" placeholder="{{ entry_alipay }}" id="input-alipay" class="form-control" />
+              {% if error_alipay %}
+              <div class="text-danger">{{ error_paypal }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </fieldset>
+        {% if text_agree %}
+        <div class="buttons clearfix">
+          <div class="pull-right">{{ text_agree }}
+            {% if agree %}
+            <input type="checkbox" name="agree" value="1" checked="checked" />
+            {% else %}
+            <input type="checkbox" name="agree" value="1" />
+            {% endif %}
+            &nbsp;
+            <input type="submit" value="{{ button_continue }}" class="btn btn-primary" />
+          </div>
+        </div>
+        {% else %}
+        <div class="buttons clearfix">
+          <div class="pull-right">
+            <input type="submit" value="{{ button_continue }}" class="btn btn-primary" />
+          </div>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script type="text/javascript"><!--
+    $('select[name=\'country_id\']').on('change', function() {
+    	$.ajax({
+    		url: 'index.php?route=account/account/country&country_id=' + this.value,
+    		dataType: 'json',
+    		beforeSend: function() {
+    			$('select[name=\'country_id\']').prop('disabled', true);
+    		},
+    		complete: function() {
+    			$('select[name=\'country_id\']').prop('disabled', false);
+    		},
+    		success: function(json) {
+    			if (json['postcode_required'] == '1') {
+    				$('input[name=\'postcode\']').parent().parent().addClass('required');
+    			} else {
+    				$('input[name=\'postcode\']').parent().parent().removeClass('required');
+    			}
+
+    			html = '<option value="">{{ text_select }}</option>';
+
+    			if (json['zone'] && json['zone'] != '') {
+    				for (i = 0; i < json['zone'].length; i++) {
+    					html += '<option value="' + json['zone'][i]['zone_id'] + '"';
+
+    					if (json['zone'][i]['zone_id'] == '{{ zone_id }}') {
+    						html += ' selected="selected"';
+    					}
+
+    					html += '>' + json['zone'][i]['name'] + '</option>';
+    				}
+    			} else {
+    				html += '<option value="0" selected="selected">{{ text_none }}</option>';
+    			}
+
+    			$('select[name=\'zone_id\']').html(html);
+          $('select[name=\'city_id\']').html('<option>{{ text_select }}</option>');
+          $('select[name=\'county_id\']').html('<option>{{ text_select }}</option>');
+          $('select[name=\'zone_id\']').trigger('change');
+    		},
+    		error: function(xhr, ajaxOptions, thrownError) {
+    			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    		}
+    	});
+    });
+    $('select[name=\'country_id\']').trigger('change');
+  //--></script>
+  <script type="text/javascript"><!--
+    var showCityOrCountyOptions = function(currentEl, changeEl, isTop, cityId, callback) {
+      var zoneId = currentEl.val();
+      if (zoneId == null) return;
+      var requestUrl = '{{ store_url }}' + 'index.php?route=account/account/zone&zone_id=' + zoneId + '&is_top=' + isTop;
+      $.ajax({
+        url: requestUrl,
+        dataType: 'json',
+        beforeSend: function () {
+          $('select[name=\'city_id\']').prop('disabled', true);
+          $('select[name=\'county_id\']').prop('disabled', true);
+        },
+        complete: function () {
+          $('select[name=\'city_id\']').prop('disabled', false);
+          $('select[name=\'county_id\']').prop('disabled', false);
+        },
+        success: function (json) {
+          html = '<option value="">{{ text_select }}</option>';
+          if (json['city'] && json['city'] != '') {
+            for (i = 0; i < json['city'].length; i++) {
+              html += '<option value="' + json['city'][i]['city_id'] + '"';
+              if (json['city'][i]['city_id'] == cityId) {
+                html += ' selected="selected"';
+              }
+              html += '>' + json['city'][i]['name'] + '</option>';
+            }
+          } else {
+            html += '<option value="0" selected="selected">{{ text_none }}</option>';
+          }
+          changeEl.html(html);
+          if (typeof(callback) == 'function') {
+            callback();
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    };
+
+    $('select[name=\'zone_id\']').bind('change', function() {
+      var changeEl = $('select[name=\'city_id\']');
+      var cityId = '{{ city_id  }}';
+      showCityOrCountyOptions($(this), changeEl, 1, cityId, function() {
+        changeEl.trigger('change');
+      });
+    });
+
+    $('select[name=\'city_id\']').bind('change', function() {
+      var changeEl = $('select[name=\'county_id\']');
+      var countyId = '{{ county_id }}';
+      showCityOrCountyOptions($(this), changeEl, 0, countyId);
+    });
+  //--></script>
+{% endblock %}

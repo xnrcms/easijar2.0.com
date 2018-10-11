@@ -1,0 +1,399 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2017-09-25 15:27:20
+// @modified         2018-04-17 10:54:42
+//
+
+body {
+  background-color: #fff;
+
+  &.common-home {
+    footer {
+      margin-top: 0;
+      border-top: none;
+    }
+  }
+
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: #F5F5F5;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #F5F5F5;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #ccc;
+  }
+
+  &.body-overflow {
+    overflow: hidden;
+
+    &:before {
+      opacity: 1;
+      // pointer-events: auto;
+      z-index: 999;
+    }
+  }
+
+  @media (max-width: 992px) {
+    &:before {
+      content: '';
+      background: rgba(41,45,53,.5);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      z-index: -1;
+      // pointer-events: none;
+      transition: .3s opacity;
+    }
+  }
+}
+
+.dropdown-menu {
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb-wrapper {
+  @media (min-width: 992px) {
+    border-top: 1px solid #ee3333;
+    background-color: #f5f5f5;
+    margin-bottom: 14px;
+  }
+  line-height: 26px;
+  border-radius: 0;
+
+  .breadcrumb {
+    margin: 0 auto;
+    padding: 8px 15px;
+    background-color: transparent;
+    a {
+      color: #222;
+    }
+  }
+}
+
+
+.form-control {
+  box-shadow: none !important;
+}
+
+div.required .control-label:before {
+  content: '* ';
+  color: #f00;
+  font-weight: bold;
+}
+
+.filter-wrapper {
+  overflow: hidden;
+  padding: 11px 12px 8px;
+  border: $default-border;
+
+  button {
+    outline: 0;
+  }
+
+  .input-group-addon {
+    background-color: #f4f5f5;
+    border-color: #f4f5f5;
+  }
+
+  @media (max-width: 992px) {
+    .hidden-xs > .form-group {
+        height: 35px;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 0;
+    height: 28px;
+  }
+
+  .btn-group {
+    a {
+      padding: 4px 6px;
+      font-size: 16px;
+      border: none;
+      color: #ddd;
+    }
+
+    .active {
+      background-color: #fff;
+      box-shadow: none;
+      // border-color: $brand-primary;
+      color: #333;
+    }
+  }
+}
+
+.well {
+  box-shadow: none;
+}
+
+.no-items {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 40px;
+  color: #707077;
+  line-height: 26px;
+
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  span {
+    display: block;
+  }
+
+  img {
+    margin: 20px auto 34px auto;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    margin-top: 20px;
+  }
+}
+
+html[lang^="en"] {
+  .no-items {
+    font-size: 15px;
+    line-height: 24px;
+
+    .inner {
+      display: inline-block;
+      @media (min-width: 768px) {
+        max-width: 600px;
+      }
+    }
+  }
+}
+
+.success-items {
+  background-color: #f3fcee;
+  border-top: 2px solid #4cb64c;
+  padding: 20px;
+  font-size: 16px;
+  overflow: hidden;
+
+  &.failure {
+    border-color: #e05b4c;
+    background-color: #fcf1ee;
+
+    .icon-wrapper i, h2.title {
+      color: #d00000 !important;
+    }
+  }
+
+  .order-info {
+    overflow: hidden;
+    margin: 0 auto;
+    @media (min-width: 992px) {
+      max-width: 740px;
+    }
+
+    .row {
+      margin-bottom: 6px;
+    }
+
+    .icon-wrapper {
+      float: left;
+      margin-right: 15px;
+      i {
+        font-size: 66px;
+        color: $brand-success;
+        @media (min-width: 992px) {
+          margin-top: 8px;
+        }
+      }
+    }
+
+    .inner-wrapper {
+      float: left;
+
+      h2.title {
+        color: #219a21;
+      }
+    }
+
+    .color-red {
+      color: #d20505;
+    }
+  }
+
+  h2.title {
+    color: #219a21;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    padding: 8px 26px;
+  }
+}
+
+@for $i from 1 through 6 {
+  h#{$i} {
+    font-size: 26px - ($i *2);
+    margin: 0 0 20px - ($i *2);
+  }
+}
+
+.zoomContainer {
+  z-index: 999;
+}
+
+.btn {
+  outline: none !important;
+}
+
+.default-border {
+  overflow: hidden;
+
+  &.default-border-old {
+    border: $default_border;
+
+    li {
+      padding: 0 10px;
+    }
+  }
+
+  ol,ul {list-style: none;}
+
+  .title {
+    position: relative;
+    margin: 0;
+    background: #f5f5f5;
+    font-size: 15px;
+    color: #333;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e7e7e7;
+  }
+
+  .list-unstyled {
+    margin-bottom: 0;
+
+    li {
+      @include transition(all .3s ease 0s);
+
+      &:hover {
+        // padding-left: 20px;
+        background-color: #f5f5f5;
+
+        a {
+          color: $brand-primary;
+          &:before {
+            color: $brand-primary;
+          }
+        }
+      }
+    }
+
+    a {
+      display: block;
+      padding: 8px 0;
+      font-size: 14px;
+      color: #777;
+      position: relative;
+      padding-left: 23px;
+
+      &:before {
+        content: "\f101";
+        font-family: 'FontAwesome';
+        top: 8px;
+        left: 5px;
+        position: absolute;
+        color: #ddd;
+        @include transition(all .1s ease 0s);
+      }
+    }
+  }
+}
+
+.form-group-list {
+  .buttons {
+    margin-top: 10px;
+  }
+
+  .form-group {
+    label {
+      width: 100%;
+      font-weight: bold;
+      padding-top: 0 !important;
+      margin-bottom: 5px !important;
+      text-align: left !important;
+    }
+
+    .col-sm-10 {
+      width: 100%;
+    }
+
+    .radio-inline {
+      width: auto;
+    }
+
+    input[type="text"] {
+      border-radius: 0px;
+    }
+    textarea {
+      border-radius: 0px;
+    }
+  }
+}
+
+.tab-product-list {
+  margin-bottom: 15px;
+
+  .table-bordered {
+    border: none !important;
+    td {
+      border-left: none !important;
+      border-right: none !important;
+      border-top: none !important;
+    }
+  }
+
+  a.name {
+    color: #333;
+  }
+
+  .img-thumbnail {
+    max-width: 60px;
+  }
+}
+
+.bg-gray {
+  background-color: #f5f5f5;
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.information-information {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}

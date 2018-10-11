@@ -1,0 +1,24 @@
+<form action="{{ action }}" method="post">
+  <input type="hidden" name="source" value="{{ source }}" />
+  <input type="hidden" name="api_key" value="{{ api_key }}" />
+  <input type="hidden" name="api_sig" value="{{ api_sig }}" />
+  <input type="hidden" name="pm_id" value="{{ pm_id }}" />
+  <input type="hidden" name="payer_name" value="{{ payer_name }}" />
+  <input type="hidden" name="payer_ref">
+  <input type="hidden" name="payer_email"  value="{{ payer_email }}" />
+  <input type="hidden" name="track_id" value="{{ track_id }}" />
+  <input type="hidden" name="sub_track_id" />
+  <input type="hidden" name="description" value="{{ description }}" />
+  <input type="hidden" name="amount" value="{{ amount }}" />
+  <input type="hidden" name="currency" value="{{ currency }}" />
+  <input type="hidden" name="language" value="en">
+  <input type="hidden" name="notify_url"  value="{{ notify_url }}" >
+  <input type="hidden" name="success_url" value="{{ success_url }}" />
+  <input type="hidden" name="return_url"  value="{{ return_url }}" />
+
+  <div class="buttons">
+    <div class="pull-right">
+      <input type="submit" value="{{ button_confirm }}" class="btn btn-primary" />
+    </div>
+  </div>
+</form>

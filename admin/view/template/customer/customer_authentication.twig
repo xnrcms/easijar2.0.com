@@ -1,0 +1,36 @@
+<div class="table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <td class="text-left">{{ column_id }}</td>
+        <td class="text-left">{{ column_provider }}</td>
+        <td class="text-right">{{ column_uid }}</td>
+        <td class="text-right">{{ column_union_id }}</td>
+        <td class="text-right">{{ column_access_token }}</td>
+        <td class="text-right">{{ column_date_added }}</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% if authentications %}
+        {% for item in authentications %}
+          <tr>
+            <td class="text-left">{{ item.id }}</td>
+            <td class="text-left">{{ item.provider }}</td>
+            <td class="text-left">{{ item.uid }}</td>
+            <td class="text-left">{{ item.unionid }}</td>
+            <td class="text-left">{{ item.access_token|length > 50 ? item.access_token|slice(0, 50) ~ '...' : item.access_token }}</td>
+            <td class="text-left">{{ item.date_added }}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td class="text-center" colspan="6">{{ text_no_results }}</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+<div class="row">
+  <div class="col-sm-6 text-left">{{ pagination }}</div>
+  <div class="col-sm-6 text-right">{{ results }}</div>
+</div>

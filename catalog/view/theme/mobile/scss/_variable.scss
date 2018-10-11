@@ -1,0 +1,68 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-02-01 09:54:07
+//
+
+$gutter: 10px;
+
+$main_color: #e93b3d;
+$second_color: #272727;
+
+$a_color: $second_color;
+$a_color_active: $main_color;
+
+$bottom_tab_color: #8f939e;
+$bottom_tab_color_active: $main_color;
+$bottom_tab_wishlist_color: #777;
+$bottom_tab_wishlist_color_active: $main_color;
+
+$widget_title_color: #222;
+
+$nav_bar_color: $second_color;
+
+$sort_button_color: $second_color;
+$sort_button_color_active: $main_color;
+
+$btn_info_bg_color: $main_color;
+$btn_info_border_color: $btn_info_bg_color;
+$btn_info_bg_color_hover: $main_color;
+$btn_info_border_color_hover: $btn_info_bg_color_hover;
+
+$btn_danger_bg_color: $second_color;
+$btn_danger_border_color: $btn_danger_bg_color;
+$btn_danger_bg_color_active: $second_color;
+$btn_danger_border_color_active: $btn_danger_bg_color_active;
+
+
+$nav_tabs_border_bottom: 1px solid $second_color;
+$nav_tabs_border_bottom_active_color: $main_color;
+$nav_tabs_border_bottom_active: 2px solid $main_color;
+
+$home_page_top_search_color_active: $main_color;
+
+$product_page_name_font_size: 14px;
+$product_page_name_color: $second_color;
+$product_page_price_color: $main_color;
+$product_page_scroll_to_desc_color: $main_color;
+$product_page_option_title_color: $main_color;
+$product_page_option_border_color: #ccc;
+
+$cart_page_empty_icon_color: #777;
+$cart_page_empty_message_color: $main_color;
+
+$account_page_avatar_container_bg_1: #000;
+$account_page_avatar_container_bg_2: #000;
+$account_page_avatar_container_bg_3: #000;
+$account_page_avatar_width: 66px;
+$account_page_order_icon_color: $second_color;
+
+$account_coupon_page_decoration_border: 9px solid $main_color;
+
+$footer_color: $second_color;
+
+$checkout_button: $main_color;

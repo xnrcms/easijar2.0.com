@@ -1,0 +1,63 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2017-06-06 15:02:39
+//
+
+.account-register {
+  legend {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  .telephone-group .border-right:before {
+    display: none;
+  }
+  #input-pre-telephone {
+    border: 1px solid #ccc !important;
+    margin-left: 0 !important;
+  }
+  fieldset {
+    background-color: #fff;
+    padding: 10px;
+    .form-group:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+  .nav-tabs {
+    li {
+      width: 50%;
+
+      a {
+        margin-right: 0;
+        border: none;
+        text-align: center;
+        background-color: transparent;
+      }
+
+      &.active {
+        // background-color: #efefef;
+        a {
+          color: #333;
+          border-bottom: 2px solid $main_color;
+
+          &:hover {
+            color: #333;
+            border: none;
+            border-bottom: 2px solid $main_color;
+          }
+        }
+      }
+    }
+  }
+
+  .form-group {
+    & > label {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-06-19 22:00:30
+// @modified         2018-07-17 14:36:17
+//
+
+// @font-face {
+//   font-family: 'iconfont';  /* project id 712977 */
+//   src: url('//at.alicdn.com/t/font_712977_j40jt4wud9e.eot');
+//   src: url('//at.alicdn.com/t/font_712977_j40jt4wud9e.eot?#iefix') format('embedded-opentype'),
+//   url('//at.alicdn.com/t/font_712977_j40jt4wud9e.woff') format('woff'),
+//   url('//at.alicdn.com/t/font_712977_j40jt4wud9e.ttf') format('truetype'),
+//   url('//at.alicdn.com/t/font_712977_j40jt4wud9e.svg#iconfont') format('svg');
+// }
+
+@font-face {font-family: 'iconfont';
+  src: url('font-iconfont/iconfont.eot'); /* IE9*/
+  src: url('font-iconfont/iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('font-iconfont/iconfont.woff') format('woff'), /* chrome、firefox */
+  url('font-iconfont/iconfont.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+  url('font-iconfont/iconfont.svg#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+
+.iconfont {
+	font-family:"iconfont" !important;
+	font-size:16px;font-style:normal;
+	-webkit-font-smoothing: antialiased;
+	-webkit-text-stroke-width: 0.1px;
+	-moz-osx-font-smoothing: grayscale;
+  vertical-align: middle;
+}

@@ -1,0 +1,194 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2018-04-04 16:02:58
+// @modified         2018-04-19 15:23:19
+//
+
+.ui-sortable-container {
+  list-style: none;
+  padding: 0;
+  min-height: 520px;
+  max-height: 520px;
+  overflow-y: auto;
+  background-color: #f7f7f7;
+}
+
+.ui-sortable {
+  .ui-sortable-handle {
+    overflow: hidden;
+    position: relative;
+    padding: 5px 30px 5px 10px;
+    margin-bottom: 1px;
+    background: #fff;
+    border: 1px solid #eee;
+    cursor:move;
+
+    &:hover {
+      background-color: #f9f9f9;
+    }
+
+    &:after {
+      content: '\f0c9';
+      font-family: 'fontawesome';
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -8px;
+      color: #999;
+    }
+
+    i {
+      // float: left;
+      margin-right: 5px;
+      cursor:pointer;
+    }
+  }
+}
+
+.sortable-left-handle {
+  .ui-sortable-handle {
+    padding: 5px 5px 5px 30px;
+
+    &:after {
+      left: 10px;
+    }
+  }
+}
+
+.ui-draggable-container {
+  list-style: none;
+  padding: 0;
+}
+
+// 小程序
+.selected-modules-wrapper {
+  width: 350px;
+  height: 740px;
+  padding: 112px 27px 20px 32px;
+  // margin: 0 auto;
+  float: left;
+  background-image: url('../image/iphone-frame.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  li.ui-sortable-handle {
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    &:hover {
+      .action-group {
+        display: block;
+      }
+    }
+  }
+
+  .info {
+    border-left: 1px solid #eaeaea;
+    padding-left: 10px;
+
+    .type {
+      font-weight: 700;
+      display: block;
+    }
+
+    .name {
+      display: block;
+      color: #999;
+    }
+  }
+
+  .action-group {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    top: 50%;
+    margin-top: -9px;
+    display: none;
+
+    a {
+      color: #545454;
+    }
+  }
+}
+
+.available-module-wrapper {
+  float: left;
+  width: 300px;
+  margin-left: 50px;
+}
+
+.available-module-title {
+  // margin-bottom: 10px;
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #777;
+  // border-radius: 6px;
+  border: 1px solid #d3d3d3;
+  background-color: #f8f8f8;
+}
+
+.available-module-container {
+  border: 1px solid #e3e3e3;
+  // background-color: #eaeaea;
+  // padding: 5px;
+
+  .module-group-wrapper {
+    padding: 5px;
+    // margin-bottom: 10px;
+    background-color: #fff;
+
+    .module-group-title {
+      font-size: 12px;
+      font-weight: 700;
+      // margin: 10px 0;
+      // border-bottom: 1px solid #d3d3d3;
+      // background: #e4e4e4;
+      padding: 5px;
+      margin: 0;
+    }
+  }
+
+
+  ul {
+    padding: 3px;
+    // height: 450px;
+    overflow-y: auto;
+    margin-bottom: 0;
+
+    li {
+      font-size: 12px;
+      background-color: #f5f5f5;
+      display: block;
+      padding: 0 5px;
+      height: 30px;
+      line-height: 30px;
+      overflow: hidden;
+      // background: #fff;
+      border: 1px solid #e4e4e4;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      -ms-border-radius: 2px;
+      border-radius: 2px;
+      cursor: move;
+      color: #666;
+      margin-bottom: 3px;
+
+      .handle {
+        float: right;
+        color: #999;
+      }
+
+      &:hover {
+        border-color: #4285f4;
+      }
+    }
+  }
+}

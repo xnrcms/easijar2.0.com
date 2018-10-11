@@ -1,0 +1,126 @@
+<div class="multi-filter-wrapper content-top-bottom mb-3">
+  <div class="filter-group">
+    <div class="group-title">{{ text_status }}</div>
+    <div class="group-content">
+      <div class="filter-stock-section">
+        <ul class="list-unstyled">
+          <li>
+            <div class="checkbox {{ selected_in_stock ? 'active' }}">
+              <label>
+                <input type="checkbox" value="1" {{ selected_in_stock ? 'checked' }}>
+                {{ text_in_stock }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {% if brands %}
+  <div class="filter-group">
+    <div class="group-title">{{ text_brand }}</div>
+    <div class="group-content">
+      <div class="filter-brand-section">
+        <ul class="list-unstyled">
+          {% for brand in brands %}
+          <li>
+            <div class="checkbox {{ brand.manufacturer_id in selected_brands ? 'active' }}">
+              <label>
+                <input type="checkbox" value="{{ brand.manufacturer_id }}" {{ brand.manufacturer_id in selected_brands ? 'checked' }}>
+                {{ brand.name }}
+              </label>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if attributes %}
+  {% for attribute in attributes %}
+    {% if attribute.values %}
+    {% set selected = selected_attributes[attribute.attribute_id] %}
+    <div class="filter-group">
+      <div class="group-title">{{ attribute.name }}</div>
+      <div class="group-content">
+        <div class="filter-attribute-section">
+          <ul class="list-unstyled">
+            {% for value in attribute.values %}
+            <li>
+              <div class="checkbox {{ (selected and (value.text|trim in selected)) ? 'active' }}">
+                <label {{ (selected and (value.text|trim in selected)) ? 'active' }}>
+                  <input type="checkbox" data-id="{{ value.attribute_id }}" value="{{ value.text }}" {{ (selected and (value.text|trim in selected)) ? 'checked' }}>
+                  {{ value.text|trim }}
+                </label>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+
+  {% if options %}
+  {% for option in options %}
+    {% if option.options %}
+    <div class="filter-group">
+      <div class="group-title">{{ option.name }}</div>
+      <div class="group-content">
+        <div class="filter-option-section">
+          <ul class="list-unstyled">
+            {% for value in option.options %}
+            <li>
+              <div class="checkbox {{ value.option_value_id in selected_options ? 'active' }}">
+                <label>
+                  <input type="checkbox" value="{{ value.option_value_id }}" {{ value.option_value_id in selected_options ? 'checked' }}>
+                  {{ value.option_value_name|trim }}
+                </label>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+
+  {% if variants %}
+  {% for variant in variants %}
+    {% if variant.variants %}
+    <div class="filter-group">
+      <div class="group-title">{{ variant.name }}</div>
+      <div class="group-content">
+        <div class="filter-variant-section">
+          <ul class="list-unstyled">
+            {% for value in variant.variants %}
+            <li>
+              <div class="checkbox {{ value.variant_value_id in selected_variants ? 'active' }}">
+                <label>
+                  <input type="checkbox" value="{{ value.variant_value_id }}" {{ value.variant_value_id in selected_variants ? 'checked' }}>
+                  {{ value.variant_value_name|trim }}
+                </label>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+</div>
+
+{% if filter %}
+<script type="text/javascript">
+  var filter = {{ filter|json_encode() }};
+</script>
+{% endif %}

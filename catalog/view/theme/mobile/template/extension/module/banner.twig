@@ -1,0 +1,11 @@
+<div class="row widget banner-widget">
+  <div class="col-xs-12">
+    {% for banner in banners %}
+      {% if banner.link %}
+      <a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>
+      {% else %}
+      <img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,178 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-flash-sale" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i>
+      {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-seckill" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+            <li><a href="#tab-product" data-toggle="tab">{{ tab_product }}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="flash-sale-start">{{ entry_start }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_flash_sale_start" value="{{ module_flash_sale_start }}" placeholder="{{ entry_start }}" class="form-control" id="flash-sale-start" readonly style="background: #fff; cursor: pointer;" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="flash-sale-end">{{ entry_end }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_flash_sale_end" value="{{ module_flash_sale_end }}" placeholder="{{ entry_end }}" class="form-control" id="flash-sale-end" readonly style="background: #fff; cursor: pointer;" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                <div class="col-sm-10">
+                  <select name="module_flash_sale_status" id="input-status" class="form-control">
+                    {% if module_flash_sale_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab-product">
+              <div class="row">
+                <div class="col-sm-2">
+                  <input type="text" name="product_name" value="" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
+                </div>
+                <div class="col-sm-10">
+                  <div class="table-responsive">
+                    <table id="flash-sale-product" class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <td class="text-left">{{ entry_product_name }}</td>
+                          <td class="text-left">{{ entry_price }}</td>
+                          <td class="text-left">{{ entry_limit_count }}</td>
+                          <td class="text-left">{{ entry_count }}</td>
+                          <td class="text-left">{{ entry_action }}</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% set product_row = 0 %}
+                        {% for flash_sale_product in module_flash_sale_products %}
+                        <tr id="{{ flash_sale_product['product_id'] }}">
+                          <td class="text-left">
+                            {{ flash_sale_product['name'] }}
+                            <input type="hidden" name="module_flash_sale_products[{{ product_row }}][product_id]" value="{{ flash_sale_product['product_id'] }}">
+                          </td>
+                          <td><input type="text" price="{{ flash_sale_product['price'] }}" name="module_flash_sale_products[{{ product_row }}][price]" value="{{ flash_sale_product['price'] }}" class="form-control product-price"></td>
+                          <td><input type="text" value="{{ flash_sale_product['cart_count'] }}" name="module_flash_sale_products[{{ product_row }}][cart_count]" class="form-control"></td>
+                          <td><input type="text" minimum="{{ flash_sale_product['minimum'] }}" max="{{ flash_sale_product['quantity'] }}" name="module_flash_sale_products[{{ product_row }}][count]" value="{{ flash_sale_product['count'] }}" class="form-control product-count"></td>
+                          <td><button type="button" onclick="$(this).parent('td').parent('tr').remove();" data-toggle="tooltip" rel="tooltip" title="" class="btn btn-danger" data-original-title="删除"><i class="fa fa-minus-circle"></i></button></td>
+                        </tr>
+                        {% set product_row = product_row + 1 %}
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var product_row = '{{ product_row }}';
+  $('input[name=\'product_name\']').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['product_id'],
+              price: item['price'],
+              quantity: item['quantity'],
+              minimum: item['minimum']
+            }
+          }));
+        }
+      });
+    },
+    select: function(item) {
+      $('#flash-sale-product tbody tr#' + item['value']).remove();
+      var label = item['label'].substring(0, 60);
+      var tr_html = '';
+      tr_html += '<tr id=' + item['value'] + '>';
+      tr_html += '    <td class="text-left">' + label + '<input type="hidden" name="module_flash_sale_products[' + product_row + '][product_id]" value="' + item['value'] + '"></td>';
+      tr_html += '    <td><input type="text" price="' + item['price'] + '" name="module_flash_sale_products[' + product_row + '][price]" value="' + item['price'] + '" class="form-control product-price"></td>';
+      tr_html += '    <td><input class="form-control" type="text" name="module_flash_sale_products[' + product_row + '][cart_count]" value=""></td>';
+      tr_html += '    <td><input class="product-count form-control" minimum="' + item['minimum'] + '" max="' + item['quantity'] + '" type="text" name="module_flash_sale_products[' + product_row + '][count]" value="' + item['quantity'] + '"></td>';
+      tr_html += '    <td><button type="button" onclick="$(this).parent(\'td\').parent(\'tr\').remove();" data-toggle="tooltip" rel="tooltip" title="" class="btn btn-danger" data-original-title="删除"><i class="fa fa-minus-circle"></i></button></td>';
+      tr_html += '</tr>';
+      $('#flash-sale-product tbody').append(tr_html);
+      product_row++;
+    }
+  });
+  laydate.render({
+    elem: '#flash-sale-start',
+    type: 'datetime'
+  });
+  laydate.render({
+    elem: '#flash-sale-end',
+    type: 'datetime'
+  });
+  $(document).on('blur', '.product-count', function() {
+    var $this = $(this);
+    var minimum = $this.attr('minimum');
+    var max = $this.attr('max');
+    var input_value = $this.val();
+    var prefix = /^[1-9]\d*$/gi;
+    if (!prefix.test(input_value)){
+      input_value = minimum;
+    }
+    if (parseInt(input_value) < parseInt(minimum)){
+        input_value = minimum;
+    }
+    if (parseInt(input_value) > parseInt(max)){
+        input_value = max;
+    }
+    $this.val(input_value);
+  });
+  $(document).on('blur', '.product-price', function() {
+    var $this = $(this);
+    var price = $this.attr('price');
+    var input_price = $this.val();
+    var price_prefix = /^\d+(\.{0,1}\d+){0,1}$/gi;
+    if (!price_prefix.test(input_price)){
+        input_price = price;
+    }
+    $this.val(input_price);
+  });
+</script>
+{{ footer }}

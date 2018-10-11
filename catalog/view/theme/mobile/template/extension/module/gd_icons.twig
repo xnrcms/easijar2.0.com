@@ -1,0 +1,8 @@
+<div class="row widget quick-icon-link-widget">
+  {% for image in images %}
+  <a href="{{ image.link }}">
+    <img data-src="{{ image.image }}" src="{{ placeholder }}" class="lazy img-responsive">
+    <span>{{ image.title }}</span>
+  </a>
+  {% endfor %}
+</div>

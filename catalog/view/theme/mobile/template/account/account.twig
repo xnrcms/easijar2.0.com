@@ -1,0 +1,82 @@
+{{ header }}
+<div class="container account-page">
+  <div class="row">
+    <div id="content" class="col-sm-12">{{ content_top }}
+      <div class="row widget avatar-container">
+        <div class="col-sm-12 acconut-bg">
+          <div class="personal-content">
+            <img class="personal-image" src="{{ helper.image_resize(avatar) }}" class="img-responsive img-circle">
+            <div class="personal-account">
+              <span>{{ helper.customer().getFullName() ?: text_no_name }}</span>
+              <span>{{ helper.customer().getEmail() ?: text_no_email }}</span>
+            </div>
+          </div>
+          <div class="eidt-account"><a href="{{ edit }}"><i class="iconfont">&#xe741;</i></a></div>
+          <div class="account-bg-bg"><img src="{{ helper.url().fullPathLink('catalog/view/theme/mobile/image/account-bg-bg.png') }}" class="img-responsive"></div>
+        </div>
+      </div>
+      {% if helper.is_pro() %}
+      <div class="row all-order-box">
+        <a class="bottom-border" href="{{ order }}">
+          <span>{{ text_order_all }}</span><span>{{ text_order_all }}</span>
+        </a>
+      </div>
+      <div class="row widget">
+        <div class="col-sm-12">
+          <div class="order-button-groups">
+            <div class="order-button"><a href="{{ order }}"><i class="iconfont">&#xe624;</i><span>{{ text_order_all }}</span></a></div>
+            <div class="order-button"><a href="{{ order_unpaid }}"><i class="iconfont">&#xe60c;</i>{% if unpaid_total %}<span class="text-number">{{ unpaid_total }}</span>{% endif %}<span>{{ text_order_unpaid }}</span></a></div>
+            <div class="order-button"><a href="{{ order_unshipped }}"><i class="iconfont">&#xe628;</i>{% if unshipped_total %}<span class="text-number">{{ unshipped_total }}</span>{% endif %}<span>{{ text_order_unshipped }}</span></a></div>
+            <div class="order-button"><a href="{{ order_shipped }}"><i class="iconfont">&#xe62d;</i>{% if shipped_total %}<span class="text-number">{{ shipped_total }}</span>{% endif %}<span>{{ text_order_shipped }}</span></a></div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="row widget">
+        <div class="col-sm-12">
+          <ul class="accordion-list list-unstyled">
+            <li><a href="{{ edit }}"><i class="iconfont icon-zhanghuxinxi">&#xe63a;</i> {{ text_edit }}</a></li>
+            <li><a href="{{ password }}"><i class="iconfont icon-iconfontmima">&#xe657;</i> {{ text_password }}</a></li>
+            <li><a href="{{ address }}"><i class="iconfont icon-iconfontchanpincanshu">&#xe69e;</i> {{ text_address }}</a></li>
+            <li><a href="{{ wishlist }}"><i class="iconfont icon-iconfontyouhuiquan">&#xe71a;</i> {{ text_wishlist }}</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row widget">
+        <div class="col-sm-12">
+          <ul class="accordion-list list-unstyled">
+            <li><a href="{{ order }}"><i class="iconfont icon-iconfontquanbudingdan">&#xe624;</i> {{ text_order }}</a></li>
+            <li><a href="{{ download }}"><i class="iconfont icon-iconxiazai">&#xe730;</i> {{ text_download }}</a></li>
+            <li><a href="{{ coupons }}"><i class="iconfont icon-iconxiazai">&#xe620;</i> {{ text_coupons }}</a></li>
+            {% if reward %}
+            <li><a href="{{ reward }}"><i class="iconfont icon-iconfontwodehuiyuanqia">&#xe60a;</i> {{ text_reward }}</a></li>
+            {% endif %}
+            <li><a href="{{ return }}"><i class="iconfont icon-tuihuo">&#xe6a4;</i> {{ text_return }}</a></li>
+            <li><a href="{{ transaction }}"><i class="iconfont icon-custom-take-notes">&#xe67f;</i> {{ text_transaction }}</a></li>
+            <li><a href="{{ helper.url.link('account/oreview') }}"><i class="iconfont icon-zhanghuxinxi">&#xe63a;</i> {{ button_reviews }}</a></li>
+            <li><a href="{{ withdraw_list }}"><i class="iconfont icon-custom-take-notes">&#xe60d;</i> {{ text_withdraw }}</a></li>
+            {% if not helper.is_free_or_pro() %}
+            <li><a href="{{ recurring }}"><i class="iconfont icon-custom-take-notes"></i> {{ text_recurring }}</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      <div class="row widget">
+        <div class="col-sm-12">
+          <ul class="accordion-list list-unstyled">
+            <li><a href="{{ newsletter }}"><i class="iconfont icon-iconfontyoujian">&#xe63f;</i> {{ text_newsletter }}</a></li>
+            <li><a href="{{ logout }}"><i class="iconfont icon-iconfont31wode">&#xe613;</i> {{ text_logout }}</a></li>
+          </ul>
+        </div>
+      </div>
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{{ avatar_upload }}
+{% if success %}
+<script>
+  showToast('{{ success }}');
+</script>
+{% endif %}
+{{ footer }}

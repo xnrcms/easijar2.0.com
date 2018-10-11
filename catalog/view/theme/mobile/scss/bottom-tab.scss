@@ -1,0 +1,238 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-02-05 12:33:20
+//
+
+#bottom-tab-menu {
+  z-index: 9999;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f8f8f8;
+  // border-top: 1px solid #ddd;
+  min-height: 40px;
+  box-shadow: 0 0 30px -6px rgba(37, 45, 51, 0.3);
+
+  @include display-flex;
+
+  .menu-item {
+    width: 20%;
+    text-align: center;
+
+    a {
+      padding-top: 5px;
+      display: block;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      color: $bottom_tab_color;
+      &:after {
+        content: "";
+        background: rgba(170,170,170,.3);
+        display: block;
+        position: absolute;
+        border-radius: 50%;
+        padding-top: 140%;
+        padding-left: 140%;
+        margin-top: -70%;
+        margin-left: -70%;
+        opacity: 0;
+        top: 50%;
+        left: 50%;
+        @include transition(all .2s ease-in-out 0s);
+      }
+
+      &:active:after {
+        padding-top: 0;
+        padding-left: 0;
+        margin-top: 0;
+        margin-left: 0;
+        opacity: 1;
+        transition: 0s
+      }
+
+      &:active {
+        background-color: #f3f3f3;
+      }
+
+      &.active {
+        color: $bottom_tab_color_active;
+
+        .name {
+          color: $bottom_tab_color_active;
+        }
+      }
+
+      i {
+        position: relative;
+      }
+    }
+  }
+}
+
+#bottom-add-to-cart {
+  z-index: 100;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f8f8f8;
+  min-height: 40px;
+  @include display-flex;
+  @include align-items(center);
+  .menu-item {
+    flex: 1;
+    text-align: center;
+
+    &.menu-buy-now {
+      &:before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        bottom: 0;
+        width:0;
+        height:0;
+        border-top:25px solid transparent;
+        border-bottom:0 solid transparent;
+        border-right:8px solid $main_color;
+      }
+    }
+
+    &.menu-add-to-cart {
+      &:after {
+        content: '';
+        position: absolute;
+        right: -8px;
+        z-index: 9;
+        top: 0;
+        width:0;
+        height:0;
+        border-top: 0 solid transparent;
+        border-bottom: 25px solid transparent;
+        border-left: 8px solid $second_color;
+      }
+    }
+
+    &.menu-add-to-cart, &.menu-buy-now {
+      position: relative;
+      flex: 2;
+    }
+
+    button, a {
+      border: none;
+      background-color: transparent;
+      color: $bottom_tab_wishlist_color;
+      font-size: 12px;
+      height: 50px;
+      &:active {
+        color: $bottom_tab_wishlist_color_active;
+      }
+    }
+
+    i {
+      position: relative;
+      font-size: 20px;
+    }
+
+    #button-add-to-wishlist {
+      i.active {
+        color: $bottom_tab_wishlist_color_active;
+      }
+    }
+
+    .button-add-to-cart, .button-buy-now {
+      width: 100%;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .button-add-to-cart {
+      background-color: $second_color;
+
+      &.disabled {
+        // background-color: #999;
+      }
+    }
+
+    .button-buy-now {
+      background-color: $main_color;
+    }
+  }
+}
+
+#bottom-tab-menu, #bottom-add-to-cart {
+  .cart-total {
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 8px;
+    height: 8px;
+    text-align: center;
+    font-size: 9px;
+    color: #fff;
+    background-color: #e03136;
+    border-radius: 15px;
+  }
+}
+
+#bottom-checkout {
+  z-index: 100;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 0 30px -6px rgba(37, 45, 51, 0.3);
+  @include display-flex;
+  @include align-items(center);
+
+  .cart-select-group {
+    @include display-flex;
+    @include align-items(center);
+
+    .cart-select {
+      margin-left: 10px;
+      position: relative;
+    }
+
+    span {
+      margin-left: 10px;
+      line-height: 40px;
+      font-weight: bold;
+    }
+  }
+
+  .total-group {
+    text-align: right;
+    flex: 3;
+
+    span {
+      padding-right: 10px;
+      color: $checkout_button;
+
+      strong {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .checkout-group {
+    flex: 2;
+
+    a {
+      display: block;
+      height: 50px;
+      line-height: 50px;
+      color: #fff;
+      font-size: 17px;
+      text-align: center;
+      background-color: $main_color;
+    }
+  }
+}

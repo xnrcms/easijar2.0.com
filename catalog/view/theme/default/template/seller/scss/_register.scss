@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-06-22 14:17:22
+// @modified         2018-06-22 16:11:29
+//
+
+body.page-register {
+	background-image: url(../image/login-bg.png);
+
+	.inner-wrapper {
+		margin: 50px auto 140px;
+		width: 800px;
+
+		@media (max-width: 768px) {
+			width: 90%;
+		}
+	}
+
+	.agree {
+		margin-bottom: 10px;
+	}
+}

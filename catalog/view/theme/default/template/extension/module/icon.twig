@@ -1,0 +1,49 @@
+<div class="icon-module mb-3">
+  <div class="container">
+    <div class="swiper-viewport">
+      <div class="swiper-container" id="icon-module-{{ module_id }}">
+        <div class="swiper-wrapper">
+        {% for item in items %}
+          <div class="swiper-slide">
+            <a class="icon-item" href="{{ item.href }}">
+              <span>
+                <img src="{{ item.image }}" class="img-responsive">
+              </span>
+              <p>{{ item.title }}</p>
+            </a>
+          </div>
+        {% endfor %}
+        </div>
+      </div>
+      <div class="swiper-pager">
+        <div class="swiper-button-next icon-module-next"></div>
+        <div class="swiper-button-prev icon-module-prev"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$(document).ready(function() {
+  var icon_module_{{ module_id }} = new Swiper('#icon-module-{{ module_id }}', {
+    slidesPerView: 6,
+    navigation: {
+      nextEl: '.icon-module-next',
+      prevEl: '.icon-module-prev',
+    },
+    spaceBetween: 20,
+    breakpoints: {
+      500: {
+        slidesPerView: 2,
+        spaceBetween: 6
+      },
+      768: {
+        slidesPerView: 3,
+        spaceBetween: 15
+      },
+      992: {
+        slidesPerView: 4,
+      }
+    }
+  });
+})
+--></script>

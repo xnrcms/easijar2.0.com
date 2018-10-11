@@ -1,0 +1,33 @@
+.owl-item {
+  z-index: 1;
+}
+
+.owl-carousel {
+  .owl-dots {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+
+    .owl-dot {
+      display: inline-block;
+      zoom: 1;
+      cursor: pointer;
+
+      span {
+        display: block;
+        width: 6px !important;
+        height: 6px !important;
+        margin: 0 3px !important;
+        background-color: #d6d6d6;
+        border-radius: 50%;
+      }
+
+      &.active {
+        span {
+          background-color: #869791;
+        }
+      }
+    }
+  }
+}

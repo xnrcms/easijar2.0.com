@@ -1,0 +1,24 @@
+<div class="main-section-wrapper mb-2">
+  {% if if_pickup_section %}
+    {{ if_pickup_section }}
+  {% endif %}
+  {% if pickup_section %}
+    {{ pickup_section }}
+  {% endif %}
+  {% if shipping_address_section %}
+    {{ shipping_address_section }}
+  {% endif %}
+  
+    {% if payment_address_section %}
+    {{ payment_address_section }}
+  {% endif %}
+  {{ payment_method_section }}
+  <div class="hidden">{{ shipping_method_section }}</div>
+  {{ cart_section }}
+  {{ comment_section }}
+  {{ agree_section }}
+
+  <div class="ml-1 mr-1">
+    <input type="button" value="{{ text_checkout_confirm }}" id="button-submit" data-loading-text="{{ text_loading }}" class="btn btn-primary btn-block" />
+  </div>
+</div>

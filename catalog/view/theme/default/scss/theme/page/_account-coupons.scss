@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-01-18 19:45:50
+// @modified         2018-01-29 14:42:37
+//
+
+body.account-coupons {
+  h3 {
+    margin-top: 0;
+  }
+
+  .coupon-item-wrapper {
+    text-align: center;
+    background: #4abff8;
+    background: radial-gradient(transparent 0, transparent 5px, #ececec 5px);
+    background-size: 15px 15px;
+    background-position: 12px -7px;
+    margin-bottom: 20px;
+    padding-top: 1px;
+    @include transition(all .2s ease-out);
+    &:hover {
+      box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    }
+
+    .coupon-item {
+      background: #ececec;
+      background-image: -webkit-repeating-linear-gradient(top left, #f8f8f8 0%, #ececec 100%);
+      background-image: repeating-linear-gradient(to bottom left, #f8f8f8 0%, #ececec 100%);
+      background-color:#ececec;
+      padding: 12px 11px;
+      margin-top: 5px;
+      color: #333;
+
+      .coupon-border {
+        border: 1px dashed #bbb;
+        padding: 12px 10px;
+      }
+
+      .coupon-discount {
+        font-size: 50px;
+        font-weight: 700;
+        // margin-top: 15px;
+        margin-bottom: 12px;
+      }
+
+      span {
+        display: block;
+      }
+    }
+  }
+}

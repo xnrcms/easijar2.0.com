@@ -1,0 +1,59 @@
+<div id="tab-question" class="tab-pane">
+  <div id="displayQuestionAnwser" class="mb-2">
+    {% for valueQuestion in showInProductPage %}
+    <div class="item">
+      <dl class="ask">
+        <dd>
+          <div class="content">
+            <div>
+              <i class="fa fa-question-circle"></i>
+              <div class="inner"><b>{{ valueQuestion.user_name }}：{{ valueQuestion.product_question }}</b></div>
+            </div>
+            <div class="date-answer">{{ valueQuestion.question_asked_date }}</div>
+          </div>
+        </dd>
+      </dl>
+      <dl class="answer">
+        <dd>
+          <div class="content">
+            <div>
+              <i class="fa fa-comments"></i>
+              <div class="inner">{{ text_answer }}{{ valueQuestion.product_answer }}</div>
+            </div>
+            <div class="date-answer">{{ valueQuestion.question_answred_date }}</div>
+          </div>
+        </dd>
+      </dl>
+    </div>
+   {% endfor %}
+  </div>
+  <div class="form-horizontal" id="form-question">
+    <h2>{{ entry_question_title }}</h2>
+    <div class="form-group required">
+      <div class="col-sm-12">
+        <label class="control-label" for="input-question-name">{{ entry_name }}</label>
+        <input type="text" name="question_name" value="" placeholder="{{ entry_name }}" id="input-question-name" class="form-control" />
+      </div>
+    </div>
+    <div class="form-group required">
+      <div class="col-sm-12">
+        <label class="control-label" for="input-question-question">{{ entry_question }}</label>
+        <textarea name="question_question" rows="5" id="input-question-question" class="form-control"></textarea>
+        <div class="help-block">{{ text_note }}</div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="button-question">{{ text_submit }}</button>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$(document).ready(function() {
+  $('#form-question').ProductQuestion({
+    productId: {{ product_id }},
+    emptyLabel: {
+      name: '{{ error_name_empty }}',
+      question: '{{ error_question_empty }}'
+    }
+  });
+});
+//--></script>

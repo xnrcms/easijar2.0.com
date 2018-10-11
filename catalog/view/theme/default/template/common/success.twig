@@ -1,0 +1,22 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div id="common-success" class="container">
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <div class="no-items">
+        <img src="{{ helper.url().fullPathLink('catalog/view/theme/default/image/success_items.png') }}" class="img-responsive">
+        <span class="title">{{ heading_title }}</span>
+        <span class="inner">{{ text_message }}</span>
+        <div><a href="{{ continue }}" class="btn btn-primary btn-lg">{{ button_continue }}</a></div>
+      </div>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

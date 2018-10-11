@@ -1,0 +1,12 @@
+<div class="row widget module-blog-category">
+  {% if heading_title %}
+    <h2>{{ heading_title }}</h2>
+  {% endif %}
+  <div class="col-xs-12">
+    <ul class="list-unstyled">
+      {% for category in categories %}
+      <li><a href="{{ category.href('show') }}" class="">{{ category.localizedDescription().name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

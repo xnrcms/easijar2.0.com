@@ -1,0 +1,32 @@
+{{ header }}
+<div class="container">
+  <div class="notice"></div>
+  {% set search_bar_position = helper.config('theme_mobile_homepage_search_bar_position', 'fixed') %}
+  {% if ((content_top or content_bottom) and search_bar_position != 'none') %}
+  <div id="{{ search_bar_position == 'fixed' ? 'top-search-fixed' : 'top-search' }}" class="row">
+    
+    <!--2018.9.11 xnrcms {{ helper.url.link('mobile/categories') }}-->
+    <a href="javascript:;" class="category">
+      <!--<i class="iconfont category-change-color">&#xe615;</i><i class="iconfont">&#xe615;</i>-->
+    </a>
+    <a href="{{ helper.url.link('product/search') }}" class="placeholder">
+      <i class="iconfont">&#xe600;</i>{{ text_search_placeholder }}<span class="placeholder-change-bg"></span>
+    </a>
+
+    <!--2018.9.11 xnrcms {{ helper.url.link('checkout/cart') }}-->
+    <a href="javascript:;" class="cart">
+      <!--<i class="iconfont category-change-color">&#xe639;</i><i class="iconfont">&#xe639;</i>-->
+    </a>
+    <div class="change-bg"></div>
+  </div>
+  {% endif %}
+  <div id="content">
+    {{ content_top }}
+    {{ content_bottom }}
+  </div>
+</div>
+<script>
+  var items = $('.change-bg, .placeholder-change-bg, .category-change-color');
+  bgcOpacity(items);
+</script>
+{{ footer }}

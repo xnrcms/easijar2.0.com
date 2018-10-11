@@ -1,0 +1,64 @@
+{{ header }}
+<div id="blog-post" class="container">
+  {{ include(helper.template('_partial/breadcrumb')) }}
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      {% set post_desc = post.localizedDescription() %}
+      <div class="nav-bar">{{ post_desc.name }}</div>
+      <div class="row widget">
+        <div class="col-xs-12">
+          <div class="info">
+            <p><i class="fa fa-calendar-check-o" aria-hidden="true"></i> {{ post.date_added|date(date_format_short) }} {{ author }}</p>
+            <div class="share">
+              <!-- AddThis Button BEGIN -->
+              <div class="addthis_toolbox addthis_default_style" data-url="{{ share_url }}">
+
+                  <a class="addthis_button_twitter"></a>
+                  <a class="addthis_button_facebook"></a>
+                  <a class="addthis_button_google_plusone_share"></a>
+
+              </div>
+              <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-515eeaf54693130e"></script>
+              <!-- AddThis Button END -->
+            </div>
+          </div>
+          <hr>
+          {% if post_desc.description %}
+          <div class="description small">
+            {{ post_desc.description }}
+          </div>
+          <hr>
+          {% endif %}
+          <div class="post-body">
+            {{ post_desc.html('content') }}
+          </div>
+          <hr>
+          <div class="seo">
+            <ul class="list-unstyled">
+              <li>{{ text_title }}{{ post_desc.name }}</li>
+              <li>{{ text_permalink }}<a href="{{ post.href('show') }}">{{ post.href('show') }}</a></li>
+              {% if post.categories.count() %}
+              <li>{{ text_category }}
+                {% for category in post.categories %}
+                <a href="{{ category.href('show') }}">{{ category.localizedDescription().name }}</a>
+                {% endfor %}
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {{ content_bottom }}</div>
+    </div>
+</div>
+<script>
+  $(document).ready(function() {
+    var post_body_width = $('.post-body').width();
+    $('#content .post-body img').each(function() {
+      if($(this).width() > post_body_width) {
+        $(this).removeClass('img-responsive').addClass('img-responsive');
+      }
+    });
+  })
+</script>
+{{ footer }}

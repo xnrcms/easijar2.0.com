@@ -1,0 +1,88 @@
+{% if error %}
+  <div class="warning"><?php echo $error; ?></div>
+{% endif %}
+{% if success %}
+  <div class="success"><?php echo $success; ?></div>
+{% endif %}
+<table class="table table-bordered">
+  <thead>
+  <tr>
+    <td class="text-left">{{ column_date_added }}</td>
+    <td class="text-left">{{ column_kuaidi_code }}</td>
+    <td class="text-left">{{ column_kuaidi_number }}</td>
+    <td class="text-left">{{ column_comment }}</td>
+    <td class="text-left">{{ column_kuaidi_track }}</td>
+    <td class="text-right">{{ column_action }}</td>
+  </tr>
+  </thead>
+  <tbody>
+  {% if histories %}
+    {% for history in histories %}
+      <tr>
+        <td class="text-left">{{ history.date_added }}</td>
+        <td class="text-left">{{ history.tracking_name }}</td>
+        <td class="text-left">{{ history.tracking_number }}</td>
+        <td class="text-left">{{ history.comment }}</td>
+        <td class="text-left">
+          <a target="_bank" href="javascript:;" t-href="{{ history.track }}" class="show-detail">{{ text_view }}</a>
+        </td>
+        <td class="text-right">
+          <button id="button-del{{ history.id }}" class="btn-small btn-info"
+                  onclick="delAfterShip('{{ history.id }}', '{{ history.tracking_code }}', '{{ history.tracking_number }}')">{{ button_delete }}</button>
+        </td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    <tr>
+      <td class="text-center" colspan="6">{{ text_no_results }}</td>
+    </tr>
+  {% endif %}
+  </tbody>
+</table>
+<div class="row">
+  <div class="col-sm-6 text-left"><?php echo $pagination; ?></div>
+</div>
+<script type="text/javascript"><!--
+  $('.show-detail').click(function () {
+    var url = $(this).attr('t-href');
+    layer.open({
+      type: 2,
+      title: '{{ text_after_detail }}',
+      shadeClose: true,
+      shade: 0.8,
+      maxmin: true,
+      area: ['60%', '50%'],
+      content: url
+    });
+  });
+  function delAfterShip(id, code, number) {
+    $.ajax({
+      url: 'index.php?route=seller/aftership/delete&id=' + id + '&number=' + number +'&code=' + code,
+      type: 'post',
+      dataType: 'json',
+      data: '',
+      beforeSend: function () {
+        $('#button-del' + id).button('loading');
+      },
+      complete: function () {
+        $('#button-del' + id).button('reset');
+      },
+      success: function (json) {
+        $('.alert').remove();
+
+        if (json['error']) {
+          $('#ship-tracking').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+
+        if (json['success']) {
+          $('#ship-tracking').load('index.php?route=seller/aftership/getList&user_token={{ user_token }}&order_id={{ order_id }}');
+
+          $('#ship-tracking').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+      }
+    });
+  }
+  //--></script>

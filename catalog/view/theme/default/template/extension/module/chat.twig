@@ -1,0 +1,55 @@
+{% if helper.config('module_chat_status') and not helper.config('is_mobile') %}
+  <div class="item children hidden-xs">
+    <a href="javascript:void(0);" class="chat-toggle"><i class="fa fa-comments" aria-hidden="true"></i></a>
+    <div class="chat-wrapper children-inner">
+      <div class="header">{{ helper.config("module_chat_titles.#{helper.current_language_id()}") }}</div>
+      {% if helper.config("module_chat_telephone") is not empty %}
+      <div class="phone">{{ helper.config("module_chat_telephone") }}</div>
+      {% endif %}
+      <ul>
+        {% for item in helper.config("module_chat_items") if item.text[helper.current_language_id()] is not empty %}
+        <li>
+          <a href="{{ item.link ?: 'javascript:void(0);' }}" target="_blank">
+            {% if item.image is not empty %}
+              <div class="icon"><img src="{{ helper.image_resize(item.image, 20, 20) }}" class="img-responsive"></div>
+            {% endif %}
+            <span>{{ item.text[helper.current_language_id()] }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if helper.config("module_chat_meiqia") is not empty %}
+      <div class="btn-meiqia btn btn-sm btn-block"><i class="fa fa-comments" aria-hidden="true"></i>{{ button_meiqia }}</div>
+      {% endif %}
+      {% if helper.config('module_chat_qrcode') is not empty %}
+      <div class="footer">
+        <img src="{{ helper.image_resize(helper.config('module_chat_qrcode'), 200, 200) }}" class="img-responsive">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% if helper.config("module_chat_meiqia") is not empty %}
+  <script type='text/javascript'>
+    (function(m, ei, q, i, a, j, s) {
+      m[i] = m[i] || function() {
+        (m[i].a = m[i].a || []).push(arguments)
+      };
+      j = ei.createElement(q),
+        s = ei.getElementsByTagName(q)[0];
+      j.async = true;
+      j.charset = 'UTF-8';
+      j.src = 'https://static.meiqia.com/dist/meiqia.js?_=t';
+      s.parentNode.insertBefore(j, s);
+    })(window, document, 'script', '_MEIQIA');
+    _MEIQIA('entId', '{{ helper.config("module_chat_meiqia") }}');
+    _MEIQIA('language', '{{ helper.is_zh_cn() ? "zh" : "en" }}');
+    _MEIQIA('manualInit'); // 在这里开启手动模式
+    _MEIQIA('withoutBtn'); // 不显示默认按钮
+    _MEIQIA('init');
+
+    $(document).on('click', '.btn-meiqia', function(event) {
+      _MEIQIA('showPanel');
+    });
+  </script>
+  {% endif %}
+{% endif %}

@@ -1,0 +1,34 @@
+{% if helper.is_home_page() %}
+<div class="module-image-text">
+<div class="container">
+{% endif %}
+
+{% for item in items %}
+<div class="row">
+  <div class="col-sm-4 hidden-xs {{ item.direction == 'img-left' ? 'pull-left' : 'pull-right' }}">
+    <div class="img-wrapper">
+    {% if item.href %}
+    <a class="left-img" href="{{ item.href }}"><img src="{{ item.image }}" class="img-responsive"></a>
+    {% else %}
+    <img src="{{ item.image }}" class="img-responsive">
+    {% endif %}
+    </div>
+  </div>
+  <div class="col-sm-8 col-xs-12">
+    <div class="text-content">
+      <div class="title">{{ item.title }}</div>
+      <div class="text">{{ item.text }}</div>
+      {% if item.href %}
+      <a href="{{ item.href }}" class="btn btn-primary">{{ button_view }}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+<script type="text/javascript">
+  $('.img-wrapper').height($('.module-image-text').outerHeight());
+</script>
+
+{% if helper.is_home_page() %}
+</div></div>
+{% endif %}

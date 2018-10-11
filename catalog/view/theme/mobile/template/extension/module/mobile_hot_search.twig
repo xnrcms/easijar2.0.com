@@ -1,0 +1,16 @@
+<div class="row widget hot-keywords-widget">
+  <h2>{{ helper.config('module_mobile_hot_search_title') }}</h2>
+  <div class="col-xs-12">
+    <ul class="list-inline">
+      {% for keyword in hot_search_keywords %}
+        {% if keyword.keyword %}
+        <li class="col-xs-4">
+          <a href="{{ keyword.href ?: ('index.php?route=product/search&search=' ~ keyword.keyword) }}" style="{{ keyword.style }}">
+            {{ keyword.keyword }}
+          </a>
+        </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+</div>

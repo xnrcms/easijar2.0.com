@@ -1,0 +1,30 @@
+<h3 class="widget-title"><span>{{ heading_title }}</span></h3>
+<div class="default-border mb-3">
+  <ul class="sidebar-widget" id="category-module">
+    {% for key, category in categories %}
+    <li class="panel {{ category.category_id == category_id ? 'active'}}">
+      <a href="{{ category.href }}" class="category-href">{{ category.name }}</a>
+      {# 2nd level #}
+      {% if category.children %}
+        <a class="toggle-icon" data-toggle="collapse" data-parent="#category-module" href="#category-module-{{ key }}"><i class="fa fa-angle-up" aria-hidden="true"></i></a>
+        <ul id="category-module-{{ key }}" class="panel-collapse collapse {{ category.category_id == category_id ? 'in' }}">
+          {% for key, child in category.children %}
+          <li class="{{ child.category_id == child_id ? 'active' }}">
+            <a href="{{ child.href }}">{{ child.name }}</a>
+              {# 3rd level #}
+              {% if child.grand_children %}
+              <a class="toggle-icon" data-toggle="collapse" data-parent="#category-grand" href="#category-grand-{{ key }}"><i class="fa fa-angle-up" aria-hidden="true"></i></a>
+              <ul id="category-grand-{{ key }}" class="panel-collapse collapse {{ child.category_id == child_id ? 'in' }}">
+                {% for grand_child in child.grand_children %}
+                <li class="{{ grand_child.category_id == grand_child_id ? 'active' }}"><a href="{{ grand_child.href }}">{{ grand_child.name }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>

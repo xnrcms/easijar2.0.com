@@ -1,0 +1,63 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2017-08-28 18:32:15
+// @modified         2018-01-16 23:01:54
+//
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin box-shadow($shadow) {
+  -webkit-box-shadow: $shadow;
+  -moz-box-shadow: $shadow;
+  box-shadow: $shadow;
+}
+
+@mixin transition($param) {
+  -webkit-transition: $param;
+  -moz-transition: $param;
+  -o-transition: $param;
+  transition: $param;
+}
+
+@mixin transform($value) {
+  -ms-transform: translateX($value);
+  -webkit-transform: translateX($value);
+  transform: translateX($value);
+}
+
+@mixin display-flex() {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+}
+
+@mixin align-items($position) {
+  -ms-align-items: $position;
+  align-items: $position;
+}
+
+@mixin default-transform($value){
+  -ms-transform: ($value);
+  -webkit-transform: ($value);
+  -o-transform: ($value);
+  transform: ($value);
+}
+
+@mixin bg-gradient($angle,$colorone,$colortwo) { // 背景渐变，兼容IE (固定IE渐变的角度)
+  background: -webkit-linear-gradient($angle,$colorone 0,$colortwo 100%);
+  background: -moz-linear-gradient($angle,$colorone 0,$colortwo 100%);
+  background: -o-linear-gradient($angle,$colorone 0,$colortwo 100%);
+  background: linear-gradient($angle,$colorone 0,$colortwo 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#{$colorone}, endColorstr=#{$colortwo},GradientType=0.9);
+}

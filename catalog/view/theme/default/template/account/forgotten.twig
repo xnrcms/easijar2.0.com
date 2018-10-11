@@ -1,0 +1,141 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  {% if error_warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+  {% endif %}
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <h1>{{ heading_title }}</h1>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab-telephone" data-toggle="tab" aria-expanded="true">{{ tab_mobile }}</a></li>
+        <li><a href="#tab-email" data-toggle="tab" aria-expanded="true">{{ tab_email }}</a></li>
+      </ul>
+      <div class="tab-content mt-1">
+        <div class="tab-pane" id="tab-email">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal form-group-list">
+            <input type="hidden" name="type" value="email" />
+            <div class="form-group required">
+              <label class="col-sm-2 control-label" for="input-email">{{ entry_email }}</label>
+              <div class="col-sm-10">
+                <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="input-email" class="form-control" />
+              </div>
+            </div>
+            <div class="buttons clearfix">
+              <div class="pull-right">
+                <input type="submit" value="{{ button_submit }}" class="btn btn-primary" />
+              </div>
+              <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
+            </div>
+          </form>
+        </div>
+        <div class="tab-pane active" id="tab-telephone">
+
+          {% if module_sms_status %}
+          <form action="{{ action_telephone }}" method="post" enctype="multipart/form-data" class="form-horizontal form-group-list">
+            <input type="hidden" name="type" value="telephone" />
+            <div class="form-group required">
+              <label class="col-sm-2 control-label" for="input-telephone">{{ entry_telephone }}</label>
+                <div class="col-sm-10">
+                  <div class="row">
+                    <div class="col-xs-8">
+                      {{ include(helper.template('_partial/telephone')) }}
+                    </div>
+                    <div class="col-xs-4">
+                      <input id="button-verify" type="button" class="button button-code btn btn-info btn-block" value="{{ entry_getsmscode }}" onClick="get(this)" />
+                    </div>
+                  </div>
+                  {% if error_telephone %}
+                  <div class="text-danger">{{ error_telephone }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label hidden-xs" for="input-smscode">{{ entry_smscode }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="smscode" value="{{ smscode }}" placeholder="{{ entry_smscode }}" id="input-smscode" class="form-control" />
+                  {% if error_smscode %}
+                  <div class="text-danger">{{ error_smscode }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-password">{{ entry_password }}</label>
+                <div class="col-sm-10">
+                  <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" id="input-password" class="form-control" />
+                  {% if error_password %}
+                  <div class="text-danger">{{ error_password }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-confirm">{{ entry_confirm }}</label>
+                <div class="col-sm-10">
+                  <input type="password" name="confirm" value="{{ confirm }}" placeholder="{{ entry_confirm }}" id="input-confirm" class="form-control" />
+                  {% if error_confirm %}
+                  <div class="text-danger">{{ error_confirm }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            <div class="buttons clearfix">
+              <div class="pull-right">
+                <input type="submit" value="{{ button_submit }}" class="btn btn-primary" />
+              </div>
+              <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
+            </div>
+          </form>
+          {% else %}
+          <p>{{ text_cannot_telephone }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+<script type="text/javascript"><!--
+var timeconst = 2*60
+var maxtime = timeconst;
+function CountDown()
+{
+  if(maxtime>=0)
+  {
+    msg = maxtime + "{{ text_countdown }}";
+    $('#button-verify').val(msg);
+    --maxtime;
+  }
+  else
+  {
+    clearInterval(timer);
+    maxtime = timeconst;
+    $('#button-verify').val("{{ text_reget_modify_code }}");
+    $('#button-verify').attr("disabled",false);
+  }
+}
+function get(obj) {
+  $.ajax({
+      url: 'index.php?route=account/forgotten/verify',
+      type: "POST",
+      data: "telephone=" + $("#input-telephone").val(),
+      dataType: 'json',
+      success: function(data) {
+        if(data['error']) {
+          alert(data['error']);
+        } else if (data['status'] == "fail") {
+          alert(data['msg']);
+        } else if (data['status'] == "success") {
+          obj.disabled = true;
+          timer = setInterval("CountDown()",1000);
+        }
+      }
+  })
+}
+//--></script>
+{{ footer }}

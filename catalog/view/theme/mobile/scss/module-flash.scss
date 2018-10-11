@@ -1,0 +1,245 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-01-16 11:36:15
+// @modified         2018-02-11 16:48:39
+//
+
+
+.seckill-title {
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 6px;
+  margin-top: -3px;
+  margin-bottom: 0;
+  border-bottom: 1px solid #FFC2C1;
+  h2 {
+    display: block;
+    margin: 0 0 0;
+    padding: 4px 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    color: #f72b2b;
+    float: left;
+
+    i {
+      margin-right: 2px;
+    }
+
+    img {
+      display: inline-block;
+      margin-right: 3px;
+    }
+  }
+
+  .product-count-down {
+    float: right;
+    padding: 0 4px 0 0;
+    margin-bottom: 0;
+    right: 0;
+    list-style: none;
+
+    > li {
+      float: left;
+      // border: 1px solid #eee;
+      padding: 1px 2px;
+      margin-right: 5px;
+      border-radius: 2px;
+      background-color: #f25127;
+      color: #fff;
+      position: relative;
+
+      &:last-of-type:before {
+        display: none;
+      }
+
+      &:before {
+        content: ':';
+        position: absolute;
+        right: -5px;
+        top: 2px;
+        color: #f25127;
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.seckill-container {
+  border-top-width: 0;
+
+  .image {
+    position: relative;
+  }
+  .ing-seckill {
+    position: absolute;
+    top: 6px;
+    z-index: 999;
+    right: 0;
+    height: 21px;
+    line-height: 20px;
+    padding: 1px 2px;
+    font-size: 12px;
+    color: #fff;
+
+    &.ing {
+      background-color: red;
+    }
+
+    &.end {
+      background-color: #333;
+
+      &:before, &:after {
+        border-top-color: #333 !important;
+        border-bottom-color: #333 !important;
+      }
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-top: 12px solid red;
+      border-left: 12px solid transparent;
+    }
+
+    &:after {
+      content: '';
+      position: absolute;
+      left: -12px;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-bottom: 12px solid red;
+      border-left: 12px solid transparent;
+    }
+  }
+
+  .end-seckill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 6px;
+    z-index: 99;
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(0,0,0,.5);
+    }
+  }
+}
+
+.flash-price-wrap {
+  margin: 0 -10px;
+  height: 50px;
+  background-color: #fa215f;
+
+  .product-price-wrapper {
+    float: left;
+    width: 65%;
+    height: 100%;
+    padding: 0 0 0 10px;
+
+    span {
+      font-weight: 500;
+      color: #fff;
+
+      &.price-new {
+        font-size: 24px;
+        display: inline-block;
+        float: left;
+        margin-right: 10px;
+        line-height: 50px;
+        // width: 50%;
+      }
+
+      &.price-old {
+        font-size: 16px;
+        color: #f5f5f5;
+      }
+
+      &.points {
+        float: none;
+        color: #fff;
+      }
+    }
+    .special-points {
+      display: table;
+      height: 100%;
+    }
+    .table-cell {
+      display: table-cell;
+      vertical-align: middle;
+
+      span {
+        display: block;
+        line-height: 18px;
+      }
+    }
+  }
+
+  .product-countdown {
+    height: 100%;
+    width: 35%;
+    float: left;
+    text-align: center;
+    // background-color: #fbe253;
+    background-color: #ffea70;
+
+    .text {
+      color: #fa215f;
+      display: inline-block;
+      margin-bottom: 2px;
+    }
+
+    .countdown {
+      padding-left: 0;
+      margin-bottom: 0;
+      list-style: none;
+    }
+
+    li {
+      display: inline;
+      position: relative;
+      margin: 0 1px;
+      &:last-of-type:after {
+        display: none;
+      }
+
+      &:after {
+        content: ':';
+        position: absolute;
+        right: -4px;
+        top: -2px;
+        color: #000;
+      }
+
+      span {
+        background-color: #fa215f;
+        padding: 4px 2px;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+.new-attribute {
+  border-top: 1px dashed #e6e6e6;
+  padding: 8px 0 0;
+  font-size: 15px;
+  clear: both;
+  overflow: hidden;
+}

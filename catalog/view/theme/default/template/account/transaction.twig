@@ -1,0 +1,51 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <h2>{{ heading_title }}</h2>
+      {% if transactions %}
+      <div class="clearfix mb-1">
+        <span>{{ text_total }}</span> <b>{{ total }}</b>
+        <a href="{{ recharge }}" class="btn btn-primary pull-right">{{ button_recharge }}</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th class="text-left">{{ column_date_added }}</th>
+              <th class="text-left">{{ column_description }}</th>
+              <th class="text-right">{{ column_amount }}</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for transaction in transactions %}
+          <tr>
+            <td class="text-left">{{ transaction.date_added }}</td>
+            <td class="text-left">{{ transaction.description }}</td>
+            <td class="text-right">{{ transaction.amount }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {{ include(helper.template('_partial/pagination')) }}
+      {% else %}
+      {% if helper.is_pro() %}
+      <div class="pull-right">
+        <a href="{{ recharge }}" class="btn btn-primary">{{ button_recharge }}</a>
+      </div>
+      {% endif %}
+      {{ include(helper.template('_partial/no_result')) }}
+      {% endif %}
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

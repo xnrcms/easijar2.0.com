@@ -1,0 +1,119 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2017-10-11 22:22:40
+// @modified         2018-01-30 16:56:42
+//
+
+
+.account-oreview-info {
+  .name-info {
+    border-bottom: $default-border;
+
+    > div {
+      margin-bottom: 10px;
+    }
+  }
+}
+.account-oreview-add, .account-oreview-info {
+  .upload-img {
+    float: left;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    position: relative;
+    &:hover {
+      button {
+        display: block;
+      }
+    }
+    img {
+      max-width: 82px;
+      max-height: 82px;
+    }
+    button {
+      display: none;
+      top: 0;
+      right: 0;
+      padding: 1px 5px;
+      position: absolute;
+    }
+    &:hover {
+      border-color: $brand-primary;
+    }
+  }
+}
+.account-oreview-add {
+  h2 {
+    margin-bottom: 15px;
+  }
+
+  .star-box {
+    font-size: 0;
+    display: table;
+
+    > label {
+      color: #ddd;
+      float: right;
+      width: auto !important;
+      cursor: pointer;
+
+      &:before {
+        content: '\f005';
+        font-family: FontAwesome;
+        display: inline-block;
+        padding: 5px;
+        font-size: 24px;
+        line-height: 1em;
+      }
+    }
+
+    > input:checked ~ label, &:not(:checked) > label:hover, &:not(:checked) > label:hover ~ label {
+      color: #FFD700;
+    }
+  }
+
+  .control-label {
+    font-size: 14px;
+    font-weight: 600;
+    span {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    &.title {
+      margin-bottom: 15px !important;
+    }
+  }
+  .up-btn {
+    button {
+      border: 1px dashed #ccc;
+      width: 100%;
+      height: 64px;
+      text-align: center;
+      color: #666;
+      padding: 0;
+      font-size: 18px;
+      @media (max-width: 768px) {
+        height: 44px;
+        font-size: 12px;
+      }
+      &:hover, &:focus {
+        border-color: #777;
+        background: #f7f7f7;
+        color: #333;
+      }
+      i {
+        font-size: 18px;
+        margin-bottom: 4px;
+        @media (max-width: 768px) {
+          font-size: 12px;
+        }
+      }
+      &.disabled {
+        background: #f7f7f7 !important;
+      }
+    }
+  }
+}

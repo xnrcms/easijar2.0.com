@@ -1,0 +1,11 @@
+{% if product.price %}
+<div class="price">
+  {% if product.flash %}
+    <span class="price-new">{{ product.flash }}</span> <span class="price-old">{{ product.price }}</span>
+  {% elseif product.special %}
+    <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+  {% else %}
+    <span class="price-new">{{ product.price }}</span>
+  {% endif %}
+</div>
+{% endif %}

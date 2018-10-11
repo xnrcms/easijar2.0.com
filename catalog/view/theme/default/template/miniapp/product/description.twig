@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta content="telephone=no" name="format-detection">
+  <meta name="wap-font-scale" content="no">
+  <title></title>
+  <base href="{{ helper.config('config_url') }}" />
+  <script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
+  <script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+  <link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+  <style>
+    .main-wrapper {margin:5px;}
+    .nav-tabs {margin-top: 0; border-bottom: 1px solid #eaeaea;}
+    .nav-tabs li a {color: #333; padding: 10px 30px; font-weight: bold;}
+    .nav-tabs li.active > a, .nav-tabs li.active > a:focus, .nav-tabs li.active > a:hover {border: none; border-bottom: 2px solid #e2373a;}
+    .tab-pane {padding: 10px;}
+  </style>
+</head>
+<script>
+  $(document).ready(function() {
+    $('#tab-description img').not('[img-responsive]').addClass('img-responsive'); // Make description image responsive
+  });
+</script>
+<body>
+  <div class="main-wrapper">
+    {% if error %}
+      <p>{{ error }}</p>
+    {% endif %}
+
+    {% if description or attribute_groups %}
+    <ul class="nav nav-tabs">
+      {% if description %}
+        <li class="active"><a href="#tab-description" data-toggle="tab" aria-expanded="true">{{ text_product_description }}</a></li>
+      {% endif %}
+
+      {% if attribute_groups %}
+        <li class=""><a href="#tab-attribute" data-toggle="tab" aria-expanded="false">{{ text_product_attribute }}</a></li>
+      {% endif %}
+    </ul>
+    {% endif %}
+
+    {% if description or attribute_groups %}
+    <div class="tab-content">
+      {% if description %}
+      <div class="tab-pane active" id="tab-description">
+        {{ description }}
+      </div>
+      {% endif %}
+
+      {% if attribute_groups %}
+      <div class="tab-pane" id="tab-attribute">
+        <table class="table table-bordered">
+          {% for attribute_group in attribute_groups %}
+          <thead>
+            <tr>
+              <td colspan="2"><strong>{{ attribute_group.name }}</strong></td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for attribute in attribute_group.attribute %}
+            <tr>
+              <td>{{ attribute.name }}</td>
+              <td>{{ attribute.text }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          {% endfor %}
+        </table>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>

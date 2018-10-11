@@ -1,0 +1,67 @@
+{{ header }}
+<div id="account-address" class="container">
+  {{ include(helper.template('_partial/breadcrumb')) }}
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}
+        <a href="{{ recharge }}" class="btn btn-default btn-right">{{ button_withdraw }}</a>
+      </div>
+      {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+      {% endif %}
+      <div class="row widget">
+      <div class="col-xs-12">
+        <h2>{{ text_total }} <b>{{ total }}</b></h2>
+      </div>
+      </div>
+      {% if withdraws %}
+      {% for withdraw in withdraws %}
+        <div class="list-two-column-justified row widget">
+          <div class="col-xs-12">
+          <dl>
+            <dt>{{ column_date_added }}</dt>
+            <dd>{{ withdraw.date_added }}</dd>
+          </dl>
+          <dl>
+            <dt>{{ column_amount }}</dt>
+            <dd>{{ withdraw.amount }}</dd>
+          </dl>
+          <dl>
+            <dt>{{ column_bank_account }}</dt>
+            <dd>{{ withdraw.bank_account }}</dd>
+          </dl>
+          <dl>
+            <dt>{{ column_message }}</dt>
+            <dd>{{ withdraw.message }}</dd>
+          </dl>
+          <dl>
+            <dt>{{ column_status }}</dt>
+            <dd>{{ withdraw.status ? text_withdraw_status_1 : text_withdraw_status_0 }}</dd>
+          </dl>
+          <dl>
+            <dt>{{ column_refused }}</dt>
+            <dd>{{ withdraw.refused ? text_withdraw_refused_1 : text_withdraw_refused_0 }}</dd>
+          </dl>
+          </div>
+        </div>
+      {% endfor %}
+      <div class="row">
+        <div class="col-sm-6 col-xs-6 text-left">{{ pagination }}</div>
+      </div>
+      {% else %}
+        <div class="row widget" style="margin-top: -15px;">
+        <div class="col-xs-12">
+          <div class="no-items">
+            <div class="icon">
+              <i class="iconfont">&#xe60d;</i>
+            </div>
+            <dd class="msg">{{ text_empty }}</dd>
+          </div>
+        </div>
+        </div>
+      {% endif %}
+        {{ content_bottom }}
+      </div>
+    </div>
+</div>
+{{ footer }}

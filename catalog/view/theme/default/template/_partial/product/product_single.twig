@@ -1,0 +1,21 @@
+{% set style = style is null ? 'grid' : style %}
+<div class="product-thumb">
+  <div class="image">
+    <a href="{{ product.href }}">
+      <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" />
+    </a>
+    {% if style == 'grid' %}
+    {{ include(helper.template('_partial/product/sales_block')) }}
+    {% endif %}
+  </div>
+  <div class="caption">
+    <h4 class="product-name"><a href="{{ product.href }}" title="{{ product.name }}">{{ product.name }}</a></h4>
+    <p class="product-description hidden-xs">{{ product.description }}</p>
+    {% if style != 'grid' %}
+    {{ include(helper.template('_partial/product/sales_block')) }}
+    {% endif %}
+    {{ include(helper.template('_partial/product/rating_block')) }}
+    {{ include(helper.template('_partial/product/price_block')) }}
+  </div>
+  {{ include(helper.template('_partial/product/product_button_block')) }}
+</div>

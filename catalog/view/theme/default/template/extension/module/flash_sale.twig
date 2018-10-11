@@ -1,0 +1,105 @@
+{% if date_end != '0000-00-00' and date_end is not null and seconds > 0 and show %}
+  {% if helper.is_home_page() %}
+  <div class="bg-white">
+  <div class="container"><div class="row"><div class="col-sm-12">
+  {% endif %}
+  <div class="flash-wrapper mb-3 mt-3">
+    {% if heading_title %}
+    <h3 class="widget-title">
+      <span>{{ heading_title }}</span>
+      <div class="flash-widget-title">
+        <ul class="count-down product-count-down" data-countdown="{{ seconds }}"></ul>
+      </div>
+      <div class="title-pager"><span class="flash-prev"></span><span class="flash-next"></span></div>
+    </h3>
+    {% endif %}
+    <div class="row">
+      <div class="col-sm-12 swiper-viewport flash-swiper-wrap">
+        <div class="product-wrapper swiper-container" id="flash-swiper{{ module }}">
+          <div class="swiper-wrapper">
+            {% for product in products %}
+              <div class="swiper-slide">
+                <div class="product-layout">
+                  {% if product['sell_out'] %}
+                  <div class="sell-out-ing">{{ text_ing }}</div>
+                  {% else %}
+                  <div class="sell-out-end">{{ text_end }}</div>
+                  {% endif %}
+                  {{ include(helper.template('_partial/product/product_single')) }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if helper.is_home_page() %}
+  </div></div></div></div>
+  {% endif %}
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      $('[data-countdown]').each(function() {
+        var $this = $(this), end = moment().add($(this).data('countdown'), 'seconds').toDate();
+
+        $this.countdown(end, function(event) {
+          var _itemEnd = event.strftime('%D,%H,%M,%S'), dateHtml = '';
+          if ( _itemEnd == '00,00,00,00' ) {
+              dateDnd($this);
+          }
+
+          if ( parseInt(event.strftime('%D')) ) dateHtml = '<li><span>%D</span>{{ text_day }}</li>';
+
+          $this.html(event.strftime(dateHtml + '<li><span>%H</span>{{ text_hour }}</li> <li><span>%M</span>{{ text_minute }}</li> <li><span>%S</span>{{ text_second }}</li>'));
+
+          // $('.flash-widget-title').css('marginLeft', -$('.flash-widget-title').width() / 2 + 'px');
+        });
+      });
+
+      var dateDnd = function (item) {
+        item.hide();
+        $('.end-img').show();
+      }
+
+
+      var flash_product_swiper{{ module }} = new Swiper('#flash-swiper{{ module }}', {
+        slidesPerView: 5,
+        breakpoints: {
+          320: {
+            slidesPerView: 1,
+            spaceBetween: 6
+          },
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 15
+          },
+          992: {
+            slidesPerView: 3,
+          }
+        },
+        {% if products|length > 4 %}
+        navigation: {
+          nextEl: '.flash-next',
+          prevEl: '.flash-prev',
+        },
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false
+        },
+        loop: true,
+        {% endif %}
+        spaceBetween: 15
+      });
+
+      $('#flash-swiper{{ module }}').hover(function() {
+        flash_product_swiper{{ module }}.autoplay.stop();
+      }, function() {
+        flash_product_swiper{{ module }}.autoplay.start();
+      });
+
+    });
+  </script>
+{% endif %}

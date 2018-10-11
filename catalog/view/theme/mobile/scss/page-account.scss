@@ -1,0 +1,243 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-02-08 16:05:38
+//
+.account-edit,.account-password {
+  input[type="submit"] {
+    margin-top: 20px;
+  }
+}
+.avatar-container {
+  padding: 0 0 10px;
+  margin-bottom: 0;
+  overflow: hidden;
+
+  .acconut-bg {
+    background: url(../image/account-bg.png);
+    background-size: cover;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+
+    .eidt-account {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      a {
+        color: #fff;
+        i {
+          font-size: 24px;
+        }
+      }
+    }
+
+    .account-bg-bg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+  }
+
+  .personal-content {
+    padding: 48px 0 30px;
+    text-align: center;
+    position: relative;
+
+    .personal-image {
+      width: $account_page_avatar_width;
+      height: $account_page_avatar_width;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .personal-account {
+      margin-top: 10px;
+      flex: 1;
+      color: #fff;
+
+      span {
+        display: block;
+        font-size: 14px;
+        line-height: 20px;
+        &:first-of-type {
+          font-weight: bold;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+}
+
+.account-page {
+  .all-order-box {
+    background-color: #fff;
+    font-size: 15px;
+    a {
+      margin: 0 15px;
+      padding: 13px 0;
+      display: flex;
+      justify-content:space-between;
+    }
+    &:active {
+      background-color: #eee;
+    }
+    span {
+      display: inline-block;
+      &:first-of-type {
+        text-align: left;
+      }
+      &:last-of-type {
+        text-align: right;
+        color: #aaa;
+        position: relative;
+        margin-right: 25px;
+        &:after {
+          content: "\e62b";
+          font-family: 'iconfont';
+          position: absolute;
+          top: 50%;
+          margin-top: -10px;
+          right: -25px;
+          color: #aaa;
+        }
+      }
+    }
+  }
+  .order-button-groups {
+    @include display-flex;
+
+    a {
+      color: $account_page_order_icon_color;
+    }
+
+    .order-button {
+      flex: 1;
+      border-right: 1px solid #f1f1f1;
+      text-align: center;
+      position: relative;
+      margin-top: 5px;
+
+      &:active {
+        background-color: #eee;
+      }
+
+      .text-number {
+        display: inline;
+        line-height: 15px;
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        top: -15%;
+        right: 25%;
+        background-color: $main-color;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 9px;
+      }
+
+      &:last-child {
+        border: none;
+      }
+    }
+    i {
+      color: #888;
+      font-size: 22px;
+
+    }
+    span {
+      color: $second_color;
+      display: block;
+      margin-top: 2px;
+    }
+  }
+  .avatar {
+    img {
+      border-radius: 50px;
+    }
+  }
+  .userinfo {
+    span {
+      display: block;
+    }
+    .username {
+      font-size: 14px;
+      font-weight: bold;
+    }
+  }
+}
+
+// Accordion list style
+.accordion-list {
+  display: block;
+  overflow: hidden;
+  margin: -$gutter 0 -$gutter;
+
+  li {
+    &:active {
+      background-color: #eee;
+    }
+    a {
+      display: block;
+      height: 50px;
+      line-height: 50px;
+      margin: 0 15px;
+      font-size: 14px;
+      position: relative;
+
+      &:before {
+        height: 1px;
+        content: '';
+        width: 100%;
+        border-top: 1px solid #e5e5e5;
+        position: absolute;
+        bottom: -1px;
+        right: 0;
+        transform: scaleY(0.5);
+        -webkit-transform: scaleY(0.5);
+        z-index: 10;
+      }
+
+      &:after {
+        content: "\e62b";
+        font-family: 'iconfont';
+        position: absolute;
+        top: 50%;
+        margin-top: -23px;
+        right: 0;
+        color: #aaa;
+      }
+
+      i {
+        color: #888;
+        margin-right: 3px;
+      }
+    }
+    &:first-of-type {
+      a {
+        border-top: 0;
+      }
+    }
+  }
+}
+
+// Avatar upload
+#avatar-upload {
+  margin: 0;
+  text-align: center;
+
+  #clipArea {
+    height: 300px;
+  }
+  #file, #clipBtn {
+    margin: 20px;
+  }
+  #file {
+    display: none;
+  }
+}
+

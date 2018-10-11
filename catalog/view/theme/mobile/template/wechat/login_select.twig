@@ -1,0 +1,23 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-xs-12">
+      <div class="nav-bar">{{ heading_title }}</div>
+      <h1 class="mt-4">{{ text_account_type }}</h1>
+      <div class="mb-4">
+        <p>{{ help_existing_customer }}</p>
+        <a class="btn btn-primary btn-block" href="{{ action_old }}">{{ button_old_customer }}</a>
+      </div>
+      <div>
+        <p>{{ help_new_customer }}</p>
+        <a class="btn btn-default btn-block" href="{{ action_new }}">{{ button_new_customer }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% if error_warning %}
+<script>
+  showToast('{{ error_warning }}');
+</script>
+{% endif %}
+{{ footer }}

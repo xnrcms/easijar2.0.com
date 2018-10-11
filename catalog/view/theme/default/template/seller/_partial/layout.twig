@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>{% block title %}{% endblock %} {{ heading_title }}</title>
+  <base href="{{ helper.config('config_url') }}">
+  <link rel="stylesheet" type="text/css" href="catalog/view/javascript/bootstrap/css/bootstrap.css">
+  <script type="text/javascript" src="catalog/view/javascript/jquery/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="catalog/view/javascript/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="catalog/view/javascript/layer/layer.js"></script>
+  <script type="text/javascript" src="catalog/view/theme/default/template/seller/javascript/common.js"></script>
+  <link rel="stylesheet" type="text/css" href="catalog/view/javascript/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="catalog/view/theme/default/template/seller/stylesheet/stylesheet.css">
+  {% for style in helper.document.getStyles() %}
+  <link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+  {% endfor %}
+  {% for script in helper.document.getScripts() %}
+  <script src="{{ script }}" type="text/javascript"></script>
+  {% endfor %}
+  {% block header %}
+  {% endblock %}
+</head>
+<body class="seller-page {% block body_class endblock %}">
+  <div class="sidebar">
+    <ul class="list-unstyled">
+      {% set route = helper.current_route() %}
+      <li><a {{ route == 'seller/account' ? 'class="active"' }} href="{{ helper.url.link('seller/account') }}">
+        <i class="iconfont left">&#xe635;</i>{{ text_dashboard }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a {{ route == 'seller/edit' ? 'class="active"' }} href="{{ helper.url.link('seller/edit') }}">
+        <i class="iconfont left">&#xe647;</i>{{ text_edit }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a {{ route == 'account/password' ? 'class="active"' }} href="{{ helper.url.link('account/password','ptype=1') }}">
+        <i class="iconfont left">&#xe65f;</i>{{ text_password }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a {{ route == 'seller/product' or route == 'seller/product/edit' or route == 'seller/product/add' ? 'class="active"' }} href="{{ helper.url.link('seller/product') }}">
+        <i class="iconfont left">&#xe604;</i>{{ text_product }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a {{ route == 'seller/order' or route == 'seller/order/info' ? 'class="active"' }} href="{{ helper.url.link('seller/order') }}">
+        <i class="iconfont left">&#xe678;</i>{{ text_order }}<i class="iconfont right">&#xe6a7;</i>
+      <li><a {{ route == 'seller/return' or route == 'seller/return/info' ? 'class="active"' }} href="{{ helper.url.link('seller/return') }}">
+        <i class="iconfont left">&#xe678;</i>{{ text_return }}<i class="iconfont right">&#xe6a7;</i>
+      <li><a {{ route == 'seller/oreview' or route == 'seller/oreview/edit' ? 'class="active"' }} href="{{ helper.url.link('seller/oreview') }}">
+        <i class="iconfont left">&#xe669;</i>{{ text_oreview }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a {{ route == 'seller/transaction' ? 'class="active"' }} href="{{ helper.url.link('seller/transaction') }}">
+        <i class="iconfont left">&#xe611;</i>{{ text_transaction }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a {{ route == 'seller/shipping_cost' or route == 'seller/shipping_cost/edit' or route == 'seller/shipping_cost/add' ? 'class="active"' }} href="{{ helper.url.link('seller/shipping_cost') }}">
+        <i class="iconfont left">&#xe600;</i>{{ text_shipping }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+      <li><a href="{{ helper.url.link('account/logout') }}">
+        <i class="iconfont left">&#xe60d;</i>{{ text_logout }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+    </ul>
+  </div>
+
+  <div class="nav-top">
+    <div class="top-header"><i class="iconfont">&#xe639;</i>{{ text_seller_account }}</div>
+    <div class="top-inner">
+      {{ include(helper.template('seller/_partial/breadcrumb')) }}
+      <ul class="links pull-right">
+        <li class="hidden-xs hidden-sm">
+          <div class="avatar">
+            <span>{{ helper.customer.getFullName() }}</span>
+            <img src="{{ helper.image_resize(helper.customer.getAvatar(), 34, 34) }}">
+          </div>
+        </li>
+        <li><a href="{{ helper.config('config_url') }}">{{ text_back_home }}</a></li>
+        <li class="btn-nav hidden-lg hidden-md"><button class="btn btn-link"><i class="iconfont">&#xe605;</i></button></li>
+      </ul>
+    </div>
+  </div>
+  {% block content %}
+  {% endblock %}
+
+  {% block footer %}
+  {% endblock %}
+</body>
+</html>

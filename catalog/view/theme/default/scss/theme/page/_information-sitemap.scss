@@ -1,0 +1,18 @@
+@charset "UTF-8";
+
+.information-sitemap {
+	.map-wrapper {
+		li > a:first-child, li > span:first-child {
+			padding: 7px;
+			display: block;
+			color: #020202;
+		}
+
+		> ul {
+			> li > a:first-child, li > span:first-child {
+				background: #eee;
+				margin: 7px;
+			}
+		}
+	}
+}

@@ -1,0 +1,13 @@
+<div class="row widget category-sort-widget">
+  <div class="col-sm-12">
+    <ul>
+      {% for sorts in sorts %}
+      <li>
+        <a class="{{ sorts.active ? 'active' }}" href="{{ sorts.href }}">
+          {{ sorts.text }} <i class="fa {{ sorts.active ? (sorts.type ? 'fa-level-down' : 'fa-level-up') : 'fa-sort' }}"></i>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

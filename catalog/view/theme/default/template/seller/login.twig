@@ -1,0 +1,79 @@
+{% extends helper.template("seller/_partial/layout_content") %}
+
+{% block body_class 'page-login' %}
+
+{% block content %}
+  <div class="table-box">
+    <div class="middle-wrapper">
+      <div class="inner-wrapper">
+        {% if success %}
+        <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+        {% endif %}
+        {% if error_warning %}
+        <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+        {% endif %}
+        <div class="logo">
+          <a href="{{ helper.config('config_url') }}">
+            <img src="image/{{ helper.config('config_logo') }}" class="img-responsive">
+          </a>
+          {% if not helper.is_ft() %}
+          <h2>{{ text_returning_seller }}</h2>
+          {% endif %}
+        </div>
+        <form action="{{ action }}" method="post" enctype="multipart/form-data">
+          {% if helper.is_ft() %}
+          <ul class="nav nav-tabs mb-1">
+            <li id="tab-email-li" class="{{ type == 'email' ? 'active' : '' }}"><a href="#tab-email" data-toggle="tab">{{ text_login_email }}</a></li>
+            <li id="tab-mobile-li" class="{{ type == 'mobile' ? 'active' : '' }}"><a href="#tab-mobile" data-toggle="tab">{{ text_login_mobile }}</a></li>
+          </ul>
+          <br/>
+          <div class="tab-content">
+            <div class="tab-pane {{ type == 'email' ? 'active' : '' }}" id="tab-email">
+              <div class="form-group">
+                <label class="control-label" for="input-account">{{ entry_email }}</label>
+                <input type="text" name="account" value="{{ account }}" placeholder="{{ entry_email }}" id="input-account" class="form-control" />
+              </div>
+            </div>
+            <input type="hidden" name="type" value="{{ type }}" id="input-type"/>
+            <div class="tab-pane {{ type == 'mobile' ? 'active' : '' }}" id="tab-mobile">
+              <div class="form-group">
+                <label class="control-label" for="input-telephone">{{ entry_telephone }}</label>
+                {{ include(helper.template('_partial/telephone')) }}
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="form-group">
+            <label class="control-label" for="input-account">{{ entry_account }}</label>
+            <input type="text" name="account" value="{{ account }}" placeholder="{{ entry_account }}" id="input-account" class="form-control input-lg" />
+          </div>
+          {% endif %}
+          <div class="form-group">
+            <label class="control-label" for="input-password">{{ entry_password }}</label>
+            <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" id="input-password" class="form-control input-lg" />
+          </div>
+          <div class="form-group clearfix">
+            <a class="pull-left" href="{{ forgotten }}">{{ text_forgotten }}</a>
+            <a class="pull-right" href="{{ register }}">{{ text_new_seller }}</a>
+          </div>
+          <br>
+          <input type="submit" value="{{ button_login }}" class="btn btn-primary btn-block btn-lg" />
+          {% if redirect %}
+          <input type="hidden" name="redirect" value="{{ redirect }}" />
+          {% endif %}
+        </form>
+      </div>
+      <div class="text-center description">{{ text_description }}{{ powered }}</div>
+    </div>
+  </div>
+{% if helper.is_ft() %}
+<script type="text/javascript"><!--
+  $('#tab-email-li').on('click', function () {
+    $('#input-type').val('email');
+  });
+  $('#tab-mobile-li').on('click', function () {
+    $('#input-type').val('mobile');
+  });
+//--></script>
+{% endif %}
+{% endblock %}

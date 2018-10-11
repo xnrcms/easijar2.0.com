@@ -1,0 +1,135 @@
+{% extends helper.template("seller/_partial/layout") %}
+{% block content %}
+
+<div id="content" class="col-sm-12">
+  <div class="content-wrapper">
+    <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal form-group-list">
+      <fieldset>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-title">{{ entry_title }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="title" value="{{ title }}" placeholder="{{ entry_title }}" id="input-title" class="form-control" />
+            {% if error_title %}
+            <div class="text-danger">{{ error_title }}</div>
+            {% endif %} </div>
+        </div>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-geo-zone">{{ entry_geo_zone }}</label>
+          <div class="col-sm-12">
+            <select name="geo_zone_id" id="input-geo-zone" class="form-control">
+              {% for geo_zone in geo_zones %}
+                {% if geo_zone.geo_zone_id == geo_zone_id %}
+                  <option value="{{ geo_zone.geo_zone_id }}" selected="selected">{{ geo_zone.name }}</option>
+                {% else %}
+                  <option value="{{ geo_zone.geo_zone_id }}">{{ geo_zone.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            {% if error_geo_zone_id %}
+            <div class="text-danger">{{ error_geo_zone_id }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-type">{{ entry_type }}</label>
+          <div class="col-sm-12">
+            <select name="type" id="input-type" class="form-control">
+              {% for item in types %}
+                {% if item.type_id == type %}
+                  <option value="{{ item.type_id }}" selected="selected">{{ item.name }}</option>
+                {% else %}
+                  <option value="{{ item.type_id }}">{{ item.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-group required by-weight">
+          <label class="col-sm-12" for="input-unit_weight">{{ entry_unit_weight }}</label>
+          <div class="col-sm-12">
+            <select name="unit_weight" id="input-unit_weight" class="form-control">
+              {% for item in unit_weights %}
+                {% if item.weight_class_id == unit_weight %}
+                  <option value="{{ item.weight_class_id }}" selected="selected">{{ item.title }}</option>
+                {% else %}
+                  <option value="{{ item.weight_class_id }}">{{ item.title }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-group required by-volume">
+          <label class="col-sm-12" for="input-unit_volume">{{ entry_unit_volume }}</label>
+          <div class="col-sm-12">
+            <select name="unit_volume" id="input-unit_volume" class="form-control">
+              {% for item in unit_volumes %}
+                {% if item.length_class_id == unit_volume %}
+                  <option value="{{ item.length_class_id }}" selected="selected">{{ item.title }}</option>
+                {% else %}
+                  <option value="{{ item.length_class_id }}">{{ item.title }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-initial">{{ entry_initial }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="initial" value="{{ initial }}" placeholder="{{ entry_initial }}" id="input-initial" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-initial-cost">{{ entry_initial_cost }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="initial_cost" value="{{ initial_cost }}" placeholder="{{ entry_initial_cost }}" id="input-initial-cost" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-continue">{{ entry_continue }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="continue" value="{{ continue }}" placeholder="{{ entry_continue }}" id="input-continue" class="form-control" />
+            {% if error_continue %}
+            <div class="text-danger">{{ error_continue }}</div>
+            {% endif %} </div>
+        </div>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-continue-cost">{{ entry_continue_cost }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="continue_cost" value="{{ continue_cost }}" placeholder="{{ entry_continue_cost }}" id="input-continue-cost" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group required">
+          <label class="col-sm-12" for="input-sort-order">{{ entry_sort_order }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="sort_order" value="{{ sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
+          </div>
+        </div>
+      </fieldset>
+      <div class="buttons clearfix">
+        <div class="pull-right">
+          <input type="submit" value="{{ button_submit }}" class="btn btn-primary" />
+        </div>
+        <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+  $('select[name="type"]').change(function () {
+      if ($(this).val() == {{ const_type.by_weight }}) {
+          $('.by-volume').hide();
+          $('.by-weight').show();
+      } else if ($(this).val() == {{ const_type.by_volume }}) {
+          $('.by-volume').show();
+          $('.by-weight').hide();
+      } else if ($(this).val() == {{ const_type.by_count }}) {
+          $('.by-volume').hide();
+          $('.by-weight').hide();
+      }
+  })
+
+  $('select[name="type"]').trigger('change');
+--></script>
+{% endblock %}

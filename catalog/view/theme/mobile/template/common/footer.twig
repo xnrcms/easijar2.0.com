@@ -1,0 +1,94 @@
+{% if (not modal) and not (route starts with 'wechat/login') %}
+  <footer>
+    {% if language or currency %}
+    <div class="language-currency-wrapper mb-1 mt-1">
+      {{ language }}
+      {{ currency }}
+    </div>
+    {% endif %}
+    <div class="container">
+      <div class="footer-powered">
+        {{ powered }}
+      </div>
+    </div>
+  </footer>
+  {% if route starts with 'product/product' %}
+    <nav id="bottom-add-to-cart" class="top-border">
+      <div class="menu-item menu-wishlist right-border">
+        <button id="button-add-to-wishlist"><i class="fa fa-heart {{ in_wishlist ? 'active' }}"></i></button>
+      </div>
+      <div class="menu-item menu-cart">
+        <a href="{{ shopping_cart }}">
+          <i class="iconfont">&#xe608;<span class="cart-total" style="{{ cart_count < 1 ? 'display:none;' }}"></span></i>
+        </a>
+      </div>
+      <div class="menu-item menu-add-to-cart">
+        {% if quantity > 0 %}
+        <button data-loading-text="{{ text_please_wait }}" class="button-add-to-cart">{{ text_add_to_cart }}</button>
+        {% else %}
+        <button class="button-add-to-cart disabled" disabled>{{ text_out_of_stock }}</button>
+        {% endif %}
+      </div>
+      {% if quantity > 0 %}
+      <div class="menu-item menu-buy-now">
+        <button data-loading-text="{{ text_please_wait }}" class="button-buy-now">{{ text_buy_now }}</button>
+      </div>
+      {% endif %}
+    </nav>
+  {% elseif route starts with 'checkout/cart' and cart_count > 0 %}
+    <nav id="bottom-checkout">
+      {% if helper.is_pro() %}
+      <div class="cart-select-group">
+        <div class="cart-select">
+          <input type="checkbox" value="" id="checkbox-all" style="visibility: hidden"/>
+          <label for="checkbox-all"></label>
+        </div>
+        <span>{{ text_select_all }}</span>
+      </div>
+      {% endif %}
+      <div class="total-group">
+        <span class="total-price"><span class="text-pay">{{ text_to_pay }}</span><strong class="number">--</strong></span>
+      </div>
+      <div class="checkout-group"><a href="{{ checkout }}">{{ text_checkout }}</a></div>
+    </nav>
+  {% else %}
+    <nav id="bottom-tab-menu">
+      <div class="menu-item">
+        <a class="{{ (route starts with 'common/home') ? 'active' }}" href="{{ helper.url.link('common/home') }}">
+          <i class="iconfont">&#xe669;</i>
+          <div class="name">{{ text_home }}</div>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a class="{{ (route starts with 'product/search') ? 'active' }}" href="{{ helper.url.link('product/search') }}">
+          <i class="iconfont">&#xe602;</i>
+          <div class="name">{{ text_search }}</div>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a class="{{ (route starts with 'mobile/categories' or route starts with 'product/manufacturer') ? 'active' }}" href="{{ helper.url.link('mobile/categories') }}">
+          <i class="iconfont">&#xe61d;</i>
+          <div class="name">{{ text_category }}</div>
+        </a>
+      </div>
+      <div class="menu-item cart">
+        <a class="{{ (route starts with 'checkout') ? 'active' }}" href="{{ shopping_cart }}">
+          <i class="iconfont"><span class="cart-total" style="{{ cart_count <= 0 ? 'display:none;' }}"></span>&#xe660;</i>
+          <div class="name">{{ text_cart }}</div>
+        </a>
+      </div>
+      <div class="menu-item">
+        <a class="{{ (route starts with 'account') ? 'active' }}" href="{{ account }}">
+          <i class="iconfont">&#xe640;</i>
+          <div class="name">{{ text_account }}</div>
+        </a>
+      </div>
+    </nav>
+  {% endif %}
+{% endif %}
+
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+</body>
+</html>

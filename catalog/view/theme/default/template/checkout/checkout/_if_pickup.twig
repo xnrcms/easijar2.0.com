@@ -1,0 +1,17 @@
+<div class="checkout-section" id="if-pickup-section">
+  <div class="title-wrapper">
+    <h2>
+      {{ text_checkout_if_pickup }}
+    </h2>
+  </div>
+  <div class="radio {{ is_pickup ? 'active' }}">
+    <label>
+      <input type="radio" name="is_pickup" value="1" {{ is_pickup ? 'checked="checked"' }}/>{{ text_pickup }}
+    </label>
+  </div>
+  <div class="radio {{ not is_pickup ? 'active' }}">
+    <label>
+      <input type="radio" name="is_pickup" value="0" {{ not is_pickup ? 'checked="checked"' }}/>{{ text_shipping }}
+    </label>
+  </div>
+</div>

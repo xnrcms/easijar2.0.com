@@ -1,0 +1,10 @@
+{% for module in modules %}
+{{ module }}
+{% endfor %}
+{% if isback %}
+<div class="page-back" style="position: absolute;top: 6px;left: 8px;z-index: 999;background: rgba(130, 130, 130, 0.71);border-radius: 50%;">
+<a href="javascript:window.history.back(-1);" style="display: block;text-align: center;width: 30px;height: 30px;line-height: 30px;">
+  <i class="iconfont">&#xe622;</i>
+</a>
+</div>
+{% endif%}

@@ -1,0 +1,19 @@
+{% set style = style is null ? 'grid' : style %}
+<div class="product-item-wrapper">
+  <div class="image">
+    <a href="{{ product.href }}">
+      <img data-src="{{ product.thumb }}" src="{{ helper.image_resize() }}" class="lazy img-responsive">
+    </a>
+    {% if style == 'grid' %}
+    {{ include(helper.template('_partial/product/sales_block')) }}
+    {% endif %}
+  </div>
+  <div class="info">
+    <a href="{{ product.href }}">{{ product.name }}</a>
+    {% if style != 'grid' and style != 'list-small' %}
+    {{ include(helper.template('_partial/product/sales_block')) }}
+    {% endif %}
+    {{ include(helper.template('_partial/product/price_block')) }}
+    {{ include(helper.template('_partial/product/product_button_block')) }}
+  </div>
+</div>

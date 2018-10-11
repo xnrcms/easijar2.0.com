@@ -1,0 +1,31 @@
+<div class="widget image-slideshow-container">
+  <div class="col-xs-12">
+    <div id="slideshow-{{ module_id }}" class="swiper-container">
+      <div class="swiper-wrapper">
+        {% for slide in slides %}
+          <div class="swiper-slide">
+            {% if slide.link %}
+              <a href="{{ slide.link }}">
+                <img src="{{ slide.image }}" alt="{{ slide.title }}" class="img-responsive" />
+              </a>
+            {% else %}
+              <img src="{{ slide.image }}" alt="{{ slide.title }}" class="img-responsive" />
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+    <script type="text/javascript">
+    var slideshow_swiper = new Swiper ('#slideshow-{{ module_id }}', {
+      loop: true,
+      autoplay: {
+        delay: 5000,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+      }
+    });
+    </script>
+  </div>
+</div>

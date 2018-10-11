@@ -1,0 +1,45 @@
+{% if type == 'single' %}
+{% for index, image in images if index >= 0 %}
+<div class="row module-banner">
+  <a href="{{ image.href ?: 'javascript:void(0);'; }}"><img src="{{ image.image }}" class="img-responsive">
+    {% if image.title is empty || image.subtitle is empty %}
+    <div class="banner-describe-box">
+      <div class="banner-describe-border">
+        <div class="banner-describe-inner">
+          <span class="title">{{ image.title }}</span>
+          <span class="innrt">{{ image.subtitle }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </a>
+</div>
+{% endfor %}
+{% elseif type == 'two_even' %}
+<div class="row module-Line-box-two">
+  <div class="module-title"><span>{{ heading_title }}</span></div>
+  <div class="inner-list">
+    {% for index, image in images if index >= 1 %}
+    <a href="{{ image.href ?: 'javascript:void(0);'; }}"><img src="{{ image.image }}" class="img-responsive"></a>
+    {% endfor %}
+  </div>
+</div>
+{% elseif type == 'three_right_vertical' %}
+<div class="row module-transverse">
+  <div class="module-title"><span>{{ heading_title }}</span></div>
+  <div class="inner-list">
+    {% for index, image in images if index >= 2 %}
+    <a href="{{ image.href ?: 'javascript:void(0);'; }}"><img src="{{ image.image }}" class="img-responsive"></a>
+    {% endfor %}
+  </div>
+</div>
+{% elseif type == 'three_right_horizontal' %}
+<div class="row module-Line-box-three">
+  <div class="module-title"><span>{{ heading_title }}</span></div>
+  <div class="inner-list">
+    {% for index, image in images if index >= 2 %}
+    <a href="{{ image.href ?: 'javascript:void(0);'; }}"><img src="{{ image.image }}" class="img-responsive"></a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

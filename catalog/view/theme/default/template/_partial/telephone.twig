@@ -1,0 +1,30 @@
+{% if helper.is_ft() %}
+{% set telephones = telephone|split('-') %}
+<div class="input-group">
+  <div class="input-group-btn">
+    <select id="input-pre-telephone" name="pre_telephone" class="form-control" style="min-width: 120px;">
+      <option value="">{{ text_select }}</option>
+      {% for country in helper.get_calling_codes() %}
+      {% if telephones[0] == country.code %}
+      <option value="{{ country.code }}" selected="selected">{{ country.name }}</option>
+      {% else %}
+      <option value="{{ country.code }}">{{ country.name }}</option>
+      <{% endif %}
+      {% endfor %}
+    </select>
+  </div><!-- /btn-group -->
+  <input name="post_telephone" style="margin-left: -1px;" value="{{ telephones[1] }}" id="input-post-telephone" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" class="form-control" />
+</div><!-- /input-group -->
+<input name="telephone" value="{{ telephone }}" placeholder="{{ entry_telephone }}" id="input-telephone" class="form-control hidden" />
+{% else %}
+<input name="telephone" value="{{ telephone }}" placeholder="{{ entry_telephone }}" id="input-telephone" class="form-control" />
+{% endif %}
+
+<script type="text/javascript"><!--
+$('#input-pre-telephone').on('change', function() {
+    $('#input-telephone').val($('#input-pre-telephone').val() + '-' + $('#input-post-telephone').val())
+})
+$('#input-post-telephone').on('change', function() {
+    $('#input-telephone').val($('#input-pre-telephone').val() + '-' + $('#input-post-telephone').val())
+})
+//--></script>

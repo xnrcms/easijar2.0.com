@@ -1,0 +1,33 @@
+<! -- 引入微信官方的JSSDK 1.2版本-->
+<script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<div class="buttons">
+  <div class="pull-right">
+    <input type="button" value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary" />
+  </div>
+</div>
+<script type="text/javascript"><!--
+  wx.config({{ options|json_encode }});
+
+  wx.ready(function () {
+      // 这里获取到PHP生成签名参数包，注意是JSON格式
+       var  options = {{ options|json_encode }};
+
+       // 支付成功后的操作
+       options.success = function () {
+        window.location.href = "{{ action_success }}";
+       };
+
+      //  取消支付的操作
+       options.cancel = function () {
+       };
+
+      // 支付失败的处理
+       options.fail = function () {
+       };
+
+      $('#button-confirm').on('click', function() {
+           // 传入参数，发起JSAPI支付
+           wx.chooseWXPay(options);
+      });
+   });
+//--></script>

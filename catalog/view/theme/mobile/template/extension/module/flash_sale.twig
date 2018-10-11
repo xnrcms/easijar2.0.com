@@ -1,0 +1,42 @@
+{% if date_end != '0000-00-00' and date_end is not null and seconds > 0 and show %}
+  <div class="row widget seckill-title">
+    <h2><i class="iconfont">&#xe60b;</i>{{ heading_title }}</h2>
+    <ul class="count-down product-count-down" data-countdown="{{ seconds }}"></ul>
+  </div>
+  <div class="row seckill-container product-list-item-style product-grid-box">
+    {% for product in products %}
+    <div class="col-xs-6 product-item">
+      <div class="product-layout">
+        {% if product['sell_out'] %}
+        <span class="ing-seckill ing">{{ text_ing }}</span>
+        {% else %}
+        <span class="ing-seckill end">{{ text_end }}</span>
+        {% endif %}
+        {{ include(helper.template('_partial/product/product_single')) }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('[data-countdown]').each(function() {
+        var $this = $(this), end = moment().add($(this).data('countdown'), 'seconds').toDate();
+
+        $this.countdown(end, function(event) {
+          var _itemEnd = event.strftime('%D,%H,%M,%S'), dateHtml = '';
+          if ( _itemEnd == '00,00,00,00' ) {
+              dateDnd($this);
+          }
+
+          if ( parseInt(event.strftime('%D')) ) dateHtml = '<li><span>%D</span>{{ text_day }}</li>';
+
+          $this.html(event.strftime(dateHtml + '<li><span>%H</span>{{ text_hour }}</li> <li><span>%M</span>{{ text_minute }}</li> <li><span>%S</span>{{ text_second }}</li>'));
+        });
+      });
+      var dateDnd = function (item) {
+        item.hide();
+        $('.end-img').show();
+      }
+    });
+  </script>
+{% endif %}

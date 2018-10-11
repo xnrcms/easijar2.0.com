@@ -1,0 +1,113 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2017-05-25 09:12:48
+// @modified         2018-02-01 18:43:12
+//
+
+$post_body_color: #5d5d5d;
+
+.blog-category {
+  #content {
+    h2 {
+      font-size: 18px;
+    }
+
+    p {
+      &.empty {
+        text-align: center;
+        font-size: 28px;
+        color: #ccc;
+        margin: 40px 0;
+      }
+    }
+
+    .description-section {
+      margin-bottom: $gutter;
+      padding: $gutter;
+      overflow: hidden;
+      background-color: #f7f7f7;
+
+      img.thumb {
+        float: left;
+        margin-right: $gutter;
+        max-width: 100px;
+      }
+
+      p {
+        font-size: 13px;
+        color: #555;
+      }
+    }
+
+    .post-section {
+      p.info {
+        font-size: 13px;
+        color: #969696;
+      }
+
+      .thumb {
+        margin-bottom: 20px;
+      }
+    }
+  }
+}
+
+.blog-post {
+  #content {
+    h1 {
+      margin: 10px 0 20px;
+    }
+
+    p {
+      line-height: 28px;
+      color: $post_body_color;
+    }
+
+    .info {
+      position: relative;
+    }
+
+    .post-body {
+      a {
+        text-decoration: underline;
+      }
+
+      h1, h2, h3, h4 {
+        border-bottom: none;
+      }
+
+      ol, ul {
+        li {
+          line-height: 28px;
+        }
+      }
+
+      blockquote {
+        font-size: 13px;
+        border-left-color: $main_color;
+        background-color: #f7f7f7;
+      }
+
+      pre {
+        @include border-radius(0);
+        background-color: #f7f7f7;
+        color: $post_body_color;
+      }
+    }
+
+    .seo {
+      padding: 20px;
+      margin-bottom: $gutter;
+      border-left: 4px solid $main_color;
+      background: #f7f7f7;
+
+      ul {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

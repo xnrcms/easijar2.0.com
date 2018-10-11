@@ -1,0 +1,142 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-01-20 18:17:11
+// @modified         2018-01-22 15:40:59
+//
+
+.batch-edit-item-layer {
+	.layui-layer-content {
+		padding: 20px;
+		p {
+			margin: -10px 0 10px;
+		}
+
+		.batch-edit-item-wrapper {
+			max-width: 400px;
+
+			.input-group {
+				margin-bottom: 10px;
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+
+				&.active {
+					.input-group-addon {
+						border-color: #8ec5e2;
+						background-color: #f2f7fb;
+
+						input {
+							background-color: #5cb85c;
+							border-color: #5cb85c;
+						}
+					}
+
+					.inner {
+						border-color: #8ec5e2;
+						background-color: #f2f7fb;
+						width: 100%;
+						margin-left: -1px;
+						opacity: 1;
+					}
+				}
+
+				.input-group-addon {
+					position: relative;
+					cursor: pointer;
+			    padding: 8px 10px 8px 34px;
+			    text-align: left;
+					z-index: 999;
+					min-width: 126px;
+					border: 1px solid #ddd;
+					background-color: #fff;
+
+					&:hover {
+						border-color: #8ec5e2;
+					}
+
+					input {
+						position: absolute;
+						left: 10px;
+						width: 16px;
+						height: 16px;
+						border-radius: 2px;
+						margin-right: 6px;
+					}
+
+					input:checked:after {
+						content: '';
+						display: block;
+						height: 5px;
+						width: 9px;
+						border: 0 solid #333;
+						border-width: 0 0 2px 2px;
+						-webkit-transform: rotate(-45deg);
+						transform: rotate(-45deg);
+						position: absolute;
+						top: 3px;
+						left: 3px;
+						border-color: #fff;
+					}
+				}
+
+				.inner {
+					overflow: hidden;
+					height: 45px;
+					width: 0;
+					padding: 0 14px;
+					border: 1px solid #ddd;
+					margin-left: -9px;
+					opacity: 0;
+					-webkit-transition: all 0.3s ease 0s;
+					-moz-transition: all 0.3s ease 0s;
+					-o-transition: all 0.3s ease 0s;
+					transition: all 0.3s ease 0s;
+
+					select, input {
+						float: left;
+						height: 70%;
+						margin-top: 6px;
+						outline: 0;
+						border: 1px solid #ddd;
+						&:focus {
+							border: 1px solid #8ec5e2;
+						}
+					}
+
+					select {
+						width: 32%;
+						margin-right: 2%;
+					}
+
+					input {
+				    width: 66%;
+						padding: 0 4px;
+					}
+				}
+
+				.input-group-addon, .form-control {
+					border-radius: 0;
+			    height: 45px;
+			    font-size: 14px;
+			    -webkit-transition: all 0.3s ease 0s;
+			    -moz-transition: all 0.3s ease 0s;
+			    -o-transition: all 0.3s ease 0s;
+			    transition: all 0.3s ease 0s;
+				}
+			}
+		}
+	}
+
+	.layui-layer-btn {
+		padding-top: 0 !important;
+		a {
+			height: 32px;
+	    padding: 0 26px;
+			line-height: 32px;
+		}
+	}
+}

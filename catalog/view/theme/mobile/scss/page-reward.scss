@@ -1,0 +1,91 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-01-29 16:02:45
+//
+
+.account-reward, .account-transaction {
+  .reward-widget, .balance-widget {
+    @include bg-gradient(180deg,#FEA235,#FF8B36);
+    color: #fff;
+    margin-bottom: 0;
+    position: relative;
+    padding-bottom: 0;
+
+    .nav-bar {
+      color: #fff;
+      background-color: transparent;
+
+      &:after {
+        border-color: #fff;
+      }
+    }
+
+    .reward-title, .balance-title {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .reward-number, .balance-number {
+      font-size: 34px;
+      text-align: center;
+      line-height: 130px;
+      text-shadow: 4px 3px 3px #F5862A;
+      border: 2px solid #ffaa44;
+      @include box-shadow(1px, 1px, 1px, #F5862A);
+      @include border-radius(50%);
+      width: 130px;
+      height:130px;
+      margin: 10px auto;
+    }
+
+    .balance-number {
+      font-size: 24px;
+    }
+  }
+
+  ul.reward-details {
+    padding: 0;
+    margin: 0;
+    background-color:#fff;
+    list-style-type: none;
+
+    li {
+      padding: 5px 0;
+      display: block;
+      overflow: hidden;
+      border-bottom:1px solid #ededed;
+
+      .reward-description {
+        float: left;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    span {
+      color: #868686;
+      display: inline-block;
+    }
+
+    .reward-points {
+      font-size: 20px;
+      color: #EE3838;
+      line-height: 40px;
+      float: right;
+      padding-right:10px;
+    }
+  }
+}
+
+.account-transaction {
+  div.list-two-column-justified:first-of-type {
+    margin-top: 0;
+  }
+}

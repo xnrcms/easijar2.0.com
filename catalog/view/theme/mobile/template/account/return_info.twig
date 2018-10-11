@@ -1,0 +1,105 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-sm-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="list-two-column-justified row widget">
+            <div class="col-xs-12">
+              <h2>{{ text_return_detail }}</h2>
+              <dl>
+                <dt>{{ text_return_id }}</dt>
+                <dd>#{{ return_id }}</dd>
+              </dl>
+              <dl>
+                <dt>{{ text_date_added }}</dt>
+                <dd>{{ date_added }}</dd>
+              </dl>
+              <dl>
+                <dt>{{ text_order_id }}</dt>
+                <dd>#{{ order_id }}</dd>
+              </dl>
+              <dl>
+                <dt>{{ text_date_ordered }}</dt>
+                <dd>{{ date_ordered }}</dd>
+              </dl>
+            </div>
+          </dl>
+          </div>
+          <div class="list-two-column-justified row widget">
+            <div class="col-xs-12">
+              <h2>{{ text_product }}</h2>
+              <dl>
+                <dt>{{ column_product }}</dt>
+                <dd>{{ product }}</dd>
+              </dl>
+              <dl>
+                <dt>{{ column_model }}</dt>
+                <dd>{{ model }}</dd>
+              </dl>
+              <dl>
+                <dt>{{ column_quantity }}</dt>
+                <dd>{{ quantity }}</dd>
+              </dl>
+            </div>
+          </dl>
+          </div>
+          <div class="list-two-column-justified row widget">
+            <div class="col-xs-12">
+              <h2>{{ text_reason }}</h2>
+              <dl>
+                <dt>{{ column_reason }}</dt>
+                <dd>{{ reason }}</dd>
+              </dl>
+              <dl>
+                <dt>{{ column_opened }}</dt>
+                <dd>{{ opened }}</dd>
+              </dl>
+              {% if action is not empty %}
+              <dl>
+                <dt>{{ column_action }}</dt>
+                <dd>{{ action }}</dd>
+              </dl>
+              {% endif %}
+            </div>
+          </div>
+          {% if comment %}
+            <div class="list-two-column-justified row widget">
+              <div class="col-xs-12">
+              <dl>
+                <dt>{{ text_comment }}</dt>
+                <dd>{{ comment }}</dd>
+              </dl>
+              </div>
+            </div>
+          {% endif %}
+          {% if histories %}
+            <div class="list-two-column-justified row widget">
+              <div class="col-xs-12">
+                <h2>{{ text_history }}</h2>
+                {% for history in histories %}
+                  <dl>
+                    <dt>{{ column_date_added }}</dt>
+                    <dd>{{ history.date_added }}</dd>
+                  </dl>
+                  <dl>
+                    <dt>{{ column_status }}</dt>
+                    <dd>{{ history.status }}</dd>
+                  </dl>
+                  {% if history.comment is not empty %}
+                  <dl>
+                    <dt>{{ column_comment }}</dt>
+                    <dd>{{ history.comment }}</dd>
+                  </dl>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {{ content_bottom }}</div>
+    </div>
+</div>
+{{ footer }}

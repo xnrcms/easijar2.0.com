@@ -1,0 +1,168 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+  {% endif %}
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <h1>{{ heading_title }}</h1>
+      <table class="list">
+        <thead>
+          <tr>
+            <td class="left" colspan="2">{{ text_order_detail }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left" style="width: 50%;">
+              {% if invoice_no %}
+              <b>{{ text_invoice_no }}</b> {{ invoice_no }}<br />
+              {% endif %}
+              <b>{{ text_order_id }}</b> #{{ order_id }}<br />
+              <b>{{ text_date_added }}</b> {{ date_added }}</td>
+            <td class="left" style="width: 50%;">
+              {% if payment_method %}
+              <b>{{ text_payment_method }}</b> {{ payment_method }}<br />
+              {% endif %}
+              {% if shipping_method %}
+              <b>{{ text_shipping_method }}</b> {{ shipping_method }}
+              {% endif %}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="list">
+        <thead>
+          <tr>
+            <td class="left">{{ text_payment_address }}</td>
+            {% if shipping_address %}
+            <td class="left">{{ text_shipping_address }}</td>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left">{{ payment_address }}</td>
+            {% if shipping_address %}
+            <td class="left">{{ shipping_address }}</td>
+            {% endif %}
+          </tr>
+        </tbody>
+      </table>
+      <table class="list">
+        <thead>
+          <tr>
+            <td class="left">{{ column_name }}</td>
+            <td class="left">{{ column_model }}</td>
+            <td class="right">{{ column_quantity }}</td>
+            <td class="right">{{ column_price }}</td>
+            <td class="right">{{ column_total }}</td>
+            {% if products %}
+            <td style="width: 1px;"></td>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td class="left">{{ product.name }}
+              {% for option in product.option %}
+              <br />
+              &nbsp;<small> - {{ option.name }}: {{ option.value }}</small>
+              {% endfor %}</td>
+            <td class="left">{{ product.model }}</td>
+            <td class="right">{{ product.quantity }}</td>
+            <td class="right">{{ product.price }}</td>
+            <td class="right">{{ product.total }}</td>
+            <td class="right"><a href="{{ product.return }}"><img src="catalog/view/theme/default/image/return.png" alt="{{ button_return }}" title="{{ button_return }}" /></a></td>
+          </tr>
+          {% endfor %}
+          {% for voucher in vouchers %}
+          <tr>
+            <td class="left">{{ voucher.description }}</td>
+            <td class="left"></td>
+            <td class="right">1</td>
+            <td class="right">{{ voucher.amount }}</td>
+            <td class="right">{{ voucher.amount }}</td>
+            {% if products %}
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          {% for total in totals %}
+          <tr>
+            <td colspan="3"></td>
+            <td class="right"><b>{{ total.title }}:</b></td>
+            <td class="right">{{ total.text }}</td>
+            {% if products %}
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tfoot>
+      </table>
+      {% if comment %}
+      <table class="list">
+        <thead>
+          <tr>
+            <td class="left">{{ text_comment }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left">{{ comment }}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% endif %}
+      {% if histories %}
+      <h2>{{ text_history }}</h2>
+      <table class="list">
+        <thead>
+          <tr>
+            <td class="left">{{ column_date_added }}</td>
+            <td class="left">{{ column_status }}</td>
+            <td class="left">{{ column_comment }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for history in histories %}
+          <tr>
+            <td class="left">{{ history.date_added }}</td>
+            <td class="left">{{ history.status }}</td>
+            <td class="left">{{ history.comment }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+  <!-- 快递单详情 -->
+  {% if order_express_code != '' and order_tracking_number != '' %}
+  <h2>{{ text_express }}</h2>
+  <div id="express_order"></div>
+
+  <script type="text/javascript">
+  //ajax调取数据信息
+  $('#express_order').load('index.php?route=module/express_tracking&order_express_code={{ order_express_code }}&order_tracking_number={{ order_tracking_number }}');
+  </script>
+
+  {% endif %}
+  <!-- 快递单详情 -->
+
+  <div class="buttons">
+    <div class="right"><a href="{{ continue }}" class="button">{{ button_continue }}</a></div>
+  </div>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

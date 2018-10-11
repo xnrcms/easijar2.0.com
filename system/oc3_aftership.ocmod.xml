@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>AfterShip Module</name>
+    <code>AfterShip Module</code>
+    <id>for_module_aftership</id>
+    <version>1.0</version>
+    <author>GuangDa network Ltd</author>
+    <link>http://www.opencart.cn</link>
+
+    <file path="admin/controller/sale/order.php" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                $this->response->setOutput($this->load->view('sale/order_info', $data));
+            ]]></search>
+            <add position="before"><![CDATA[
+                $data['module_aftership_status'] = $this->config->get('module_aftership_status');
+                $aftership_trackings = $this->config->get('module_aftership_data');
+                $data['aftership_trackings'] = array();
+                if ($aftership_trackings) {
+                    foreach ($aftership_trackings as $track) {
+                        if($track['status']) {
+                            $data['aftership_trackings'][] = $track;
+                        }
+                    }
+                }
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/view/template/sale/order_info.twig" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                <li class="active"><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
+            ]]></search>
+            <add position="after"><![CDATA[
+                {% if module_aftership_status %}
+                <li><a href="#tab-aftership" data-toggle="tab">{{ tab_aftership }}</a></li>
+                {% endif %}
+            ]]></add>
+        </operation>
+        <operation error="log">
+            <search><![CDATA[
+                <div class="tab-content">
+            ]]></search>
+            <add position="after"><![CDATA[
+                {% if module_aftership_status %}
+                <div class="tab-pane" id="tab-aftership">
+                    <div id="ship-tracking"></div>
+                    <br/>
+                    <fieldset>
+                        <legend>{{ text_aftership_info }}</legend>
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="tracking-code">{{ entry_aftership_code }}</label>
+                                <div class="col-sm-10">
+                                    <select name="tracking_code" id="tracking-code"  class="form-control">
+                                        {% for item in aftership_trackings %}
+                                            <option value="{{ item.code }}" data-name="{{ item.name }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="tracking-number">{{ entry_aftership_number }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="tracking_number" rows="8" id="tracking-number" class="form-control"></input>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="input-comment">{{ entry_aftership_comment }}</label>
+                                <div class="col-sm-10">
+                                    <textarea name="message" rows="8" id="input-comment" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="text-right">
+                            <button id="button-tracking" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_aftership_add }}</button>
+                        </div>
+                    </fieldset>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('#ship-tracking').load('index.php?route=extension/module/aftership/getList&user_token={{ user_token }}&order_id={{ order_id }}');
+                    });
+                    $(document).on('click', '#button-tracking', function () {
+
+                        var tracking_number = $('#tracking-number').val();
+                        if(tracking_number.replace(/\s/gi, '') == '') {
+                            alert("{{ error_aftership_number }}");
+                            return false;
+                        }
+                        var tracking_code = $('#tracking-code').find('option:selected').val();
+                        var tracking_name = $('#tracking-code').find('option:selected').attr('data-name');
+                        var comment = $('#input-comment').val();
+                        $.ajax({
+                            url: 'index.php?route=extension/module/aftership/add&user_token={{ user_token }}&order_id={{ order_id }}',
+                            type: 'post',
+                            dataType: 'json',
+                            data: 'tracking_number=' + tracking_number + '&tracking_code=' + tracking_code + '&comment=' + comment + '&tracking_name=' + tracking_name,
+                            beforeSend: function() {
+                                $('#button-tracking').button('loading');
+                            },
+                            complete: function() {
+                                $('#button-tracking').button('reset');
+                            },
+                            success: function (json) {
+                                $('.alert').remove();
+                                if (json['error']) {
+                                    $('#ship-tracking').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                                }
+                                if (json['success']) {
+                                    $('#ship-tracking').load('index.php?route=extension/module/aftership/getList&user_token={{ user_token }}&order_id={{ order_id }}');
+                                    $('#ship-tracking').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                                    $('#input-comment').val('');
+                                }
+                            },
+                            error: function(xhr, ajaxOptions, thrownError) {
+                                console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                            }
+                        });
+                    });
+                </script>
+                {% endif %}
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/language/en-gb/sale/order.php" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                // Text
+            ]]></search>
+            <add position="after"><![CDATA[
+                $_['tab_aftership'] = 'Express Information';
+                $_['text_aftership_info'] = 'Express Information';
+                $_['entry_aftership_code'] = 'Express Company';
+                $_['entry_aftership_number'] = 'Tracking Number';
+                $_['entry_aftership_comment'] = 'Comments';
+                $_['button_aftership_add'] = 'Add Express';
+                $_['error_aftership_number'] = 'Please input tracking number';
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/language/zh-cn/sale/order.php" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                // Text
+            ]]></search>
+            <add position="after"><![CDATA[
+                $_['tab_aftership'] = '物流信息';
+                $_['text_aftership_info'] = '物流信息';
+                $_['entry_aftership_code'] = '物流公司';
+                $_['entry_aftership_number'] = '物流单号';
+                $_['entry_aftership_comment'] = '备注';
+                $_['button_aftership_add'] = '添加物流信息';
+                $_['error_aftership_number'] = '请输入物流单号';
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/language/zh-hk/sale/order.php" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                // Text
+            ]]></search>
+            <add position="after"><![CDATA[
+                $_['tab_aftership'] = '物流信息';
+                $_['text_aftership_info'] = '物流信息';
+                $_['entry_aftership_number'] = '物流單號';
+                $_['entry_aftership_comment'] = '備註';
+                $_['button_aftership_add'] = '添加物流信息';
+                $_['error_aftership_number'] = '請輸入物流單號';
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="catalog/controller/account/order.php" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                $this->response->setOutput($this->load->view('account/order_info', $data));
+            ]]></search>
+            <add position="before"><![CDATA[
+                $this->load->model('extension/module/aftership');
+                $data['order_tracking'] = array();
+                if ($this->config->get('module_aftership_status')) {
+                    $order_aftership_tracking = $this->model_extension_module_aftership->getOrderShippingTrack($order_id);
+                    foreach ($order_aftership_tracking as $item) {
+                        $seller_name = $this->model_extension_module_aftership->getShippingSellerName($item['seller_id']);
+                        if ($seller_name) {
+                            $show_name = '[' . $seller_name . ']';
+                        } else {
+                            $show_name = '';
+                        }
+                        $data['order_tracking'][] = array(
+                            'tracking_code'    => $item['tracking_code'],
+                            'tracking_name'    => $this->model_extension_module_aftership->getTrackingNameByCode($item['tracking_code']) . $show_name,
+                            'tracking_number'  => $item['tracking_number'],
+                            'comment'          => $item['comment']
+                        );
+                    }
+                }
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="catalog/view/theme/*/template/account/order_info.twig" error="log">
+        <operation error="log">
+            <search><![CDATA[
+                <h2>{{ text_history }}</h2>
+            ]]></search>
+            <add position="before"><![CDATA[
+                {% if order_tracking %}
+                    {% for item in order_tracking %}
+                        <h3>{{ text_aftership_info }}: {{ item.tracking_name }} {{ item.tracking_number }}</h3>
+                        {% if item.comment %}
+                            {{ item.comment }}
+                        {% endif %}
+                        <div id="tracking-{{ item.tracking_code }}">
+                            <button onClick="$(this).parent().load('index.php?route=extension/module/aftership/getTrace&slug={{ item.tracking_code }}&number={{ item.tracking_number }}')">{{ button_view }}</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            ]]></add>
+        </operation>
+    </file>
+</modification>

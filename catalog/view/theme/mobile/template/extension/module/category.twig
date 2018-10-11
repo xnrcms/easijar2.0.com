@@ -1,0 +1,8 @@
+<div class="row mobile-category-box">
+  <div class="module-title"><span>{{ heading_title }}</span></div>
+  {% for category in categories %}
+    <div class="col-xs-3 category-item">
+      <a href="{{ category.href }}"><img src="{{ category.image }}" class="img-responsive" alt="">{{ category.name }}</a>
+    </div>
+  {% endfor %}
+</div>

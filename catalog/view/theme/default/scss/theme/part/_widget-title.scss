@@ -1,0 +1,87 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2017-11-14 17:16:21
+// @modified         2018-04-24 15:59:19
+//
+
+.widget-title {
+  position: relative;
+  clear: both;
+  padding: 0 0 16px;
+  margin: 0 0 18px;
+  color: #333;
+  border-bottom: 1px solid #e5e5e5;
+
+  &:before {
+    content: "";
+    position: absolute;
+    left: 0px;
+    bottom: -1px;
+    height: 2px;
+    background: #ccc;
+    width: 90px;
+  }
+
+  > span {
+    display: inline-block;
+    font-weight: 200;
+    font-size: 22px;
+  }
+
+  .title-pager {
+    position: absolute;
+    right: 0;
+    top: -3px;
+
+    span {
+      width: 32px;
+      height: 32px;
+      display: inline-block;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      line-height: 25px;
+      text-align: center;
+      margin-left: 6px;
+      color: #888;
+      border-radius: 2px;
+      @include transition(all .3s ease 0s);
+
+      &:hover {
+        background-color: $brand-primary;
+        border-color: $brand-primary;
+        color: #fff;
+      }
+
+      &:before {
+        content: "\f104";
+        font-family: fontawesome;
+        font-size: 14px;
+      }
+
+      &:last-of-type:before {
+        content: "\f105";
+      }
+    }
+  }
+
+  .link {
+    margin-top: 16px;
+    font-size: 14px;
+
+    a {
+      color: #666;
+    }
+  }
+}
+
+#column-left, #column-right {
+  .widget-title {
+    > span {
+      font-size: 18px;
+    }
+  }
+}

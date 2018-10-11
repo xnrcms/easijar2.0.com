@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2017-06-02 10:06:11
+// @modified         2018-07-25 10:03:18
+//
+
+@import 'variable';
+@import 'mixin';
+@import 'bootstrap-reset';
+
+#content {
+  min-height: 500px;
+}
+
+@import 'header';
+@import 'bottom-tab';
+@import 'footer';
+@import 'owl-carousel';
+@import 'owl-carousel2';
+@import 'widget';
+@import 'module-home-category';
+@import 'module-quick-icon-link';
+@import 'module-hot-search';
+@import 'module-banner';
+@import 'module-information';
+@import 'module-account';
+@import 'page-home';
+@import 'product-list-item-style';
+@import 'page-product';
+@import 'page-search';
+@import 'page-cart';
+@import 'page-checkout';
+@import 'page-login';
+@import 'page-register';
+@import 'page-account';
+@import 'page-order-list';
+@import 'page-order-info';
+@import 'page-account-coupon';
+@import 'page-account-return';
+@import 'page-wishlist';
+@import 'page-category';
+@import 'page-manufacturer';
+@import 'nav-tab';
+@import 'pagination';
+@import 'page-reward';
+@import 'page-not-found';
+@import 'page-success';
+@import 'page-blog';
+@import 'module-blog-latest';
+@import 'module-blog-category';
+@import 'module-multi-filter';
+@import 'iconfont';
+@import 'module-home-style';
+@import 'layer-custom';
+@import 'common';
+@import 'swiper';
+@import 'checkout-connect';
+@import 'module-flash';
+@import 'page-account-transaction';
+@import 'rating';
+@import 'page-account-withdraw';
+@import 'side-menu';
+
+.border-right {
+  &:before {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 8px;
+    height: 26px;
+    width: 1px;
+    background: #ddd;
+    z-index: 9;
+  }
+}
+#input-pre-telephone {
+  border: none;
+  font-size: 14px;
+  margin-left: -10px;
+  // padding: 6px 4px;
+}
+
+#input-post-telephone {
+  padding-left: 14px;
+}

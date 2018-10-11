@@ -1,0 +1,51 @@
+{{ header }}
+<div class="container">
+  {{ include(helper.template('_partial/breadcrumb')) }}
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      <div class="nav-bar">
+        {{ heading_title }}
+        {% if categories %}
+          <span class="btn btn-default side-open btn-{{ content_top ? 'left' : 'right' }}">{{ text_refine }}</span>
+          <div class="side-menu side-right">
+            <div class="side-inner">
+              <h4 class="side-title">{{ heading_title }}</h4>
+              <ul class="nav navbar-nav">
+                {% for category in categories %}
+                <li>
+                  <a class="subcategory-wrapper" href="{{ category.href }}">
+                    <span>{{ category.name }}</span>
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      {% if products %}
+      {{ include(helper.template('_partial/product/filter_bar_block')) }}
+      <div class="row product-list-item-style product-grid-box">
+        {% for product in products %}
+        <div class="col-xs-6 product-item">
+          {{ include(helper.template('_partial/product/product_single')) }}
+        </div>
+        {% endfor %}
+      </div>
+      {{ include(helper.template('_partial/pagination')) }}
+      {% endif %}
+      {% if not categories and not products %}
+        <div class="row widget">
+          <div class="col-xs-12">
+            <div class="no-items">
+              <div class="icon"><i class="iconfont">&#xe61a;</i></div>
+              <div class="msg">{{ text_no_results }}</div>
+              <a class="btn btn-default btn-block" href="{{ continue }}">{{ button_continue }}</a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    </div>
+</div>
+{{ footer }}

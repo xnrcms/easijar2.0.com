@@ -1,0 +1,18 @@
+{% if helper.is_home_page() %}
+<div class="bg-gray pb-3"><div class="container"><div class="row"><div class="col-sm-12">
+{% endif %}
+
+<h3 class="widget-title"><span>{{ heading_title }}</span><div class="pull-right link"><a href="{{ helper.url.link('product/latest') }}">{{ button_link_all }} ></a></div></h3>
+<div class="row mb-1">
+  <div class="product-wrapper">
+    {% for product in products %}
+    <div class="latest-wrapper col-lg-4 col-md-4 col-sm-4 col-xs-6">
+      {{ include(helper.template('_partial/product/product_single')) }}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if helper.is_home_page() %}
+</div></div></div></div>
+{% endif %}

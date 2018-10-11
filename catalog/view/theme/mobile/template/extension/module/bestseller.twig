@@ -1,0 +1,8 @@
+<div class="module-title"><span>{{ heading_title }}</span></div>
+<div class="row product-list-item-style product-grid-box">
+  {% for product in products %}
+  <div class="col-xs-6 product-item">
+    {{ include(helper.template('_partial/product/product_single')) }}
+  </div>
+  {% endfor %}
+</div>

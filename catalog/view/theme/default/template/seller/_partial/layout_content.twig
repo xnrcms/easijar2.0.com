@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %} {{ heading_title }}</title>
+  <base href="{{ helper.config('config_url') }}">
+  <link rel="stylesheet" type="text/css" href="catalog/view/javascript/bootstrap/css/bootstrap.css">
+  <script type="text/javascript" src="catalog/view/javascript/jquery/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="catalog/view/javascript/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="catalog/view/javascript/layer/layer.js"></script>
+  <script type="text/javascript" src="catalog/view/theme/default/template/seller/javascript/common.js"></script>
+  <link rel="stylesheet" type="text/css" href="catalog/view/javascript/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="catalog/view/theme/default/template/seller/stylesheet/stylesheet.css">
+</head>
+<body class="seller-page {% block body_class endblock %}">
+  {% block content %}
+  {% endblock %}
+
+  {% block footer %}
+  {% endblock %}
+</body>
+</html>

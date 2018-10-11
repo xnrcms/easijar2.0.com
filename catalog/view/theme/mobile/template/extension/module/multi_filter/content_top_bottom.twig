@@ -1,0 +1,109 @@
+<span class="btn-multi-filter btn btn-default">{{ heading_title }}</span>
+
+<div class="multi-filter-layer">
+  <div class="multi-filter-wrapper">
+    {% if price_range.min > 0 and price_range.max > 0 %}
+    <div class="group-title">{{ text_price }}</div>
+    <div class="group-content">
+      <div class="filter-price-section">
+        <div class="range-input-group">
+          <input type="number" name="price_range_min" value="{{ selected_price_range[0] ?? price_range.min }}" class="form-control">
+          <input type="number" name="price_range_max" value="{{ selected_price_range[1] ?? price_range.max }}" class="form-control">
+        </div>
+        <div class="price-slider" data-min="{{ price_range.min }}" data-max="{{ price_range.max }}" data-start="{{ selected_price_range[0] }}" data-end="{{ selected_price_range[1] ?? price_range.max }}"></div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="group-title">{{ text_status }}</div>
+    <div class="group-content">
+      <div class="filter-stock-section">
+        <ul class="list-unstyled">
+          <li>
+            <div class="checkbox">
+              <label {{ selected_in_stock ? 'class="active"' }}>
+                <input type="checkbox" value="1" {{ selected_in_stock ? 'checked' }}>
+                {{ text_in_stock }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    {% if brands %}
+    <div class="group-title">{{ text_brand }}</div>
+    <div class="group-content">
+      <div class="filter-brand-section">
+        <ul class="list-unstyled">
+          {% for brand in brands %}
+          <li>
+            <div class="checkbox">
+              <label {{ brand.manufacturer_id in selected_brands ? 'class="active"' }}>
+                <input type="checkbox" value="{{ brand.manufacturer_id }}" {{ brand.manufacturer_id in selected_brands ? 'checked' }}>
+                {{ brand.name }}<span class="total">({{ brand.total }})</span>
+              </label>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if attributes %}
+    {% for attribute in attributes %}
+      {% if attribute.values %}
+      {% set selected = attribute.attribute_id in selected_attributes %}
+      <div class="group-title">{{ attribute.name }}</div>
+      <div class="group-content">
+        <div class="filter-attribute-section">
+          <ul class="list-unstyled">
+            {% for value in attribute.values %}
+            <li>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" data-id="{{ value.attribute_id }}" value="{{ value.text }}" {{ (selected and (value.text|trim in selected)) ? 'checked' }}>
+                  {{ value.text|trim }}<span class="total">({{ value.total }})</span>
+                </label>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if options %}
+    {% for option in options %}
+      {% if option.options %}
+      <div class="group-title">{{ option.name }}</div>
+      <div class="group-content">
+        <div class="filter-option-section">
+          <ul class="list-unstyled">
+            {% for value in option.options %}
+            <li>
+              <div class="checkbox">
+                <label {{ value.option_value_id in selected_options ? 'class="active"' }}>
+                  <input type="checkbox" value="{{ value.option_value_id }}" {{ value.option_value_id in selected_options ? 'checked' }}>
+                  {{ value.option_value_name|trim }}<span class="total">({{ value.total }})</span>
+                </label>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% if filter %}
+<script type="text/javascript">
+  var filter = {{ filter|json_encode() }}
+</script>
+{% endif %}

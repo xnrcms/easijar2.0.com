@@ -1,0 +1,266 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2017-09-25 15:34:25
+// @modified         2018-02-06 11:17:22
+//
+
+nav#top {
+  background-color: $page_top_bg_color;
+  color: $page_top_color;
+  height: $page_top_height;
+  border-bottom: $page_top_border;
+
+  .list-inline {
+    > li {
+      height: $page_top_height;
+      line-height: $page_top_height;
+      &:hover {
+          >a, >button {
+            color: $page_top_bg_color_hover !important;
+          }
+      }
+    }
+  }
+
+  .btn-group, .list-inline li {
+    &:hover {
+      .dropdown-menu {
+        display: block;
+        visibility: visible;
+        top: 100%;
+      }
+    }
+  }
+
+
+  a,button {
+    color: $page_top_color;
+    font-size: 12px;
+    &:hover {
+      color: $page_top_bg_color_hover !important;
+    }
+  }
+
+  .dropdown-menu {
+    button, a {
+      color: #333;
+      text-align: left;
+      padding: 8px 13px;
+      &:hover {
+        background-color: #eee;
+        color: $page_top_bg_color_hover;
+      }
+    }
+  }
+
+  .pull-left {
+    margin-right: 10px;
+    .btn-group {
+      > button {
+        height: $page_top_height;
+        padding: 0;
+      }
+    }
+  }
+}
+
+header {
+  background-color: #fff;
+
+  @media (min-width: 992px) {
+    padding: $header_padding;
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  #search {
+    position: relative;
+    float: right;
+    margin-top: 3px;
+    width: 190px;
+
+    @media (max-width: 1200px) {
+      width: 150px;
+    }
+
+    @media (max-width: 992px) {
+      width: 100%;
+      float: none;
+    }
+
+    input {
+      border-color: #e3e3e3;
+      height: $header_button_height;
+      padding: 4px 8px;
+
+      @media (min-width: 992px) {
+        border-right: none;
+        border-top: none;
+        border-left: none;
+        border-color: #ddd;
+      }
+
+      &:focus {
+        border-color: $brand-primary;
+      }
+    }
+
+    span {
+      width: 30px;
+      text-align: center;
+      cursor: pointer;
+
+      @media (min-width: 992px) {
+        position: absolute;
+        top: -4px;
+        right: 0;
+        font-size: 18px;
+      }
+
+      @media (max-width: 992px) {
+        button {
+          padding: 9px 13px;
+        }
+      }
+    }
+  }
+
+  #logo {
+    width: 230px;
+    margin-top: 6px;
+
+    @media (min-width: 992px) {
+      float: left;
+    }
+
+    @media (max-width: 1200px) {
+      width: auto;
+    }
+
+    @media (max-width: 992px) {
+      margin: 20px 0;
+      text-align: center;
+      width: 100%;
+    }
+
+    img {
+      display: inline-block;
+    }
+  }
+
+  .search-cart {
+    float: right;
+    height: 50px;
+    line-height: 50px;
+
+    i.fa-search, i.fa-shopping-bag {
+      color: #666;
+    }
+  }
+
+  #cart {
+    float: right;
+    position: relative;
+
+    .cart-total {
+      position: absolute;
+      top: 4px;
+      right: -9px;
+      min-width: 16px;
+      line-height: 16px;
+      text-align: center;
+      z-index: 999;
+      font-size: 12px;
+      height: 16px;
+      background-color: $brand-primary;
+      color: #fff;
+      border-radius: 50%;
+    }
+
+    .no-results {
+      margin-bottom: 0;
+      padding: 16px 6px;
+    }
+
+    &:hover {
+      .dropdown-menu {
+        display: block;
+        visibility: visible;
+        top: 100%;
+      }
+    }
+
+    > button {
+      padding: 0 0 0 16px;
+      background: #fff;
+      line-height: inherit;
+      text-align: right;
+
+      @media (max-width: 1200px) {
+        padding: 0 0 0 10px;
+      }
+
+      i {
+        font-size: 22px;
+      }
+
+      &:active {
+        box-shadow: none;
+      }
+
+      #cart-total {
+        font-weight: bold;
+        font-size: 15px;
+        padding-left: 4px;
+      }
+    }
+
+    .dropdown-menu {
+      min-width: 350px;
+      padding: 10px;
+
+      li {
+        border-bottom: none;
+
+        td {
+          font-size: 12px;
+          padding: 8px;
+        }
+
+        .name {
+          height: 33px;
+          line-height: 16px;
+          overflow: hidden;
+          display: inline-block;
+        }
+
+        &.products {
+          max-height: 400px;
+          overflow: hidden;
+          overflow-y: auto;
+
+          a {
+            color: #333;
+          }
+        }
+      }
+
+      img {
+        min-width: 50px;
+        transition: none;
+      }
+
+      .btn-danger {
+        background: #fff;
+        color: #555;
+        border-color: #eee;
+      }
+    }
+  }
+}

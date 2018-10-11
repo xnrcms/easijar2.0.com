@@ -1,0 +1,47 @@
+{% if helper.is_home_page() %}
+<div class="bg-gray pb-3"><div class="container"><div class="row"><div class="col-sm-12">
+{% endif %}
+<div class="module-banner-wrapper swiper-viewport">
+<div class="swiper-container" id="banner{{ module }}">
+  <div class="swiper-wrapper">
+    {% for banner in banners %}
+      <div class="swiper-slide">
+        {% if banner.link %}
+          <a href="{{ banner.link }}"><img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" /></a>
+        {% else %}
+          <img src="{{ banner.image }}" alt="{{ banner.title }}" class="img-responsive" />
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% if banners|length > 1 %}
+  <div class="swiper-pagination"></div>
+  <div class="swiper-pager">
+    <div class="swiper-button-next slideshow-next0"></div>
+    <div class="swiper-button-prev slideshow-prev0"></div>
+  </div>
+  {% endif %}
+</div>
+</div>
+
+{% if helper.is_home_page() %}
+</div></div></div></div>
+{% endif %}
+
+{% if banners|length > 1 %}
+<script type="text/javascript"><!--
+  var banner_swiper = new Swiper('#banner{{ module }}', {
+    slidesPerView: 1,
+    loop: true,
+    pagination: {el: '.swiper-pagination'},
+    navigation: {
+      nextEl: '.swiper-button-prev',
+      prevEl: '.swiper-button-next',
+    },
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false
+    },
+  });
+--></script>
+{% endif %}

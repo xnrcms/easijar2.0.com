@@ -1,0 +1,14 @@
+{% if product.price %}
+<p class="price">
+  {% if product.flash %}
+    <span class="price-new">{{ product.flash }}</span> <span class="price-old">{{ product.price }}</span>
+  {% elseif product.special %}
+    <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+  {% else %}
+    {{ product.price }}
+  {% endif %}
+  {% if product.tax %}
+  <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
+  {% endif %}
+</p>
+{% endif %}

@@ -1,0 +1,492 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-seller" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">{% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_form }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-seller" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+
+            {% if seller_id %}
+              <li><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
+              <li><a href="#tab-transaction" data-toggle="tab">{{ tab_transaction }}</a></li>
+            {% endif %}
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="tab-seller">
+                      <fieldset>
+                        <legend>{{ text_account }}</legend>
+                        {% if not seller_id %}
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-customer">{{ entry_customer }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="seller_name" value="{{ seller_name }}" placeholder="{{ entry_customer }}"  class="form-control"/>
+                            <input type="hidden" name="seller_id" value="{{ customer_id }}" placeholder="{{ entry_customer }}" id="input-customer" class="form-control"/>
+                            {% if error_customer %}
+                              <div class="text-danger">{{ error_customer }}</div>
+                            {% endif %}</div>
+                          </div>
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-seller-group">{{ entry_seller_group }}</label>
+                          <div class="col-sm-10">
+                            <select name="seller_group_id" id="input-seller-group" class="form-control">
+                              {% for seller_group in seller_groups %}
+                                {% if seller_group.seller_group_id == seller_group_id %}
+                                  <option value="{{ seller_group.seller_group_id }}" selected="selected">{{ seller_group.name }}</option>
+                                {% else %}
+                                  <option value="{{ seller_group.seller_group_id }}">{{ seller_group.name }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-store-name">{{ entry_store_name }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="store_name" value="{{ store_name }}" placeholder="{{ entry_store_name }}" id="input-store-name" class="form-control"/>
+                            {% if error_store_name %}
+                              <div class="text-danger">{{ error_store_name }}</div>
+                            {% endif %}</div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-company">{{ entry_company }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="company" value="{{ company }}" placeholder="{{ entry_company }}" id="input-company" class="form-control"/>
+                            {% if error_company %}
+                              <div class="text-danger">{{ error_company }}</div>
+                            {% endif %}</div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-description">{{ entry_description }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="description" value="{{ description }}" placeholder="{{ entry_description }}" id="input-description" class="form-control"/>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-country">{{ entry_country }}</label>
+                          <div class="col-sm-10">
+                            <select name="country_id" id="input-country" class="form-control">
+                              {% for country in countries %}
+                                {% if country.country_id == country_id %}
+                                  <option value="{{ country.country_id }}" selected="selected">{{ country.name }}</option>
+                                {% else %}
+                                  <option value="{{ country.country_id }}">{{ country.name }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-zone">{{ entry_zone }}</label>
+                          <div class="col-sm-10">
+                            <select name="zone_id" id="input-zone" class="form-control">
+                            </select>
+                            {% if error_zone %}
+                              <div class="text-danger">{{ error_zone }}</div>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-city">{{ entry_city }}</label>
+                          <div class="col-sm-10">
+                            <select name="city_id" id="input-city" class="form-control">
+                            </select>
+                            {% if error_city %}
+                              <div class="text-danger">{{ error_city }}</div>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-county">{{ entry_county }}</label>
+                          <div class="col-sm-10">
+                            <select name="county_id" id="input-county" class="form-control">
+                            </select>
+                            {% if error_county %}
+                              <div class="text-danger">{{ error_county }}</div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </fieldset>
+                      <fieldset>
+                        <legend>{{ text_other }}</legend>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-avatar">{{ entry_avatar }}</label>
+                          <div class="col-sm-10"><a href="" id="thumb-avatar" data-toggle="image" class="img-thumbnail"><img src="{{ avatar }}" alt="" title="" data-placeholder="{{ placeholder }}"/></a> <input type="hidden" name="avatar" value="{{ avatar }}" id="input-avatar"/>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-banner">{{ entry_banner }}</label>
+                          <div class="col-sm-10"><a href="" id="thumb-banner" data-toggle="image" class="img-thumbnail"><img src="{{ banner }}" alt="" title="" data-placeholder="{{ placeholder }}"/></a> <input type="hidden" name="banner" value="{{ banner }}" id="input-banner"/>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-alipay">{{ entry_alipay }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="alipay" value="{{ alipay }}" placeholder="{{ entry_alipay }}" id="input-alipay" class="form-control"/>
+                            {% if error_alipay %}
+                              <div class="text-danger">{{ error_alipay }}</div>
+                            {% endif %}</div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-product_validation">{{ entry_product_validation }}</label>
+                          <div class="col-sm-10">
+                            <select name="product_validation" id="input-product_validation" class="form-control">
+                              {% if product_validation %}
+                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                <option value="0">{{ text_disabled }}</option>
+                              {% else %}
+                                <option value="1">{{ text_enabled }}</option>
+                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="col-sm-2 control-label" for="input-alipay">{{ entry_chat_key }}</label>
+                          <div class="col-sm-10">
+                            <input type="text" name="chat_key" value="{{ chat_key }}" placeholder="{{ entry_chat_key }}" id="input-chat_key" class="form-control"/>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                          <div class="col-sm-10">
+                            <select name="status" id="input-status" class="form-control">
+                              {% if status %}
+                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                <option value="0">{{ text_disabled }}</option>
+                              {% else %}
+                                <option value="1">{{ text_enabled }}</option>
+                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                              {% endif %}
+                            </select>
+                          </div>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </div>
+            </div>
+            {% if seller_id %}
+              <div class="tab-pane" id="tab-history">
+                <fieldset>
+                  <legend>{{ text_history }}</legend>
+                  <div id="history"></div>
+                </fieldset>
+                <br/>
+                <fieldset>
+                  <legend>{{ text_history_add }}</legend>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-comment">{{ entry_comment }}</label>
+                    <div class="col-sm-10">
+                      <textarea name="comment" rows="8" placeholder="{{ entry_comment }}" id="input-comment" class="form-control"></textarea>
+                    </div>
+                  </div>
+                </fieldset>
+                <div class="text-right">
+                  <button id="button-history" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+                </div>
+              </div>
+              <div class="tab-pane" id="tab-transaction">
+                <fieldset>
+                  <legend>{{ text_transaction }}</legend>
+                  <div id="transaction"></div>
+                </fieldset>
+                <br/>
+                <fieldset>
+                  <legend>{{ text_transaction_add }}</legend>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-transaction-description">{{ entry_description }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="transaction_description" value="" placeholder="{{ entry_description }}" id="input-transaction-description" class="form-control"/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-amount">{{ entry_amount }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="amount" value="" placeholder="{{ entry_amount }}" id="input-amount" class="form-control"/>
+                    </div>
+                  </div>
+                </fieldset>
+                <div class="text-right">
+                  <button type="button" id="button-transaction" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_transaction_add }}</button>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+	$('.date').datetimepicker({
+		language: '{{ datepicker }}',
+		pickTime: false
+	});
+
+	$('.datetime').datetimepicker({
+		language: '{{ datepicker }}',
+		pickDate: true,
+		pickTime: true
+	});
+
+	$('.time').datetimepicker({
+		language: '{{ datepicker }}',
+		pickDate: false
+	});
+//--></script>
+
+<script type="text/javascript"><!--
+$('input[name=\'seller_name\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'seller_id\']').val(item['value']);
+		$('input[name=\'seller_name\']').val(item['label']);
+	}
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('select[name=\'country_id\']').on('change', function() {
+	$.ajax({
+		url: 'index.php?route=localisation/country/country&user_token={{ user_token }}&country_id=' + this.value,
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'country_id\']').prop('disabled', true);
+		},
+		complete: function() {
+			$('select[name=\'country_id\']').prop('disabled', false);
+		},
+		success: function(json) {
+			if (json['postcode_required'] == '1') {
+				$('input[name=\'postcode\']').parent().parent().addClass('required');
+			} else {
+				$('input[name=\'postcode\']').parent().parent().removeClass('required');
+			}
+
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['zone'] && json['zone'] != '') {
+				for (i = 0; i < json['zone'].length; i++) {
+					html += '<option value="' + json['zone'][i]['zone_id'] + '"';
+
+					if (json['zone'][i]['zone_id'] == '{{ zone_id }}') {
+						html += ' selected="selected"';
+					}
+
+					html += '>' + json['zone'][i]['name'] + '</option>';
+				}
+			} else {
+				html += '<option value="0" selected="selected">{{ text_none }}</option>';
+			}
+
+			$('select[name=\'zone_id\']').html(html);
+      $('select[name=\'city_id\']').html('<option>{{ text_select }}</option>');
+      $('select[name=\'county_id\']').html('<option>{{ text_select }}</option>');
+      $('select[name=\'zone_id\']').trigger('change');
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+$('select[name=\'country_id\']').trigger('change');
+//--></script>
+<script type="text/javascript"><!--
+var showCityOrCountyOptions = function(currentEl, changeEl, isTop, cityId, callback) {
+  var zoneId = currentEl.val();
+  if (zoneId == null) return;
+  var requestUrl = '{{ store_url }}' + 'index.php?route=account/account/zone&zone_id=' + zoneId + '&is_top=' + isTop;
+  $.ajax({
+    url: requestUrl,
+    dataType: 'json',
+    beforeSend: function () {
+      $('select[name=\'city_id\']').prop('disabled', true);
+      $('select[name=\'county_id\']').prop('disabled', true);
+    },
+    complete: function () {
+      $('select[name=\'city_id\']').prop('disabled', false);
+      $('select[name=\'county_id\']').prop('disabled', false);
+    },
+    success: function (json) {
+      html = '<option value="">{{ text_select }}</option>';
+      if (json['city'] && json['city'] != '') {
+        for (i = 0; i < json['city'].length; i++) {
+          html += '<option value="' + json['city'][i]['city_id'] + '"';
+          if (json['city'][i]['city_id'] == cityId) {
+            html += ' selected="selected"';
+          }
+          html += '>' + json['city'][i]['name'] + '</option>';
+        }
+      } else {
+        html += '<option value="0" selected="selected">{{ text_none }}</option>';
+      }
+      changeEl.html(html);
+      if (typeof(callback) == 'function') {
+        callback();
+      }
+    },
+    error: function (xhr, ajaxOptions, thrownError) {
+      alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    }
+  });
+};
+
+$('select[name=\'zone_id\']').bind('change', function() {
+  var changeEl = $('select[name=\'city_id\']');
+  var cityId = '{{ city_id  }}';
+  showCityOrCountyOptions($(this), changeEl, 1, cityId, function() {
+    changeEl.trigger('change');
+  });
+});
+
+$('select[name=\'city_id\']').bind('change', function() {
+  var changeEl = $('select[name=\'county_id\']');
+  var countyId = '{{ county_id }}';
+  showCityOrCountyOptions($(this), changeEl, 0, countyId);
+});
+//--></script>
+
+<script type="text/javascript"><!--
+$('#history').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+
+	$('#history').load(this.href);
+});
+
+$('#history').load('index.php?route=customer/customer/history&user_token={{ user_token }}&customer_id={{ customer_id }}');
+
+$('#button-history').on('click', function(e) {
+	e.preventDefault();
+
+	$.ajax({
+		url: 'index.php?route=customer/customer/addhistory&user_token={{ user_token }}&customer_id={{ customer_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: 'comment=' + encodeURIComponent($('#tab-history textarea[name=\'comment\']').val()),
+		beforeSend: function() {
+			$('#button-history').button('loading');
+		},
+		complete: function() {
+			$('#button-history').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#tab-history').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#tab-history').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+				$('#history').load('index.php?route=customer/customer/history&user_token={{ user_token }}&customer_id={{ customer_id }}');
+
+				$('#tab-history textarea[name=\'comment\']').val('');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+//--></script>
+<script type="text/javascript"><!--
+$('#transaction').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+
+	$('#transaction').load(this.href);
+});
+
+$('#transaction').load('index.php?route=multiseller/seller/transaction&user_token={{ user_token }}&seller_id={{ seller_id }}');
+
+$('#button-transaction').on('click', function(e) {
+	e.preventDefault();
+
+	$.ajax({
+		url: 'index.php?route=multiseller/seller/addtransaction&user_token={{ user_token }}&seller_id={{ seller_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: 'description=' + encodeURIComponent($('#tab-transaction input[name=\'transaction_description\']').val()) + '&amount=' + encodeURIComponent($('#tab-transaction input[name=\'amount\']').val()),
+		beforeSend: function() {
+			$('#button-transaction').button('loading');
+		},
+		complete: function() {
+			$('#button-transaction').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#tab-transaction').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#tab-transaction').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+				$('#transaction').load('index.php?route=multiseller/seller/transaction/transaction&user_token={{ user_token }}&seller_id={{ seller_id }}');
+
+				$('#tab-transaction input[name=\'amount\']').val('');
+				$('#tab-transaction input[name=\'transaction_description\']').val('');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+//--></script>
+<script type="text/javascript"><!--
+$('.date').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+
+$('.datetime').datetimepicker({
+	language: '{{ datepicker }}',
+	pickDate: true,
+	pickTime: true
+});
+
+$('.time').datetimepicker({
+	language: '{{ datepicker }}',
+	pickDate: false
+});
+//--></script>
+{{ footer }}

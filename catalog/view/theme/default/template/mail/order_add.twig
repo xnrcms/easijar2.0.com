@@ -1,0 +1,131 @@
+{% set global_style = "font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #444; line-height: 2em;" %}
+{% set table_style = "border-collapse: collapse; width: 100%; margin: 35px 0;" %}
+{% set thead_td_style = "border: 1px solid #eee; text-align: left; padding: 7px; font-size: 12px; background-color: #f5f5f5; font-weight: bold; color: #222;" %}
+{% set td_style = "border: 1px solid #eee; text-align: left; padding: 7px; font-size: 12px;" %}
+{% set main_color = "#fd7533" %}
+{% set border_color = "#eee" %}
+{% set text_right = "text-align: right;" %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{{ title }}</title>
+</head>
+<body style="{{ global_style }}">
+  <div style="width: 700px; margin: 40px auto; border-radius: 4px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);">
+    {# 顶部 logo #}
+    <div style="border-bottom: 1px solid {{ border_color }};">
+      {% if logo is empty %}
+        <a href="{{ store_url }}" style="display: block; padding: 30px 0; padding-left: 25px; text-decoration: none; color: {{ main_color }}; font-size: 20px;">{{ store_name }}</a>
+      {% else %}
+        <a href="{{ store_url }}" style="display:block; padding: 15px 0; text-align: center;"><img src="{{ logo }}" alt="{{ store_name }}" title="{{ store_name }}" style="max-width: 180px !important;" /></a>
+      {% endif %}
+    </div>
+    {# content 部分 #}
+    <div style="padding: 25px;">
+      <p>{{ text_greeting }}</p>
+      {% if customer_id %}
+      <p>{{ text_link }}</p>
+      <p><a href="{{ link }}" style="color: {{ main_color }}">{{ link }}</a></p>
+      {% endif %}
+      {% if download %}
+      <p>{{ text_download }}</p>
+      <p><a href="{{ download }}" style="color: {{ main_color }}">{{ download }}</a></p>
+      {% endif %}
+      <table style="{{ table_style }}">
+        <thead>
+          <tr>
+            <td style="{{ thead_td_style }}" colspan="2">{{ text_order_detail }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="{{ td_style }}"><b>{{ text_order_id }}</b> {{ order_id }}<br />
+              <b>{{ text_date_added }}</b> {{ date_added }}<br />
+              <b>{{ text_payment_method }}</b> {{ payment_method }}<br />
+              {% if shipping_method %} <b>{{ text_shipping_method }}</b> {{ shipping_method }}
+              {% endif %}
+            </td>
+            <td style="{{ td_style }}"><b>{{ text_email }}</b> {{ email }}<br />
+              <b>{{ text_telephone }}</b> {{ telephone }}<br />
+              <b>{{ text_ip }}</b> {{ ip }}<br />
+              <b>{{ text_order_status }}</b> {{ order_status }}<br />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {% if comment %}
+      <table style="{{ table_style }}">
+        <thead>
+          <tr>
+            <td style="{{ thead_td_style }}">{{ text_instruction }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="{{ td_style }}">{{ comment }}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% endif %}
+      {% if shipping_address %}
+      <table style="{{ table_style }}">
+        <thead>
+          <tr>
+            <td style="{{ thead_td_style }}">{{ text_shipping_address }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="{{ td_style }}">{{ shipping_address }}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% endif %}
+      <table style="{{ table_style }}">
+        <thead>
+          <tr>
+            <td style="{{ thead_td_style }}">{{ text_product }}</td>
+            <td style="{{ thead_td_style }}">{{ text_model }}</td>
+            <td style="{{ thead_td_style }}">{{ text_quantity }}</td>
+            <td style="{{ thead_td_style }}">{{ text_price }}</td>
+            <td style="{{ thead_td_style }}">{{ text_total }}</td>
+          </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+        <tr>
+          <td style="{{ td_style }}">{{ product.name }}
+            {% for option in product.option %}<br />
+            &nbsp;<small> - {{ option.name }}: {{ option.value }}</small>{% endfor %}</td>
+          <td style="{{ td_style }}">{{ product.model }}</td>
+          <td style="{{ td_style }}">{{ product.quantity }}</td>
+          <td style="{{ td_style }}">{{ product.price }}</td>
+          <td style="{{ td_style }}">{{ product.total }}</td>
+        </tr>
+        {% endfor %}
+        {% for voucher in vouchers %}
+        <tr>
+          <td style="{{ td_style }}">{{ voucher.description }}</td>
+          <td style="{{ td_style }}"></td>
+          <td style="{{ td_style }}">1</td>
+          <td style="{{ td_style }}">{{ voucher.amount }}</td>
+          <td style="{{ td_style }}">{{ voucher.amount }}</td>
+        </tr>
+        {% endfor %}
+          </tbody>
+        <tfoot>
+        {% for total in totals %}
+        <tr>
+          <td style="{{ td_style }} {{ text_right }}" colspan="4">{{ total.title }}:</td>
+          <td style="{{ td_style }}">{{ total.text }}</td>
+        </tr>
+        {% endfor %}
+          </tfoot>
+      </table>
+      <p style="color: #999; border-top: 1px solid {{ border_color }}; padding-top: 13px;">{{ text_footer }}</p>
+    </div>
+  </div>
+</body>
+</html>

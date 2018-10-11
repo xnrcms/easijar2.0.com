@@ -1,0 +1,50 @@
+/.idea
+# Config and Htaccess Files
+/.htaccess
+/config.php
+/admin/config.php
+
+# Image File
+!/image/no_image.jpg
+
+# Image Cache Files
+/image/.ckfinder/*
+/image/cache/*
+/image/app_image_cache/*
+!/image/cache/index.html
+
+# Image Placehloder Files
+/image/placeholder/*
+!/image/placeholder/index.html
+
+# Image Placehloder Files
+/image/avatar/*
+!/image/avatar/index.html
+!/image/avatar/default-avatar.png
+
+# Templates Files
+/image/templates/*
+/image/templates/default.jpg
+
+# Review Image Files
+/image/review/*
+!/image/review/index.html
+
+/image/catalog/*
+
+/system/info.txt
+
+# Flags
+# remove sharp char if you want to add flags to gitignore
+# /flags/*
+
+# Vqmod cache and log
+/vqmod/logs/*
+/vqmod/vqcache/*
+!/vqmod/vqcache/index.html
+
+# If you want to ignore install file use following lines [on development mode]
+# /backup.install/*
+# /install/*
+get-weixin-code.html
+/license.php

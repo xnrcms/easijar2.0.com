@@ -1,0 +1,130 @@
+{{ header }}
+{% if categories %}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      <!--
+      {% if helper.config('theme_mobile_category_brand_link_status', 1) %}
+      <div class="category-manufacturer-switch bottom-border">
+        <a href="{{ helper.url.link('mobile/categories') }}" class="active">{{ text_category }}</a>
+        <a href="{{ helper.url.link('product/manufacturer') }}">{{ text_brand }}</a>
+      </div>
+      {% else %}
+      <div class="nav-bar">{{ text_category }}</div>
+      {% endif %}-->
+      <div class="nav-bar">{{ text_category }}</div>
+
+      {% if helper.config('theme_mobile_category_page_style', 'flat') == 'flat' %}
+        {% for category in categories %}
+        <div class="row widget category-section">
+          <a href="{{ category.href }}" class="category-title">
+            {{ category.name }}
+          </a>
+          {% if category.children %}
+          <div class="item-list">
+            {% if category.children %}
+            {% for child in category.children %}
+            <div class="col-xs-4 item">
+              <a href="{{ child.href }}">
+                <img data-src="{{ child.thumb }}" src="{{ placeholder }}" class="lazy img-responsive"/>
+                <span>{{ child.name }}</span>
+              </a>
+            </div>
+            {% endfor %}
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="item-list">
+            <div class="col-xs-4 item">
+              <a href="{{ category.href }}">
+                <img data-src="{{ category.thumb }}" src="{{ placeholder }}" class="lazy img-responsive"/>
+                <span>{{ text_all }}</span>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="mobile-class">
+        <div class="left-nav">
+          <ul>
+          {% for key, category in categories %}
+            <li class="bottom-border {{ key == 0 ? 'active' }}">
+              <a href="javascript:void(0);" id="#category-top-{{ key }}">{{ category.name }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+        <div class="right-inner">
+        {% for key, category in categories %}
+          <div class="mobile-class-tab">
+            {% if category.children %}
+              {% for child in category.children %}
+                <h3>{{ child.name }}<a href="{{ child.href }}"> <i class="iconfont">&#xe62b;</i></a></h3>
+                <div class="row">
+                  {% if child.grand_children %}
+                    {% for grand_child in child.grand_children %}
+                      <div class="col-xs-6 item">
+                        <a href="{{ grand_child.href }}">
+                          <img data-src="{{ grand_child.thumb }}" src="{{ placeholder }}" class="lazy img-responsive"/>
+                        </a>
+                        <span>{{ grand_child.name }}</span>
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="col-xs-6 item">
+                      <a href="{{ child.href }}">
+                        <img data-src="{{ child.thumb }}" src="{{ placeholder }}" class="lazy img-responsive"/>
+                      </a>
+                      <span>{{ text_all }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="no-children">
+                <div class="icon"><i class="iconfont">&#xe615;</i></div>
+                <div class="text">{{ text_no_children }}</div>
+                <a class="btn btn-default" href="{{ category.href }}">{{ text_all }}</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if helper.config('theme_mobile_category_page_style', 'flat') != 'flat' %}
+<script type="text/javascript">
+  function categoryhome() {
+    $('html,body').css('overflow-y','hidden');
+
+    var window_h = $(window).height();
+    $('.left-nav ul,.right-inner').height(window_h - ( 48 + 55 ) + 'px');
+
+    // tab
+    $(".left-nav li:first").addClass('active');
+
+    $('.left-nav li').each(function(i) {
+      $(this).on('click',function() {
+        $(this).addClass('active').siblings('li').removeClass('active');
+        $('.mobile-class-tab:eq(' + i + ')').fadeIn(250).siblings('.mobile-class-tab').hide();
+
+        $("img.lazy").unveil(10, function() {
+          $(this).load(function() {
+            this.style.opacity = 1;
+          });
+        });
+      })
+    })
+  }
+  window.onload = categoryhome();
+</script>
+{% endif %}
+{{ footer }}
+</body></html>

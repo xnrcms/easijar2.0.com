@@ -1,0 +1,15 @@
+<div class="buttons">
+	<div class="pull-right">
+		<form method="post" name="chinabankform" action="https://Pay3.chinabank.com.cn/PayGate">
+			<input type="hidden" name="v_mid"         value="{{ v_mid }}">
+			<input type="hidden" name="v_oid"         value="{{ v_oid }}">
+			<input type="hidden" name="v_amount"      value="{{ v_amount }}">
+			<input type="hidden" name="v_moneytype"   value="{{ v_moneytype }}">
+			<input type="hidden" name="v_url"         value="{{ v_url }}">
+			<input type="hidden" name="v_md5info"     value="{{ v_md5info }}">
+			<input type="hidden" name="remark1"       value="{{ remark1 }}">
+			<input type="hidden" name="remark2"       value="{{ remark2 }}">
+		</form>
+		<a href="javascript:document.chinabankform.submit()" class="btn btn-primary"><?php echo $button_confirm; ?></a>
+	</div>
+</div>

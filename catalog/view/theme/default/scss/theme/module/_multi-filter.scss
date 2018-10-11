@@ -1,0 +1,204 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2018-04-10 15:21:15
+// @modified         2018-06-05 11:09:58
+//
+
+.multi-filter-wrapper {
+  &.column-left-right {
+
+    @media (max-width: 1200px) {
+      padding: $gutter;
+    }
+
+    .group-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .group-content {
+      margin-bottom: $gutter;
+      border-bottom: 1px dotted #eaeaea;
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .category-list-section {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+          margin: 10px 0;
+
+          &.active {
+            a {
+              font-weight: bold;
+            }
+          }
+        }
+
+        a {
+          color: #777;
+        }
+      }
+
+      .filter-price-section {
+        padding-bottom: 20px;
+
+        .range-input-group {
+          margin: 8px 0 16px;
+
+          > input {
+            width: 46%;
+            display: inline-block;
+            -moz-appearance: textfield;
+
+            &::-webkit-outer-spin-button, &::-webkit-inner-spin-button {
+              -webkit-appearance:textfield;
+            }
+
+            & + input {
+              float: right;
+            }
+          }
+        }
+
+        .price-slider {
+          margin: 0 5px;
+          height: .3em;
+          border-color: $brand-primary;
+
+          div {
+            background-color: $brand-primary;
+          }
+
+          span {
+            top: -.5em;
+            outline: 0;
+            border-radius: 50%;
+            background-color: #fff;
+          }
+        }
+      }
+
+      .checkbox {
+        color: #777;
+        position: relative;
+
+        label {
+          display: block;
+          height: 18px;
+          overflow: hidden;
+
+          &:before {
+            content: "\f096";
+            font-family: fontawesome;
+            left: 0;
+            top: 1px;
+            position: absolute;
+          }
+
+          &.active:before  {
+            content: "\f046";
+            color: $brand-primary;
+          }
+
+          &:active:before {
+            color: $brand-primary;
+          }
+
+          input {
+            display: none;
+          }
+
+          .total {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #fff;
+            color: #c7c7c7;
+          }
+        }
+      }
+
+      .btn-more {
+        cursor: pointer;
+        text-align: right;
+
+        &:after {
+          content: '\f0fe';
+          font-family: 'FontAwesome';
+          color: #999;
+        }
+
+        &.active {
+          &:after {
+            content: '\f146';
+          }
+        }
+      }
+    }
+  }
+
+  &.content-top-bottom {
+    border: $default-border;
+    max-height: 205px;
+    overflow-y: auto;
+    padding: 0 16px;
+
+    .filter-group {
+      overflow: hidden;
+      clear: both;
+      padding: 7px 0;
+      border-bottom: 1px dotted #eaeaea;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .group-title {
+        float: left;
+        width: 100px;
+        padding: 6px 0;
+      }
+
+      .group-content {
+        overflow: hidden;
+        margin-left: 100px;
+
+        ul {
+          overflow: hidden;
+          margin: 0;
+        }
+
+        .checkbox {
+          float: left;
+          margin: 2px 9px 2px 2px;
+          padding: 2px 6px;
+          background-color: #f9f9f9;
+
+          &:hover, &.active {
+            background-color: $brand-primary;
+            color: #fff;
+          }
+
+          label {
+            padding-left: 0;
+          }
+
+          input {
+            display: none;
+          }
+        }
+      }
+    }
+
+  }
+}

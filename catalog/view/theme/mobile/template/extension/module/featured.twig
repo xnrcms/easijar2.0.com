@@ -1,0 +1,10 @@
+<div class="row product-list-item-style product-min-box">
+	<div class="module-title"><span>{{ heading_title }}</span></div>
+	<div class="product-grid-box col-xs-12">
+	  {% for product in products %}
+	  <div class="col-xs-6 product-item">
+	    {{ include(helper.template('_partial/product/product_single')) }}
+	  </div>
+	  {% endfor %}
+	</div>
+</div>

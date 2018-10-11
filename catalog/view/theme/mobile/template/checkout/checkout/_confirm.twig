@@ -1,0 +1,62 @@
+<div class="checkout-section" id="cart-section">
+  <h2>{{ text_checkout_cart }}</h2>
+  {% if redirect %}
+    <script type="text/javascript"><!--
+    location = '{{ redirect }}';
+    //--></script>
+  {% else %}
+    {% for product in products %}
+    <div class="product-item">
+      <img src="{{ product.image }}" class="img-responsive">
+      <div class="info">
+        <span class="name">{{ product.name }}</span>
+        {% if product.option %}
+        <span>
+          {% for option in product.option %}
+          {{ option.value }}&nbsp;
+          {% endfor %}
+        </span>
+        {% endif %}
+        {% if product.recurring %}
+        <span class="text-muted">{{ text_recurring_item }}</span> <small>{{ product.recurring }}</small>
+        {% endif %}
+        <span class="text-muted">{{ product.model }}</span>
+        <span>{{ product.price }} x {{ product.quantity }}</span>
+        <span class="total">{{ product.total }}</span>
+      </div>
+    </div>
+    {% endfor %}
+    {% for voucher in vouchers %}
+    <div class="voucher-wrap">
+      <div class="name">{{ voucher.description }}</div>
+      <div class="amount">{{ voucher.amount }}</div>
+    </div>
+    {% endfor %}
+    {% for recharge in recharges %}
+    <div class="voucher-wrap">
+      <div class="name">{{ recharge.description }}</div>
+      <div class="amount">{{ recharge.amount }}</div>
+    </div>
+    {% endfor %}
+    <div class="list-two-column-justified">
+      {% for total in totals %}
+      <dl>
+        <dt>
+          {% if loop.last %}
+          <strong>{{ total.title }}</strong>
+          {% else %}
+          <span>{{ total.title }}</span>
+          {% endif %}
+        </dt>
+        <dd>
+          {% if loop.last %}
+          <strong>{{ total.text }}</strong>
+          {% else %}
+          <span>{{ total.text }}</span>
+          {% endif %}
+        </dd>
+      </dl>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

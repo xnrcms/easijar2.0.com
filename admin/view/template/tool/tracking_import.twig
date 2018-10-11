@@ -1,0 +1,53 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">{% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-exchange"></i> {{ heading_title }}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="pull-right">
+          <button type="button" id="button-import" data-toggle="tooltip" title="{{ button_import }}" class="btn btn-primary"><i class="fa fa-upload"></i>{{ button_import }}</button>
+        </div>
+        <div class="clearfix"></div>
+        <form action="{{ action }}" enctype="multipart/form-data" method="post" id="form-import" class="form-horizontal">
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-csvfile">{{ entry_file }}</label>
+            <div class="col-sm-10">
+              <input type="file" name="csvfile" id="input-csvfile"/>
+              {% if error_csvfile %}
+                <div class="text-danger">{{ error_csvfile }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+        <div class="alert alert-info">{{ text_help }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-import').on('click', function() {
+    $('#form-import').submit();
+})
+--></script>
+{{ footer }}

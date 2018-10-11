@@ -1,0 +1,191 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-12-15 12:21:23
+// @modified         2017-06-08 16:29:01
+//
+
+.account-order,.account-oreview {
+  .order-type-widget {
+    padding: 0;
+    border-bottom: 1px solid #dedede;
+
+    .order-button-group {
+      // margin: 0;
+      // padding: 0;
+      position: relative;
+      // height: 30px;
+      // border-bottom: 1px solid #ddd;
+      @include display-flex;
+
+      & > div {
+        width: 25%;
+        // list-style-type: none;
+        // float: left;
+        // width: 25%;
+        text-align: center;
+
+        a {
+          display: block;
+          line-height: 40px;
+          font-weight: bold;
+        }
+
+        // span {
+        //   float: right;
+        //   color: #ddd;
+        //   width: 2px;
+        // }
+
+        // border-right: 1px solid #ddd;
+        &.active {
+          border-bottom: 2px solid $main_color;
+          // padding-bottom: 8px;
+        }
+      }
+    }
+  }
+
+  .order-item-wrapper {
+    display: block;
+    overflow: hidden;
+    // margin-bottom: $gutter;
+
+    .order-info-top {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+      position: relative;
+      clear: both;
+      overflow: hidden;
+
+      .info {
+        @include display-flex;
+
+        a {
+          flex: 1;
+        }
+      }
+
+      .action {
+        text-align: right;
+        margin-left: 50%;
+
+        .btn {
+          padding: 5px 12px;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .products {
+      margin: $gutter 0;
+
+      a {
+        display: block;
+        overflow: hidden;
+      }
+
+      .product-item {
+        @include display-flex;
+        margin-bottom: $gutter;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .image {
+          width: 80px;
+        }
+
+        .info {
+          flex: 1;
+          margin-left: $gutter;
+
+          .name {
+            // font-size: 14px;
+          }
+
+          .price {
+            font-weight: bold;
+            font-size: 14px;
+            color: $main_color;
+          }
+        }
+      }
+    }
+
+    .order-info-bottom {
+      clear: both;
+      padding-top: $gutter;
+      border-top: 1px solid #eee;
+      overflow: hidden;
+      .total {
+        float: left;
+        font-size: 14px;
+        font-weight: bold;
+        color: $main_color;
+      }
+      .date {
+        font-size: 12px;
+        float: right;
+        color: #999;
+      }
+    }
+
+    .order-info-action {
+      margin-top: $gutter;
+      text-align: right;
+
+      .btn {
+        margin-bottom: 0;
+        font-size: 12px;
+      }
+
+      .btn-info {
+        &:active, &:focus {
+          border: none;
+          background-color: $second_color;
+        }
+      }
+    }
+  }
+}
+
+body.account-oreview-add {
+  #button-upload {
+    &:focus, &:hover, &:active {
+      background-color: #eee;
+      border-color: #eee;
+    }
+  }
+  .upload-img {
+    float: left;
+    margin: 0 10px 10px 0;
+    border: 1px solid #ddd;
+    position: relative;
+
+    img {
+      max-width: 82px;
+      max-height: 82px;
+    }
+    button {
+      top: 0;
+      right: 0;
+      padding: 1px 5px;
+      position: absolute;
+    }
+  }
+}
+
+body.account-oreview-info {
+  .name-info {
+    border-bottom: 1px solid #ebebeb;
+
+    > div {
+      margin-bottom: 10px;
+    }
+  }
+}

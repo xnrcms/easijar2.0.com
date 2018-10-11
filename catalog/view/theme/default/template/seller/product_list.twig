@@ -1,0 +1,387 @@
+{% extends helper.template("seller/_partial/layout") %}
+
+{% block content %}
+  <div id="content" class="col-sm-12">
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+    {% endif %}
+    {% if error_warning %}
+      <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+    {% endif %}
+    <h2 class="pull-left">{{ heading_title }}</h2>
+    <div class="pull-right">
+      <a href="{{ add }}" data-toggle="tooltip" class="btn btn-primary" title="{{ text_add }}"><i class="fa fa-plus"></i></a>
+      <button type="button" form="form-product" formaction="{{ delete }}" data-toggle="tooltip" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-product').submit() : false;" title="{{ text_delete }}"><i class="fa fa-trash-o"></i></button>
+    </div>
+    <div class="row">
+      <div id="filter-product" class="col-sm-12 hidden-sm hidden-xs">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-name">{{ entry_name }}</label> <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-status">{{ entry_status }}</label> <select name="filter_status" id="input-status" class="form-control">
+                    <option value="">{{ text_all }}</option>
+                    {% if filter_status == '1' %}
+                      <option value="1" selected="selected">{{ text_enabled }}</option>
+                    {% else %}
+                      <option value="1">{{ text_enabled }}</option>
+                    {% endif %}
+                    {% if filter_status == '0' %}
+                      <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% else %}
+                      <option value="0">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-model">{{ entry_model }}</label> <input type="text" name="filter_model" value="{{ filter_model }}" placeholder="{{ entry_model }}" id="input-model" class="form-control"/>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label class="control-label" for="input-show-variant">{{ entry_show_variant }}</label> <select name="filter_show_variant" id="input-show-variant" class="form-control">
+                    {% if filter_show_variant == '1' %}
+                      <option value="1" selected="selected">{{ text_show_variant }}</option>
+                    {% else %}
+                      <option value="1">{{ text_show_variant }}</option>
+                    {% endif %}
+                    {% if filter_show_variant == '0' %}
+                      <option value="0" selected="selected">{{ text_hide_variant }}</option>
+                    {% else %}
+                      <option value="0">{{ text_hide_variant }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+                <div class="form-group text-right">
+                  <div class="btn-group">
+                    <button disabled class="dropdown-toggle btn btn-success" id="batch-edit" type="button" data-toggle="dropdown">{{ text_batch_edit }}
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu batch-edit-item" role="menu">
+                      <li>
+                        <a href="javascript:void(0)" data-type="price">{{ text_product_price }}</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" data-type="quantity">{{ text_product_quantity }}</a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" data-type="status">{{ text_product_down }}</a>
+                      </li>
+                    </ul>
+                  </div>
+                  <button type="button" id="button-filter" class="btn btn-default"><i class="fa fa-filter"></i> {{ button_filter }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+          </div>
+          <div class="panel-body">
+            <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-product">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').trigger('click');" id="all-selected" /></td>
+                    <td class="text-center">{{ column_image }}</td>
+                    <td class="text-left">{% if sort == 'pd.name' %}<a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>{% else %}<a href="{{ sort_name }}">{{ column_name }}</a> {% endif %}</td>
+                    <td class="text-left">{% if sort == 'p.model' %}<a href="{{ sort_model }}" class="{{ order|lower }}">{{ column_model }}</a>{% else %}<a href="{{ sort_model }}">{{ column_model }}</a> {% endif %}</td>
+                    <td class="text-right">{% if sort == 'p.price' %}<a href="{{ sort_price }}" class="{{ order|lower }}">{{ column_price }}</a>{% else %}<a href="{{ sort_price }}">{{ column_price }}</a> {% endif %}</td>
+                    <td class="text-right">{{ column_quantity }}</td>
+                    <td class="text-left">{% if sort == 'p.status' %}<a href="{{ sort_status }}" class="{{ order|lower }}">{{ column_status }}</a>{% else %}<a href="{{ sort_status }}">{{ column_status }}</a> {% endif %}</td>
+                    <td class="text-right">{{ column_action }}</td>
+                  </thead>
+                  <tbody>
+                    {% if products %}
+                      {% for product in products %}
+                        <tr>
+                          <td class="text-center selected-item">
+                            {% if product.product_id in selected %}
+                              <input type="checkbox" name="selected[]" value="{{ product.product_id }}" checked="checked" onchange="isChecked();" />
+                            {% else %}
+                              <input type="checkbox" name="selected[]" value="{{ product.product_id }}" onchange="isChecked();" />
+                            {% endif %}
+                          </td>
+                          <td class="text-center">{% if product.image %}<img src="{{ product.image }}" alt="{{ product.name }}" class="img-thumbnail"/>{% else %}<span class="img-thumbnail list"><i class="fa fa-camera fa-2x"></i></span>{% endif %}</td>
+                          <td class="text-left name-editor">
+                            {{ product.name }}
+                          </td>
+                          <td class="text-left model-editor" data-item="model">
+                            <span>{{ product.model }}</span>
+                          </td>
+                          <td class="text-right price-editor" data-item="price">
+                            {% if product.special %}
+                              <span style="text-decoration: line-through;">{{ product.price }}</span>
+                              <br/>
+                              <div class="text-danger special">{{ product.special }}</div>
+                            {% else %}
+                              <span>{{ product.price }}</span>
+                            {% endif %}
+                          </td>
+                          <td class="text-right quantity-editor" data-item="quantity">
+                            {% if product.quantity <= 0 %}<span class="label label-warning">{{ product.quantity }}</span>{% elseif product.quantity <= 5 %}<span class="label label-danger">{{ product.quantity }}</span>{% else %}<span class="label label-success">{{ product.quantity }}</span>{% endif %}
+                          </td>
+                          <td class="text-left">
+                            {% if product.status %}
+                              {{ text_enabled }}
+                            {% else %}
+                              {{ text_disabled }}
+                            {% endif %}
+                          </td>
+                          <td class="text-right">
+                            <div class="btn-group" style="min-width: 65px;">
+                              <a href="{{ product.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary">
+                                <i class="fa fa-pencil"></i>
+                              </a>
+                              <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+                                <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-right">
+                                <li>
+                                  <a href="javascript:void(0);" class="btn-variant" data-id="{{ product.product_id }}">
+                                    <i class="fa fa-cog"></i> {{ button_edit_child_product }}
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="{{ product.view }}" target="_blank">
+                                    <i class="fa fa-search"></i> {{ button_view }}
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                      <tr>
+                        <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                      </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </form>
+            <div class="row">
+              <div class="col-sm-6 text-left">{{ pagination }}</div>
+              <div class="col-sm-6 text-right">{{ results }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script type="text/javascript">
+    // 商品批量操作
+    var batchProductIds = new Array(), checkedProductCount; // 全局初始化商品选中ID数组与选中length
+    function isChecked() {
+      batchProductIds = [];
+      checkedProductCount = $(".selected-item input:checked").length;
+      var
+        _trLength = $('.table-responsive tbody tr').length,
+        _btnAlls = document.getElementById('all-selected'),
+        _btnBatch = document.getElementById('batch-edit');
+
+      checkedProductCount == _trLength ? _btnAlls.checked = true : _btnAlls.checked = false;
+      checkedProductCount ? _btnBatch.disabled = false : _btnBatch.disabled = true;
+
+      $('input[name="selected[]"]:checked').each(function() {
+        batchProductIds.push($(this).val())
+      });
+    }
+    isChecked();
+
+    $('.batch-edit-item a').on('click', function(event) {
+      var
+        _item = $(this).data('type'),
+        _name = $(this).children('span').text();
+
+      layer.open({
+        type: 1,
+        title: "{{ text_batch_edit }}" + _name,
+        skin: 'batch-edit-item-layer',
+        area: ['500px', ''],
+        btn: ['{{ button_save }}', '{{ button_cancel }}'],
+        content: editWrapperHtml(_item, _name),
+        yes: function(index, layero) {
+          batchEditProduct(_item, _name);
+        }
+      });
+    });
+
+    var editWrapperHtml = function(_item, _name) {
+      var html = '';
+
+      if ( _item == 'status') {
+        html +=  '<h4> {{ text_batch_number }} </h4>'
+      } else {
+        html +=  '<p>{{ text_batch_setting_title }}：</p>'
+        html +=  '<div class="batch-edit-item-wrapper">'
+        html +=    '<div class="input-group active">'
+        html +=      '<label class="input-group-addon" id="basic-addon1"><input name="reset" type="checkbox" checked> {{ text_batch_reset }}' + _name + '</label>'
+        html +=      '<div class="inner"><input type="number" name="value" class="value"></div>'
+        html +=    '</div>'
+        html +=    '<div class="input-group">'
+        html +=      '<label class="input-group-addon" id="basic-addon1"><input name="raise" type="checkbox"> {{ text_batch_add }}' + _name + '</label>'
+        html +=      '<div class="inner">'
+        if ( _item != 'quantity' ) {
+          html +=        '<select><option value="price">{{ text_sale_price }}</option><option value="pct">{{ text_percent }}</option></select>'
+        }
+        html +=        '<input type="number" name="value" class="value">'
+        html +=      '</div>'
+        html +=    '</div>'
+        html +=    '<div class="input-group">'
+        html +=      '<label class="input-group-addon" id="basic-addon1"><input name="reduce" type="checkbox"> {{ text_batch_down }}' + _name + '</label>'
+        html +=      '<div class="inner">'
+        if ( _item != 'quantity' ) {
+          html +=        '<select><option value="price">{{  text_sale_price }}</option><option value="pct">{{ text_percent }}</option></select>'
+        }
+        html +=        '<input type="number" name="value" class="value">'
+        html +=      '</div>'
+        html +=    '</div>'
+        html +=  '</div>'
+      }
+
+      return html;
+    }
+
+    var batchEditProduct = function(_item, _name) {
+      var
+        _actives = $('.batch-edit-item-wrapper .active'),
+        _value = _actives.find('input[name="value"]').val(),
+        _type = _actives.find('input[type="checkbox"]').prop('name'),
+        _key = _actives.find('option:selected').val();
+
+      if ( _value == '' ) return layer.tips('{{ error_content_required }}', _actives.find('.value'), {tips:3});
+      if ( _value <= 0 ) return layer.tips('{{ error_number_quantity }}', _actives.find('.value'), {tips:3});
+      if ( _key == 'pct' ) {
+        if ( _value < 0 || _value > 100 ) return layer.tips('{{ error_number_scope }}', _actives.find('.value'), {tips:3});
+      }
+
+      var filter = '';
+
+      var filter_name = $('input[name=\'filter_name\']').val();
+
+      if (filter_name) {
+          filter += '&filter_name=' + encodeURIComponent(filter_name);
+      }
+
+      var filter_model = $('input[name=\'filter_model\']').val();
+
+      if (filter_model) {
+          filter += '&filter_model=' + encodeURIComponent(filter_model);
+      }
+
+      var filter_status = $('select[name=\'filter_status\']').val();
+
+      if (filter_status !== '') {
+          filter += '&filter_status=' + encodeURIComponent(filter_status);
+      }
+
+      if ({{ sort != null}}) {
+          filter += '&sort={{ sort }}';
+      }
+
+      if ({{ order != null}}) {
+          filter += '&order={{ order }}';
+      }
+
+      if ({{ page != null}}) {
+          filter += '&page={{ page }}';
+      }
+
+      $.ajax({
+        url: 'index.php?route=seller/product/update' + _item +  filter,
+        type: 'post',
+        dataType: 'json',
+        data: {'product_id': batchProductIds, 'type': _type, 'key': _key, 'value': _value},
+        success: function(json) {
+          if (json['status'] == 1) {
+            layer.msg(json.message, {icon:1, time: 500}, function() {
+              layer.load(2, {shade: [0.2,'#fff']});
+              location.href = json['link'];
+            });
+          } else {
+            layer.msg(json.message);
+          }
+        },
+        error: function () {
+          layer.msg('{{ error_network }}', {time: 1000});
+        }
+      });
+    }
+
+    $(document).on('click', '.batch-edit-item-wrapper .input-group label', function(event) {
+      $(this).parent().addClass('active').siblings().removeClass('active');
+      $(this).parent().siblings().find('input').prop("checked", false);
+    });
+
+    $(document).on('change', '.batch-edit-item-wrapper select', function(event) {
+      $(this).siblings('input').val('');
+    });
+
+
+    $('#button-filter').on('click', function() {
+      var url = '';
+
+      var filter_name = $('input[name=\'filter_name\']').val();
+
+      if (filter_name) {
+        url += '&filter_name=' + encodeURIComponent(filter_name);
+      }
+
+      var filter_model = $('input[name=\'filter_model\']').val();
+
+      if (filter_model) {
+        url += '&filter_model=' + encodeURIComponent(filter_model);
+      }
+
+      var filter_status = $('select[name=\'filter_status\']').val();
+
+      if (filter_status !== '') {
+        url += '&filter_status=' + encodeURIComponent(filter_status);
+      }
+
+      var filter_show_variant = $('select[name=\'filter_show_variant\']').val();
+      if (filter_show_variant !== '') {
+        url += '&filter_show_variant=' + filter_show_variant;
+      }
+
+      location = 'index.php?route=seller/product' + url;
+    });
+
+    $('.btn-variant').click(function () {
+      var product_id = $(this).data('id');
+      layer.open({
+        type: 2,
+        title: '{{ text_edit_child_product }}',
+        shadeClose: false,
+        shade: 0.8,
+        scrollbar: false,
+        area: ['95%', '90%'],
+        content: '{{ helper.url.link('seller/product/variant') }}&product_id=' + product_id,
+        end: function () {
+          layer.load(1, { shade: [0.5, '#fff'] });
+          location.reload();
+        }
+      });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,125 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-12-07 20:04:55
+// @modified         2018-02-11 10:21:55
+//
+
+.common-home {
+  // margin-top: 44px;
+}
+
+#top-search-fixed, #top-search {
+  text-align: center;
+  vertical-align: middle;
+  padding:7px 0;
+  font-weight: 100;
+  &.horizontal-border:after {
+    border-color: #ccc;
+  }
+
+  .change-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    background-color: #fff;
+    box-shadow: 0px 1px 3px rgba(170, 174, 195, 0.5);
+  }
+
+  a {
+    display: block;
+    float: left;
+    width:12%;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    position: relative;
+    @include transition(all .2s ease);
+    i {
+      &.category-change-color {
+        position: absolute;
+        color: $second_color;
+        opacity: 0;
+      }
+    }
+  }
+
+  .category i {
+    font-size: 20px;
+  }
+
+  .cart i {
+    font-size: 26px;
+    display: inline-block;
+    margin-top: -2px;
+  }
+
+  .placeholder {
+    width: 76%;
+    background: #fff;
+    text-align: left;
+    padding:0 10px;
+    color: #aaa;
+    z-index: 999;
+    position: relative;
+    @include border-radius(22px);
+    .placeholder-change-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0;
+      @include border-radius(22px);
+      background-color: #d8d8d8;
+    }
+    &:active {
+      background-color: #ddd;
+    }
+
+    i {
+      text-align:right;
+      float: left;
+      margin-right: 8px;
+      color: #aaa;
+    }
+  }
+}
+
+#top-search-fixed {
+  margin: 0 !important;
+  position: fixed;
+  width: 100%;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  background-image:-webkit-linear-gradient(
+  to bottom,
+  rgba(111,111,111,1) 0%,
+  rgba(111,111,111,.5) 62%,
+  rgba(111,111,111,0) 100%);
+  background-image: linear-gradient(
+  to bottom,
+  rgba(111,111,111,1) 0%,
+  rgba(111,111,111,.5) 62%,
+  rgba(111,111,111,0) 100%);
+}
+
+#top-search {
+  background-color: #fff;
+  a {
+    color: #333;
+  }
+
+  .placeholder {
+    background-color: #d8d8d8;
+  }
+}

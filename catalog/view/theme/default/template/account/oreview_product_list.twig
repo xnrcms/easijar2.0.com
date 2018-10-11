@@ -1,0 +1,72 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ success }}</div>
+  {% endif %}
+  {% if warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ warning }}</div>
+  {% endif %}
+  <div class="row"> {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}"> {{ content_top }}
+      <h2>{{ heading_title }}</h2>
+      <div class="oreview-tab-wrapper mb-1">
+        <ul class="nav nav-tabs">
+          <li {{ active_tab != 'reviewed' ? 'class="active"' }}>
+            <a href="{{ helper.url.link('account/oreview') }}">{{ button_unreviewed }}</a>
+          </li>
+          <li {{ active_tab == 'reviewed' ? 'class="active"' }}>
+            <a href="{{ helper.url.link('account/oreview', 'reviewed=1') }}">{{ button_reviewed }}</a>
+          </li>
+        </ul>
+      </div>
+      {% if oreviews %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th class="text-right">{{ column_order_id }}</th>
+              <th class="text-left">{{ column_product }}</th>
+              <th class="text-left">{{ column_date_added }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for oreview in oreviews %}
+            <tr>
+              <td class="text-right">
+                <a href="{{ helper.url.link('account/order/info', 'order_id=' ~ oreview.order_id) }}">#{{ oreview.order_id }}</a>
+              </td>
+              <td class="text-left"><a href="{{ oreview.product_link }}">{{ oreview.name }}</a></td>
+              <td class="text-left">
+                <span class="text-muted">{{ oreview.date_added }}</span>
+              </td>
+              <td class="text-center">
+                {% if oreview.add %}
+                <a href="{{ oreview.add }}">{{ button_review }}</a>
+                {% else %}
+                <a href="{{ oreview.info }}">{{ button_view }}</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      {{ include(helper.template('_partial/pagination')) }}
+      {% else %}
+      <div class="no-items">
+        <img src="{{ helper.url().fullPathLink('catalog/view/theme/default/image/no_items.png') }}" class="img-responsive">
+        <span>{{ text_empty }}</span>
+      </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

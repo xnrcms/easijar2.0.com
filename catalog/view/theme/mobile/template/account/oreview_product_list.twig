@@ -1,0 +1,70 @@
+{{ header }}
+<div class="container">
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ success }}</div>
+  {% endif %}
+  {% if warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ warning }}</div>
+  {% endif %}
+  <div class="row"> {{ column_left }}
+    <div id="content" class="col-sm-12"> {{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+        <div class="oreview-tab-wrapper">
+          <div class="row widget" style="padding-bottom: 0;">
+            <ul class="nav nav-tabs" style="margin: 0;">
+              <li {{ active_tab != 'reviewed' ? 'class="active"' }}>
+                <a href="{{ helper.url.link('account/oreview') }}">{{ button_unreviewed }}</a>
+              </li>
+              <li {{ active_tab == 'reviewed' ? 'class="active"' }}>
+                <a href="{{ helper.url.link('account/oreview', 'reviewed=1') }}">{{ button_reviewed }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        {% if oreviews %}
+        {% for oreview in oreviews %}
+        <div class="row widget">
+          <div class="col-xs-12">
+            <div class="order-item-wrapper">
+              <div class="order-info-top">
+                <div class="info">
+                  <a href="{{ helper.url.link('account/order/info', 'order_id=' ~ oreview.order_id) }}">{{ column_order_id }}: #{{ oreview.order_id }}</a>
+                </div>
+              </div>
+              <div class="products">
+                <a href="{{ oreview.product_link }}">{{ oreview.name }}</a>
+              </div>
+              <div class="order-info-bottom">
+                <a href="{{ order.view }}">
+                  <div class="date" style="float: left;">{{ column_date_added }}: {{ oreview.date_added }}</div>
+                  <div class="pull-right">
+                      {% if oreview.add %}
+                      <a class="btn btn-info" style="padding: 4px 12px; border: none;" href="{{ oreview.add }}">{{ button_review }}</a>
+                      {% else %}
+                      <a class="btn btn-info" style="padding: 4px 12px; border: none;" href="{{ oreview.info }}">{{ button_view }}</a>
+                      {% endif %}
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {{ include(helper.template('_partial/pagination')) }}
+        {% else %}
+        <div class="row widget">
+          <div class="col-xs-12">
+            <div class="no-items">
+              <div class="icon">
+                <i class="iconfont">&#xe620;</i>
+              </div>
+              <dd class="msg">{{ text_no_results }}</dd>
+              <a href="{{ back }}" class="btn btn-primary">{{ button_back }}</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ footer }}

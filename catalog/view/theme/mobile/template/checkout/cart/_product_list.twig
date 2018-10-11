@@ -1,0 +1,95 @@
+<div class="row widget cart-list-box">
+  <div class="col-xs-12">
+    <form id="cart" action="{{ action }}" method="post" enctype="multipart/form-data">
+      <div class="product-section">
+        {% for product in products %}
+        <div class="product-item">
+          {% if helper.is_pro() %}
+          <div class="selected">
+            <div class="cart-select">
+              <input type="checkbox" value="{{ product.cart_id }}" id="checkbox-{{ product.cart_id }}" name="selected[]" onchange="cart_select();" {% if product.selected %}checked{% endif %} />
+              <label for="checkbox-{{ product.cart_id }}"></label>
+            </div>
+          </div>
+          {% endif %}
+          <div class="thumb">
+            {% if product.thumb %}
+            <a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-responsive" /></a>
+            {% endif %}
+          </div>
+          <div class="info">
+            <div class="name">
+              {% if not product.stock %}
+                <span class="label label-danger">{{ text_no_stock }}</span>
+              {% endif %}
+              {{ product.name }}
+            </div>
+            <div class="price">{{ column_price }}: {{ product.price }}</div>
+            <div class="options">
+              {% if product.option %}
+              {% for option in product.option %}
+              <small>{{ option.name }}: {{ option.value }}</small>
+              {% endfor %}
+              {% endif %}
+              {% if product.reward %}
+              <small>{{ product.reward }}</small>
+              {% endif %}
+              {% if product.recurring %}
+              <span class="label label-info">{{ text_recurring_item }}</span> <small>{{ product.recurring }}</small>
+              {% endif %}
+            </div>
+
+            <div class="buttom-total">
+              <div class="sub-total">{{ column_total }}: {{ product.total }}</div>
+              <div class="cart-quantity-wrapper">
+                <div id="cart-product-quantity" class="input-group">
+                  <span class="input-group-btn quantity-down">
+                    <button class="btn btn-default" type="button">-</button>
+                  </span>
+                  <input type="text" name="quantity[{{ product.cart_id }}]" value="{{ product.quantity }}" onkeyup="this.value=this.value.replace(/\D/g,'')"  onafterpaste="this.value=this.value.replace(/\D/g,'')" size="2" class="form-control cart-input-quantity" />
+                  <span class="input-group-btn quantity-up">
+                    <button class="btn btn-default" type="button">+</button>
+                  </span>
+                </div>
+                <div class="remove-button"><button type="button" class="btn btn-default" data-toggle="tooltip" title="{{ button_remove }}" onclick="cart.remove('{{ product.cart_id }}');">{{ button_remove }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% for voucher in vouchers %}
+        <div class="product-item">
+          <div class="info">
+            <div class="name">
+              {{ voucher.description }}
+            </div>
+            <div class="buttom-total">
+              <div class="sub-total">{{ column_total }}: {{ voucher.amount }}</div>
+              <div class="cart-quantity-wrapper" style="width: auto;">
+                <button type="button" style="padding: 2px 12px;" title="{{ button_remove }}" class="btn btn-default delete" onclick="voucher.remove('{{ voucher.key }}');">{{ button_remove }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% if helper.is_pro() %}
+        {% for recharge in recharges %}
+        <div class="product-item">
+          <div class="selected"></div><div class="thumb">
+          </div>
+          <div class="recharge info">
+            <div class="name">{{ recharge.description }}</div>
+            <div class="actions">
+              <div class="remove-button"><button type="button" class="btn btn-default" data-toggle="tooltip" title="{{ button_remove }}" onclick="cart.remove('{{ recharge.key }}');">{{ button_remove }}</button>
+              </div>
+            </div>
+            <div class="sub-total">{{ column_total }}: {{ recharge.amount }}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>

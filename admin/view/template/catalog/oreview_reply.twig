@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ text_edit_child_product }}</title>
+  <script type="text/javascript" src="view/javascript/jquery/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="view/javascript/jquery/jquery-ui/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="view/javascript/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="view/javascript/vue/vue.min.js"></script>
+  <script type="text/javascript" src="view/javascript/layer/layer.js"></script>
+  <link href="view/stylesheet/bootstrap.css" type="text/css" rel="stylesheet"/>
+  <link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+  <link type="text/css" href="view/stylesheet/stylesheet.css" rel="stylesheet" media="screen"/>
+</head>
+<body>
+  <div id="review-reply" class="container">
+    <form action="" method="post" enctype="multipart/form-data" id="form-reply" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="input-content">{{ entry_content }}</label>
+        <div class="col-sm-10">
+          <textarea name="content" cols="60" rows="8" placeholder="{{ entry_content }}" id="input-content" class="form-control"/>{{ sort_order }}</textarea>
+        </div>
+      </div>
+    </form>
+    <div class="pull-right">
+      <button id="button-submit" data-toggle="tooltip" title="{{ button_submit }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+  $('#button-submit').bind('click', function () {
+      $.ajax({
+          url: 'index.php?route=catalog/oreview/reply_save&review_id={{ review_id }}&user_token={{ user_token }}',
+          method: 'post',
+          dataType: 'json',
+          data: $('#review-reply textarea[name=\'content\']'),
+          beforeSend: function () {
+              _loading = layer.load(1, {shade: [0.5, '#fff']});
+          },
+          success: function (json) {
+              if (json['error']) {
+                  layer.msg(json['error']);
+              } else {
+                  layer.msg(json['success']);
+              }
+          },
+          error: function (xhr, errorType, error) {
+              layer.msg('error!');
+          },
+          complete: function () {
+              layer.close(_loading);
+          }
+      })
+  })
+</script>
+</html>

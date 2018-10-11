@@ -1,0 +1,118 @@
+{{ header }}
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-water" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary">
+          <i class="fa fa-save"></i>
+        </button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default">
+          <i class="fa fa-reply"></i>
+        </a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="alert alert-info">
+      <i class="fa fa-info-circle"></i>{{ text_water_notice }}
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-water" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_water_type }}</label>
+            <div class="col-sm-10">
+              <label class="radio-inline"><input type="radio" name="module_water_type" value="1" {% if module_water_type == 1 %} checked="checked" {% endif %} />{{ text_water_image }}</label>
+              <label class="radio-inline"><input type="radio" name="module_water_type" value="2" {% if module_water_type == 2 %} checked="checked" {% endif %}/>{{ text_water_font }}</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_water_position }}</label>
+            <div class="col-sm-10">
+              <label class="radio-inline">
+                <input type="radio" name="module_water_position" value="lt" {% if module_water_position == 'lt' %}checked="checked"{% endif %}/>
+                {{ text_left_top }}
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="module_water_position" value="rt" {% if module_water_position == 'rt' %}checked="checked"{% endif %}/>
+                {{ text_right_top }}
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="module_water_position" value="lb" {% if module_water_position == 'lb' %}checked="checked"{% endif %}/>
+                {{ text_left_bottom }}
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="module_water_position" value="rb" {% if module_water_position == 'rb' %}checked="checked"{% endif %}/>
+                {{ text_right_bottom }}
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="module_water_position" value="cc" {% if module_water_position == 'cc' %}checked="checked"{% endif %}/>
+                {{ text_center }}
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-water-font">{{ entry_water_font }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="module_water_font" id="input-font" placeholder="{{ entry_water_font }}" class="form-control" value="{{ module_water_font }}"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-alpha"><span data-toggle="tooltip" data-container="#tab-general" title="{{ help_water_alpha }}">{{ entry_water_alpha }}</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="module_water_alpha" id="input-alpha" placeholder="{{ entry_water_alpha }}" class="form-control" value="{{ module_water_alpha }}"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-water-font-color">{{ entry_water_font_color }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="module_water_font_color" value="{{ module_water_font_color }}" id="input-water-font-color" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-water-image">{{ entry_water_image }}</label>
+            <div class="col-sm-10"><a href="" id="thumb-water-image" data-toggle="image" class="img-thumbnail"><img src="{{ src_water_image }}" alt="" title="" data-placeholder="{{ placeholder }}" /></a>
+              <input type="hidden" name="module_water_image" value="{{ module_water_image }}" id="input-water-image" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="module_water_status" id="input-status" class="form-control">
+                {% if module_water_status %}
+                <option value="1" selected="selected">{{ text_enabled }}</option>
+                <option value="0">{{ text_disabled }}</option>
+                {% else %}
+                <option value="1">{{ text_enabled }}</option>
+                <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $("#input-water-font-color").spectrum({
+    color: "{{ water_font_color }}",
+    preferredFormat: 'rgb'
+  });
+</script>
+{{ footer }}

@@ -1,0 +1,279 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning  %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success  %}
+    <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }} </h3>
+      </div>
+      <div class="panel-body">
+        <div class="well">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="control-label" for="input-name">{{ column_name }}</label>
+                <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ column_name }}" id="input-name" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-model">{{ column_model }}</label>
+                <input type="text" name="filter_model" value="{{ filter_model }}" placeholder="{{ column_model }}" id="input-model" class="form-control" />
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="control-label" for="input-customername">{{ column_customer_name }}</label>
+                <input type="text" name="filter_customer_name" value="{{ filter_customer_name }}" placeholder="{{ column_customer_name }}" id="input-customername" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-question">{{ column_question }}</label>
+                <input type="text" name="filter_question" value="{{ filter_question }}" placeholder="{{ column_question }}" id="input-question" class="form-control" />
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="control-label" for="input-status">{{ column_status }}</label>
+                <select name="filter_status" id="input-status" class="form-control">
+                  <option value="*"></option>
+                  {% if filter_status %}
+                  <option value="1" selected="selected">{{ text_enabled }}</option>
+                  {% else %}
+                  <option value="1">{{ text_enabled }}</option>
+                  {% endif %}
+                  {% if filter_status == '0' %}
+                  <option value="0" selected="selected">{{ text_disabled }}</option>
+                  {% else %}
+                  <option value="0">{{ text_disabled }}</option>
+                  {% endif %}
+                </select>
+              </div>
+              <button type="button" id="button-filter" class="btn btn-primary pull-right"><i class="fa fa-search"></i> {{ button_filter }}</button>
+            </div>
+          </div>
+        </div>
+        <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-askquestion">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td class="text-left">{% if sort == 'pq.user_name' %}
+                    <a href="{{ sort_customer_name }}" class="{{ order|lower }}">{{ column_customer_name }}</a>
+                    {% else %}
+                    <a href="{{ sort_customer_name }}">{{ column_customer_name }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'pd.name' %}
+                    <a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>
+                    {% else %}
+                    <a href="{{ sort_name }}">{{ column_name }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'pq.model' %}
+                    <a href="{{ sort_model }}" class="{{ order|lower }}">{{ column_model }}</a>
+                    {% else %}
+                    <a href="{{ sort_model }}">{{ column_model }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'pq.product_question' %}
+                    <a href="{{ sort_question }}" class="{{ order|lower }}">{{ column_question }}</a>
+                    {% else %}
+                    <a href="{{ sort_question }}">{{ column_question }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{{ column_answer }}</td>
+                  <td class="text-left">{% if sort == 'pq.product_status' %}
+                    <a href="{{ sort_status }}" class="{{ order|lower }}">{{ column_status }}</a>
+                    {% else %}
+                    <a href="{{ sort_status }}">{{ column_status }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'pq.question_asked_date' %}
+                    <a href="{{ sort_question_added }}" class="{{ order|lower }}">{{ column_question_added }}</a>
+                    {% else %}
+                    <a href="{{ sort_question_added }}">{{ column_question_added }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'pq.question_answred_date' %}
+                    <a href="{{ sort_answer_added }}" class="{{ order|lower }}">{{ column_answer_added }}</a>
+                    {% else %}
+                    <a href="{{ sort_answer_added }}">{{ column_answer_added }}</a>
+                    {% endif %}</td>
+                  <td class="right"><?php echo $column_action; ?></td>
+                </tr>
+              </thead>
+              <tbody>
+          {% for proQues in getQues %}
+          <tr id="totalUserQues_{{ proQues.id }}">
+          <td class="text-left">{{ proQues.user_name }}</td>
+          <td class="text-left"><a target="_blank" href="{{ proQues.href }}">{{ proQues.name }}</a></td>
+          <td class="text-left">{{ proQues.model }}</td>
+          <td class="text-left">{{ proQues.product_question }}</td>
+          {% if proQues.product_answer == '' %}
+          <td class="center"><a id="{{ proQues.id }}" class="answerForQuestion btn btn-default" style="color:red;text-decoration:none">{{ text_click_answer }}</a>
+          {% else %}
+          <td class="center"><a id="{{ proQues.id }}" class="answerForQuestion btn btn-default" style="color:green;text-decoration:none">{{ text_view_anwser }}</a>
+          {% endif %}
+          <div class="focusField" id="questions_{{ proQues.id }}" style="display:none">
+          <div>
+          <label>{{ text_question }}</label><br>
+          <label>{{ proQues.product_question }}</label><br>
+          <label>{{ text_your_answer }}</label><br>
+          <input type="hidden" name="hiddenproduct" value="{{ proQues.id }}" class="hiddenproductid_{{ proQues.id }}">
+          {% if proQues.product_answer != "" %}
+          <textarea name="solutionForQuestion" id="solutionForQuestion_{{ proQues.id }}" class="form-control" cols="40" rows="5">{{ proQues.product_answer }}</textarea><br>
+          {% else %}
+          <textarea name="solutionForQuestion" id="solutionForQuestion_{{ proQues.id }}" class="form-control" cols="40" rows="5"></textarea><br>
+          {% endif %}
+
+          {#<br><a class="button" id="solutionForQuestionSubmit_{{ proQues.id }}" data="{{ proQues.id }}" display="none">{{ text_answer }}</a><br>#}
+          <span class="errorQuestion" style="display:none;color:red"></span>
+          <span class="AnsweredSuccess" style="display:none;rgb(5, 197, 74);"></span>
+          </div>
+
+          </div></td>
+          <td class="text-left">{% if proQues.product_status == '1' %} {{ text_enabled }} {% else %} {{ text_disabled }}{% endif %}</td>
+          <td class="text-center">{{ proQues.question_asked_date }}</td>
+          <td class="text-center">{{ proQues.question_answred_date }}</td>
+          <td class="text-right"><a id="questionDelete_{{ proQues.id }}" class="questionDelete btn btn-danger" title="{{ text_delete }}"><i class="fa fa-trash-o"></i></a></td>
+          </tr>
+             {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <div class="row">
+          <div class="col-sm-6 text-left">{{ pagination }}</div>
+          <div class="col-sm-6 text-right">{{ results }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript"><!--
+$('#button-filter').on('click', function() {
+  var url = 'index.php?route=catalog/askquestion&user_token={{ user_token }}';
+
+  var filter_name = $('input[name=\'filter_name\']').val();
+
+  if (filter_name) {
+    url += '&filter_name=' + encodeURIComponent(filter_name);
+  }
+
+  var filter_model = $('input[name=\'filter_model\']').val();
+
+  if (filter_model) {
+    url += '&filter_model=' + encodeURIComponent(filter_model);
+  }
+
+  var filter_customer_name = $('input[name=\'filter_customer_name\']').val();
+
+  if (filter_customer_name) {
+    url += '&filter_customer_name=' + encodeURIComponent(filter_customer_name);
+  }
+
+  var filter_question = $('input[name=\'filter_question\']').val();
+
+  if (filter_question) {
+    url += '&filter_question=' + encodeURIComponent(filter_question);
+  }
+
+  var filter_status = $('select[name=\'filter_status\']').val();
+
+  if (filter_status != '*') {
+    url += '&filter_status=' + encodeURIComponent(filter_status);
+  }
+
+  location = url;
+})
+//--></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('.answerForQuestion').click(function() {
+    var getProductId=$(this).attr('id');
+    $('.errorQuestion').hide();
+    $('.AnsweredSuccess').hide();
+    layer.open({
+        type: 1,
+        title: "答复问题",
+        skin: 'quick-product-name-edit-modal',
+        shadeClose: false,
+        btn: ['确定', '取消'],
+        content: $('#questions_' + getProductId).html(),
+        yes: function (index, layero) {
+          var InsertGetProductId = getProductId;
+          var InsertAnswer = $('.quick-product-name-edit-modal textarea').val();
+
+          if( InsertAnswer == "" ) {
+            $('.errorQuestion').animate({opacity:"show"}, "slow").html('Please provide answer');
+          } else {
+            $.ajax({
+              type:'get',
+              url:'index.php?route=catalog/askquestion/insertAnswerForQues&{{ sessionAjax }}',
+              data:"productidForQus=" + InsertGetProductId + "&InsertanswerForQus=" + InsertAnswer,
+              beforeSend:function() {},
+              complete: function() {},
+              success:function(result) {
+                $('.errorQuestion').animate({opacity:"hide"}, "slow");
+                $('.AnsweredSuccess').animate({opacity:"show"}, "slow").html("<span style=\"color:red;\">" + result + "</span>");
+                $('.errorQuestion').parent().parent().animate({opacity:"hide"}, 1500);
+                location.reload(true);
+              }
+            });
+          }
+        }
+    });
+  });
+
+  $('.questionStatus').click(function() {
+    var quesStatusId=$(this).attr('id');
+    var splitProductId=quesStatusId.split('_');
+    var sendData="productId="+splitProductId[1];
+    $.ajax({
+      type:'get',
+      url:'index.php?route=catalog/askquestion/changeQuesStatus&{{ sessionAjax }}',
+      data:sendData,
+      beforeSend:function() {},
+      complete: function() {},
+      success:function(result) {
+        if( result == 'Enabled' ) {
+          $("#questionStatus_" + splitProductId[1]).animate({opacity:"hide"}, "slow").html('Enabled');
+          $("#questionStatus_" + splitProductId[1]).animate({opacity:"show"}, "slow").html('Enabled');
+
+        } else if( result == 'Disabled' ) {
+          $("#questionStatus_" + splitProductId[1]).animate({opacity:"hide"}, "slow").html('Disabled');
+          $("#questionStatus_" + splitProductId[1]).animate({opacity:"show"}, "slow").html('Disabled');
+        }
+      }
+    });
+  });
+
+  $('.questionDelete').click(function() {
+    var quesDeleteId = $(this).attr('id');
+    var splitQuesId = quesDeleteId.split('_');
+    var sendData = "quesId=" + splitQuesId[1];
+    $.ajax({
+      type:'get',
+      url:'index.php?route=catalog/askquestion/changeQuesDelete&{{ sessionAjax }}',
+      data:sendData,
+      beforeSend:function(){},
+      complete: function() {},
+      success:function(result){
+        $("#totalUserQues_" + splitQuesId[1]).animate({opacity:"hide"}, "slow");
+      }
+    });
+  });
+});
+</script>
+<?php echo $footer; ?>

@@ -1,0 +1,10 @@
+<div class="widget icon-links">
+  {% for icon in icons %}
+    <div class="icon-link-group">
+      <a href="{{ icon.href }}">
+        <img data-src="{{ icon.image }}" src="{{ placeholder }}" class="lazy img-responsive">
+        <h3>{{ icon.title }}</h3>
+      </a>
+    </div>
+  {% endfor %}
+</div>

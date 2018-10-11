@@ -1,0 +1,163 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-06-21 12:15:29
+// @modified         2018-07-06 14:18:45
+//
+
+body {
+	background-color: #f2f3f7;
+
+	&.active:before {
+		opacity: 1;
+		z-index: 999;
+	}
+
+	&:before {
+		content: '';
+    background: rgba(41, 45, 53, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    z-index: -1;
+    transition: .3s opacity;
+	}
+
+	#content {
+	  padding-top: 90px;
+
+		@media (min-width: 768px) {
+		  padding-left: 245px;
+		}
+	}
+}
+
+.nav-top {
+	height: 60px;
+	margin-bottom: 30px;
+	background-color: #fff;
+	position: fixed;
+	z-index: 999;
+	width: 100%;
+	background-color: #2f323e;
+	@include bg-gradient(90deg, #00b8ff, #1E9FF2);
+	@include box-shadow(0 2px 30px 2px rgba(0,0,0,.1));
+
+	a {
+		color: #fff !important;
+	}
+
+	.top-header {
+		float: left;
+    width: 230px;
+    height: 100%;
+    font-size: 20px;
+    background: #FFF;
+    line-height: 60px;
+    text-align: center;
+
+    @media (max-width: 768px) {
+	    width: auto;
+	    padding: 0 10px;
+	    font-size: 16px;
+    }
+
+		@media (max-width: 500px) {
+			display: none;
+		}
+
+    i {
+    	color: $main_color;
+    	margin-right: 14px;
+    	font-size: 20px;
+
+	    @media (max-width: 768px) {
+		    font-size: 16px;
+	    }
+    }
+	}
+
+	.top-inner {
+		height: 100%;
+		padding: 0 20px;
+
+		@media (max-width: 768px) {
+			margin-left: 0;
+			padding: 0 10px;
+		}
+	}
+
+	.breadcrumb-wrapper {
+		height: 100%;
+		float: left;
+		display: table;
+  	margin-left: 10px;
+
+		.breadcrumb {
+			padding: 0;
+			display: table-cell;
+			vertical-align: middle;
+			background-color: transparent;
+		}
+	}
+
+	ul.links {
+		height: 100%;
+		padding-left: 0;
+		list-style: none;
+		margin-bottom: 0;
+		color: #fff;
+
+		> li {
+			float: left;
+			padding: 0 15px;
+			line-height: 60px;
+
+			@media (max-width: 768px) {
+				padding: 0 8px;
+			}
+
+			.avatar {
+				span {
+					margin-right: 10px;
+					font-weight: bold;
+					font-size: 16px;
+				}
+
+				img {
+					border-radius: 50%;
+				}
+			}
+
+			&.btn-nav {
+				.btn {
+					outline: none;
+			    text-decoration: none;
+					color: #fff;
+					border-radius: 3px;
+
+					&:active i {
+						color: #000;
+					}
+
+					&:hover {
+						color: $main_color;
+						background-color: #fff;
+					}
+				}
+			}
+		}
+	}
+}
+
+div.required .control-label:not(span):before, td.required:before {
+  content: '* ';
+  color: #F00;
+  font-weight: bold;
+}

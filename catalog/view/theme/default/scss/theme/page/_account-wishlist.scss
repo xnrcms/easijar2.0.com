@@ -1,0 +1,25 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-01-29 17:04:32
+// @modified         2018-01-29 17:07:14
+//
+
+.account-wishlist {
+	.fa-shopping-cart, .fa-times {
+		width: 12px;
+	}
+
+	@media (min-width:768px) and (max-width:1200px) {
+		.table-hover {
+			tr {
+				.btn + .btn {
+					margin-top: 5px;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,248 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-sms"  class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+            <li><a href="#tab-option" data-toggle="tab">{{ tab_option }}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-owner">{{ entry_plant }}</label>
+                <div class="col-sm-10">
+                  <label class="radio-inline">
+                    <input type="radio" name="module_sms_plant" value="yunpian" {{ module_sms_plant == 'yunpian' ? 'checked="true"' : '' }}  />{{ ' yunpian'|upper }}
+                  </label>
+                  <label class="radio-inline">
+                   <input type="radio" name="module_sms_plant" value="c123" {{ module_sms_plant == 'c123' ? 'checked="true"' : '' }}  />{{ ' c123'|upper }} 
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="module_sms_plant" value="ihuyi" {{ module_sms_plant == 'ihuyi' ? 'checked="true"' : '' }}  />{{ ' ihuyi'|upper }}
+                  </label>
+                  {% if error_plant %}
+                  <div class="text-danger">{{ error_plant }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group required yunpian c123">
+                <label class="col-sm-2 control-label" for="input-sign">{{ entry_sign }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                    <div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/></span> <input type="text" name="module_sms_sign[{{ language.language_id }}]" value="{{ module_sms_sign[language.language_id] ? module_sms_sign[language.language_id] }}" placeholder="{{ entry_sign }}" class="form-control"/>
+                    </div>
+                    {% if error_sign[language.language_id] %}
+                      <div class="text-danger">{{ error_sign[language.language_id] }}</div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="form-group c123">
+                <label class="col-sm-2 control-label" for="input-ac">{{ entry_c123_ac }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_c123_ac" value="{{ module_sms_c123_ac }}" placeholder="{{ entry_c123_ac }}" id="input-ac" class="form-control" />
+                  {% if error_c123_ac %}
+                  <div class="text-danger">{{ error_c123_ac }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group c123">
+                <label class="col-sm-2 control-label" for="input-authkey">{{ entry_c123_authkey }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_c123_authkey" value="{{ module_sms_c123_authkey }}" placeholder="{{ entry_c123_authkey }}" id="input-authkey" class="form-control" />
+                  {% if error_c123_authkey %}
+                  <div class="text-danger">{{ error_c123_authkey }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group c123">
+                <label class="col-sm-2 control-label" for="input-cgid">{{ entry_c123_cgid }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_c123_cgid" value="{{ module_sms_c123_cgid }}" placeholder="{{ entry_c123_cgid }}" id="input-cgid" class="form-control" />
+                  {% if error_c123_cgid %}
+                  <div class="text-danger">{{ error_c123_cgid }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group c123">
+                <label class="col-sm-2 control-label" for="input-csid">{{ entry_c123_csid }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_c123_csid" value="{{ module_sms_c123_csid }}" placeholder="{{ entry_c123_csid }}" id="input-csid" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group yunpian">
+                <label class="col-sm-2 control-label" for="input-apikey">{{ entry_yunpian_apikey }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_yunpian_apikey" value="{{ module_sms_yunpian_apikey }}" placeholder="{{ entry_yunpian_apikey }}" id="input-apikey" class="form-control" />
+                  {% if error_yunpian_apikey %}
+                  <div class="text-danger">{{ error_yunpian_apikey }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group ihuyi">
+                <label class="col-sm-2 control-label" for="input-account">{{ entry_ihuyi_account }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_ihuyi_account" value="{{ module_sms_ihuyi_account }}" placeholder="{{ entry_ihuyi_account }}" id="input-account" class="form-control" />
+                  {% if error_ihuyi_account %}
+                  <div class="text-danger">{{ error_ihuyi_account }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group ihuyi">
+                <label class="col-sm-2 control-label" for="input-password">{{ entry_ihuyi_password }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_sms_ihuyi_password" value="{{ module_sms_ihuyi_password }}" placeholder="{{ entry_ihuyi_password }}" id="input-password" class="form-control" />
+                  {% if error_ihuyi_password %}
+                  <div class="text-danger">{{ error_ihuyi_password }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group c123 ihuyi yunpian">
+                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                <div class="col-sm-10">
+                  <select name="module_sms_status" id="input-status" class="form-control">
+                    {% if module_sms_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+              <p><b>{{ text_help }}</b></p>
+            </div>
+            <div class="tab-pane" id="tab-option">
+              <ul class="nav nav-tabs" id="language">
+                {% for language in languages %}
+                  <li><a href="#language{{ language.language_id }}" data-toggle="tab"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/> {{ language.name }}</a></li>
+                {% endfor %}
+              </ul>
+              <div class="tab-content">
+                {% for language in languages %}
+                <div class="tab-pane" id="language{{ language.language_id }}">
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-customer_approve_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_customer_approve_message|escape('html') }}">{{ entry_customer_approve_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_customer_approve_message[{{ language.language_id }}]" placeholder="{{ entry_customer_approve_message }}" id="input-customer_approve_message{{ language.language_id }}" class="form-control">{{ module_sms_customer_approve_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-customer_register_verify_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_customer_register_verify_message|escape('html') }}">{{ entry_customer_register_verify_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_customer_register_verify_message[{{ language.language_id }}]" placeholder="{{ entry_customer_register_verify_message }}" id="input-customer_register_verify_message{{ language.language_id }}" class="form-control">{{ module_sms_customer_register_verify_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-customer_add_transaction_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_customer_add_transaction_message|escape('html') }}">{{ entry_customer_add_transaction_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_customer_add_transaction_message[{{ language.language_id }}]" placeholder="{{ entry_customer_add_transaction_message }}" id="input-customer_add_transaction_message{{ language.language_id }}" class="form-control">{{ module_sms_customer_add_transaction_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-customer_add_reward_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_customer_add_reward_message|escape('html') }}">{{ entry_customer_add_reward_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_customer_add_reward_message[{{ language.language_id }}]" placeholder="{{ entry_customer_add_reward_message }}" id="input-customer_add_reward_message{{ language.language_id }}" class="form-control">{{ module_sms_customer_add_reward_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-return_update_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_return_update_message|escape('html') }}">{{ entry_return_update_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_return_update_message[{{ language.language_id }}]" placeholder="{{ entry_return_update_message }}" id="input-return_update_message{{ language.language_id }}" class="form-control">{{ module_sms_return_update_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-customer_register_login_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_customer_register_login_message|escape('html') }}">{{ entry_customer_register_login_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_customer_register_login_message[{{ language.language_id }}]" placeholder="{{ entry_customer_register_login_message }}" id="input-customer_register_login_message{{ language.language_id }}" class="form-control">{{ module_sms_customer_register_login_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-customer_register_approval_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_customer_register_approval_message|escape('html') }}">{{ entry_customer_register_approval_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_customer_register_approval_message[{{ language.language_id }}]" placeholder="{{ entry_customer_register_approval_message }}" id="input-customer_register_approval_message{{ language.language_id }}" class="form-control">{{ module_sms_customer_register_approval_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-order_effect_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_order_effect_message|escape('html') }}">{{ entry_order_effect_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_order_effect_message[{{ language.language_id }}]" placeholder="{{ entry_order_effect_message }}" id="input-order_effect_message{{ language.language_id }}" class="form-control">{{ module_sms_order_effect_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-order_update_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_order_update_message|escape('html') }}">{{ entry_order_update_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_order_update_message[{{ language.language_id }}]" placeholder="{{ entry_order_update_message }}" id="input-order_update_message{{ language.language_id }}" class="form-control">{{ module_sms_order_update_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-find_back_password{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_find_back_password|escape('html') }}">{{ entry_find_back_password }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_find_back_password[{{ language.language_id }}]" placeholder="{{ entry_find_back_password }}" id="input-find_back_password{{ language.language_id }}" class="form-control">{{ module_sms_find_back_password[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-order_paid_notify_admin_message{{ language.language_id }}"><span data-toggle="tooltip" data-html="true" title="{{ help_order_paid_notify_admin_message|escape('html') }}">{{ entry_order_paid_notify_admin_message }}</span></label>
+                    <div class="col-sm-10">
+                      <textarea type="text" name="module_sms_order_paid_notify_admin_message[{{ language.language_id }}]" placeholder="{{ entry_order_paid_notify_admin_message }}" id="input-order_paid_notify_admin_message{{ language.language_id }}" class="form-control">{{ module_sms_order_paid_notify_admin_message[language.language_id] }}</textarea>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<script type="text/javascript"><!--
+{% for language in languages %}
+$('#input-sign{{ language.language_id }}').summernote({height: 300});
+{% endfor %}
+//--></script>
+<script type="text/javascript"><!--
+function swichInput() {
+  if ($("input[name='module_sms_plant']:checked").val() == 'yunpian') {
+    $(".c123").hide();
+    $(".ihuyi").hide();
+    $(".yunpian").show();
+  } else if ($("input[name='module_sms_plant']:checked").val() == 'ihuyi') {
+    $(".c123").hide();
+    $(".yunpian").hide();
+    $(".ihuyi").show();
+  } else if ($("input[name='module_sms_plant']:checked").val() == 'c123') {
+    $(".ihuyi").hide();
+    $(".yunpian").hide();
+    $(".c123").show();
+  }
+}
+$("input[name='module_sms_plant']").on('click', swichInput)
+swichInput();
+$('#language a:first').tab('show');
+//--></script></div>
+{{ footer }}

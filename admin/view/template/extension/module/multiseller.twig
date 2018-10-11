@@ -1,0 +1,167 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-seller-group">{{ entry_seller_group }}</label>
+            <div class="col-sm-10">
+              <select name="module_multiseller_seller_group" id="input-seller-group" class="form-control">
+                {% for seller_group in seller_groups %}
+                  {% if seller_group.seller_group_id == module_multiseller_seller_group %}
+                    <option value="{{ seller_group.seller_group_id }}" selected="selected">{{ seller_group.name }}</option>
+                  {% else %}
+                    <option value="{{ seller_group.seller_group_id }}">{{ seller_group.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-product-validation">{{ entry_product_validation }}</label>
+            <div class="col-sm-10">
+              <select name="module_multiseller_product_validation" id="input-product-validation" class="form-control">
+                {% if module_multiseller_product_validation %}
+                  <option value="1" selected="selected">{{ text_yes }}</option>
+                  <option value="0">{{ text_no }}</option>
+                {% else %}
+                  <option value="1">{{ text_yes }}</option>
+                  <option value="0" selected="selected">{{ text_no }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-seller-approval">{{ entry_seller_approval }}</label>
+            <div class="col-sm-10">
+              <select name="module_multiseller_seller_approval" id="input-seller-approval" class="form-control">
+                {% if module_multiseller_seller_approval %}
+                  <option value="1" selected="selected">{{ text_yes }}</option>
+                  <option value="0">{{ text_no }}</option>
+                {% else %}
+                  <option value="1">{{ text_yes }}</option>
+                  <option value="0" selected="selected">{{ text_no }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-seller-shipping"><span data-toggle="tooltip" title="{{ help_seller_shipping }}">{{ entry_seller_shipping }}</label>
+            <div class="col-sm-10">
+              <label class="radio-inline">
+                <input type="radio" name="module_multiseller_seller_shipping" value="1" {% if module_multiseller_seller_shipping == 1 %}checked="checked"{% endif %}>
+                {{ text_yes }}
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="module_multiseller_seller_shipping" value="0" {% if module_multiseller_seller_shipping == false %}checked="checked"{% endif %}>
+                {{ text_no }}
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="module_multiseller_seller_shipping" value="2" {% if module_multiseller_seller_shipping == 2 %}checked="checked"{% endif %}>
+                {{ text_seller_select }}
+              </label>
+            </div>
+          </div>
+            <div class="form-group">
+              <label class="col-md-2 control-label" for="input-category"><span data-toggle="tooltip" title="{{ help_seller_categories }}">{{ entry_seller_categories }}</span></label>
+              <div class="col-md-10">
+                <div class="input-group">
+                  <div class="input-group-addon"><i class="fa fa-search" aria-hidden="true"></i></div>
+                  <input type="text" name="category" value="" placeholder="{{ entry_seller_categories }}" id="input-category" class="form-control"/>
+                </div>
+                <div id="seller-category" class="well well-sm" style="min-height: 150px; max-height: 150px; overflow: auto;">
+                  {% for seller_category in module_multiseller_seller_categories %}
+                    <div id="seller-category{{ seller_category.category_id }}"><i class="fa fa-minus-circle"></i> {{ seller_category.name }}
+                      <input type="hidden" name="module_multiseller_seller_categories[]" value="{{ seller_category.category_id }}"/>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-seller"><span data-toggle="tooltip" title="{{ help_seller }}">{{ entry_seller }}</span></label>
+            <div class="col-sm-10">
+              <select name="module_multiseller_seller_id" id="input-seller" class="form-control">
+                <option value="0">{{ text_none }}</option>
+                {% for information in informations %}
+                  {% if information.information_id == module_multiseller_seller_id %}
+                    <option value="{{ information.information_id }}" selected="selected">{{ information.title }}</option>
+                  {% else %}
+                    <option value="{{ information.information_id }}">{{ information.title }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="module_multiseller_status" id="input-status" class="form-control">
+                {% if module_multiseller_status %}
+                  <option value="1" selected="selected">{{ text_enabled }}</option>
+                  <option value="0">{{ text_disabled }}</option>
+                {% else %}
+                  <option value="1">{{ text_enabled }}</option>
+                  <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+// Category
+$('input[name=\'category\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['category_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'category\']').val('');
+
+		$('#seller-category' + item['value']).remove();
+
+		$('#seller-category').append('<div id="seller-category' + item['value'] + '" class="ui-sortable-handle"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="module_multiseller_seller_categories[]" value="' + item['value'] + '" /></div>');
+	}
+});
+
+$('#seller-category').delegate('.fa-minus-circle', 'click', function() {
+	$(this).parent().remove();
+});
+--></script>
+{{ footer }}

@@ -1,0 +1,85 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+  {% endif %}
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <div class="row">
+        {% if avatar and helper.config('module_avatar_status') %}
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="link-group-wrapper default-border default-border-old account-height">
+            <h3 class="title"><i class="fa fa-user"></i>{{ text_account }}</h3>
+            <div class="col-sm-4 col-xs-4 pt-1 pb-1">
+              <div class="avatar-section">
+                <div class="avatar-wrapper">
+                  <img id="avatar" src="{{ helper.image_resize(avatar) }}" class="img-circle">
+                  <a href="#" id="button-avatar">{{ button_avatar }}</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-8 col-xs-8 pt-1 pb-1">
+              <div class="account-information">
+                <p><i class="fa fa-user"></i> {{ helper.customer().getFullName() ?: text_no_name }}</p>
+                <p><i class="fa fa-phone"></i> {{ helper.customer().getTelephone() ?: text_no_telephone }}</p>
+                <p><i class="fa fa-envelope"></i> {{ helper.customer().getEmail() ?: text_no_email }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="link-group-wrapper default-border default-border-old account-height">
+            <h3 class="title"><i class="fa fa-user"></i>{{ text_my_account }}</h3>
+            <ul class="list-unstyled">
+              <li><a href="{{ edit }}">{{ text_edit }}</a></li>
+              <li><a href="{{ password }}">{{ text_password }}</a></li>
+              <li><a href="{{ address }}">{{ text_address }}</a></li>
+              <li><a href="{{ wishlist }}">{{ text_wishlist }}</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      {% if credit_cards %}
+      <div class="link-group-wrapper default-border default-border-old">
+        <h3 class="title"><i class="fa fa-file-text" aria-hidden="true"></i>{{ text_credit_card }}</h3>
+        <ul class="list-unstyled">
+          {% for credit_card in credit_cards %}
+          <li><a href="{{ credit_card.href }}">{{ credit_card.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <div class="account-grid-wrapper mt-2">
+        {% set icon_path = helper.url().fullPathLink('catalog/view/theme/default/image/account') %}
+        <div class="row">
+          <div class="col-sm-3"><a href="{{ order }}"><span><img src="{{ icon_path }}/order.png"></span><em>{{ text_order }}</em></a></div>
+          <div class="col-sm-3"><a href="{{ download }}"><span><img src="{{ icon_path }}/download.png"></span><em>{{ text_download }}</em></a></div>
+          {% if reward %}
+          <div class="col-sm-3"><a href="{{ reward }}"><span><img src="{{ icon_path }}/reward.png"></span><em>{{ text_reward }}</em></a></div>
+          {% endif %}
+          <div class="col-sm-3"><a href="{{ return }}"><span><img src="{{ icon_path }}/return.png"></span><em>{{ text_return }}</em></a></div>
+          <div class="col-sm-3"><a href="{{ transaction }}"><span><img src="{{ icon_path }}/transaction.png"></span><em>{{ text_transaction }}</em></a></div>
+          <div class="col-sm-3"><a href="{{ coupons }}"><span><img src="{{ icon_path }}/coupons.png"></span><em>{{ text_coupons }}</em></a></div>
+          {% if not tracking %}
+          <div class="col-sm-3"><a href="{{ affiliate }}"><span><img src="{{ icon_path }}/affiliate.png"></span><em>{{ text_affiliate_add }}</em></a></div>
+          {% else %}
+          <div class="col-sm-3"><a href="{{ affiliate }}"><span><img src="{{ icon_path }}/affiliate.png"></span><em>{{ text_affiliate_edit }}</em></a></div>
+          <div class="col-sm-3"><a href="{{ tracking }}"><span><img src="{{ icon_path }}/tracking.png"></span><em>{{ text_tracking }}</em></a></div>
+          {% endif %}
+          <div class="col-sm-3"><a href="{{ newsletter }}"><span><img src="{{ icon_path }}/newsletter.png"></span><em>{{ text_newsletter }}</em></a></div>
+        </div>
+      </div>
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+{{ avatar_upload }}
+{{ footer }}

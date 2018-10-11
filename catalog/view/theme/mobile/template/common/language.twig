@@ -1,0 +1,42 @@
+{% if languages|length > 1 %}
+  {% for language in languages %}
+  {% if language.code == helper.current_language_code() %}
+  <a href="#" id="switch-language">
+    <img src="catalog/language/{{ language.code }}/{{ language.code }}.png" alt="{{ language.name }}" title="{{ language.name }}">
+    {{ language.name }}
+  </a>
+  {% endif %}
+  {% endfor %}
+
+  <script type="text/javascript">
+  $('#switch-language').click(function (e) {
+    e.preventDefault();
+    layer.open({
+      type: 1,
+      title: '{{ text_language }}',
+      closeBtn: 1,
+      anim: 2,
+      shadeClose: true,
+      scrollbar: false,
+      area: ['80%'],
+      content: language_modal_content()
+    });
+  });
+
+  function language_modal_content() {
+    var html = '';
+    html += '<div class="p-2">';
+    html += '<form action="{{ action }}" method="post" enctype="multipart/form-data" id="language">';
+    html += '<input type="hidden" name="code" value="" />';
+    html += '<input type="hidden" name="redirect" value="{{ redirect }}" />';
+    html += '<div class="list-group mb-0">';
+    {% for language in languages %}
+    html += '<a href="{{ language.code }}" class="list-group-item"><img src="catalog/language/{{ language.code }}/{{ language.code }}.png"/> {{ language.name }}</a>';
+    {% endfor %}
+    html += '</div>';
+    html += '</form>';
+    html += '</div>';
+    return html;
+  }
+  </script>
+{% endif %}

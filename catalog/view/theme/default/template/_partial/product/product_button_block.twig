@@ -1,0 +1,19 @@
+<div class="button-group product-button-wrapper">
+  <button type="button" class="btn btn-default" data-toggle="tooltip" title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');">
+    <i class="fa fa-heart"></i>
+  </button>
+  {% if product.quantity > 0 %}
+  <button type="button" class="btn btn-default cart" data-loading-text="{{ text_loading }}" onclick="cart.add('{{ product.product_id }}', '{{ product.minimum }}');">
+    <i class="fa fa-shopping-cart"></i> <span class="hidden-xs hidden-sm hidden-md">{{ button_cart }}</span>
+  </button>
+  {% else %}
+    <button type="button" class="btn btn-default cart" disabled>
+    <i class="fa fa-shopping-cart"></i> <span class="hidden-xs hidden-sm hidden-md">{{ text_out_of_stock }}</span>
+  </button>
+  {% endif %}
+  <!-- 
+  <button type="button" class="btn btn-default" data-toggle="tooltip" title="{{ button_compare }}" onclick="compare.add('{{ product.product_id }}');">
+    <i class="fa fa-exchange"></i>
+  </button>
+  -->
+</div>

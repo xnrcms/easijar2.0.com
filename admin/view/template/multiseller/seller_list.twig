@@ -1,0 +1,269 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="button" data-toggle="tooltip" title="{{ button_filter }}" onclick="$('#filter-seller').toggleClass('hidden-sm hidden-xs');" class="btn btn-default hidden-md hidden-lg"><i class="fa fa-filter"></i></button>
+        <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+        <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-seller').submit() : false;"><i class="fa fa-trash-o"></i></button>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">{% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+    <div class="row">
+      <div id="filter-seller" class="col-md-3 col-md-push-9 col-sm-12 hidden-sm hidden-xs">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="control-label" for="input-name">{{ entry_name }}</label> <input type="text" name="filter_name" value="{{ filter_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-store-name">{{ entry_store_name }}</label> <input type="text" name="filter_store_name" value="{{ filter_store_name }}" placeholder="{{ entry_store_name }}" id="input-store-name" class="form-control"/>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-company">{{ entry_company }}</label> <input type="text" name="filter_company" value="{{ filter_company }}" placeholder="{{ entry_company }}" id="input-company" class="form-control"/>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-seller-group">{{ entry_seller_group }}</label> <select name="filter_seller_group_id" id="input-seller-group" class="form-control">
+                <option value=""></option>
+                {% for seller_group in seller_groups %}
+                  {% if seller_group.seller_group_id == filter_seller_group_id %}
+                    <option value="{{ seller_group.seller_group_id }}" selected="selected">{{ seller_group.name }}</option>
+                  {% else %}
+                    <option value="{{ seller_group.seller_group_id }}">{{ seller_group.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-status">{{ entry_status }}</label> <select name="filter_status" id="input-status" class="form-control">
+                <option value=""></option>
+                {% if filter_status == '1' %}
+                  <option value="1" selected="selected">{{ text_enabled }}</option>
+                {% else %}
+                  <option value="1">{{ text_enabled }}</option>
+                {% endif %}
+                {% if filter_status == '0' %}
+                  <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% else %}
+                  <option value="0">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-date-added">{{ entry_date_added }}</label>
+              <div class="input-group date">
+                <input type="text" name="filter_date_added" value="{{ filter_date_added }}" placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD" id="input-date-added" class="form-control"/>
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group text-right">
+              <button type="button" id="button-filter" class="btn btn-default"><i class="fa fa-filter"></i> {{ button_filter }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9 col-md-pull-3 col-sm-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+          </div>
+          <div class="panel-body">
+            <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-seller">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').trigger('click');"/></td>
+                      <td class="text-left">{% if sort == 'name' %}<a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>{% else %}<a href="{{ sort_name }}">{{ column_name }}</a>{% endif %}</td>
+                      <td class="text-left">{% if sort == 'store_name' %}<a href="{{ sort_store_name }}" class="{{ order|lower }}">{{ column_store_name }}</a>{% else %}<a href="{{ sort_store_name }}">{{ column_store_name }}</a>{% endif %}</td>
+                      <td class="text-left">{% if sort == 'company' %}<a href="{{ sort_company }}" class="{{ order|lower }}">{{ column_company }}</a>{% else %}<a href="{{ sort_company }}">{{ column_company }}</a>{% endif %}</td>
+                      <td class="text-left">{% if sort == 'seller_group' %}<a href="{{ sort_seller_group }}" class="{{ order|lower }}">{{ column_seller_group }}</a> {% else %} <a href="{{ sort_seller_group }}">{{ column_seller_group }}</a>{% endif %}</td>
+                      <td class="text-left">{% if sort == 'c.status' %}<a href="{{ sort_status }}" class="{{ order|lower }}">{{ column_status }}</a>{% else %}<a href="{{ sort_status }}">{{ column_status }}</a>{% endif %}</td>
+                      <td class="text-left">{% if sort == 'c.date_added' %}<a href="{{ sort_date_added }}" class="{{ order|lower }}">{{ column_date_added }}</a>{% else %}<a href="{{ sort_date_added }}">{{ column_date_added }}</a>{% endif %}</td>
+                      <td class="text-right">{{ column_action }}</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% if sellers %}
+                      {% for seller in sellers %}
+                        <tr>
+                          <td class="text-center">{% if seller.seller_id in selected %}
+                              <input type="checkbox" name="selected[]" value="{{ seller.seller_id }}" checked="checked"/>
+                            {% else %}
+                              <input type="checkbox" name="selected[]" value="{{ seller.seller_id }}"/>
+                            {% endif %} </td>
+                          <td class="text-left"><a href="{{ seller.customer_href }}">{{ seller.name }}</a></td>
+                          <td class="text-left">{{ seller.store_name }}</td>
+                          <td class="text-left">{{ seller.company }}</td>
+                          <td class="text-left">{{ seller.seller_group }}</td>
+                          <td class="text-left">{{ seller.status }}</td>
+                          <td class="text-left">{{ seller.date_added }}</td>
+                          <td class="text-right">
+                            <div class="btn-group" style="min-width: 65px;"><a href="{{ seller.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+                              <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="caret"></span></button>
+                              <ul class="dropdown-menu dropdown-menu-right">
+                                <li class="dropdown-header">{{ text_option }}</li>
+                                <li class="dropdown-header">{{ text_login }}</li>
+                                {% for store in seller.store %}
+                                  <li><a href="{{ store.href }}" target="_blank"><i class="fa fa-lock"></i> {{ store.name }}</a></li>
+                                {% endfor %}
+                              </ul>
+                            </div>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                      <tr>
+                        <td class="text-center" colspan="9">{{ text_no_results }}</td>
+                      </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </form>
+            <div class="row">
+              <div class="col-sm-6 text-left">{{ pagination }}</div>
+              <div class="col-sm-6 text-right">{{ results }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-filter').on('click', function() {
+	url = 'index.php?route=multiseller/seller&user_token={{ user_token }}';
+
+	var filter_name = $('input[name=\'filter_name\']').val();
+
+	if (filter_name) {
+		url += '&filter_name=' + encodeURIComponent(filter_name);
+	}
+
+	var filter_store_name = $('input[name=\'filter_store_name\']').val();
+
+	if (filter_store_name) {
+		url += '&filter_store_name=' + encodeURIComponent(filter_store_name);
+	}
+
+	var filter_company = $('input[name=\'filter_company\']').val();
+
+	if (filter_company) {
+		url += '&filter_company=' + encodeURIComponent(filter_company);
+	}
+
+	var filter_seller_group_id = $('select[name=\'filter_seller_group_id\']').val();
+
+	if (filter_seller_group_id !== '') {
+		url += '&filter_seller_group_id=' + encodeURIComponent(filter_seller_group_id);
+	}
+
+	var filter_status = $('select[name=\'filter_status\']').val();
+
+	if (filter_status !== '') {
+		url += '&filter_status=' + encodeURIComponent(filter_status);
+	}
+
+	var filter_ip = $('input[name=\'filter_ip\']').val();
+
+	if (filter_ip) {
+		url += '&filter_ip=' + encodeURIComponent(filter_ip);
+	}
+
+	var filter_date_added = $('input[name=\'filter_date_added\']').val();
+
+	if (filter_date_added) {
+		url += '&filter_date_added=' + encodeURIComponent(filter_date_added);
+	}
+
+	location = url;
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=multiseller/seller/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['seller_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_name\']').val(item['label']);
+	}
+});
+$('input[name=\'filter_store_name\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=multiseller/seller/autocomplete&user_token={{ user_token }}&filter_store_name=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['store_name'],
+						value: item['seller_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_store_name\']').val(item['label']);
+	}
+});
+$('input[name=\'filter_company\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=multiseller/seller/autocomplete&user_token={{ user_token }}&filter_company=' + encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['company'],
+						value: item['seller_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_company\']').val(item['label']);
+	}
+});
+//--></script>
+<script type="text/javascript"><!--
+$('.date').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+//--></script>
+{{ footer }} 

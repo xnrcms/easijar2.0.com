@@ -1,0 +1,12 @@
+<div class="row widget module-blog-latest">
+  {% if heading_title %}
+    <h2>{{ heading_title }}</h2>
+  {% endif %}
+  <div class="col-xs-12">
+    <ul class="list-unstyled">
+      {% for post in posts %}
+      <li><a href="{{ post.href('show') }}" class="">{{ post.localizedDescription().name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

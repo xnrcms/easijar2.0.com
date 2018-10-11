@@ -1,0 +1,18 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+      <div class="row widget error-widget">
+        <div class="col-xs-12">
+          <p>{{ text_error }}</p>
+        </div>
+      </div>
+      <div class="buttons">
+        <div class="pull-right"><a href="{{ continue }}" class="btn btn-primary">{{ button_continue }}</a></div>
+      </div>
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{{ footer }}

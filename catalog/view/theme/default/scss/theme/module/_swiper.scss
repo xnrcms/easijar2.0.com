@@ -1,0 +1,98 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2017-11-24 11:51:00
+// @modified         2018-02-02 11:31:59
+//
+
+.swiper-viewport {
+  position: relative;
+
+  @media (max-width: 768px) {
+    margin: 0 0 15px;
+  }
+
+  &:hover {
+    .swiper-button-prev, .swiper-button-next {
+      display: block !important;
+    }
+  }
+
+  .swiper-container {
+    direction: ltr !important;
+  }
+
+  .swiper-pager {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    margin-top: -5px;
+
+    .swiper-button-prev, .swiper-button-next {
+      width: 25px;
+      height: 55px;
+      display: none;
+      text-align: center;
+      line-height: 55px;
+      z-index: 2 !important;
+      background-image: none !important;
+      @include transition(all .3s ease-in-out);
+
+      @media (max-width: 768px) {
+        display: none;
+      }
+
+      &:before {
+        content: "";
+        color: #222;
+        font-family: FontAwesome;
+        font-size: 22px;
+      }
+
+      &:hover:before {
+        color: $brand-primary;
+      }
+    }
+
+    .swiper-button-prev {
+      left: 0;
+
+      &:before {
+        content: "\f104";
+      }
+    }
+
+    .swiper-button-next {
+      right: 0;
+
+      &:before {
+        content: "\f105";
+      }
+    }
+  }
+
+  .swiper-pagination {
+    bottom: 0;
+    width: 100%;
+
+    .swiper-pagination-bullet {
+      margin: 0 4px;
+
+      &:hover {
+        background: #333;
+      }
+    }
+    .swiper-pagination-bullet-active {
+      background: $brand-primary;
+    }
+  }
+
+  .swiper-button-next.swiper-button-disabled, .swiper-button-prev.swiper-button-disabled {
+    opacity: 0.5;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+}

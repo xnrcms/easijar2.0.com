@@ -1,0 +1,116 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2018-07-25 10:18:58
+//
+
+@mixin side-auto($left: left, $width: 80%) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  cursor: pointer;
+  z-index: 9999999;
+  background: rgba(0,0,0,.4);
+
+  .side-inner {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: $width;
+    text-align: left;
+    overflow-y: auto;
+    @if $left == left {
+      @include transform(-100%);
+    } @else {
+      @include transform(100%);
+    }
+    background-color: #fff;
+    @include transition(all .3s ease-out);
+
+    &.active {
+      box-shadow: rgba(0,0,0,.1) 0 0 100px 0;
+      @include transform(0);
+    }
+
+    @if $left == left {
+      left: 0;
+    } @else {
+      right: 0;
+    }
+  }
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+
+
+@mixin box-shadow($h, $v, $blur, $color) {
+  -webkit-box-shadow: $h $v $blur $color;
+  -moz-box-shadow: $h $v $blur $color;
+  box-shadow: $h $v $blur $color;
+}
+
+@mixin box-shadow-none() {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+@mixin transition($param) {
+  -webkit-transition: $param;
+  -moz-transition: $param;
+  -o-transition: $param;
+  transition: $param;
+}
+
+@mixin transform($value) {
+  -ms-transform: translateX($value);
+  -webkit-transform: translateX($value);
+  transform: translateX($value);
+}
+
+@mixin transform-s($value) {
+  -ms-transform: $value;
+  -webkit-transform: $value;
+  transform: $value;
+}
+
+@mixin background-linear($color1,$color2,$color3) {
+  background: -webkit-linear-gradient(left, $color1,$color2,$color3);
+  background: -o-linear-gradient(right,$color1,$color2,$color3);
+  background: -moz-linear-gradient(right,$color1,$color2,$color3);
+  background: linear-gradient(to right, $color1,$color2,$color3);
+}
+
+// flex
+@mixin display-flex() {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+}
+
+@mixin align-items($position) {
+  -ms-align-items: $position;
+  align-items: $position;
+}
+
+@mixin bg-gradient($angle,$colorone,$colortwo) { // 背景渐变，兼容IE (固定IE渐变的角度)
+  background: -webkit-linear-gradient($angle,$colorone 0,$colortwo 100%);
+  background: -moz-linear-gradient($angle,$colorone 0,$colortwo 100%);
+  background: -o-linear-gradient($angle,$colorone 0,$colortwo 100%);
+  background: linear-gradient($angle,$colorone 0,$colortwo 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#{$colorone}, endColorstr=#{$colortwo},GradientType=0.9);
+}

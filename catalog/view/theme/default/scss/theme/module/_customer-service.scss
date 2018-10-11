@@ -1,0 +1,96 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-02-02 11:26:40
+// @modified         2018-02-05 15:35:47
+//
+
+.module-customer-service {
+  background-color: #fff;
+
+  @media (max-width: 768px) {
+    margin: 0;
+    padding: 16px 0 0;
+  }
+
+  .item {
+    position: relative;
+    margin-bottom: 26px;
+
+    &:before {
+      content: '';
+      position: absolute;
+
+      @media (min-width: 768px) {
+        top: 20%;
+        right: 0;
+        height: 60%;
+        border-right: 1px solid #e4e4e4;
+      }
+
+      @media (max-width: 768px) {
+        bottom: 0;
+        width: 96%;
+        left: 2%;
+        border-bottom: 1px solid #e4e4e4;
+      }
+    }
+
+    &:last-of-type:before {
+      border: none;
+    }
+
+
+    @media (max-width: 768px) {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+  }
+
+  .icon {
+    float: left;
+    width: 55px;
+
+    @media (max-width: 768px) {
+      margin-right: 7px;
+      width: 40px;
+      height: auto;
+      line-height: 45px;
+    }
+
+    img {
+      display: inline-block;
+    }
+  }
+
+  .text {
+    margin-left: 70px;
+
+    .title {
+      color: #505050;
+      font-size: 15px;
+      text-overflow: ellipsis;
+      font-weight: bold;
+      margin-bottom: 8px;
+      overflow: hidden;
+      white-space: nowrap;
+
+      @media (max-width: 768px) {
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+    }
+
+    .sub-title {
+      color: #999;
+      font-size: 14px;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+      }
+    }
+  }
+}

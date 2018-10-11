@@ -1,0 +1,68 @@
+{{ header }}
+<div class="container">
+  {{ include(helper.template('_partial/breadcrumb')) }}
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+    <div class="nav-bar">{{ text_blog }}</div>
+      <div class="row widget">
+        <div class="col-xs-12">
+          {% set category_description = category.localizedDescription() %}
+          <h1>{{ category_description.name }}</h1>
+          {% if category_description.image or category_description.description %}
+          <div class="description-section">
+            {% if category_description.description %}
+            {% if category_description.image %}
+            <img src="{{ helper.image_resize(category_description.image) }}" alt="{{ category_description.name }}" title="{{ category_description.name }}" class="thumb img-responsive" />
+            {% endif %}
+            <p>{{ category_description.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if posts.count %}
+      <div class="post-section">
+        {% for post in posts %}
+        {% set post_description = post.localizedDescription() %}
+        <div class="row widget">
+          <h2><a href="{{ post.href('show') }}" title="{{ post_description.name }}">{{ post_description.name }}</a></h2>
+          {% if helper.config('blog_post_image_status') and post_description.image and helper.config('blog_post_image_position', 'left') == 'left' %}
+          <div class="col-sm-2">
+            <a href="{{ post.href('show') }}" title="{{ post_description.name }}"><img src="{{ helper.image_resize(post_description.image, helper.config('blog_post_image_width', 100), helper.config('blog_post_image_height', 100)) }}" alt="{{ post_description.name }}" title="{{ post_description.name }}" class="img-responsive" /></a>
+          </div>
+          {% endif %}
+          <div class="col-sm-{{ (helper.config('blog_post_image_status') and post_description.image and helper.config('blog_post_image_position', 'left') == 'left') ? '10' : '12' }}">
+            {% if helper.config('blog_post_image_status') and post_description.image and helper.config('blog_post_image_position', 'left') == 'top' %}
+
+            <p class="info"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> {{ post_description.date_added|date(date_format_short) }} {{ post_description.author ?: helper.config("blog_default_author.#{helper.current_language_id()}") }}&nbsp;
+              {% if post.categories|length %}
+              {% for post_category in post.categories %}
+              <a href="{{ post_category.href('show') }}" title="{{ post_category.localizedDescription().name }}">{{ post_category.localizedDescription().name }}</a>&nbsp;
+              {% endfor %}
+              {% endif %}
+            </p>
+
+            <div class="thumb"><a href="{{ post.href('show') }}"><img src="{{ helper.image_resize(post_description.image, helper.config('blog_post_image_width', 100), helper.config('blog_post_image_height', 100)) }}" alt="{{ post_description.name }}" title="{{ post_description.name }}" class="img-responsive" /></a></div>
+            {% endif %}
+
+
+            {% set description = (post_description.html('description') ?: post_description.html('content')) %}
+            {% set description = description|striptags %}
+            <p>{{ description|length > helper.config('blog_post_description_length') ? description|slice(0, helper.config('blog_post_description_length')) ~ '...' : description  }}</p>
+
+            <a class="btn btn-primary" href="{{ post.href('show') }}" title="{{ post_description.name }}">{{ helper.config("blog_post_read_more.#{helper.current_language_id()}", button_read_more) }}</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {{ include(helper.template('_partial/pagination')) }}
+      {% else %}
+      <p class="empty">{{ text_empty }}</p>
+      <div class="buttons">
+        <div class="pull-right"><a href="{{ continue }}" class="btn btn-primary">{{ button_continue }}</a></div>
+      </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    </div>
+</div>
+{{ footer }}

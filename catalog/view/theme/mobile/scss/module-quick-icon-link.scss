@@ -1,0 +1,32 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2016-11-24 18:03:26
+// @modified         2017-06-06 15:02:04
+//
+
+.quick-icon-link-widget {
+  padding-bottom: $gutter;
+
+  a {
+    display: block;
+    width: 25%;
+    float: left;
+    padding: 8px;
+    text-align: center;
+
+    img {
+      border-radius: 50%;
+      overflow: hidden;
+      display: inline-block;
+      padding: 5px;
+    }
+  }
+  span {
+    display: block;
+    text-align: center;
+  }
+}

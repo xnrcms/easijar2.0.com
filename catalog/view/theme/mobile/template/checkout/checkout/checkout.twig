@@ -1,0 +1,342 @@
+{{ header }}
+<div class="container">
+  {{ include(helper.template('_partial/breadcrumb')) }}
+  <div class="row">
+    <div id="content">{{ content_top }}
+      <div class="col-sm-12">
+        <div class="nav-bar mr-0 ml-0">{{ heading_title }}</div>
+      </div>
+      {% if error_warning %}
+      <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+      {% endif %}
+      <div class="quick-checkout-wrapper">
+        {{ include(helper.template('checkout/checkout/_main_section')) }}
+      </div>
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$.ajaxSetup ({ cache: false });
+
+$(document).on('click', '.show-more', function(event) {
+  $(this).toggleClass('active').siblings('li').toggleClass('block');
+});
+
+// New address
+{% for type in ['shipping', 'payment'] %}
+  $(document).delegate('#{{ type }}-address-section .btn-new-address', 'click', function() {
+    open_address_form_modal(0, '{{ type }}');
+  });
+
+  $(document).delegate('#{{ type }}-address-section .address-action .edit', 'click', function() {
+    var address_id = parseInt($(this).parents('li').data('address-id'));
+    open_address_form_modal(address_id, '{{ type }}');
+  });
+{% endfor %}
+
+function open_address_form_modal(address_id, type) {
+  layer.open({
+    type: 2,
+    title: (address_id < 1 ? '{{ text_address_new }}' : '{{ text_address_edit }}'),
+    shadeClose: false,
+    skin: 'address-form-modal',
+    shade: 0.3,
+    scrollbar: false,
+    area: ['100%', '100%'],
+    content: 'index.php?route=checkout/checkout/address_form&modal=1&type=' + type + '&address_id=' + address_id,
+    end: function(index) {
+      reload_section_html();
+    }
+  });
+}
+
+function change_address_id(type, address_id) {
+  var data = {};
+  data[type + '_address_id'] = address_id;
+
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/update',
+    type: 'post',
+    data: data,
+    dataType: 'json',
+    beforeSend: function() {
+      // TODO
+    },
+    success: function(json) {
+      if (json['redirect']) {
+        location = json['redirect'];
+        return;
+      }
+
+      reload_section_html();
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+    }
+  });
+}
+
+function change_pickup_id(pickup_id, country_id, zone_id) {
+  var data = {};
+  data['pickup_id'] = pickup_id;
+  data['country_id'] = country_id;
+  data['zone_id'] = zone_id;
+
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/update',
+    type: 'post',
+    data: data,
+    dataType: 'json',
+    beforeSend: function() {
+      // TODO
+    },
+    success: function(json) {
+      if (json['redirect']) {
+        location = json['redirect'];
+        return;
+      }
+
+      reload_section_html();
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+    }
+  });
+}
+
+$(document).delegate('#pickup-section select[name="pickup_id"]', 'change', function() {
+  var pickup_id = $(this).val();
+  var country_id = $('#pickup-section select[name="country_id"]').val();
+  var zone_id = $('#pickup-section select[name="zone_id"]').val();
+  change_pickup_id(pickup_id, country_id, zone_id);
+});
+
+function change_is_pickup(is_pickup) {
+  var data = {};
+  data['is_pickup'] = is_pickup;
+
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/update',
+    type: 'post',
+    data: data,
+    dataType: 'json',
+    beforeSend: function() {
+      // TODO
+    },
+    success: function(json) {
+      if (json['redirect']) {
+        location = json['redirect'];
+        return;
+      }
+
+      reload_section_html();
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+    }
+  });
+}
+
+$(document).delegate('#if-pickup-section input[type="radio"]', 'change', function() {
+  var is_pickup = $(this).val();
+  change_is_pickup(is_pickup);
+});
+
+{% if shipping_required %}
+  $(document).delegate('#shipping-address-section ul li .item', 'click', function() {
+    var address_id = $(this).parent().data('address-id');
+    change_address_id('shipping', address_id);
+  });
+{% endif %}
+
+{% if payment_address_required %}
+  $(document).delegate('#payment-address-section ul li .item', 'click', function() {
+    var address_id = $(this).parent().data('address-id');
+    change_address_id('payment', address_id);
+  });
+{% endif %}
+
+// Payment method changed
+$(document).on('change', '#payment-method-section input[type=\'radio\']', function() {
+  save_payment_method();
+});
+
+// Shipping method changed
+$(document).delegate('#shipping-method-section input[type=\'radio\']', 'change', function() {
+  save_shipping_method();
+});
+
+// Comment changed
+$(document).delegate('#comment-section textarea[name=\'comment\']', 'change', function() {
+  save_comment();
+});
+
+// Agreement changed
+$(document).delegate('#agree-section input[name=\'terms\']', 'change', function() {
+  save_agreement();
+});
+
+// Submit button clicked
+$(document).delegate('#button-submit', 'click', function () {
+  submit();
+});
+
+// Payment method & shipping method
+{% set types = (shipping_required ? ['payment', 'shipping'] : ['payment']) %}
+{% for type in types %}
+function save_{{ type }}_method() {
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/update',
+    type: 'post',
+    data: $('#{{ type }}-method-section input[type=\'radio\']:checked'),
+    dataType: 'json',
+    beforeSend: function() {
+      $('.container .alert-danger').remove();
+      $('#{{ type }}-method-section .alert-danger').remove();
+    },
+    success: function(json) {
+      if (json['redirect']) {
+        location = json['redirect'];
+      }
+
+      if (json['error'] && json['error']['warning']) {
+        $('#{{ type }}-method-section').append('<div class="alert alert-danger">' + json['error']['warning'] + '</div>')
+      }
+
+      reload_section_html();
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert(thrownError);
+    }
+  });
+}
+{% endfor %}
+
+function save_comment() {
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/update',
+    type: 'post',
+    data: $('#comment-section textarea[name=\'comment\']'),
+    dataType: 'json',
+    beforeSend: function() {
+      // TODO
+    },
+    success: function(json) {
+      reload_section_html();
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+    }
+  });
+}
+
+function save_agreement() {
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/update',
+    type: 'post',
+    data: {terms: $('#agree-section input[name=\'terms\']').prop('checked') ? 1 : 0},
+    dataType: 'json',
+    beforeSend: function() {
+      $('#agree-section input[name=\'terms\']').prop('disabled', true);
+    },
+    success: function(json) {
+      reload_section_html();
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+    }
+  });
+}
+
+function submit() {
+  var data = {}, loads;
+  {% if not logged %}
+  data['account'] = account_type;
+  {% endif %}
+  $('.quick-checkout-wrapper input[type="hidden"], .quick-checkout-wrapper input[type="text"], .quick-checkout-wrapper input[type="password"], .quick-checkout-wrapper select, .quick-checkout-wrapper input:checked, .quick-checkout-wrapper textarea[name="comment"]').each(function () {
+    data[$(this).attr('name')] = $(this).val();
+  });
+
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/confirm',
+    type: 'post',
+    data: data,
+    dataType: 'json',
+    beforeSend: function() {
+      $('.form-group').removeClass('has-error');
+      $('.alert-danger').remove();
+      $('.text-danger').remove();
+      $('#button-submit').button('loading');
+      loads = layer.load(2, {shade: [0.1,'#fff']});
+    },
+    success: function(json) {
+      if (json['redirect']) {
+        location = json['redirect'];
+        return;
+      }
+
+      if (json['error']) {
+        $('#button-submit').button('reset');
+
+        if (json['error']['pickup']) {
+          $('#pickup-section').append('<div class="alert alert-danger">' + json['error']['pickup'] + '</div>')
+        }
+
+        {% set types = ['payment', 'shipping']%}
+
+        {% for type in types %}
+        if (json['error']['{{ type }}_address']) {
+          $('#{{ type }}-address-section.no-addresses').addClass('border-red');
+          $('html, body').animate({ scrollTop: 0} , 'fast');
+          layer.msg(json['error']['{{ type }}_address']);
+        }
+        {% endfor %}
+
+        {% for type in types %}
+        if (json['error']['{{ type }}_method'] && json['error']['{{ type }}_method']['warning']) {
+          $('html, body').animate({ scrollTop: 0} , 'fast');
+          $('#{{ type }}-method-section').append('<div class="alert alert-danger">' + json['error']['{{ type }}_method']['warning'] + '</div>')
+        }
+        {% endfor %}
+
+        if (json['error']['agree']) {
+          if (json['error']['agree']['terms']) {
+            var control = $('#agree-section [name="terms"]');
+            control.closest('label').addClass('has-error');
+            control.closest('label').after('<div class="text-danger">' + json['error']['agree']['terms'] + '</div>');
+          }
+        }
+      } else {
+        // Order created go to payment connect page
+        location = 'index.php?route=checkout/checkout/connect';
+      }
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert(thrownError);
+      $('#button-submit').button('reset');
+    },
+    complete: function () {
+      layer.close(loads);
+    }
+  });
+}
+
+function reload_section_html() {
+  $.ajax({
+    url: 'index.php?route=checkout/checkout/reload',
+    dataType: 'html',
+    beforeSend: function () {
+      layer.load(2, {shade: [0.1,'#fff']});
+    },
+    success: function(html) {
+      $('.main-section-wrapper').replaceWith(html);
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert(thrownError);
+    },
+    complete: function () {
+      layer.closeAll();
+    }
+  });
+}
+//--></script>
+{{ footer }}

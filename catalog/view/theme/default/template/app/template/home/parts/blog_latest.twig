@@ -1,0 +1,21 @@
+{% if heading_title %}
+<h3 class="blog-widget-title"><span>{{ heading_title }}</span></h3>
+{% endif %}
+<div class="module-blog-latest default-border mb-3">
+  <ul class="list-unstyled">
+    {% for post in posts %}
+    {% set post_description = post.localizedDescription() %}
+    <li>
+      <a class="thumb" href="{{ post.href('show_app') }}" title="{{ post_description.name }}">
+        <img src="{{ helper.image_resize(post_description.image, 400, 300) }}" class="img-responsive">
+      </a>
+      <div class="info">
+        <a href="{{ post.href('show_app') }}" title="{{ post_description.name }}">
+          {{ post_description.name }}
+        </a>
+        <span>{{ text_view_count }} {{ post.viewed|number_format }}</span>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>

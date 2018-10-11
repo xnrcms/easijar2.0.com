@@ -1,0 +1,128 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Sam Chen <sam.chen@opencart.cn>
+// @created          2018-05-18 11:51:26
+// @modified         2018-05-21 14:06:35
+//
+
+#product-variant-app {
+  #tab-variant {
+    .variant-group-section, .variant-list-section, .selected-variant-section {
+      padding: 15px;
+      border: 1px solid #eee;
+      overflow: hidden;
+
+      h4 {
+        font-weight: bold;
+      }
+    }
+
+    .variant-group-section {
+      margin-bottom: 30px;
+
+      .variant-group {
+        float: left;
+        padding: 5px 10px;
+        margin-right: 5px;
+        cursor: pointer;
+        background: #f1f1f1;
+        border-radius: 2px;
+
+        &:hover {
+          background-color: #f1f1f1 - 20;
+        }
+
+        .delete {
+          i {
+            color: #c5c5c5;
+
+            &:hover {
+              color: #333;
+            }
+          }
+        }
+
+        &.new-button {
+          background-color: #1e91cf;
+          color: #fff;
+
+          &:hover {
+            background-color: #1e91cf - 20;
+          }
+        }
+      }
+    }
+  }
+}
+
+.variant-custom-wrapper {
+  > .variant-list {
+    display: block;
+    overflow: hidden;
+    > ul {
+      width: 48%;
+      float: left;
+
+      i {
+        color: #aaa;
+        margin-right: 10px;
+        display: inline-block;
+      }
+
+      > div {
+        height: 385px;
+        overflow-x: auto;
+        border: 1px solid #ddd;
+      }
+
+      li {
+        border: none;
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        &:hover {
+          background: #f4f4f4 !important;
+          cursor: pointer;
+        }
+        &:last-of-type {
+          border-bottom: none;
+        }
+        &.active {
+          color: #04a919;
+          background: #fff;
+          border-color: #eee;
+
+          i:before {
+            content: '\f14a';
+            color: #04a919;
+          }
+        }
+      }
+    }
+
+    > .select-wrapper {
+      width: 48%;
+      float: right;
+
+      .select-box {
+        border: 1px solid #ddd;
+        height: 100%;
+        height: 385px;
+        overflow-x: auto;
+        margin-bottom: 20px;
+
+        li {
+          padding: 2px 15px 6px;
+          border-bottom: 1px solid #eee;
+          &:last-of-type {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+}

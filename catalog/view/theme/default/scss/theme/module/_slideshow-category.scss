@@ -1,0 +1,263 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-02-02 11:26:40
+// @modified         2018-02-05 15:35:47
+//
+
+.slideshow-category {
+	.swiper-pagination {
+		bottom: 11px;
+
+		span {
+			position: relative;
+			width: 10px;
+			height: 10px;
+			background-color: transparent;
+			border: 2px solid rgba(255,255,255,.6);
+			opacity: 1;
+
+			&.swiper-pagination-bullet-active, &:hover {
+				margin: 0 6px !important;
+				background-color: #fff !important;
+
+				&:before {
+					content: '';
+					position: absolute;
+					top: -6px;
+					left: -6px;
+					z-index: -1;
+					width: 18px;
+					height: 18px;
+					border-radius: 50%;
+					background-color: rgba(255,255,255,0.4);
+				}
+			}
+		}
+	}
+
+	.container {
+		position: relative;
+	}
+
+	.category-wrapper {
+		height: 100%;
+		position: absolute;
+		left: 10px;
+		top: 0;
+		width: 240px;
+		z-index: 99;
+    background-color: rgba(0,0,0,0.6);
+
+    @media (max-width: 1200px) {
+    	display: none;
+    }
+
+    > ul {
+			overflow-y: auto;
+			height: 100%;
+    	padding-left: 0;
+    	list-style: none;
+    	&::-webkit-scrollbar {
+    	  width: 5px;
+    	  height: 5px;
+    	}
+
+    	&::-webkit-scrollbar-track {
+    	  background-color: transparent;
+    	}
+
+    	&::-webkit-scrollbar-thumb {
+    	  border-radius: 0;
+    	  background-color: rgba(0,0,0,0.8);
+    	}
+
+    	> .category-item {
+    		color: #fff;
+    		font-size: 14px;
+
+				&:hover {
+					background-color: $brand-primary;
+
+					> a.children-arrows:before {
+						color: #fff;
+					}
+
+					.description {
+						color: #fff;
+					}
+
+					.category-info {
+						display: block !important;
+					}
+				}
+
+    		> a {
+					padding: 12px 18px 12px 20px;
+	    		color: #fff;
+	    		display: block;
+	    		position: relative;
+
+	    		&.children-arrows:before {
+	    			content: '\f105';
+	    			font-family: fontawesome;
+						position: absolute;
+						top: 50%;
+						right: 8px;
+						color: #888;
+						height: 20px;
+						line-height: 20px;
+						margin-top: -10px;
+						font-size: 22px;
+	    		}
+
+					.title {
+						font-size: 15px;
+					}
+
+	    		.description {
+	    			margin-top: 6px;
+	    			height: 18px;
+	    			color: #b7b7b7;
+	    			overflow: hidden;
+	    			padding-right: 10px;
+	    			font-size: 12px;
+	    		}
+    		}
+
+    		.category-info {
+					position: absolute;
+    			display: none;
+			    left: 240px;
+			    top: 0;
+			    width: 700px;
+			    color: #444;
+			    height: 100%;
+	        border-top: 1px solid #eaeaea;
+	        border-bottom: 1px solid #eaeaea;
+			    background-color: #FFF;
+
+			    ul {
+			    	overflow: hidden;
+			    	li {
+			    		float: left;
+			    	}
+			    }
+
+			    a {
+				    color: #444;
+
+				    &:hover {
+					    color: $brand-primary;
+				    }
+				  }
+
+			    .category-title {
+			    	padding: 24px 40px;
+			    	font-size: 26px;
+			    	color: $brand-primary;
+		        border-bottom: 1px solid #eaeaea;
+			    }
+
+			    .children {
+			    	list-style: none;
+			    	padding: 20px 40px;
+
+		        li {
+		        	margin: 0 26px 20px 0;
+		        }
+			    }
+
+			    .products {
+		        border-top: 1px solid #eaeaea;
+			    	list-style: none;
+			    	padding-left: 0;
+			    	position: absolute;
+			    	left: 0;
+						width: 100%;
+			    	bottom: 0;
+
+			    	li {
+			    		position: relative;
+			    		text-align: center;
+							width: 25%;
+							padding: 10px;
+
+							img {
+								display: inline-block;
+							}
+
+							p.name {
+								margin: 10px 0;
+								height: 40px;
+								overflow: hidden;
+							}
+
+							p.price {
+								color: #cc0e11;
+								margin-bottom: 0;
+								height: 21px;
+								overflow: hidden;
+
+								.price-old {
+									font-weight: 500;
+									color: #888;
+									text-decoration: line-through;
+									font-size: 12px;
+								}
+							}
+
+							.price-tax {
+								display: block;
+								height: 22px;
+								overflow: hidden;
+								color: #888;
+							}
+
+							&:last-of-type:before {
+								display: none;
+							}
+
+							&:before {
+								content: "";
+								width: 1px;
+								height: 100%;
+								background: #eaeaea;
+								position: absolute;
+								right: 0;
+								top: 0;
+							}
+			    	}
+			    }
+    		}
+    	}
+    }
+	}
+
+	.swiper-container {
+		.swiper-slide {
+			a {
+				background-position: center center;
+				-webkit-background-size: cover;
+				-moz-background-size: cover;
+				-o-background-size: cover;
+				background-size: cover;
+				display: block;
+
+				@media (max-width: 1200px) {
+					height: auto !important;
+					background-image: none !important;
+				}
+			}
+
+			@media (min-width: 1200px) {
+				img {
+					display: none;
+				}
+			}
+		}
+	}
+}

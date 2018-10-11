@@ -1,0 +1,144 @@
+@charset "UTF-8";
+
+//
+// @copyright        2017 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2017-09-26 11:13:24
+// @modified         2018-06-26 18:17:51
+//
+
+html[lang^="en"] {
+  body.account-account {
+    .account-grid-wrapper {
+      a {
+        em {
+          height: 44px !important;
+        }
+      }
+    }
+  }
+}
+
+body.account-account {
+  .account-grid-wrapper {
+    a {
+      display: block;
+      border: $default-border;
+      padding: 26px 16px 20px;
+      text-align: center;
+      font-size: 16px;
+      color: #333;
+      border-radius: 4px;
+      margin-bottom: 30px;
+      @include transition(all .2s ease-out);
+
+      &:hover {
+        border-color: $brand-primary;
+      }
+
+      span {
+        display: block;
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 16px auto;
+      }
+
+      em {
+        font-style: normal;
+        display: inline-block;
+        height: 22px;
+        overflow: hidden;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: inline-block;
+      }
+
+      &:before { display: none; }
+    }
+  }
+
+  .link-group-wrapper {
+    margin-bottom: $gutter * 2;
+    padding-bottom: 0;
+
+    i {
+      margin-right: 5px;
+      color: #555;
+    }
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    display: inline-block;
+
+    .img-circle {
+      display: inline-block;
+      max-width: 100%;
+      border: 3px solid #e8e8e8;
+
+      @media (max-width: 768px) {
+        max-width: 80px;
+      }
+    }
+
+    #button-avatar {
+      display: none;
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      text-align: center;
+      top: 50%;
+      margin-top: -14px;
+      background: $brand-primary;
+      color: #fff;
+      padding: 5px 0;
+    }
+
+    &:hover {
+      #button-avatar {
+        display: block;
+      }
+    }
+  }
+
+  @media (min-width: 992px) {
+    .account-height {
+      height: 183px;
+    }
+  }
+
+  .account-information {
+    @media (min-width: 768px) {
+      margin-top: 10px;
+    }
+    p {
+      font-size: 14px;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #eceaea;
+      i {
+        color: #aeb1bb;
+      }
+    }
+  }
+
+
+  // Avatar upload form
+  #image-upload {
+    margin: 0;
+    text-align: center;
+  }
+  #clipArea {
+    height: 300px;
+  }
+  #file, #clipBtn {
+    margin: 20px;
+  }
+  #file {
+    display: none;
+  }
+}

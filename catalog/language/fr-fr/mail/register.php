@@ -1,0 +1,24 @@
+<?php
+//////////////////////////////////////
+//									//
+// Opencart France					//
+// http://www.opencart-france.fr	//
+// Traduit par LeorLindel			//
+// Exclusivité d’Opencart France 	//
+//									//
+//////////////////////////////////////
+
+// Text
+$_['text_subject']			= '%s - nous vous remercions de votre enregistrement ';
+$_['text_welcome']			= 'Bienvenue et remerciements de votre enregistrement sur %s!';
+$_['text_login']			= 'Votre compte a été créé et vous pouvez vous connecter en utilisant votre adresse courriel et votre mot de passe à l’adresse suivante :';
+$_['text_approval']			= 'Votre compte doit être approuvé avant que vous puissiez vous connecter. Une fois celui-ci approuvé, vous pourrez vous connecter en utilisant votre adresse courriel et votre mot de passe à l’adresse suivante :';
+$_['text_service']			= 'Lors de la connexion, vous serez en mesure d’accéder à d’autres services, notamment l’examen des commandes passées, l’impression de factures et la modification des informations de votre compte.';
+$_['text_thanks']			= 'Remerciements,';
+$_['text_new_customer']		= 'Nouveau client';
+$_['text_signup']			= 'Un nouveau client vient de s’enregistrer :';
+$_['text_customer_group']	= 'Groupe client :';
+$_['text_firstname']		= 'Prénom :';
+$_['text_lastname']			= 'Nom :';
+$_['text_email']			= 'Courriel :';
+$_['text_telephone']		= 'Téléphone:';

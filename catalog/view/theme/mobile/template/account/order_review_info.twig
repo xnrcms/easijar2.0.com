@@ -1,0 +1,74 @@
+{{ header }}
+{{ include(helper.template('_partial/breadcrumb')) }}
+<div class="container">
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ success }}</div>
+  {% endif %}
+  {% if warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ warning }}</div>
+  {% endif %}
+  <div class="row">
+    <div id="content" class="col-xs-12">{{ content_top }}
+      <div class="nav-bar">{{ heading_title }}</div>
+      <div class="row widget">
+        <div class="col-xs-12">
+          {% for review in reviews %}
+          <div class="name-info mb-1">
+            <div>
+              {{ review.author }}
+              <span class="pull-right">{{ review.status ? text_approved : text_no_approved }}</span>
+            </div>
+            {% if not review.is_additional %}
+            <div class="rating">
+              {% for i in 1..5 %}
+              {% if review.rating < i %}
+              <span class="fa fa-stack"><i class="fa fa-star off fa-stack-1x"></i></span>
+              {% else %}
+              <span class="fa fa-stack"><i class="fa fa-star off fa-stack-1x"></i><i class="fa fa-star fa-stack-1x"></i></span>
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div>
+              {{ review.date_added }}
+            </div>
+          </div>
+          <div class="">
+            {{ review.text|nl2br }}
+          </div>
+          <div class="review-img-wrapper mt-1 clearfix">
+            {% for image in review.images %}
+            <a href="{{ helper.image_resize(image.filename, 600, 600) }}" class="upload-img oreview-fancybox" rel="group"><img src="{{ helper.image_resize(image.filename, 100, 100) }}"></a>
+            {% endfor %}
+          </div>
+          {% if review.reply %}
+          <hr/>
+          <div>
+            <b>{{ text_store_reply }}</b> {{ review.reply }}
+          </div>
+          {% endif %}
+          <br/><br/>
+          {% endfor %}
+          <div class="pull-right">
+            <a class="button btn btn-primary" href="{{ add_review }}">{{ button_review }}</a>
+          </div>
+        </div>
+      </div>
+      {{ content_bottom }}</div>
+    </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $(".oreview-fancybox").fancybox({
+      prevEffect: 'none',
+      nextEffect: 'none',
+      closeBtn: false,
+      helpers: {
+        title: { type : 'inside' },
+        buttons: {}
+      }
+    });
+  });
+</script>
+
+{{ footer }}

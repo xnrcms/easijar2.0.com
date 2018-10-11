@@ -1,0 +1,248 @@
+{% extends helper.template("seller/_partial/layout") %}
+
+{% block header %}
+  <script type="text/javascript" src="catalog/view/theme/default/template/seller/javascript/echarts.common.min.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div id="content" class="col-sm-12">
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+    {% endif %}
+    <div class="container-fluid account-xs-padding">
+      <div class="row">
+        <div class="seller-data-wrapper">
+          <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="data-item">
+              <div class="inner">
+                <div class="title">{{ text_order_count }}</div>
+                <div class="data text-success">{{ order_count }}</div>
+              </div>
+              <div class="icons"><i class="iconfont text-success">&#xe678;</i></div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="data-item">
+              <div class="inner">
+                <div class="title">{{ text_order_amount }}</div>
+                <div class="data text-purple">{{ order_amount }}</div>
+              </div>
+              <div class="icons"><i class="iconfont text-purple">&#xe657;</i></div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="data-item">
+              <div class="inner">
+                <div class="title">{{ text_product_count }}</div>
+                <div class="data text-info">{{ product_count }}</div>
+              </div>
+              <div class="icons"><i class="iconfont text-info">&#xe60e;</i></div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-xs-12">
+            <div class="data-item">
+              <div class="inner">
+                <div class="title">{{ text_account_balance }}</div>
+                <div class="data text-danger">{{ account_balance }}</div>
+              </div>
+              <div class="icons"><i class="iconfont text-danger">&#xe657;</i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="title">{{ text_order_chart }}</h3>
+      <div class="seller-graph-wrapper">
+        <div id="container" style="height: 100%"></div>
+      </div>
+
+      <h3 class="title">{{ text_order_list }}</h3>
+      <div class="seller-orders-wrapper">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <td>#</td>
+                <td><strong>{{ column_customer }}</strong></td>
+                <td class="text-center"><strong>{{ column_order_total }}</strong></td>
+                <td class="text-center"><strong>{{ column_order_date }}</strong></td>
+                <td class="text-center"><strong>{{ column_order_status }}</strong></td>
+                <td></td>
+              </tr>
+            </thead>
+            <tbody>
+              {% if orders %}
+                {% for item in orders %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td class="text-left"><span class="text-muted">{{ item.customer }}</span></td>
+                  <td class="text-center"><span class="text-info">{{ item.total }}</span></td>
+                  <td class="text-center"><span class="text-muted">{{ item.date_added }}</span></td>
+                  <td class="text-center"><span class='label label-success'>{{ item.order_status }}</span></td>
+                  <td class="text-center"><a href="{{ item.view }}" class="btn btn-link">{{ button_view }}</a></td>
+                  <!-- label-danger -->
+                  <!-- label-warning -->
+                  <!-- label-info -->
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="5"><div class="no-order"><i class="iconfont">&#xe63b;</i></div></td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script type="text/javascript">
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom);
+    var app = {};
+    option = null;
+    option = {
+      title: {
+        // text: '堆叠区域图'
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          lineStyle: {
+            color: '#ddd'
+          },
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
+        },
+        backgroundColor: 'rgba(255,255,255,.9)',
+        padding: [5, 10],
+        textStyle: {
+          color: '#7588E4',
+        },
+        extraCssText: 'box-shadow: 0 0 5px rgba(0,0,0,0.3)'
+      },
+      legend: {
+        data:['{{ text_order_count }}','{{ text_order_amount }}']
+      },
+      toolbox: {
+        feature: {
+          magicType: {show: true, type: ['stack', 'tiled'], title: {
+            stack: '{{ text_chart_stack }}',
+            tiled: '{{ text_chart_tiled }}',
+            // bar: '{{ text_chart_bar }}'
+          }},
+          saveAsImage: {show: true, name: '{{ text_order_chart }}', title: '{{ text_chart_save_img }}'}
+        }
+      },
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: {{ chart.date|json_encode }},
+        boundaryGap: false,
+        splitLine: {
+          interval: 'auto',
+          lineStyle: {
+            color: ['#D4DFF5']
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#609ee9'
+          }
+        },
+        axisLabel: {
+          margin: 10,
+          textStyle: {
+            fontSize: 14
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        splitLine: {
+          lineStyle: {
+            color: ['#D4DFF5']
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#609ee9'
+          }
+        },
+        axisLabel: {
+          margin: 10,
+          textStyle: {
+            fontSize: 14
+          }
+        }
+      },
+      series : [
+        {
+          name:'{{ text_order_count }}',
+          type:'line',
+          stack: '总量',
+          areaStyle: {
+            normal: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                offset: 0,
+                color: 'rgba(199, 237, 250,0.5)'
+              }, {
+                offset: 1,
+                color: 'rgba(199, 237, 250,0.2)'
+              }], false),
+            }
+          },
+          itemStyle: {
+            normal: {
+              color: '#aaa'
+            }
+          },
+          smooth: true,
+          data: {{ chart.count|json_encode }}
+        },
+        {
+          name:'{{ text_order_amount }}',
+          type:'line',
+          stack: '总量',
+          smooth: true,
+          showSymbol: false,
+          symbol: 'circle',
+          symbolSize: 6,
+          areaStyle: {
+            normal: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                offset: 0,
+                color: 'rgba(216, 244, 247,1)'
+              }, {
+                offset: 1,
+                color: 'rgba(216, 244, 247,1)'
+              }], false)
+            }
+          },
+          itemStyle: {
+            normal: {
+              color: '#1E9FF2'
+            }
+          },
+          smooth: true,
+          data:{{ chart.number|json_encode }}
+        },
+      ]
+    };
+
+    if (option && typeof option === "object") {
+      myChart.setOption(option, true);
+    }
+  </script>
+{% endblock %}

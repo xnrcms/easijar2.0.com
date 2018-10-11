@@ -1,0 +1,58 @@
+{{ header }}
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-sm-12">{{ content_top }}
+      <div class="row reward-widget">
+        <div class="col-xs-12">
+        <div class="nav-bar">{{ heading_title }}</div>
+        <div class="col-xs-12">
+          <div class="reward-number">
+            {{ total|number_format }}
+          </div>
+        </div>
+        </div>
+        <div class="account-bg-bg">
+          <img src="{{ helper.url().fullPathLink('catalog/view/theme/mobile/image/account-bg-bg.png') }}" class="img-responsive">
+        </div>
+      </div>
+
+      <div class="row widget">
+        <div class="col-xs-12">
+          <ul class="reward-details">
+            {% if rewards %}
+            {% for reward in rewards %}
+              <li>
+                <div class="reward-description">
+                  <div class="description-title">
+                  {% if reward.order_id %}
+                  <a href="{{ reward.href }}">{{ reward.description }}</a>
+                  {% else %}
+                  {{ reward.description }}
+                  {% endif %}
+                  </div>
+                  <span>
+                    {{ reward.date_added }}
+                  </span>
+                </div>
+                <span class="reward-points">
+                  {{ reward.points|number_format }}
+                </span>
+              </li>
+            {% endfor %}
+            {% else %}
+            <div class="text-center">
+              {{ text_no_results }}
+            </div>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      {% if pagination %}
+      <div class="row">
+        <div class="col-sm-12 text-center">{{ pagination }}</div>
+      </div>
+      {% endif %}
+      {{ content_bottom }}</div>
+    </div>
+</div>
+{{ footer }}

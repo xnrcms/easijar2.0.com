@@ -1,0 +1,27 @@
+<div class="widget product-list-style-3">
+  {% if heading_title %}
+    <div class="widget-title">{{ heading_title }}</div>
+  {% endif %}
+  <div class="product-group-wrapper">
+    <ul>
+      {% for product in products %}
+        <li class="product-group">
+          <a href="{{ product.href }}">
+            <div class="product-group-left">
+              <img data-src="{{ product.image }}" src="{{ placeholder }}" class="lazy img-responsive">
+            </div>
+            <div class="product-group-right">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="price">
+                <span class="price-new">{{ product.special ?: product.price }}</span>
+                {% if product.special %}
+                <span class="price-old">{{ product.price }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

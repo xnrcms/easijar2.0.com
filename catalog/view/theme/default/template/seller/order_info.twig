@@ -1,0 +1,418 @@
+{% extends helper.template("seller/_partial/layout") %}
+
+{% block content %}
+  <div id="content" class="seller-content col-sm-12">
+    <div class="pull-right"><a href="{{ shipping }}" target="_blank" data-toggle="tooltip" title="{{ button_shipping_print }}" class="btn btn-info"><i class="fa fa-truck"></i></a> </div>
+    {% if success %}
+    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+    {% endif %}
+
+    <h2>{{ heading_title }}</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {{ text_order_detail }}</h3>
+          </div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td style="width: 1%;"><button data-toggle="tooltip" title="{{ text_store }}" class="btn btn-info btn-xs"><i class="fa fa-shopping-cart fa-fw"></i></button></td>
+                <td><a href="{{ store_url }}" target="_blank">{{ store_name }}</a></td>
+              </tr>
+              <tr>
+                <td><button data-toggle="tooltip" title="{{ text_date_added }}" class="btn btn-info btn-xs"><i class="fa fa-calendar fa-fw"></i></button></td>
+                <td>{{ date_added }}</td>
+              </tr>
+              <tr>
+                <td><button data-toggle="tooltip" title="{{ text_payment_method }}" class="btn btn-info btn-xs"><i class="fa fa-credit-card fa-fw"></i></button></td>
+                <td>{{ payment_method }}</td>
+              </tr>
+              {% if shipping_method %}
+                <tr>
+                  <td><button data-toggle="tooltip" title="{{ text_shipping_method }}" class="btn btn-info btn-xs"><i class="fa fa-truck fa-fw"></i></button></td>
+                  <td>{{ shipping_method }}</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title"><i class="fa fa-user"></i> {{ text_customer_detail }}</h3>
+          </div>
+          <table class="table">
+            <tr>
+              <td style="width: 1%;"><button data-toggle="tooltip" title="{{ text_customer }}" class="btn btn-info btn-xs"><i class="fa fa-user fa-fw"></i></button></td>
+              <td>
+                {% if customer %}
+                <a href="{{ customer }}" target="_blank">{{ fullname ?: text_no_entry }}</a>
+                {% else %}
+                {{ fullname ?: text_no_entry }}
+                {% endif %}</td>
+            </tr>
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_customer_group }}" class="btn btn-info btn-xs"><i class="fa fa-group fa-fw"></i></button></td>
+              <td>{{ customer_group }}</td>
+            </tr>
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_email }}" class="btn btn-info btn-xs"><i class="fa fa-envelope-o fa-fw"></i></button></td>
+              <td>
+                {% if email %}
+                <a href="mailto:{{ email }}">{{ email }}</a>
+                {% else %}
+                {{ text_no_entry }}
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td><button data-toggle="tooltip" title="{{ text_telephone }}" class="btn btn-info btn-xs"><i class="fa fa-phone fa-fw"></i></button></td>
+              <td>{{ telephone ?: text_no_entry }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-info-circle"></i> {{ text_order }}</h3>
+      </div>
+      <div class="panel-body">
+        {% if shipping_method %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <td class="text-left">{{ text_shipping_address }}</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">{{ shipping_address }}</td>
+            </tr>
+          </tbody>
+        </table>
+        {% endif %}
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <td class="text-left">{{ column_product }}</td>
+              <td class="text-left">{{ column_model }}</td>
+              <td class="text-right">{{ column_quantity }}</td>
+              <td class="text-right">{{ column_price }}</td>
+              <td class="text-right">{{ column_total }}</td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+              <tr>
+                <td class="text-left"><a href="{{ product.href }}">{{ product.name }}</a>
+                  {% for option in product.option %}
+                    <br/>
+                    {% if option.type != 'file' %}&nbsp;
+                      <small> - {{ option.name }}: {{ option.value }}</small>
+                      {% else %}
+                      &nsbp;
+                      <small> - {{ option.name }}: <a href="{{ option.href }}">{{ option.value }}</a></small>
+                    {% endif %}
+                  {% endfor %}</td>
+                <td class="text-left">{{ product.model }}</td>
+                <td class="text-right">{{ product.quantity }}</td>
+                <td class="text-right">{{ product.price }}</td>
+                <td class="text-right">{{ product.total }}</td>
+              </tr>
+            {% endfor %}
+            {% for total in totals %}
+              <tr>
+                <td colspan="4" class="text-right">{{ total.title }}</td>
+                <td class="text-right">{{ total.text }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if comment %}
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <td>{{ text_comment }}</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ comment }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}</div>
+    </div>
+
+    {% if order_status_id >= 1 %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-comment-o"></i> {{ text_history }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="nav nav-tabs" style="margin-bottom: 20px;">
+          <li class="active"><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
+          {% if module_aftership_status %}
+            <li><a href="#tab-aftership" data-toggle="tab">{{ tab_aftership }}</a></li>
+          {% endif %}
+          {% if kd_tracking_status %}
+          <li><a href="#tab-express" data-toggle="tab">{{ tab_express }}</a></li>
+          {% endif %}
+        </ul>
+        <div class="tab-content">
+          {% if kd_tracking_status %}
+          <div class="tab-pane" id="tab-express">
+            <div id="kuaidi"></div>
+            <br />
+            <fieldset>
+              <legend>{{ text_express }}</legend>
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-comment">{{ entry_express_code }}</label>
+                  <div class="col-sm-10">
+                    <select name="tracking_code" id="tracking_code"  class="form-control">
+                      {% for express_code in kd_tracking_data %}
+                      //只显示后台设定的状态为可用的快递信息
+                      if($express_code['status'] == '0'){
+                        continue;
+                       }
+                       ?>
+                      <option value="{{ express_code.code }}">{{ express_code.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-comment">{{ entry_tracking_number }}</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="tracking_number" rows="8" id="tracking_number" class="form-control"></input>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-comment">{{ entry_comment }}</label>
+                  <div class="col-sm-10">
+                    <textarea name="kd_comment" rows="8" id="input-comment" class="form-control"></textarea>
+                  </div>
+                </div>
+              </form>
+              <div class="text-right">
+                <button id="button-express" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+              </div>
+            </fieldset>
+          </div>
+          {% endif %}
+          {% if module_aftership_status %}
+            <div class="tab-pane" id="tab-aftership">
+              <div id="ship-tracking"></div>
+              <br/>
+              <fieldset>
+                <legend>{{ text_aftership_info }}</legend>
+                <form class="form-horizontal">
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="tracking-code">{{ entry_aftership_code }}</label>
+                    <div class="col-sm-10">
+                      <select name="tracking_code" id="tracking-code"  class="form-control">
+                        {% for item in aftership_trackings %}
+                          <option value="{{ item.code }}" data-name="{{ item.name }}">{{ item.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="tracking-number">{{ entry_aftership_number }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="tracking_number" rows="8" id="tracking-number" class="form-control"></input>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-ship-comment">{{ entry_aftership_comment }}</label>
+                    <div class="col-sm-10">
+                      <textarea name="message" rows="8" id="input-ship-comment" class="form-control"></textarea>
+                    </div>
+                  </div>
+                </form>
+                <div class="text-right">
+                  <button id="button-tracking" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_aftership_add }}</button>
+                </div>
+              </fieldset>
+            </div>
+            <script type="text/javascript">
+              $(function () {
+                $('#ship-tracking').load('index.php?route=seller/aftership/getList&order_id={{ order_id }}');
+                $(document).on('click', '#button-tracking', function () {
+                  var tracking_number = $('#tracking-number').val();
+                  if(tracking_number.replace(/\s/gi, '') == '') {
+                    alert("{{ error_aftership_number }}");
+                    return false;
+                  }
+                  var tracking_code = $('#tracking-code').find('option:selected').val();
+                  var tracking_name = $('#tracking-code').find('option:selected').attr('data-name');
+                  var comment = $('#input-ship-comment').val();
+                  $.ajax({
+                    url: 'index.php?route=seller/aftership/add&order_id={{ order_id }}',
+                    type: 'post',
+                    dataType: 'json',
+                    data: 'tracking_number=' + tracking_number + '&tracking_code=' + tracking_code + '&comment=' + comment + '&tracking_name=' + tracking_name,
+                    beforeSend: function() {
+                      $('#button-tracking').button('loading');
+                    },
+                    complete: function() {
+                      $('#button-tracking').button('reset');
+                    },
+                    success: function (json) {
+                      $('.alert').remove();
+                      if (json['error']) {
+                        $('#ship-tracking').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                      }
+                      if (json['success']) {
+                        $('#ship-tracking').load('index.php?route=seller/aftership/getList&user_token={{ user_token }}&order_id={{ order_id }}');
+                        $('#ship-tracking').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                        $('#input-comment').val('');
+                      }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                      console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                  });
+                });
+              });
+            </script>
+          {% endif %}
+          <div class="tab-pane active" id="tab-history">
+            <div id="history"></div>
+            <br/>
+            <fieldset>
+              <legend>{{ text_history_add }}</legend>
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-order-status">{{ entry_order_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="order_status_id" id="input-order-status" class="form-control">
+                      {% for order_statuses in order_statuses %}
+                        {% if order_statuses.order_status_id == order_status_id %}
+                          <option value="{{ order_statuses.order_status_id }}" selected="selected">{{ order_statuses.name }}</option>
+                        {% else %}
+                          <option value="{{ order_statuses.order_status_id }}">{{ order_statuses.name }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-notify">{{ entry_notify }}</label>
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <input type="checkbox" name="notify" value="1" id="input-notify"/>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-comment">{{ entry_comment }}</label>
+                  <div class="col-sm-10">
+                    <textarea name="comment" rows="8" id="input-comment" class="form-control"></textarea>
+                  </div>
+                </div>
+              </form>
+            </fieldset>
+            <div class="text-right">
+              <button id="button-history" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="buttons clearfix  mb-1">
+      <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <script type="text/javascript"><!--
+    {% if kd_tracking_status %}
+    $(document).delegate('#kuaidi .pagination a', 'click', function() {
+      $('#kuaidi').load(this.href);
+      return false;
+    });
+
+    $('#kuaidi').load('index.php?route=seller/order/express&order_id={{ order_id }}');
+
+    $(document).delegate('#button-express', 'click', function() {
+      $.ajax({
+        url: 'index.php?route=seller/order/addExpress&order_id={{ order_id }}',
+        type: 'post',
+        dataType: 'json',
+        data: 'order_status_id=' + encodeURIComponent($('select[name=\'kd_order_status_id\']').val()) + '&tracking_number=' + encodeURIComponent($('input[name=\'tracking_number\']').val()) + '&tracking_code=' + encodeURIComponent($('select[name=\'tracking_code\']').val()) +  '&notify=' + encodeURIComponent($('input[name=\'kd_notify\']').attr('checked') ? 1 : 0) + '&append=' + '&kd_comment=' + encodeURIComponent($('textarea[name=\'kd_comment\']').val()),
+        beforeSend: function() {
+          $('#button-express').button('loading');
+        },
+        complete: function() {
+          $('#button-express').button('reset');
+        },
+        success: function(json) {
+          $('.alert').remove();
+
+          if (json['error']) {
+            $('#kuaidi').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+          }
+
+          if (json['success']) {
+            $('#kuaidi').load('index.php?route=seller/order/express&order_id={{ order_id }}');
+
+            $('#kuaidi').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+            $('textarea[name=\'kd_comment\']').val('');
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    });
+    {% endif %}
+    $('#history').delegate('.pagination a', 'click', function(e) {
+    	e.preventDefault();
+
+    	$('#history').load(this.href);
+    });
+
+    $('#history').load('index.php?route=seller/order/history&order_id={{ order_id }}');
+
+    $('#button-history').on('click', function() {
+    	$.ajax({
+    		url: 'index.php?route=seller/order/addHistory&store_id={{ store_id }}&order_id={{ order_id }}',
+    		type: 'post',
+    		dataType: 'json',
+    		data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&append=' + ($('input[name=\'append\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()),
+    		beforeSend: function() {
+    			$('#button-history').button('loading');
+    		},
+    		complete: function() {
+    			$('#button-history').button('reset');
+    		},
+    		success: function(json) {
+    			$('.alert-dismissible').remove();
+
+    			if (json['error']) {
+    				$('#history').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+    			}
+
+    			if (json['success']) {
+    				$('#history').load('index.php?route=seller/order/history&order_id={{ order_id }}');
+
+    				$('#history').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+    				$('textarea[name=\'comment\']').val('');
+    			}
+    		},
+    		error: function(xhr, ajaxOptions, thrownError) {
+    			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    		}
+    	});
+    });
+  //--></script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% if error %}
+<div class="warning">{{ error }}</div>
+{% endif %}
+{% if success %}
+<div class="success">{{ success }}</div>
+{% endif %}
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <td class="text-left">{{ column_date_added }}</td>
+      <td class="text-left">{{ column_express_code }}</td>
+      <td class="text-left">{{ column_tracking_number }}</td>
+      <td class="text-left">{{ column_comment }}</td>
+      <td class="text-left">{{ column_express_track }}</td>
+      <td class="text-right">{{ column_action }}</td>
+    </tr>
+  </thead>
+  <tbody>
+    {% if histories %}
+    {% for history in histories %}
+    <tr>
+      <td class="text-left">{{ history.date_added }}</td>
+      <td class="text-left">{{ history.tracking_code }}</td>
+      <td class="text-left">{{ history.tracking_number }}</td>
+      <td class="text-left">{{ history.kd_comment }}</td>
+      <td class="text-left">
+        <a onClick="var l=(screen.availWidth-500)/2;var t=(screen.availHeight-500)/2;window.open('{{ history.kd_track }}','','width=500,height=500,top='+t+',left='+l+',toolbar=no,menubar=no,location=no,status=yes');">{{ text_view }}</a>
+      </td>
+      <td class="text-right">
+        <button id="button-del{{ history.id }}" class="btn-small btn-info" onclick="delExpress({{ history.id }})" >{{ button_delete }}</button>
+      </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+      <td class="text-center" colspan="6">{{ text_no_results }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+<div class="row">
+  <div class="col-sm-6 text-left">{{ pagination }}</div>
+</div>
+<script type="text/javascript"><!--
+function delExpress(id){
+  var status_id = $('select[name="order_status_id"]').val();
+
+  $.ajax({
+    url: 'index.php?route=extension/module/express_tracking/delete&user_token={{ user_token }}&id=' + id,
+    type: 'post',
+    dataType: 'json',
+    data: '',
+            beforeSend: function() {
+              $('#button-del'+id).button('loading');
+            },
+            complete: function() {
+              $('#button-del'+id).button('reset');
+            },
+            success: function(json) {
+              $('.alert').remove();
+        
+              if (json['error']) {
+                $('#kuaidi').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+              }
+        
+              if (json['success']) {
+                $('#kuaidi').load('index.php?route=extension/module/express_tracking/getList&user_token={{ user_token }}&order_id={{ order_id }}');
+        
+                $('#kuaidi').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+              }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+              alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+  });
+}
+
+//--></script>

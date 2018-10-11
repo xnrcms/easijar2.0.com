@@ -1,0 +1,20 @@
+{{ header }}
+<div class="container empty-cart-page">
+  <div class="row">
+    <div id="content" class="col-xs-12">
+      <div class="nav-bar">{{ heading_title }}</div>
+      {{ content_top }}
+        <div class="row widget">
+          <div class="col-sm-12">
+            <div class="no-items">
+              <span class="icon"><i class="iconfont">&#xe61c;</i></span>
+              <span class="msg">{{ text_error }}</span>
+              <a class="btn btn-default btn-block" href="{{ helper.url.link('common/home') }}">{{ button_continue }}</a>
+            </div>
+          </div>
+        </div>
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{{ footer }}

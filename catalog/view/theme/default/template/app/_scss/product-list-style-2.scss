@@ -1,0 +1,42 @@
+.product-list-style-2 {
+  .product-group-wrapper {
+    margin: 0 .2rem;
+    ul {
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      display: block;
+      .product-group {
+        margin-bottom: .4rem;
+        padding: 0 .2rem;
+        width: 25%;
+        float: left;
+        a {
+          overflow: hidden;
+          display: block;
+          position: relative;
+
+          .price {
+            overflow: hidden;
+            display: block;
+            width: 100%;
+            padding: 5px 0;
+            height: 42px;
+            text-align: center;
+
+            .price-new {
+              color: #f15353;
+              font-size: 13px;
+            }
+
+            .price-old {
+              font-size: 12px;
+              text-decoration: line-through;
+              color: #999;
+            }
+          }
+        }
+      }
+    }
+  }
+}

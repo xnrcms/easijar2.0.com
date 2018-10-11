@@ -1,0 +1,55 @@
+<script>
+    // -------- 将以base64的图片url数据转换为Blob --------
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+}
+$(document).on('click', '.personal-image', function(event) {
+  layer.open({
+    title: '{{ heading_title }}',
+    type: 1,
+    skin: 'layui-layer-rim', //加上边框
+    area: ['100%', '100%'], //宽高
+    content: '<div id="avatar-upload"><div id="clipArea"></div><input type="file" id="file"><button id="clipBtn" class="btn btn-primary">{{ button_clip }}</button></div>'
+  });
+  $('#file').click();
+	var pc = new PhotoClip('#clipArea', {
+		size: 260,
+		outputSize: 640,
+		file: '#file',
+		ok: '#clipBtn',
+		done: function(dataURL) {
+      var blob = dataURLtoBlob(dataURL);
+      //使用ajax发送
+      var fd = new FormData();
+      fd.append("file", blob, "image.png");
+      $.ajax({
+        url: '/index.php?route=account/avatar',
+        type: 'post',
+        data: fd,
+        contentType: false, // 注意这里应设为false
+        processData: false,
+        dataType: 'json',
+        beforeSend: function() {
+        },
+        success: function(json) {
+          $('.personal-image').attr("src", json['imgurl'] + '?' + Math.random());
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError);
+        },
+        complete: function () {
+          layer.closeAll();
+        }
+      });
+    },
+		fail: function(msg) {
+			alert(msg);
+		}
+	});
+});
+</script>

@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+//
+// @copyright        2018 opencart.cn - All Rights Reserved
+// @link             http://www.guangdawangluo.com
+// @author           Pu shuo <pushuo@opencart.cn>
+// @created          2018-06-20 15:19:23
+// @modified         2018-06-28 17:33:13
+//
+
+.sidebar {
+	position: fixed;
+	top: 60px;
+	left: 0;
+	z-index: 10;
+	height: 100%;
+	width: 230px;
+	background-color: #fff;
+	overflow: hidden;
+  overflow-y: auto;
+
+  // @media (max-width: 768px) {
+  // 	display: none;
+  // }
+	// background-color: #c8ccda;
+	@include box-shadow(1px 0 30px rgba(0,0,0,.1));
+
+	h2.title {
+		margin: 20px 0 10px;
+		font-size: 20px;
+		text-align: center;
+		border-bottom: 1px solid #eee;
+		padding-bottom: 20px;
+
+		i {
+			font-size: 19px;
+			margin-right: 10px;
+			color: $main_color;
+		}
+	}
+
+	ul {
+		> li {
+			position: relative;
+
+			> a {
+				display: block;
+				font-size: 14px;
+				padding: 18px 35px 18px 20px;
+
+				&:before {
+					content: '';
+					position: absolute;
+					top: 0;
+					right: 0;
+					width: 4px;
+					height: 100%;
+					display: none;
+					background-color: $main_color;
+				}
+
+				i {
+					color: #777;
+
+					&.left {
+						font-size: 16px;
+						margin-right: 18px;
+					}
+
+					&.right {
+						position: absolute;
+						top: 19px;
+						right: 20px;
+						font-size: 12px;
+					}
+				}
+
+				&.active:before {
+					display: block;
+				}
+
+				&.active, &:hover {
+			    font-weight: 500;
+			    color: $main_color;
+					background: #f5f5f5;
+
+			    i {
+			    	color: $main_color;
+			    }
+				}
+			}
+		}
+	}
+}
+
+
+@media only screen and (max-width: 768px) {
+  .sidebar {
+    float: none;
+    background: #fff;
+    overflow: auto;
+    top: 60px;
+    left: auto;
+    bottom: 0;
+    right: 100%;
+    width: 80%;
+    z-index: 999;
+    @include transform(0);
+    @include transition(all .3s ease-out);
+
+    &.active {
+      @include transform(100%);
+      box-shadow: rgba(0,0,0,.1) 0 0 100px 0;
+      transition-delay: .1s;
+    }
+
+    .dropdown-menu {
+      margin-left: 0 !important;
+    }
+  }
+}
