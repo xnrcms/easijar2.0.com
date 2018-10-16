@@ -134,15 +134,16 @@ class Customer {
         return $customer->authentications()->where('provider', $provider)->count();
     }
 
-	public function getAvatar() {
+	public function getAvatar($customer_id = 0) {
+		$customer_id 	= $customer_id > 0 ? $customer_id : (int)$this->customer_id;
         $table_show = $this->db->query("show tables like '" . DB_PREFIX . "customer_authentication'")->row;
         if ($table_show) {
-            $auth_image = $this->db->query("select avatar from " . DB_PREFIX . "customer_authentication where customer_id=" . (int)$this->customer_id)->row;
+            $auth_image = $this->db->query("select avatar from " . DB_PREFIX . "customer_authentication where customer_id=" . (int)$customer_id)->row;
             if (isset($auth_image['avatar']) && !empty($auth_image['avatar'])) {
                 return $auth_image['avatar'];
             }
         }
-		$avatar = "avatar/{$this->customer_id}.jpg";
+		$avatar = "avatar/{$customer_id}.jpg";
 		if (is_file(DIR_IMAGE . $avatar)) {
 			return $avatar;
 		}

@@ -16,6 +16,7 @@ class ModelCatalogProduct extends Model {
 			$flash = Flash::getSingleton()->getFlashPriceAndCount($query->row['product_id']);
 			return array(
 				'product_id'       => $query->row['product_id'],
+				'parent_id'        => $query->row['parent_id'],
 				'name'             => $query->row['name'],
 				'description'      => $query->row['description'],
 				'meta_title'       => $query->row['meta_title'],
@@ -626,5 +627,20 @@ class ModelCatalogProduct extends Model {
         $sql = "SELECT * FROM " . DB_PREFIX . "product_questions  where product_id ='" . (int)$product_id . "' and product_status='1' and product_answer !='' order by question_asked_date desc";
         $query = $this->db->query($sql);
         return $query->rows;
+    }
+
+    public function getProductAllIdByPidOrProductId($product_id = 0)
+    {
+    	$sql 	= "SELECT product_id FROM `oc_product` WHERE product_id= " . (int)$product_id . " OR parent_id = " . (int)$product_id;
+    	$query 	= $this->db->query($sql);
+
+    	$ids 	= [];
+    	foreach ($query->rows as $key => $value) {
+    		$ids[$value['product_id']] 	= $value['product_id'];
+    	}
+
+    	sort($ids);
+
+        return $ids;
     }
 }

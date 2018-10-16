@@ -310,4 +310,48 @@ class ModelAccountOreview extends Model
 
         return $query->row;
     }
+
+
+    /**
+     * 获取一个商品的所有主评论-支持子产品
+     * @param $product_id
+     * @param int $start
+     * @param int $limit
+     * @return mixed
+     */
+    public function getOreviewsByProductIds($product_id, $start = 0, $limit = 20)
+    {
+        if (empty($product_id))  return [];
+
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        if ($limit < 1) {
+            $limit = 20;
+        }
+
+        $query = $this->db->query('SELECT r.order_product_review_id, r.order_product_id,r.customer_id, r.author, r.rating, r.text, p.product_id, pd.name, p.price, p.image, r.date_added
+                                   FROM '.DB_PREFIX.'order_product_review r
+                                   LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id)
+                                   LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id)
+                                   WHERE p.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'
+                                   ORDER BY r.date_added DESC LIMIT ".(int) $start.','.(int) $limit);
+
+        return $query->rows;
+    }
+
+    /**
+     * 获取一个商品的所有主评论 - 支持子产品
+     * @param $product_id
+     * @return mixed
+     */
+    public function getTotalOreviewsByProductIds($product_id)
+    {
+        if (empty($product_id))  return [];
+
+        $query = $this->db->query('SELECT COUNT(*) AS total FROM '.DB_PREFIX.'order_product_review r LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id) LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id) WHERE r.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'");
+
+        return $query->row['total'];
+    }
 }

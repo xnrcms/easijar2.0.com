@@ -1,7 +1,7 @@
 <?php
 function is_mobile()
 {
-  //  return true;
+    //return true;
     return (new Mobile_Detect)->isMobile() && !(new Mobile_Detect)->isTablet();
 }
 

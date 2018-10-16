@@ -176,4 +176,20 @@ class ModelMultisellerSeller extends Model {
 
 		return $order_data;
 	}
+
+	public function getSellerByProductIdForOne($product_id) {
+		$query = $this->db->query("SELECT s.*,
+		(
+            SELECT AVG(rating) 
+            FROM " . DB_PREFIX . "order_product_review r1 
+            LEFT JOIN " . DB_PREFIX . "order_product op ON (r1.order_product_id = op.order_product_id) 
+            WHERE op.product_id = ps.product_id AND r1.status = '1' GROUP BY op.product_id
+        ) AS rating,
+        (
+            SELECT COUNT(product_id) 
+            FROM " . DB_PREFIX . "ms_product_seller AS mps WHERE mps.seller_id =s.seller_id
+        ) AS total FROM `" . DB_PREFIX . "ms_seller` s LEFT JOIN `" . DB_PREFIX . "ms_product_seller` ps ON ps.seller_id = s.seller_id WHERE ps.product_id = '" . (int)$product_id . "'");
+
+		return $query->row;
+	}
 }
