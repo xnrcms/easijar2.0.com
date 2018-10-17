@@ -1,8 +1,12 @@
 <?php
 class ControllerApiHome extends Controller {
-	public function index() {
-		$allowKey		= [];
+	public function index() 
+	{
+		$this->response->addHeader('Content-Type: application/json');
+
+		$allowKey		= ['api_token'];
 		$req_data 		= $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
 
 		if ($this->checkSign($req_data)) {
 			
@@ -42,18 +46,22 @@ class ControllerApiHome extends Controller {
 				}
 			}
 
-		    $data 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
+			//购物车数量
+            //$data['cart_nums'] 		= $this->cart->countProducts();
+
+		    $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
 		}else{
 
-			$data 		= $this->returnData(['msg'=>'fail:sign error']);
+			$json 		= $this->returnData(['msg'=>'fail:sign error']);
 		}
 
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($data));
+		return $this->response->setOutput($json);
 	}
 
 	public function uhash()
 	{
+		$this->response->addHeader('Content-Type: application/json');
+
 		$allowKey		= ['code'];
 		$req_data 		= $this->dataFilter($allowKey);
 
@@ -66,21 +74,21 @@ class ControllerApiHome extends Controller {
 				$cache_data 			= !empty($cache_data) ? json_decode($cache_data,true) : [];
 
 				if (isset($cache_data['expiry_time']) && $cache_data['expiry_time'] >= time()) {
-					$json 				= ['code'=>202,'msg'=>'fail:frequent requests','data'=>''];
+					$json 				= $this->returnData(['msg'=>'fail:frequent requests']);
 				}else{
-					$json 				= ['code'=>200,'msg'=>'success','data'=>$this->makeHash($cache_key)];
+					$json 				= $this->returnData(['code'=>200,'msg'=>'success','data'=>$this->makeHash($cache_key)]);
 					$this->cache->set($cache_key, json_encode(['expiry_time'=>time() + 10]));
 				}
 			}else{
-				$json 					= ['code'=>201,'msg'=>'fail:code is error','data'=>''];
+				$json 					= $this->returnData(['msg'=>'fail:code is error']);
 			}
 		}else{
 
-			$json 		= ['code'=>202,'msg'=>'fail:sign error','data'=>''];
+			$json 		= $this->returnData(['msg'=>'fail:sign error']);
 		}
 		
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
+		
+		return $this->response->setOutput($json);
 	}
 
 	public function makeHash($code = '')
@@ -115,6 +123,7 @@ class ControllerApiHome extends Controller {
 		$session 					= new Session($this->config->get('session_engine'), $this->registry);
 		$session->start();
 		
+		$this->model_account_api->delApiSession($api_id);
 		$this->model_account_api->addApiSession($api_id, $session->getId(), $this->request->server['REMOTE_ADDR']);
 		
 		$session->data['api_id'] 			= $api_id;
@@ -123,26 +132,5 @@ class ControllerApiHome extends Controller {
 		$session->data['api_token'] 		= $session->getId();
 
 		return $session->getId();
-	}
-
-	public function testdf()
-	{
-		require "vendor/yiliandf/lib/YiLian.class.php";
-    	$yilian = new YiLian();
-    	$data = array(
-		    'ACC_NO'=>'6227003811930123771',
-		    'ACC_NAME'=>'笪飞亚',
-			'ID_NO'=>'',
-			'MOBILE_NO'=>'',
-		//    'ACC_PROVINCE'=>'',
-		//    'ACC_CITY'=>'',
-		    'AMOUNT'=>'1000.00',
-		    'CNY'=>'CNY',
-		    'PAY_STATE'=>'',
-		    'MER_ORDER_NO'=>'123456'
-		);
-
-		$res = $yilian->pay($data);
-    	print_r($res);exit();
 	}
 }

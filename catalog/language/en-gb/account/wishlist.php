@@ -6,8 +6,8 @@ $_['heading_title']   = 'My Wish List';
 $_['text_account']    = 'Account';
 $_['text_instock']    = 'In Stock';
 $_['text_wishlist']   = 'Wish List (%s)';
-$_['text_login']      = 'You must login to save your wish list</a>!';
-$_['text_success']    = 'Added to wish list</a>!';
+$_['text_login']      = 'You must login to save your wish list!';
+$_['text_success']    = 'Added to wish list!';
 $_['text_remove']     = 'Success: You have modified your wish list!';
 $_['text_no_results'] = 'Your wish list is empty.';
 

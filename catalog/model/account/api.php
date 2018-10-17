@@ -34,6 +34,10 @@ class ModelAccountApi extends Model {
 		return $api_id;
 	}
 
+	public function delApiSession($api_id) {
+		$this->db->query("DELETE FROM " . DB_PREFIX . "api_session WHERE api_id = '" . (int)$api_id . "'");
+	}
+
 	public function getApiInfoByCode($code){
 		$query = $this->db->query("SELECT `api_id`,`username`,`key`,`status` FROM `" . DB_PREFIX . "api` WHERE `code` = '" . $this->db->escape($code) . "' AND status = '1'");
 		return $query->row;
