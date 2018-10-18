@@ -44,3 +44,4 @@ $_['error_required']           = '%s required!';
 $_['error_product']            = 'Warning: There are no products in your cart!';
 $_['error_recurring_required'] = 'Please select a payment recurring!';
 $_['error_flash_count']        = 'The maximum this product you can buy is %s!';
+$_['error_product']            = 'Product not found!';

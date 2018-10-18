@@ -26,16 +26,18 @@ class ControllerApiProduct extends Controller {
 
 				//折扣率计算
 				$pinfo['discount'] 		= ($pinfo['price'] >= $pinfo['oprice']) ? round(($pinfo['price'] - $pinfo['oprice'])/$pinfo['price'], 4)*100 : 0;
+				$pinfo['free_shipping'] = '包邮';
 
 				//产品属性
 				$opt 								= [];
 				$productModel 						= \Models\Product::find($product_info['product_id']);
 				$variants 							= $productModel->getProductVariantsDetail();
+
 				if ($variants) {
 					$opt['variants'] 				= $variants['variants'];
-					$opt['keys'] 					= $productModel->getVariantKeys();
-					/*$opt['product_variants'] 	= $variants['product_variants'];
-					$opt['skus'] 				= $variants['skus'];*/
+					$opt['sku'] 					= $productModel->getVariantKeys();
+					/*$opt['product_variants'] 		= $variants['product_variants'];
+					$opt['skus'] 					= $variants['skus'];*/
 				}
 
 				//所有商品ID 子产品和和主产品
@@ -93,13 +95,7 @@ class ControllerApiProduct extends Controller {
 		        	$seller_info['store_name'] 		= $seller['store_name'];
 		        	$seller_info['product_total'] 	= $seller['total'];
 		        	$seller_info['rating'] 			= sprintf("%.1f", $seller['rating']);
-		        	$seller_info['chat_req'] 		= '10%';
-
 		        }
-
-		        
-
-				//$data['product_info'] 	= $product_info;
 
 				//商品图片
 				$product_image 			= $this->model_catalog_product->getProductImages($product_info['product_id']);
@@ -123,6 +119,7 @@ class ControllerApiProduct extends Controller {
 				$data['reviews'] 					= $review;
 		        $data['seller_info'] 				= $seller_info;
 		        $data['variants'] 					= $opt;
+		        $data['free_shipping'] 				= '10';
 
 				$json 								= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
 			}

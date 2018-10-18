@@ -23,7 +23,7 @@ $_['thousand_point']          = ',';
 $_['column_id']               = 'ID';
 
 // Text
-$_['text_home']               = '<i class="fa fa-home"></i>';
+$_['text_home']               = '<i class="fa fa-home"></i>&nbsp;<strong>Home</strong>';
 $_['text_yes']                = '是';
 $_['text_no']                 = '否';
 $_['text_none']               = ' --- 无 --- ';
