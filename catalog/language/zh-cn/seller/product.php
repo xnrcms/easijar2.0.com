@@ -181,6 +181,7 @@ $_['text_confirm_save']          = '确认要保存修改吗？';
 $_['button_save_changes']        = '保存修改';
 $_['text_save_success']          = '保存成功';
 $_['error_product_seller']       = '错误：不能删除不属于自己的商品';
+$_['error_master_cannot_delete'] = '错误：该商品是主商品，不能删除，请先删除其子商品然后再删除该商品';
 $_['error_network']              = '网络链接失败，请稍候再试！';
 $_['text_confirm_delete_group']  = '确认要删除此分组吗？';
 $_['text_delete_success']        = '删除成功';

@@ -829,6 +829,10 @@ class ControllerSellerProduct extends Controller
             if (!$seller_product) {
                 $error = $this->language->get('error_product_seller');
             }
+
+            if (\Models\Product::find($product_id)->isMaster()) {
+                $error = $this->language->get('error_master_cannot_delete');
+            }
         }
         if ($error) {
             $this->error['warning'] = $error;
@@ -1181,6 +1185,7 @@ class ControllerSellerProduct extends Controller
         }
 
         $data['product_attributes'] = array();
+        //dd($product_attributes);
         foreach ($product_attributes as $product_attribute) {
             $attribute_info = $this->ms_product->getAttribute($product_attribute['attribute_id']);
             if ($attribute_info) {

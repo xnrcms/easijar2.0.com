@@ -427,18 +427,18 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {% set attribute_row = 0 %}
-                        {% for product_attribute in product_attributes %}
-                          <tr id="attribute-row{{ attribute_row }}">
-                            <td class="text-left" style="width: 40%;"><input type="text" name="product_attribute[{{ attribute_row }}][name]" value="{{ product_attribute.name }}" placeholder="{{ entry_attribute }}" class="form-control"/> <input type="hidden" name="product_attribute[{{ attribute_row }}][attribute_id]" value="{{ product_attribute.attribute_id }}"/></td>
-                            <td class="text-left">{% for language in languages %}
-                                <div class="input-group"><span class="input-group-addon"><img src="catalog/language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/></span> <textarea name="product_attribute[{{ attribute_row }}][product_attribute_description][{{ language.language_id }}][text]" rows="5" placeholder="{{ entry_text }}" class="form-control">{{ product_attribute.product_attribute_description[language.language_id] ? product_attribute.product_attribute_description[language.language_id].text }}</textarea>
-                                </div>
-                              {% endfor %}</td>
-                            <td class="text-left"><button type="button" onclick="$('#attribute-row{{ attribute_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
-                          </tr>
-                          {% set attribute_row = attribute_row + 1 %}
-                        {% endfor %}
+                      {% set attribute_row = 0 %}
+                      {% for product_attribute in product_attributes %}
+                        <tr id="attribute-row{{ attribute_row }}">
+                          <td class="text-left" style="width: 40%;"><input type="text" name="product_attribute[{{ attribute_row }}][name]" value="{{ product_attribute.name }}" placeholder="{{ entry_attribute }}" class="form-control"/> <input type="hidden" name="product_attribute[{{ attribute_row }}][attribute_id]" value="{{ product_attribute.attribute_id }}"/></td>
+                          <td class="text-left">{% for language in languages %}
+                              <div class="input-group"><span class="input-group-addon"><img src="catalog/language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}"/></span> <textarea name="product_attribute[{{ attribute_row }}][product_attribute_description][{{ language.language_id }}][text]" rows="5" placeholder="{{ entry_text }}" class="form-control">{{ product_attribute.product_attribute_description[language.language_id] ? product_attribute.product_attribute_description[language.language_id].text }}</textarea>
+                              </div>
+                            {% endfor %}</td>
+                          <td class="text-left"><button type="button" onclick="$('#attribute-row{{ attribute_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+                        </tr>
+                        {% set attribute_row = attribute_row + 1 %}
+                      {% endfor %}
                       </tbody>
                       <tfoot>
                       <tr>
@@ -633,9 +633,6 @@
     </div>
     {{ content_bottom }}
   </div>
-{% endblock %}
-
-{% block footer %}
   <script type="text/javascript">
     jQuery(document).ready(function($) {
       $('.date').datetimepicker({
@@ -742,12 +739,10 @@
     $('#product-related').delegate('.fa-minus-circle', 'click', function() {
       $(this).parent().remove();
     });
-
-    // Attribute
-    var attribute_row = '{{ attribute_row }}';
+    var attribute_row = {{ attribute_row }};
     function addAttribute() {
       html = '<tr id="attribute-row' + attribute_row + '">';
-      html += '  <td class="text-left" style="width: 30%;"><input type="text" name="product_attribute[' + attribute_row + '][name]" value="" placeholder="{{ entry_attribute }}" class="form-control" /><input type="hidden" name="product_attribute[' + attribute_row + '][attribute_id]" value="" /></td>';
+      html += '  <td class="text-left" style="width: 20%;"><input type="text" name="product_attribute[' + attribute_row + '][name]" value="" placeholder="{{ entry_attribute }}" class="form-control" /><input type="hidden" name="product_attribute[' + attribute_row + '][attribute_id]" value="" /></td>';
       html += '  <td class="text-left">';
       {% for language in languages %}
       html += '<div class="input-group"><span class="input-group-addon"><img src="catalog/language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span><textarea name="product_attribute[' + attribute_row + '][product_attribute_description][{{ language.language_id }}][text]" rows="5" placeholder="{{ entry_text }}" class="form-control"></textarea></div>';
@@ -755,8 +750,11 @@
       html += '  </td>';
       html += '  <td class="text-left"><button type="button" onclick="$(\'#attribute-row' + attribute_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
       html += '</tr>';
+
       $('#attribute tbody').append(html);
+
       attributeautocomplete(attribute_row);
+
       attribute_row++;
     }
 

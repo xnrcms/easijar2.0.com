@@ -503,6 +503,14 @@ class ControllerMultisellerProduct extends Controller {
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
+        if (!$this->error) {
+            foreach ($this->request->post['selected'] as $product_id) {
+                if (\Models\Product::find($product_id)->isMaster()) {
+                    $this->error['warning'] = $this->language->get('error_master_cannot_delete');
+                }
+            }
+        }
+
         return !$this->error;
     }
 

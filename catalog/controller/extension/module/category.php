@@ -40,7 +40,7 @@ class ControllerExtensionModuleCategory extends Controller {
 				$grand_children = $this->model_catalog_category->getCategories($child['category_id']);
 				$grand_children_data = [];
 				foreach ($grand_children as $grand_child) {
-					$filter_data = array('filter_category_id' => $grand_child['category_id'], 'filter_sub_category' => true);
+					$filter_data = array('filter_category_id' => $grand_child['category_id'], 'filter_sub_category' => true,'parent_id'=>0);
 					$grand_children_data[] = array(
 						'category_id' => $grand_child['category_id'],
 						'name' => $grand_child['name'] . (config('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
@@ -48,7 +48,7 @@ class ControllerExtensionModuleCategory extends Controller {
 					);
 				}
 
-				$filter_data = array('filter_category_id' => $child['category_id'], 'filter_sub_category' => true);
+				$filter_data = array('filter_category_id' => $child['category_id'], 'filter_sub_category' => true,'parent_id'=>0);
 
 				$children_data[] = array(
 					'category_id' => $child['category_id'],
@@ -60,7 +60,8 @@ class ControllerExtensionModuleCategory extends Controller {
 
 			$filter_data = array(
 				'filter_category_id'  => $category['category_id'],
-				'filter_sub_category' => true
+				'filter_sub_category' => true,
+				'parent_id'=>0
 			);
 
 			$data['categories'][] = array(

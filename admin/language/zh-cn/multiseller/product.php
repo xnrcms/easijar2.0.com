@@ -128,3 +128,4 @@ $_['error_quantity_required']    = 'quantity 不能不空！';
 $_['error_content_required']     = '内容不能为空';
 $_['error_number_quantity']      = '只能输入大于 0 的数值';
 $_['error_number_scope']         = '只能输入大于 0 小于等于 100 的数值';
+$_['error_master_cannot_delete'] = '错误：该商品是主商品，不能删除，请先删除其子商品然后再删除该商品';

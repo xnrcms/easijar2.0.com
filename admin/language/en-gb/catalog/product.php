@@ -179,3 +179,4 @@ $_['error_status_required']      = 'status is missing.';
 $_['error_model_required']       = 'model is missing.';
 $_['error_quantity_required']    = 'quantity is missing.';
 $_['error_sku']                  = 'SKU must be between 3 and 64 characters!';
+$_['error_master_cannot_delete'] = 'Master product cannot be deleted! Please delete the sub products to the master first.';

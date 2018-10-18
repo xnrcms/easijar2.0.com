@@ -1142,7 +1142,7 @@ class ControllerCatalogProduct extends Controller {
         }
 
         $data['product_attributes'] = array();
-
+        //dd($product_attributes);
         foreach ($product_attributes as $product_attribute) {
             $attribute_info = $this->model_catalog_attribute->getAttribute($product_attribute['attribute_id']);
 
@@ -1393,6 +1393,14 @@ class ControllerCatalogProduct extends Controller {
     protected function validateDelete() {
         if (!$this->user->hasPermission('modify', 'catalog/product')) {
             $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        if (!$this->error) {
+            foreach ($this->request->post['selected'] as $product_id) {
+                if (\Models\Product::find($product_id)->isMaster()) {
+                    $this->error['warning'] = $this->language->get('error_master_cannot_delete');
+                }
+            }
         }
 
         return !$this->error;

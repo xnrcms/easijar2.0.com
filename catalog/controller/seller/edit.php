@@ -1,6 +1,15 @@
 <?php
 class ControllerSellerEdit extends Controller {
 	private $error = array();
+    private $ms_seller = null;
+
+    public function __construct($registry)
+    {
+        parent::__construct($registry);
+
+        $this->ms_seller = \Seller\MsSeller::getInstance($registry);
+        $_SESSION['seller_upload_permission'] = $this->ms_seller->sellerId();
+    }
 
     public function index() {
 		if (!$this->customer->isLogged()) {
@@ -10,6 +19,11 @@ class ControllerSellerEdit extends Controller {
         } else if (!$this->customer->isSeller()) {
             $this->response->redirect($this->url->link('seller/add'));
 		}
+
+        if (!session_id()) {
+            session_start();
+        }
+        $_SESSION['seller_upload_permission'] = $this->ms_seller->sellerId();
 
 		$this->load->language('seller/edit');
         $this->load->language('seller/layout');
