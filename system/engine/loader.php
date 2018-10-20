@@ -12,6 +12,7 @@
  */
 final class Loader {
 	protected $registry;
+	private $viewData;
 
 	/**
 	 * Constructor
@@ -135,6 +136,9 @@ final class Loader {
 		if ($result && !$result instanceof Exception) {
 			$output = $result;
 		}
+
+		//返回处理好的数据
+		$this->viewData 	= $data;
 
 		return $output;
 	}
@@ -264,5 +268,22 @@ final class Loader {
 
 			return $output;
 		};
+	}
+
+	public function getViewData($key = '')
+	{
+		if (is_string($key)) {
+			$keys 	= explode(',', $key);
+		}else{
+			$keys 	= $ksy;
+		}
+
+		$arr 		= [];
+		foreach ($keys as $val) {
+			if (isset($this->viewData[$val])) {
+				$arr[$val] 	= $this->viewData[$val];
+			}
+		}
+		return !empty($arr) ? $arr : $this->viewData;
 	}
 }

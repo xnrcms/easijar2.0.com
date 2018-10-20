@@ -31,14 +31,18 @@ class ControllerSellerEvent extends Controller {
         foreach ($data['products'] as $key => $product) {
             foreach ($cart_products as $cart) {
                 if ($cart['cart_id'] == $product['cart_id']) {
-                    $seller_info = $this->model_multiseller_seller->getSellerByProductId($cart['product_id']);
-                    $seller_id = $seller_info ? $seller_info['seller_id'] : 0;
+                    $seller_info        = $this->model_multiseller_seller->getSellerByProductId($cart['product_id']);
+                    $seller_id          = $seller_info ? $seller_info['seller_id'] : 0;
+
                     if (isset($products[$seller_id])) {
-                        $products[$seller_id]['products'][] = $product;
+                        $products[$seller_id]['products'][]     = $product;
                     } else {
                         $products[$seller_id] = array(
-                            'store_name' => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
-                            'products' => array($product)
+                            'store_id'      => $seller_info ? $seller_id : 0,
+                            'store_name'    => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
+                            'coupon'        => 0,
+                            'shipping'      => 0,
+                            'products'      => array($product),
                         );
                     }
                 }

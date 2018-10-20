@@ -52,77 +52,30 @@ class ControllerApiCheckout extends Controller
     {
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token','buy_type'];
+        $allowKey       = ['api_token','selected'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
-        if ($this->checkSign($req_data)) {
-
-            $json       = [];
-
-            if (!$this->isValidCart()) return $this->response->setOutput($this->returnData(['msg'=>'fail:ValidCart is error']));
-            if (!$this->isLogged()){
-                $json['code']       = '201';
-                $json['msg']        = t('warning_login');
-                return $this->response->setOutput($this->returnData($json));
-            }
-
-            // Shipping address
-            $this->initAddressSession('shipping');
-
-            // Payment address
-            $this->initAddressSession('payment');
-
-            // Init pickup
-            if ($this->hasShipping()) {
-                unset($this->session->data['pickup_id']);
-            }
-
-            /*if ($this->hasShipping()) {
-                $this->log($this->session->data['shipping_address']);
-            }
-
-            $this->log($this->session->data['payment_address']);*/
-
-            $json['logged']                         = $this->isLogged();
-            $json['shipping_required']              = $this->hasShipping();
-            //$json['payment_address_required']       = $this->isPaymentAddressRequired();
-
-            if ($this->hasShipping()) {
-                $json['shipping_address_section']   = $this->renderAddressSection('shipping');
-            }
-
-            if ($this->isPaymentAddressRequired()) {
-                $json['payment_address_section']    = $this->renderAddressSection('payment');
-            }
-
-           /* $json['if_pickup_section']              = $this->renderIfPickupSection();
-            $json['pickup_section']                 = $this->renderPickupSection();
-            $json['shipping_method_section']        = $this->renderShippingMethodSection();
-            $json['payment_method_section']         = $this->renderPaymentMethodSection();
-
-            $json['cart_section']                   = $this->renderCartSection();
-            $json['comment_section']                = $this->renderCommentSection();
-            $json['agree_section']                  = $this->renderAgreeSection();*/
-
-            return $this->response->setOutput($this->returnData($json));
-        }else{
-            $data       = $this->returnData(['msg'=>'fail:sign error']);
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
-        return $this->response->setOutput($data);
+        $json       = [];
 
-        /*if (!$this->isValidCart()) {
-            $this->log('Cart invalid');
-            $this->response->redirect($this->url->link('checkout/cart'));
-            return;
+        if (!$this->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        if (!$this->isLogged()) {
-            $this->session->data['redirect'] = $this->url->link('checkout/cart');
-            $this->session->data['error'] = t('warning_login');
-            $this->response->redirect($this->url->link('account/login'));
-            return;
+        if (!$this->isValidCart()){
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:ValidCart is error']));
+        }
+
+        //校验是否勾选额购物车商品
+        if (isset($req_data['selected']) && !empty($req_data['selected']) && is_string($req_data['selected'])) {
+            $selected       = explode(',', $req_data['selected']);
+            $this->cart->select($selected);
+        } else {
+            return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>'cart select error']));
         }
 
         // Shipping address
@@ -136,248 +89,85 @@ class ControllerApiCheckout extends Controller
             unset($this->session->data['pickup_id']);
         }
 
-        if ($this->hasShipping()) {
+        /*if ($this->hasShipping()) {
             $this->log($this->session->data['shipping_address']);
         }
-        $this->log($this->session->data['payment_address']);
 
-        $this->load->language('checkout/checkout');
-        $this->document->setTitle(t('heading_title'));
-        $this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment.min.js');
-        $this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js');
-        $this->document->addScript('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js');
-        $this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');
+        $this->log($this->session->data['payment_address']);*/
 
-        // Required by klarna
-        if ($this->config->get('klarna_account') || $this->config->get('klarna_invoice')) {
-            $this->document->addScript('http://cdn.klarna.com/public/kitt/toc/v1.0/js/klarna.terms.min.js');
-        }
-
-        $breadcrumbs = new Breadcrumb();
-        $breadcrumbs->add(t('text_home'), $this->url->link('common/home'));
-        $breadcrumbs->add(t('text_cart'), $this->url->link('checkout/cart'));
-        $breadcrumbs->add(t('heading_title'), $this->url->link('checkout/checkout'));
-        $data['breadcrumbs'] = $breadcrumbs->all();
-
-        if (isset($this->session->data['error'])) {
-            $data['error_warning'] = $this->session->data['error'];
-            unset($this->session->data['error']);
-        } else {
-            $data['error_warning'] = '';
-        }
-
-        $data['logged'] = $this->isLogged();
-        $data['shipping_required'] = $this->hasShipping();
-        $data['payment_address_required'] = $this->isPaymentAddressRequired();
+        $json['logged']                         = $this->isLogged();
+        $json['shipping_required']              = $this->hasShipping();
+        //$json['payment_address_required']       = $this->isPaymentAddressRequired();
 
         if ($this->hasShipping()) {
-            $data['shipping_address_section'] = $this->renderAddressSection('shipping');
+            $json['shipping_address_section']   = $this->renderAddressSection('shipping');
         }
 
         if ($this->isPaymentAddressRequired()) {
-            $data['payment_address_section'] = $this->renderAddressSection('payment');
+            $json['payment_address_section']    = $this->renderAddressSection('payment');
         }
 
-        $data['if_pickup_section'] = $this->renderIfPickupSection();
-        $data['pickup_section'] = $this->renderPickupSection();
-        $data['shipping_method_section'] = $this->renderShippingMethodSection();
-        $data['payment_method_section'] = $this->renderPaymentMethodSection();
+        //$json['if_pickup_section']              = $this->renderIfPickupSection();
+        //$json['pickup_section']                 = $this->renderPickupSection();
+        $json['shipping_method_section']        = $this->renderShippingMethodSection();
+        $json['payment_method_section']         = $this->renderPaymentMethodSection();
 
-        $data['cart_section'] = $this->renderCartSection();
-        $data['comment_section'] = $this->renderCommentSection();
-        $data['agree_section'] = $this->renderAgreeSection();
+        $json['cart_section']                   = $this->renderCartSection();
+        //$json['comment_section']                = $this->renderCommentSection();
+        //$json['agree_section']                  = $this->renderAgreeSection();
 
-        $data['column_left'] = $this->load->controller('common/column_left');
-        $data['column_right'] = $this->load->controller('common/column_right');
-        $data['content_top'] = $this->load->controller('common/content_top');
-        $data['content_bottom'] = $this->load->controller('common/content_bottom');
-        $data['footer'] = $this->load->controller('common/footer');
-        $data['header'] = $this->load->controller('common/header');
-
-        $this->response->setOutput($this->load->view('checkout/checkout/checkout', $data));*/
-    }
-
-    // Update checkout
-    public function update()
-    {
-        if ($this->request->server['REQUEST_METHOD'] != 'POST') {
-            $this->response->redirect($this->url->link('checkout/cart'));
-        }
-
-        $this->log(__FUNCTION__);
-        $this->log($this->request->post);
-
-        $redirect = '';
-        $error = array();
-
-        if (!$this->isLogged()) {
-            $redirect = $this->url->link('account/login');
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        if (!$this->isValidCart()) {
-            $redirect = $this->url->link('checkout/cart');
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Shipping address id
-        if ($addressId = array_get($this->request->post, 'shipping_address_id')) {
-            if (!$this->hasShipping()) {
-                unset($this->session->data['shipping_address']);
-                unset($this->session->data['shipping_methods']);
-                unset($this->session->data['shipping_method']);
-            } else {
-                $address = $this->model_account_address->getAddress($addressId);
-                $this->syncAddressSession('shipping', $address);
-
-                if (! $this->isPaymentAddressRequired()) {
-                    $this->syncAddressSession('payment', $address);
-                }
-
-                $code = array_get($this->session->data, 'shipping_method.code');
-                if (!$this->model_checkout_checkout->setShippingMethod($code)) {
-                    $this->model_checkout_checkout->setShippingMethod();
-                }
-
-                if (! $this->isPaymentAddressRequired()) {
-                    $code = array_get($this->session->data, 'payment_method.code');
-                    if (!$this->model_checkout_checkout->setPaymentMethod($code)) {
-                        $this->model_checkout_checkout->setPaymentMethod();
-                    }
-                }
-            }
-
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Payment address id
-        if ($addressId = array_get($this->request->post, 'payment_address_id')) {
-            $address = $this->model_account_address->getAddress($addressId);
-            $this->syncAddressSession('payment', $address);
-
-            $code = array_get($this->session->data, 'payment_method.code');
-            if (!$this->model_checkout_checkout->setPaymentMethod($code)) {
-                $this->model_checkout_checkout->setPaymentMethod();
-            }
-
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Payment method
-        if ($code = array_get($this->request->post, 'payment_method')) {
-            if (!array_get($this->session->data, 'payment_address')) {
-                $redirect = $this->url->link('checkout/cart');
-                $this->printJson($error, $redirect);
-                return;
-            }
-
-            if (!$this->model_checkout_checkout->setPaymentMethod($code)) {
-                $this->session->data['error'] = t('error_payment_unavailable');
-                $redirect = $this->url->link('checkout/checkout');
-            }
-
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Shipping method
-        if ($code = array_get($this->request->post, 'shipping_method')) {
-            if (!array_get($this->session->data, 'shipping_address')) {
-                $redirect = $this->url->link('checkout/cart');
-                $this->printJson($error, $redirect);
-                return;
-            }
-
-            if (!$this->model_checkout_checkout->setShippingMethod($code)) {
-                $this->session->data['error'] = t('error_shipping_unavailable');
-                $redirect = $this->url->link('checkout/checkout');
-            }
-
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // IF Pickup
-        if (isset($this->request->post['is_pickup'])) {
-            $this->session->data['is_pickup'] = (bool)$this->request->post['is_pickup'];
-            if (!$this->session->data['is_pickup'] && !isset($this->session->data['shipping_address'])) {
-                $this->initAddressSession('shipping');
-            }
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Pickup
-        if (isset($this->request->post['pickup_id'])) {
-            $this->session->data['pickup_id'] = $this->request->post['pickup_id'];
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Comment
-        if (isset($this->request->post['comment'])) {
-            $this->session->data['comment'] = $this->request->post['comment'];
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        // Agreement
-        if (isset($this->request->post['terms'])) {
-            $this->session->data['checkout_terms'] = $this->request->post['terms'];
-            $this->printJson($error, $redirect);
-            return;
-        }
+        return $this->response->setOutput($this->returnData($json));
     }
 
     // Validate and submit order
     public function confirm()
     {
+
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','shipping_address_id','payment_method','shipping_method'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!$this->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        if (!$this->isValidCart()){
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:ValidCart is error']));
+        }
+
+        if (!(isset($req_data['shipping_address_id']) && intval($req_data['shipping_address_id']) > 0 )) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:shipping_address_id is error']));
+        }
+
+        if (!(isset($req_data['payment_method']) && !empty($req_data['payment_method']) > 0 )) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:payment_method is error']));
+        }
+
         $this->log(__FUNCTION__);
-        $redirect = '';
-        $error = array();
-
-        if ($this->request->server['REQUEST_METHOD'] != 'POST') {
-            $this->response->redirect($this->url->link('checkout/cart'));
-        }
-
-        if (!$this->isLogged()) {
-            $redirect = $this->url->link('account/login');
-            $this->printJson($error, $redirect);
-            return;
-        }
-
-        if (!$this->isValidCart()) {
-            $redirect = $this->url->link('checkout/cart');
-            $this->printJson($error, $redirect);
-            return;
-        }
+        
 
         $this->log($this->request->post);
 
-        $order_data = array();
-
-        $order_data['payment_address'] = array();
-        $order_data['shipping_address'] = array();
+        $order_data                         = [];
+        $order_data['payment_address']      = [];
+        $order_data['shipping_address']     = [];
 
         // Shipping address
         if ($this->hasShipping()) {
-            $addressId = (int)array_get($this->request->post, 'shipping_address_id');
-            if (! $addressId) {
-                $error['shipping_address'] = t('error_address');
-                $this->printJson($error, $redirect);
-                return;
+            $addressId                      = (int)array_get($req_data, 'shipping_address_id');
+            if (!$addressId) {
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_address')]));
             }
 
-            $address = $this->model_account_address->getAddress($addressId);
+            $address                        = $this->model_account_address->getAddress($addressId);
             if (!$address) { // Selected address not exists anymore
-                $this->session->data['warning_error'] = t('error_address_not_exist');
-                $redirect = $this->url->link('checkout/checkout');
-                $this->printJson($error, $redirect);
-                return;
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_address_not_exist')]));
             }
 
             $order_data['shipping_address'] = $address;
@@ -397,38 +187,33 @@ class ControllerApiCheckout extends Controller
             }
 
             if ($this->config->get('config_checkout_pickup') && !array_get($this->session->data, 'pickup_id', 0)) {
-                $error['pickup'] = t('error_pickup');
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_pickup')]));
             }
         }
 
         // Payment address
-        if ($this->isPaymentAddressRequired()) {
-            $addressId = (int)array_get($this->request->post, 'payment_address_id');
+        /*if ($this->isPaymentAddressRequired()) {
+            $addressId = (int)array_get($req_data, 'payment_address_id');
             if (! $addressId) {
-                $error['payment_address'] = t('error_address');
-                $this->printJson($error, $redirect);
-                return;
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_address')]));
             }
 
             $address = $this->model_account_address->getAddress($addressId);
             if (!$address) { // Selected address not exists anymore
-                $this->session->data['warning_error'] = t('error_address_not_exist');
-                $redirect = $this->url->link('checkout/checkout');
-                $this->printJson($error, $redirect);
-                return;
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_address_not_exist')]));
             }
 
-            $order_data['payment_address'] = $address;
+            $order_data['payment_address']  = $address;
             $this->syncAddressSession('payment', $address);
-        }
+        }*/
 
         // Payment method
-        if (!array_get($this->request->post, 'payment_method')) {
-            $error['payment_method']['warning'] = t('error_payment');
+        if (!array_get($req_data, 'payment_method')) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_payment')]));
         } else {
-            $code = array_get($this->request->post, 'payment_method');
+            $code = array_get($req_data, 'payment_method');
             if (!$this->model_checkout_checkout->setPaymentMethod($code)) {
-                $error['payment_method']['warning'] = t('error_payment_unavailable');
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_payment_unavailable')]));
             } else {
                 $order_data['payment_method'] = $code;
             }
@@ -436,17 +221,15 @@ class ControllerApiCheckout extends Controller
 
         // Shipping method
         if ($this->hasShipping()) {
-            if (empty($error['shipping_address'])) {
-                if (!array_get($this->request->post, 'shipping_method')) {
-                    $error['shipping_method']['warning'] = t('error_shipping');
+            if (!array_get($req_data, 'shipping_method')) {
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_shipping')]));
+            } else {
+                $code = array_get($req_data, 'shipping_method');
+                if (!$this->model_checkout_checkout->setShippingMethod($code)) {
+                    return $this->response->setOutput($this->returnData(['msg'=>t('error_shipping_unavailable')]));
                 } else {
-                    $code = array_get($this->request->post, 'shipping_method');
-                    if (!$this->model_checkout_checkout->setShippingMethod($code)) {
-                        $error['shipping_method']['warning'] = t('error_shipping_unavailable');
-                    } else {
-                        $shipping = explode('.', $code);
-                        $order_data['shipping_method'] = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
-                    }
+                    $shipping                       = explode('.', $code);
+                    $order_data['shipping_method']  = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
                 }
             }
         } else {
@@ -455,20 +238,15 @@ class ControllerApiCheckout extends Controller
         }
 
         // Comment
-        $order_data['comment'] = array_get($this->request->post, 'comment', '');
+        $order_data['comment']                          = array_get($req_data, 'comment', '');
 
         // Terms & conditions agreement
         if ($this->config->get('config_checkout_id')) {
             $this->load->model('catalog/information');
             $information = $this->model_catalog_information->getInformation($this->config->get('config_checkout_id'));
             if ($information && !array_get($this->request->post, 'terms')) {
-                $error['agree']['terms'] = sprintf(t('error_agree'), $information['title']);
+                return $this->response->setOutput($this->returnData(['msg'=>sprintf(t('error_agree'), $information['title'])]));
             }
-        }
-
-        if ($error) {
-            $this->printJson($error, $redirect);
-            return;
         }
 
         // ALL set, update address session then submit the order
@@ -478,7 +256,7 @@ class ControllerApiCheckout extends Controller
         } else {
             unset($this->session->data['shipping_address']);
         }
-
+        //return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$order_data]));
         try {
             // Comment
             $this->session->data['comment'] = $order_data['comment'];
@@ -493,12 +271,9 @@ class ControllerApiCheckout extends Controller
                 $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('payment_cod_order_status_id'));
             }
 
-            $this->printJson($error, $redirect);
-            return;
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order submit success']));
         } catch (\Exception $e) {
-            $error['checkout'] = $e->getMessage();
-            $this->printJson($error, $redirect);
-            return;
+            return $this->response->setOutput($this->returnData(['msg'=>$e->getMessage()]));
         }
     }
 
@@ -512,13 +287,14 @@ class ControllerApiCheckout extends Controller
             $data['payment_address_section'] = $this->renderAddressSection('payment');
         }
 
-        $data['if_pickup_section'] = $this->renderIfPickupSection();
-        $data['pickup_section'] = $this->renderPickupSection();
-        $data['payment_method_section'] = $this->renderPaymentMethodSection();
-        $data['shipping_method_section'] = $this->renderShippingMethodSection();
-        $data['cart_section'] = $this->renderCartSection();
-        $data['comment_section'] = $this->renderCommentSection();
-        $data['agree_section'] = $this->renderAgreeSection();
+        $data['if_pickup_section']          = $this->renderIfPickupSection();
+        $data['pickup_section']             = $this->renderPickupSection();
+        $data['payment_method_section']     = $this->renderPaymentMethodSection();
+        $data['shipping_method_section']    = $this->renderShippingMethodSection();
+        $data['cart_section']               = $this->renderCartSection();
+        $data['comment_section']            = $this->renderCommentSection();
+        $data['agree_section']              = $this->renderAgreeSection();
+
         $this->response->setOutput($this->load->view('checkout/checkout/_main_section', $data));
     }
 
@@ -717,10 +493,10 @@ class ControllerApiCheckout extends Controller
         return $this->cart->hasShipping();
     }
 
-    private function isValidCart($buy_type = 0)
+    private function isValidCart()
     {
         //设置购物车类型
-        $this->cart->setCartBuyType($buy_type);
+        $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
         
         // Validate cart has products and has stock.
         if ((!$this->cart->hasProducts() && empty($this->session->data['vouchers']) && empty($this->session->data['recharges'])) || (!$this->cart->hasStock() && !$this->config->get('config_stock_checkout'))) {
@@ -766,10 +542,9 @@ class ControllerApiCheckout extends Controller
     // Views
     private function renderAddressSection($type = 'shipping')
     {
-        $this->log(__FUNCTION__);
-        $data['logged'] = $this->isLogged();
+        $data['logged']     = $this->isLogged();
 
-        $address_id = (int)array_get($this->session->data, "{$type}_address.address_id");
+        $address_id         = (int)array_get($this->session->data, "{$type}_address.address_id");
         if ($address_id) {
             if(! $this->model_account_address->getAddress($address_id)) {
                 $address_id = 0;
@@ -777,7 +552,7 @@ class ControllerApiCheckout extends Controller
         }
 
         $data['address_id'] = $address_id ?: $this->customer->getAddressId();
-        $data['addresses'] = $this->model_account_address->getAddresses();
+        $data['addresses']  = $this->model_account_address->getAddresses();
 
         foreach ($data['addresses'] as $addressId => $address) {
             if ($addressId == $data['address_id']) {
@@ -793,7 +568,9 @@ class ControllerApiCheckout extends Controller
             return;
         }
 
-        return $this->load->view("checkout/checkout/_{$type}_address", $data);
+        $this->load->view("checkout/checkout/_{$type}_address", $data);
+
+        return $this->load->getViewData('addresses');
     }
 
     private function renderPaymentMethodSection()
@@ -803,16 +580,16 @@ class ControllerApiCheckout extends Controller
             $this->model_checkout_checkout->getPaymentMethods();
         }
 
-        if (empty($this->session->data['payment_methods'])) {
+        /*if (empty($this->session->data['payment_methods'])) {
             $data['error_warning'] = sprintf(t('error_no_payment'), $this->url->link('information/contact'));
         } else {
             $data['error_warning'] = '';
-        }
+        }*/
 
         if (isset($this->session->data['payment_methods'])) {
             $data['payment_methods'] = $this->session->data['payment_methods'];
         } else {
-            $data['payment_methods'] = array();
+            $data['payment_methods'] = [];
         }
 
         if (isset($this->session->data['payment_method']['code'])) {
@@ -821,13 +598,15 @@ class ControllerApiCheckout extends Controller
             $data['code'] = '';
         }
 
-        if (isset($this->session->data['comment'])) {
+        /*if (isset($this->session->data['comment'])) {
             $data['comment'] = $this->session->data['comment'];
         } else {
             $data['comment'] = '';
-        }
+        }*/
 
-        return $this->load->view('checkout/checkout/_payment_method', $data);
+        $this->load->view('checkout/checkout/_payment_method', $data);
+
+        return $this->load->getViewData('code,payment_methods');
     }
 
     private function renderIfPickupSection() {
@@ -877,7 +656,6 @@ class ControllerApiCheckout extends Controller
 
     private function renderShippingMethodSection()
     {
-        $this->log(__FUNCTION__);
         $data['shipping'] = $this->hasShipping();
 
         if ($this->hasShipping()) {
@@ -886,19 +664,21 @@ class ControllerApiCheckout extends Controller
                 $this->model_checkout_checkout->getShippingMethods();
             }
 
-            if (empty($this->session->data['shipping_methods'])) {
+            /*if (empty($this->session->data['shipping_methods'])) {
                 $data['error_warning'] = sprintf(t('error_no_shipping'), $this->url->link('information/contact'));
             } else {
                 $data['error_warning'] = '';
-            }
+            }*/
 
-            $data['shipping_methods'] = array_get($this->session->data, 'shipping_methods');
-            $data['code'] = array_get($this->session->data, 'shipping_method.code');
-        } else {
-            $data['text_shipping_not_required'] = t('text_shipping_not_required');
-        }
+            $data['shipping_methods']   = array_get($this->session->data, 'shipping_methods');
+            $data['code']               = array_get($this->session->data, 'shipping_method.code');
 
-        return $this->load->view('checkout/checkout/_shipping_method', $data);
+            $this->load->view('checkout/checkout/_shipping_method', $data);
+
+            return $this->load->getViewData('code,shipping_methods');
+        } 
+
+        return [];
     }
 
     private function renderCommentSection()
@@ -912,12 +692,14 @@ class ControllerApiCheckout extends Controller
     private function renderCartSection()
     {
         $this->log(__FUNCTION__);
-        $data['products'] = $this->getProducts();
-        $data['vouchers'] = $this->getVouchers();
-        $data['recharges'] = $this->getRecharges();
-        $data['totals'] = $this->getTotals();
+        $data['products']   = $this->getProducts();
+        $data['vouchers']   = $this->getVouchers();
+        $data['recharges']  = $this->getRecharges();
+        $data['totals']     = $this->getTotals();
 
-        return $this->load->view('checkout/checkout/_confirm', $data);
+        $this->load->view('checkout/checkout/_confirm', $data);
+
+        return $this->load->getViewData('products,vouchers,recharges,totals');
     }
 
     private function renderAgreeSection()

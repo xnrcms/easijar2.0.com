@@ -49,7 +49,7 @@ class Cart
     {
         if (!$this->data) {
 
-            $cart_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "cart WHERE (customer_id = '" . (int)$this->customer->getId() . "' OR session_id = '" . $this->db->escape($this->session->getId()) . "') AND buy_type = '" . $this->buy_type . "'");
+            $cart_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "cart WHERE (customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "') AND buy_type = '" . $this->buy_type . "'");
 
             foreach ($cart_query->rows as $cart) {
                 $stock = true;
@@ -183,8 +183,9 @@ class Cart
                         $option_data = array_merge($option_data, $variantData);
                     }
 
-                    $price = $product_query->row['price'];
+                    $price      = $product_query->row['price'];
 
+                    $oprice     = $product_query->row['price'];
                     // Product Discounts
                     $discount_quantity = 0;
 
@@ -276,6 +277,7 @@ class Cart
                         'subtract' => $product_query->row['subtract'],
                         'stock' => $stock,
                         'price' => ($price + $option_price),
+                        'oprice' => ($oprice + $option_price),
                         'total' => ($price + $option_price) * $cart['quantity'],
                         'reward' => $reward * $cart['quantity'],
                         'points' => ($product_query->row['points'] ? ($product_query->row['points'] + $option_points) * $cart['quantity'] : 0),
@@ -313,7 +315,7 @@ class Cart
     public function update($cart_id, $quantity)
     {
         if (\Flash::getSingleton()->canUpdateCart($cart_id, $quantity)) {
-            $this->db->query("UPDATE " . DB_PREFIX . "cart SET quantity = '" . (int)$quantity . "' WHERE cart_id = '" . (int)$cart_id . "' AND api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'");
+            $this->db->query("UPDATE " . DB_PREFIX . "cart SET quantity = '" . (int)$quantity . "' WHERE cart_id = '" . (int)$cart_id /*. "' AND api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) */. "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'");
 
             $this->data = array();
         }
