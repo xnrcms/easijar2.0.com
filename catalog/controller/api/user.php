@@ -188,67 +188,6 @@ class ControllerApiUser extends Controller {
         return $this->response->setOutput($data);
 	}
 
-	public function token() {
-		$this->load->language('account/login');
-
-		if (isset($this->request->get['email'])) {
-			$email = $this->request->get['email'];
-		} else {
-			$email = '';
-		}
-
-		if (isset($this->request->get['login_token'])) {
-			$token = $this->request->get['login_token'];
-		} else {
-			$token = '';
-		}
-
-		// Login override for admin users
-		$this->customer->logout();
-		$this->cart->clear();
-
-		unset($this->session->data['order_id']);
-		unset($this->session->data['payment_address']);
-		unset($this->session->data['payment_method']);
-		unset($this->session->data['payment_methods']);
-		unset($this->session->data['shipping_address']);
-		unset($this->session->data['shipping_method']);
-		unset($this->session->data['shipping_methods']);
-		unset($this->session->data['comment']);
-		unset($this->session->data['coupon']);
-		unset($this->session->data['reward']);
-		unset($this->session->data['voucher']);
-		unset($this->session->data['vouchers']);
-        unset($this->session->data['credit']);
-
-		$this->load->model('account/customer');
-
-		$customer_info = $this->model_account_customer->getCustomerByEmail($email);
-
-		if ($customer_info && $customer_info['token'] && $customer_info['token'] == $token && $this->customer->login($customer_info['customer_id'], '', true)) {
-			// Default Addresses
-			$this->load->model('account/address');
-
-			if ($this->config->get('config_tax_customer') == 'payment') {
-				$this->session->data['payment_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
-			}
-
-			if ($this->config->get('config_tax_customer') == 'shipping') {
-				$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
-			}
-
-			$this->model_account_customer->editToken($customer_info['customer_id'], '');
-
-			$this->response->redirect($this->url->link('account/account'));
-		} else {
-			$this->session->data['error'] = $this->language->get('error_login');
-
-			$this->model_account_customer->editToken($customer_info['customer_id'], '');
-
-			$this->response->redirect($this->url->link('account/login'));
-		}
-	}
-
 	private function register_validate($req_data = [])
 	{
 		if (array_get($req_data, 'email') && ((utf8_strlen($req_data['email']) > 96) || !filter_var($req_data['email'], FILTER_VALIDATE_EMAIL))) {
@@ -344,5 +283,65 @@ class ControllerApiUser extends Controller {
 	public function get_captcha()
 	{
 		$this->load->controller('extension/captcha/basic/captcha');
+	}
+
+	public function get_smscode()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+		$this->load->language('account/register');
+
+        $allowKey       = ['api_token','telephone','captcha'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        $telephone 		= array_get($req_data, 'telephone','');
+
+        if (empty($telephone)) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:telephone is empty']));
+        }
+
+		if (is_ft()) {
+            $telephones 		= explode('-', $telephone);
+            if (count($telephones) < 2 || !strlen($telephones[0]) || !strlen($telephones[1] || strlen($telephones[0]) > 4)) {
+            	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
+            }
+        } else {
+            if (array_get($this->request->post, 'telephone') && ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32))) {
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
+            }
+        }
+
+        $this->load->model('account/customer');
+        if ($this->model_account_customer->getTotalCustomersByTelephone($telephone)) {
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone_exists')]));
+        }
+
+		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('register', (array)$this->config->get('config_captcha_page'))) {
+            $this->load->language('extension/captcha/basic', 'captcha');
+            if (!isset($this->session->data['captcha']) || empty($this->session->data['captcha'])
+                || !isset($this->request->post['captcha']) || ($this->session->data['captcha'] != $this->request->post['captcha'])
+            ) {
+        		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('captcha')->get('error_captcha')]));
+            }
+        }
+
+        $code 							= mt_rand(100000, 999999); //生成校验码
+        $this->session->data['smscode'] = [
+        	'code'      => $code,
+            'telephone' => $telephone,
+            'time'      => time()
+        ];
+
+        $this->load->model('notify/notify');
+        $ret = $this->model_notify_notify->customerRegisterVerify($telephone, $code);
+        if ($ret === true) {
+			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'telephone smscode get success']));
+        } else {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail: '.$ret]));
+        }
 	}
 }
