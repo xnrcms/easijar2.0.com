@@ -18,20 +18,19 @@ class ControllerSellerBanner extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->model('multiseller/seller');
+		$this->load->model('multiseller/seller_banner');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_multiseller_seller->editSeller($this->customer->getId(), $this->request->post);
+			$this->model_multiseller_seller_banner->saveSellerBanner($this->customer->getId(), $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('seller/account'));
+			$this->response->redirect($this->url->link('seller/banner'));
 		}
 
       	$data['text_form_banner'] 		= !isset($this->request->get['banner_id']) ? $this->language->get('text_banner_add') : $this->language->get('text_banner_edit');
 
 		$data['breadcrumbs'] = array();
-
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home')
@@ -67,17 +66,6 @@ class ControllerSellerBanner extends Controller {
 
 		$url = '';
 
-		if (isset($this->request->get['sort'])) {
-			$url .= '&sort=' . $this->request->get['sort'];
-		}
-
-		if (isset($this->request->get['order'])) {
-			$url .= '&order=' . $this->request->get['order'];
-		}
-
-		if (isset($this->request->get['page'])) {
-			$url .= '&page=' . $this->request->get['page'];
-		}
 
 		$data['breadcrumbs'] = array();
 
@@ -97,13 +85,7 @@ class ControllerSellerBanner extends Controller {
 			$data['action'] = $this->url->link('seller/banner/index', '&banner_id=' . $this->request->get['banner_id']);
 		}
 
-		$data['cancel'] = $this->url->link('design/banner', 'user_token=' . $this->session->data['user_token'] . $url);
-
-		if (isset($this->request->get['banner_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
-			$banner_info = $this->model_design_banner->getBanner($this->request->get['banner_id']);
-		}
-
-		$data['user_token'] = $this->session->data['user_token'];
+		$banner_info 		= $this->model_multiseller_seller_banner->getSellerBanner($this->customer->getId());
 
 		if (isset($this->request->post['name'])) {
 			$data['name'] = $this->request->post['name'];
@@ -123,16 +105,14 @@ class ControllerSellerBanner extends Controller {
 
 		$this->load->model('localisation/language');
 
-		$data['languages'] = $this->model_localisation_language->getLanguages();
+		$data['languages'] 			= $this->model_localisation_language->getLanguages();
 
 		$this->load->model('tool/image');
 
 		if (isset($this->request->post['banner_image'])) {
 			$banner_images = $this->request->post['banner_image'];
-		} elseif (isset($this->request->get['banner_id'])) {
-			$banner_images = $this->model_design_banner->getBannerImages($this->request->get['banner_id']);
 		} else {
-			$banner_images = array();
+			$banner_images = $this->model_multiseller_seller_banner->getSellerBannerImages($this->customer->getId());
 		}
 
 		$data['banner_images'] = array();
@@ -157,8 +137,8 @@ class ControllerSellerBanner extends Controller {
 			}
 		}
 
-		$data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
-		$data['editor_language'] = $this->config->get('config_admin_language') == 'en-gb' ? 'en' : 'zh_CN';
+		$data['placeholder'] 		= $this->model_tool_image->resize('no_image.png', 100, 100);
+		$data['editor_language'] 	= $this->config->get('config_admin_language') == 'en-gb' ? 'en' : 'zh_CN';
 		
 
 		$data['column_left'] = $this->load->controller('common/column_left');
