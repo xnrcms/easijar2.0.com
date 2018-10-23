@@ -15,6 +15,7 @@ $_['text_account']              = '商户中心';
 $_['text_my_account']           = '管理中心';
 $_['text_dashboard']            = '管理首页';
 $_['text_edit']                 = '编辑资料';
+$_['text_banner']      			= '横幅设置';
 $_['text_password']             = '修改密码';
 $_['text_product']              = '商品管理';
 $_['text_order']                = '订单管理';

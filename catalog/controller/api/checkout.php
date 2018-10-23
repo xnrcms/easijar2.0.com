@@ -122,10 +122,9 @@ class ControllerApiCheckout extends Controller
     // Validate and submit order
     public function confirm()
     {
-
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token','shipping_address_id','payment_method','shipping_method'];
+        $allowKey       = ['api_token','shipping_address_id','payment_method','shipping_method','comment'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
@@ -266,12 +265,18 @@ class ControllerApiCheckout extends Controller
 
             // Change order status to Unpaid
             if ($order_data['payment_method'] != 'cod') {
+                $payment_view          = $this->load->controller("extension/payment/" . $order_data['payment_method']);
                 $this->model_checkout_order->addOrderHistory($order_id, config('config_unpaid_status_id'));
             } else { // cod order does not need unpaid status
+                $payment_view          = '';
                 $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('payment_cod_order_status_id'));
             }
 
-            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order submit success']));
+            $ret                            = [];
+            $ret['payment_method']          = $order_data['payment_method'];
+            $ret['payment_view']            = $payment_view;
+
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$ret]));
         } catch (\Exception $e) {
             return $this->response->setOutput($this->returnData(['msg'=>$e->getMessage()]));
         }
@@ -375,6 +380,7 @@ class ControllerApiCheckout extends Controller
 
     public function save_address()
     {
+        $this->response->addHeader('Content-Type: application/json');
 
         $allowKey       = ['api_token','fullname','telephone','address_1','address_2','country_id','zone_id','city','postcode','default','address_id','type'];
         $req_data       = $this->dataFilter($allowKey);
@@ -420,66 +426,6 @@ class ControllerApiCheckout extends Controller
         }
 
         return $this->response->setOutput($json);
-    }
-
-    // Payment connect page when order created
-    public function connect()
-    {
-        $this->log(__FUNCTION__);
-        if (!isset($this->session->data['order_id']) || (int)$this->session->data['order_id'] <= 0) {
-            $this->response->redirect($this->url->link('common/home'));
-        }
-
-        $data['order_id'] = $order_id = (int)$this->session->data['order_id'];
-        $order = $this->model_checkout_order->getOrder($order_id);
-        if (!$order) {
-            $this->response->redirect($this->url->link('common/home'));
-        }
-
-        // Redirect cod order to checkout/success page
-        if ($order['payment_code'] == 'cod') {
-            $this->response->redirect($this->url->link('checkout/success'));
-        }
-
-        // Check if order is unpaid
-        if ($order['order_status_id'] != config('config_unpaid_status_id')) {
-            $this->response->redirect($this->url->link('account/order/info', 'order_id=' . $order['order_id']));
-        }
-
-        $this->load->language('checkout/connect');
-
-        $this->document->setTitle(t('heading_title'));
-        $data['heading_title'] = t('heading_title');
-
-        $data['text_success'] = t('text_success');
-        $data['column_order_id'] = t('column_order_id');
-        $data['column_total'] = t('column_total');
-        $data['column_shipping_method'] = t('column_shipping_method');
-        $data['column_payment_method'] = t('column_payment_method');
-        $data['button_view'] = t('button_view');
-
-        $data['total'] = $this->currency->format($order['total'], $order['currency_code'], $order['currency_value']);
-
-        $data['shipping_method'] = $order['shipping_method'] ?: false;
-        $data['payment_method'] = $order['payment_method'];
-
-        $payment_code = $order['payment_code'];
-        if ($payment_code == 'cod') {
-            $data['payment_view'] = false;
-        } else {
-            $data['payment_view'] = $this->load->controller("extension/payment/{$payment_code}");
-        }
-
-        $data['href'] = $this->url->link('account/order/info', 'order_id=' . $order['order_id']);
-
-        $data['column_left'] = $this->load->controller('common/column_left');
-        $data['column_right'] = $this->load->controller('common/column_right');
-        $data['content_top'] = $this->load->controller('common/content_top');
-        $data['content_bottom'] = $this->load->controller('common/content_bottom');
-        $data['footer'] = $this->load->controller('common/footer');
-        $data['header'] = $this->load->controller('common/header');
-
-        $this->response->setOutput($this->load->view('checkout/connect', $data));
     }
 
     // Helpers

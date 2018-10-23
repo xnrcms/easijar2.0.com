@@ -658,7 +658,7 @@ if (!function_exists('wr'))
     //文件写入，快捷调试
     function wr($data,$file = 'info.txt',$return=true)
     {
-        $return == true ? file_put_contents('./system/'.$file,var_export($data,true),FILE_APPEND) : file_put_contents('./system/'.$file,var_export($data,true));
+        $return == true ? file_put_contents(DIR_SYSTEM.$file,var_export($data,true),FILE_APPEND) : file_put_contents('./system/'.$file,var_export($data,true));
     }
 }
 

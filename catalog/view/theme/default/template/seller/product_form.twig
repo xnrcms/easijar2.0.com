@@ -634,6 +634,13 @@
     {{ content_bottom }}
   </div>
   <script type="text/javascript">
+    // Variant
+    $('#save-variant').click(function() {
+      $('input[name=\'save_variant\']').val(1);
+      $('#form-product').submit();
+    });
+  </script>
+  <script type="text/javascript">
     jQuery(document).ready(function($) {
       $('.date').datetimepicker({
         pickTime: false

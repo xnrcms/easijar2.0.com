@@ -13,5 +13,6 @@ $_['text_mutltiseller']      = 'Home page';
 $_['text_latest']            = 'New product';
 
 // Button
-$_['button_all']            = 'All goods';
-$_['company_name']            = 'Company name';
+$_['button_all']            	= 'All goods';
+$_['company_name']            	= 'Company name';
+$_['seller_info_error']         = 'businesses do not exist';

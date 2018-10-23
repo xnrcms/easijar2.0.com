@@ -830,7 +830,8 @@ class ControllerSellerProduct extends Controller
                 $error = $this->language->get('error_product_seller');
             }
 
-            if (\Models\Product::find($product_id)->isMaster()) {
+            $product = \Models\Product::find($product_id);
+            if ($product->isMaster() && count($product->getChildrenIds()) > 1) {
                 $error = $this->language->get('error_master_cannot_delete');
             }
         }

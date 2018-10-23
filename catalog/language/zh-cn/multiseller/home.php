@@ -13,5 +13,6 @@ $_['text_mutltiseller']      = '商家首页';
 $_['text_latest']            = '最新商品';
 
 // Button
-$_['button_all']            = '所有商品';
-$_['company_name']            = '公司名称';
+$_['button_all']            	= '所有商品';
+$_['company_name']            	= '公司名称';
+$_['seller_info_error']         = '商家不存在';

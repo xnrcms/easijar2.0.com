@@ -73,11 +73,11 @@ class ControllerApiHome extends Controller {
 				$cache_data 			= $this->cache->get($cache_key);
 				$cache_data 			= !empty($cache_data) ? json_decode($cache_data,true) : [];
 
-				if (isset($cache_data['expiry_time']) && $cache_data['expiry_time'] >= time()) {
+				if (isset($cache_data['expire_time']) && $cache_data['expire_time'] >= time()) {
 					$json 				= $this->returnData(['msg'=>'fail:frequent requests']);
 				}else{
-					$json 				= $this->returnData(['code'=>200,'msg'=>'success','data'=>$this->makeHash($cache_key)]);
-					$this->cache->set($cache_key, json_encode(['expiry_time'=>time() + 10]));
+					$json 				= $this->returnData(['code'=>200,'msg'=>'success','data'=>['api_token'=>$this->makeHash($cache_key),'expire_time'=>(int)(time() + 3600)]]);
+					$this->cache->set($cache_key, json_encode(['expire_time'=>time() + 10]));
 				}
 			}else{
 				$json 					= $this->returnData(['msg'=>'fail:code is error']);
@@ -119,18 +119,15 @@ class ControllerApiHome extends Controller {
 
 			$api_id 				= $this->model_account_api->addApi($user_data);
 		}
-
-		$session 					= new Session($this->config->get('session_engine'), $this->registry);
-		$session->start();
 		
 		$this->model_account_api->delApiSession($api_id);
-		$this->model_account_api->addApiSession($api_id, $session->getId(), $this->request->server['REMOTE_ADDR']);
+		$this->model_account_api->addApiSession($api_id, $this->session->getId(), $this->request->server['REMOTE_ADDR']);
 		
-		$session->data['api_id'] 			= $api_id;
-		$session->data['api_name'] 			= $username;
-		$session->data['api_key'] 			= $key;
-		$session->data['api_token'] 		= $session->getId();
+		$this->session->data['api_id'] 			= $api_id;
+		$this->session->data['api_name'] 		= $username;
+		$this->session->data['api_key'] 		= $key;
+		$this->session->data['api_token'] 		= $this->session->getId();
 
-		return $session->getId();
+		return $this->session->getId();
 	}
 }

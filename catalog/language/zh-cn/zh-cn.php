@@ -42,6 +42,8 @@ $_['text_order_all']          = '所有订单';
 $_['text_order_unpaid']       = '待付款';
 $_['text_order_unshipped']    = '待发货';
 $_['text_order_shipped']      = '待收货';
+$_['text_enabled']            = '启用';
+$_['text_disabled']           = '禁用';
 
 // Buttons
 $_['button_address_add']      = '添加地址';
