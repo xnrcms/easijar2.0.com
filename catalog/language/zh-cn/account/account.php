@@ -36,3 +36,4 @@ $_['text_no_telephone']   = '无联系电话';
 $_['text_no_email']       = '无邮箱地址';
 
 $_['button_avatar']       = '修改头像';
+$_['warning_login']       = '您还没有登录，登录后才能结账哦。';

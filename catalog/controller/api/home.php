@@ -58,7 +58,7 @@ class ControllerApiHome extends Controller {
 		return $this->response->setOutput($json);
 	}
 
-	public function uhash()
+	public function get_token()
 	{
 		$this->response->addHeader('Content-Type: application/json');
 

@@ -43,6 +43,14 @@ class ModelAccountCustomer extends Model {
 		$this->db->query("UPDATE `" . DB_PREFIX . "customer` SET token = '" . $this->db->escape($token) . "' WHERE customer_id = '" . (int)$customer_id . "'");
 	}
 
+	public function editFullName($fullname) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "customer` SET fullname = '" . $this->db->escape((string)$fullname) . "' WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+	}
+
+	public function editBrithday($brithday) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "customer` SET brithday = '" . $this->db->escape((string)$brithday) . "' WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+	}
+
 	public function editNewsletter($newsletter) {
 		$this->db->query("UPDATE " . DB_PREFIX . "customer SET newsletter = '" . (int)$newsletter . "' WHERE customer_id = '" . (int)$this->customer->getId() . "'");
 	}

@@ -27,4 +27,5 @@ $_['text_no_name']        = 'No name';
 $_['text_no_telephone']   = 'No telephone';
 $_['text_no_email']       = 'No email address';
 
-$_['button_avatar']       = 'Change';
+$_['button_avatar']       = 'Change';// Warning
+$_['warning_login']       = 'Please log in to continue';

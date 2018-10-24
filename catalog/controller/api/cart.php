@@ -11,90 +11,89 @@ class ControllerApiCart extends Controller {
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
-        if ($this->checkSign($req_data))
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        $this->session->data['buy_type'] 		= 0;
+    	$this->cart->setCartBuyType($this->session->data['buy_type']);
+
+    	if ($this->cart->hasCartProducts() || !empty($this->session->data['vouchers']) || !empty($this->session->data['recharges'])) 
         {
-        	$this->session->data['buy_type'] 		= 0;
-        	$this->cart->setCartBuyType($this->session->data['buy_type']);
+            if (!$this->cart->hasStock() && (!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning'))) {
+            	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_stock')]));
+            }
 
-        	if ($this->cart->hasCartProducts() || !empty($this->session->data['vouchers']) || !empty($this->session->data['recharges'])) 
-	        {
-	            if (!$this->cart->hasStock() && (!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning'))) {
-	            	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_stock')]));
-	            }
+            if ($this->config->get('config_customer_price') && !$this->customer->isLogged()) {
+                return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('text_login')]));
+            } 
 
-	            if ($this->config->get('config_customer_price') && !$this->customer->isLogged()) {
-	                return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('text_login')]));
-	            } 
+            $this->load->model('tool/image');
+            $this->load->model('tool/upload');
 
-	            $this->load->model('tool/image');
-	            $this->load->model('tool/upload');
+            $data['cart_nums'] 		= $this->cart->countProducts();
+            $data['currency'] 		= $this->session->data['currency'];
+            $data['products'] 		= [];
 
-	            $data['cart_nums'] 		= $this->cart->countProducts();
-	            $data['currency'] 		= $this->session->data['currency'];
-	            $data['products'] 		= [];
-
-	            $products 				= $this->cart->getCartProducts();
+            $products 				= $this->cart->getCartProducts();
 
 
-	            foreach ($products as $product) {
-	                $product_total = 0;
+            foreach ($products as $product) {
+                $product_total = 0;
 
-	                foreach ($products as $product_2) {
-	                    if ($product_2['product_id'] == $product['product_id']) {
-	                        $product_total += $product_2['quantity'];
-	                    }
-	                }
+                foreach ($products as $product_2) {
+                    if ($product_2['product_id'] == $product['product_id']) {
+                        $product_total += $product_2['quantity'];
+                    }
+                }
 
-	                if ($product['minimum'] > $product_total) {
-	                    return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_minimum'), $product['name'], $product['minimum'])]));
-	                }
+                if ($product['minimum'] > $product_total) {
+                    return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_minimum'), $product['name'], $product['minimum'])]));
+                }
 
-	                $image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_height'));
+                $image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_height'));
 
-	                // Display prices
-	                if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-	                    $unit_price = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
+                // Display prices
+                if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                    $unit_price = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
 
-	                    $price 	= $this->currency->format($unit_price, $this->session->data['currency']);
-	                    $oprice = $this->currency->format($this->tax->calculate($product['oprice'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-	                    $total 	= $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
-	                    $nprice = $unit_price * $product['quantity'];
-	                } else {
-	                    $price 		= false;
-	                    $oprice 	= false;
-	                    $total 		= false;
-	                    $nprice 	= false;
-	                }
+                    $price 	= $this->currency->format($unit_price, $this->session->data['currency']);
+                    $oprice = $this->currency->format($this->tax->calculate($product['oprice'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    $total 	= $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
+                    $nprice = $unit_price * $product['quantity'];
+                } else {
+                    $price 		= false;
+                    $oprice 	= false;
+                    $total 		= false;
+                    $nprice 	= false;
+                }
 
-	                $data['products'][] = array(
-	                    'cart_id'   => $product['cart_id'],
-	                    'thumb'     => $image,
-	                    'name'      => $product['name'],
-	                    'quantity'  => $product['quantity'],
-	                    'stock'     => $product['stock'] ? true : !(!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning')),
-	                    'price'     => $price,
-	                    'nprice'    => $nprice,
-	                    'oprice'    => $oprice,
-	                );
-	            }
+                $data['products'][] = array(
+                    'cart_id'   => $product['cart_id'],
+                    'thumb'     => $image,
+                    'name'      => $product['name'],
+                    'quantity'  => $product['quantity'],
+                    'stock'     => $product['stock'] ? true : !(!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning')),
+                    'price'     => $price,
+                    'nprice'    => $nprice,
+                    'oprice'    => $oprice,
+                );
+            }
 
-	            $this->load->view('checkout/cart', $data);
+            $this->load->view('checkout/cart', $data);
 
-	            //格式化一下数组
-	            $products 			= [];
-	            foreach ($this->load->getViewData('products') as $key => $value) {
-	            	$products[] 	= $value;
-	            }
+            //格式化一下数组
+            $products 			= [];
+            foreach ($this->load->getViewData('products') as $key => $value) {
+            	$products[] 	= $value;
+            }
 
-	            $data['products'] 	= $products;
+            $data['products'] 	= $products;
 
-	            $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
-	        }
-	        else{
-	        	$json       = $this->returnData(['msg'=>$this->language->get('text_empty')]);
-	        }
-        }else{
-            $json       = $this->returnData(['msg'=>'fail:sign error']);
+            $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
+        }
+        else{
+        	$json       = $this->returnData(['msg'=>$this->language->get('text_empty')]);
         }
 
         return $this->response->setOutput($json);

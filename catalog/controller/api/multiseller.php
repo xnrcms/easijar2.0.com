@@ -64,7 +64,7 @@ class ControllerApiMultiseller extends Controller {
                     $json['seller_banner'][] = array(
                         'title'      => $banner_image['title'],
                         'link'       => $banner_image['link'],
-                        'thumb'      => $this->model_tool_image->resize($thumb, 100, 100)
+                        'image'      => $this->model_tool_image->resize($thumb, 100, 100)
                     );
                 }
             }
