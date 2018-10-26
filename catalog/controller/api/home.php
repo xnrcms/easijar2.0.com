@@ -8,52 +8,54 @@ class ControllerApiHome extends Controller {
 		$req_data 		= $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
-		if ($this->checkSign($req_data)) {
-			
-			//获取幻灯片
-			$this->load->model('design/banner');
-		    $this->load->model('tool/image');
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+		
+		if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+        
+		//获取幻灯片
+		$this->load->model('design/banner');
+	    $this->load->model('tool/image');
 
-		    $data['banners'] 	= [];
-		    $results 			= $this->model_design_banner->getBanner(11);
-		    if (!empty($results)) {
-		    	foreach ($results as $result) {
-			      if (is_file(DIR_IMAGE . $result['image'])) {
-			        $data['banners'][] = array(
-			          'title' => $result['title'],
-			          'link'  => $result['link'],
-			          'image' => $this->model_tool_image->resize($result['image'], $setting['width'], $setting['height'])
-			        );
-			      }
-			    }
+	    $data['banners'] 	= [];
+	    $results 			= $this->model_design_banner->getBanner(11);
+	    if (!empty($results)) {
+	    	foreach ($results as $result) {
+		      if (is_file(DIR_IMAGE . $result['image'])) {
+		        $data['banners'][] = array(
+		          'title' => $result['title'],
+		          'link'  => $result['link'],
+		          'image' => $this->model_tool_image->resize($result['image'], $setting['width'], $setting['height'])
+		        );
+		      }
 		    }
+	    }
 
-		    $data['catrgory'] 	= [];
-		    $this->load->model('setting/module');
+	    $data['catrgory'] 	= [];
+	    $this->load->model('setting/module');
 
-		    //获取分类
-		    $module_id 					= 51;
-		    $code 						= 'icon';
-		    $setting_info 				= $this->model_setting_module->getModule($module_id);
+	    //获取分类
+	    $module_id 					= 51;
+	    $code 						= 'icon';
+	    $setting_info 				= $this->model_setting_module->getModule($module_id);
 
-			if ($setting_info && $setting_info['status']) {
-				$setting_info['module_id'] 	= $module_id;
-				$setting_info['position'] 	= 'content_top';
-				$cat 						= $this->load->controller('extension/module/' . $code, $setting_info,true);
+		if ($setting_info && $setting_info['status']) {
+			$setting_info['module_id'] 	= $module_id;
+			$setting_info['position'] 	= 'content_top';
+			$cat 						= $this->load->controller('extension/module/' . $code, $setting_info,true);
 
-				if ($cat) {
-					$data['catrgory'] = $cat;
-				}
+			if ($cat) {
+				$data['catrgory'] = $cat;
 			}
-
-			//购物车数量
-            //$data['cart_nums'] 		= $this->cart->countProducts();
-
-		    $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
-		}else{
-
-			$json 		= $this->returnData(['msg'=>'fail:sign error']);
 		}
+
+		//购物车数量
+        //$data['cart_nums'] 		= $this->cart->countProducts();
+
+	    $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
 
 		return $this->response->setOutput($json);
 	}

@@ -75,8 +75,20 @@ class ControllerApiUser extends Controller {
 						unset($this->session->data['wishlist'][$key]);
 					}
 				}
-
 				
+				// getCouponList
+				if (isset($this->session->data['getCouponList']) && is_array($this->session->data['getCouponList'])) {
+					$this->load->model('marketing/coupon');
+
+					foreach ($this->session->data['getCouponList'] as $key => $coupon_id)
+					{
+						if ( $this->model_marketing_coupon->isGetCoupon($coupon_id,$this->customer->getId()) <= 0 ) {
+				        	$this->model_marketing_coupon->insertCoupon($coupon_id,$this->customer->getId());
+				        }
+
+						unset($this->session->data['getCouponList'][$key]);
+					}
+				}
 
 				// Log the IP info
 				$this->model_account_customer->addLogin($this->customer->getId(), $this->request->server['REMOTE_ADDR']);
@@ -95,7 +107,7 @@ class ControllerApiUser extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('account/register');
 
-		$allowKey       = ['api_token','regtype','account','password','confirm','smscode','captcha','agree'];
+		$allowKey       = ['api_token','regtype','account','password','confirm','verification_code'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
@@ -118,11 +130,12 @@ class ControllerApiUser extends Controller {
 				$req_data['telephone'] 	= '';
 				break;
 			case 2:
-				$req_data['email'] 		= ''; 
+				return $this->response->setOutput($this->returnData(['msg'=>'regtype not open to the outside world']));
+				/*$req_data['email'] 		= ''; 
 				$req_data['telephone'] 	= $req_data['account']; 
-		    	$req_dat['from'] 		= 'telephone';
+		    	$req_dat['from'] 		= 'telephone';*/
 				break;
-			default: return ['msg'=>'regtype is error'];break;
+			default: return $this->response->setOutput($this->returnData(['msg'=>'regtype is error']));break;
 		}
 
 		unset($req_data['account']);
@@ -136,7 +149,12 @@ class ControllerApiUser extends Controller {
 
 		unset($this->session->data['guest']);
 
-		
+		$req_data['fullname'] 		= '';
+		$req_data['custom_field'] 	= '';
+		$req_data['newsletter'] 	= 0;
+		$req_data['safe'] 			= 0;
+		$req_data['status'] 		= 0;
+
 		$customer_id = $this->model_account_customer->addCustomer($req_data);
 		unset($this->session->data['smscode']);
 
@@ -174,6 +192,7 @@ class ControllerApiUser extends Controller {
 				unset($this->session->data['comment']);
 				unset($this->session->data['order_id']);
 				unset($this->session->data['coupon']);
+				//unset($this->session->data['getCouponList']);
 				unset($this->session->data['reward']);
 				unset($this->session->data['voucher']);
 				unset($this->session->data['vouchers']);
@@ -190,65 +209,6 @@ class ControllerApiUser extends Controller {
 
 	private function register_validate($req_data = [])
 	{
-		if (array_get($req_data, 'email') && ((utf8_strlen($req_data['email']) > 96) || !filter_var($req_data['email'], FILTER_VALIDATE_EMAIL))) {
-			return ['msg'=>$this->language->get('error_email')];
-		}
-
-		if (array_get($req_data, 'email') && $this->model_account_customer->getTotalCustomersByEmail($req_data['email'])) {
-			return ['msg'=>$this->language->get('error_exists_email')];
-		}
-		
-		if (is_ft()) {
-            if (array_get($req_data, 'telephone')) {
-                $telephones = explode('-', $req_data['telephone']);
-                if (count($telephones) < 2 || !strlen($telephones[0]) || !strlen($telephones[1] || strlen($telephones[0]) > 4)) {
-                    return ['msg'=>$this->language->get('error_telephone')];
-                }
-            }
-        } else {
-            if (array_get($req_data, 'telephone') && ((utf8_strlen($req_data['telephone']) < 3) || (utf8_strlen($req_data['telephone']) > 32))) {
-                return ['msg'=>$this->language->get('error_telephone')];
-            }
-        }
-
-        if ($this->config->get('module_sms_status') && $this->config->get('module_sms_customer_register_verify_message') && array_get($req_data, 'telephone')) {
-            if (!$req_data['smscode'] || !isset($this->session->data['smscode']) || $req_data['smscode'] != $this->session->data['smscode']['code'] || $this->session->data['smscode']['time'] < time() - 600) {
-                return ['msg'=>$this->language->get('error_smscode')];
-            } else if ($req_data['telephone'] != $this->session->data['smscode']['telephone']) {
-            	return ['msg'=>$this->language->get('error_telephone_eq')];
-            }
-        }
-
-		if (array_get($req_data, 'telephone') && $this->model_account_customer->getTotalCustomersByTelephone($req_data['telephone'])) {
-			return ['msg'=>$this->language->get('error_exists_telephone')];
-		}
-
-		if (!array_get($req_data, 'email') && !array_get($req_data, 'telephone')) {
-			return ['msg'=>$this->language->get('error_email_telephone_all_null')];
-        }
-
-		// Customer Group
-		if (isset($req_data['customer_group_id']) && is_array($this->config->get('config_customer_group_display')) && in_array($req_data['customer_group_id'], $this->config->get('config_customer_group_display'))) {
-			$customer_group_id = $req_data['customer_group_id'];
-		} else {
-			$customer_group_id = $this->config->get('config_customer_group_id');
-		}
-
-		// Custom field validation
-		$this->load->model('account/custom_field');
-
-		$custom_fields = $this->model_account_custom_field->getCustomFields($customer_group_id);
-
-		foreach ($custom_fields as $custom_field) {
-			if ($custom_field['location'] == 'account') {
-				if ($custom_field['required'] && empty($req_data['custom_field'][$custom_field['location']][$custom_field['custom_field_id']])) {
-					return ['msg'=>sprintf($this->language->get('error_custom_field'), $custom_field['name'])];
-				} elseif (($custom_field['type'] == 'text') && !empty($custom_field['validation']) && !filter_var($req_data['custom_field'][$custom_field['location']][$custom_field['custom_field_id']], FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $custom_field['validation'])))) {
-					return ['msg'=>sprintf($this->language->get('error_custom_field'), $custom_field['name'])];
-				}
-			}
-		}
-
 		if ((utf8_strlen(html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8')) > 40)) {
 			return ['msg'=>$this->language->get('error_password')];
 		}
@@ -257,25 +217,26 @@ class ControllerApiUser extends Controller {
 			return ['msg'=>$this->language->get('error_confirm')];
 		}
 
-		// Captcha
-		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('register', (array)$this->config->get('config_captcha_page'))) {
-			$captcha = $this->load->controller('extension/captcha/' . $this->config->get('config_captcha') . '/validate');
-
-			if ($captcha) {
-				return ['msg'=>$captcha];
-			}
+		if (
+			(utf8_strlen(html_entity_decode($req_data['verification_code'], ENT_QUOTES, 'UTF-8')) != 6) || 
+			!isset($this->session->data['smscode'][$req_data['email']]) || 
+			$req_data['verification_code'] != $this->session->data['smscode'][$req_data['email']]['code'] || 
+			$this->session->data['smscode'][$req_data['email']]['expiry_time'] < time()
+		){
+			return ['msg'=>$this->language->get('error_smscode')];
 		}
 
-		// Agree to terms
-		if ($this->config->get('config_account_id')) {
-			$this->load->model('catalog/information');
-
-			$information_info = $this->model_catalog_information->getInformation($this->config->get('config_account_id'));
-
-			if ($information_info && !isset($req_data['agree'])) {
-				return ['msg'=>sprintf($this->language->get('error_agree'), $information_info['title'])];
-			}
+		if (array_get($req_data, 'email') && ((utf8_strlen($req_data['email']) > 96) || !filter_var($req_data['email'], FILTER_VALIDATE_EMAIL))) {
+			return ['msg'=>$this->language->get('error_email')];
 		}
+
+		if (array_get($req_data, 'email') && $this->model_account_customer->getTotalCustomersByEmail($req_data['email'])) {
+			return ['msg'=>$this->language->get('error_exists_email')];
+		}
+
+		if (!array_get($req_data, 'email') && !array_get($req_data, 'telephone')) {
+			return ['msg'=>$this->language->get('error_email_telephone_all_null')];
+        }
 
 		return ['code'=>'200'];
 	}
@@ -329,11 +290,11 @@ class ControllerApiUser extends Controller {
             }
         }
 
-        $code 							= mt_rand(100000, 999999); //生成校验码
-        $this->session->data['smscode'] = [
-        	'code'      => $code,
-            'telephone' => $telephone,
-            'time'      => time()
+        $code 										= mt_rand(100000, 999999); //生成校验码
+        $this->session->data['smscode'][$email] 	= [
+        	'code'      	=> $code,
+            'send_time'		=> time()+(60*2),
+            'expiry_time'   => time()+(60*10)
         ];
 
         $this->load->model('notify/notify');
@@ -343,5 +304,72 @@ class ControllerApiUser extends Controller {
         } else {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail: '.$ret]));
         }
+	}
+
+	public function get_emailcode()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+		$this->load->language('account/register');
+
+        $allowKey       = ['api_token','email'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:token is error']));
+        }
+
+        $email 			= array_get($req_data, 'email','');
+
+        if (empty($email)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:email is empty']));
+        }
+
+        if ( utf8_strlen($email) > 96 || !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_email')]));
+		}
+
+        if (isset($this->session->data['smscode']) && ($this->session->data['smscode'][$email]['send_time']) >= time() ) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:send too fast']));
+        }
+
+        $this->load->model('account/customer');
+
+		if ($this->model_account_customer->getTotalCustomersByEmail($email)) {
+            return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_exists_email')]) );
+		}
+
+        $code 										= mt_rand(100000, 999999); //生成校验码
+        $this->session->data['smscode'][$email] 	= [
+        	'code'      	=> $code,
+            'send_time'		=> time()+(60*2),
+            'expiry_time'   => time()+(60*10)
+        ];
+
+        $this->load->language('mail/email_code');
+
+        $data 					= [];
+		$data['text_welcome'] 	= sprintf($this->language->get('text_welcome'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
+		$data['text_login'] 	= $this->language->get('text_login');
+		$data['text_thanks'] 	= $this->language->get('text_thanks');
+		$data['email_code'] 	= $code;
+		$data['store_url'] 		= HTTP_SERVER;
+		$data['store'] 			= html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8');
+
+		if ($this->config->get('config_logo')) {
+			$data['logo'] = $this->url->imageLink(config('config_logo'));
+		}
+
+        $mail 					= new Mail();
+		$mail->setTo($email);
+		$mail->setSubject(sprintf($this->language->get('text_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8')));
+		$mail->setHtml($this->load->view('mail/email_code', $data));
+		$mail->send();
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'email code get success']));
 	}
 }

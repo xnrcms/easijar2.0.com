@@ -15,6 +15,10 @@ class ControllerApiCart extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
         $this->session->data['buy_type'] 		= 0;
     	$this->cart->setCartBuyType($this->session->data['buy_type']);
 
@@ -109,84 +113,88 @@ class ControllerApiCart extends Controller {
         $req_data       = $this->dataFilter($allowKey);
         $data           =  $this->returnData();
 
-        if ($this->checkSign($req_data)) {
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
 
-        	$product_id = isset($req_data['product_id']) ? $req_data['product_id'] : 0;
-        	$buy_type 	= isset($req_data['buy_type']) ? (int)$req_data['buy_type'] : 0;
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
 
-        	$this->session->data['buy_type'] 		= $buy_type;
-        	
-        	if ( !in_array($buy_type, [0,1]) ) return $this->response->setOutput($this->returnData());
+        $product_id = isset($req_data['product_id']) ? $req_data['product_id'] : 0;
+    	$buy_type 	= isset($req_data['buy_type']) ? (int)$req_data['buy_type'] : 0;
 
-        	$this->load->model('catalog/product');
+    	$this->session->data['buy_type'] 		= $buy_type;
+    	
+    	if ( !in_array($buy_type, [0,1]) ) return $this->response->setOutput($this->returnData());
 
-        	$product_info = $this->model_catalog_product->getProduct($product_id);
+    	$this->load->model('catalog/product');
 
-        	if ($product_info) {
-        		$quantity = (isset($req_data['quantity']) && (int)$req_data['quantity'] > 0) ? (int)$req_data['quantity'] : 1;
+    	$product_info = $this->model_catalog_product->getProduct($product_id);
 
-        		//确定产品SKU 获取真是产品ID
-        		$productModel 						= \Models\Product::find($product_id);
-				$variants 							= $productModel->getProductVariantsDetail();
+    	if ($product_info) {
+    		$quantity = (isset($req_data['quantity']) && (int)$req_data['quantity'] > 0) ? (int)$req_data['quantity'] : 1;
 
-				$skus 								= isset($variants['skus']) ? $variants['skus'] : [];
-				//wr($skus);
-				if ( !array_key_exists(trim($req_data['sku']), $skus) ) {
-					return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_product')]));
-				}
+    		//确定产品SKU 获取真是产品ID
+    		$productModel 						= \Models\Product::find($product_id);
+			$variants 							= $productModel->getProductVariantsDetail();
 
-				$sku 								= $skus[trim($req_data['sku'])];
-				$product_id 						= substr($sku, (strpos($sku, '&product_id=')+12 - strlen($sku) ) );
+			$skus 								= isset($variants['skus']) ? $variants['skus'] : [];
+			//wr($skus);
+			if ( !array_key_exists(trim($req_data['sku']), $skus) ) {
+				return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_product')]));
+			}
 
-	            $option 							= isset($req_data['option']) ? array_filter($req_data['option']) : [];
+			$sku 								= $skus[trim($req_data['sku'])];
+			$product_id 						= substr($sku, (strpos($sku, '&product_id=')+12 - strlen($sku) ) );
 
-	            $product_options 					= $this->model_catalog_product->getProductOptions($product_id);
+            $option 							= isset($req_data['option']) ? array_filter($req_data['option']) : [];
 
-	            foreach ($product_options as $product_option) {
-	                if ($product_option['required'] && empty($option[$product_option['product_option_id']])) {
-	                	return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_required'), $product_option['name'])]));
-	                }
-	            }
+            $product_options 					= $this->model_catalog_product->getProductOptions($product_id);
 
-	            $cart_product_count 		= $this->cart->getCartProductCount($product_id);
-	            $flash_data 				= Flash::getSingleton()->getFlashPriceAndCount($product_id);
-	            if ($flash_data) {
-	                if (!$flash_data['checkout']) {
-	                	return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_flash_out'), $flash_data['count'])]));
-	                } else {
-	                    if ($flash_data && $flash_data['count'] && ($quantity + $cart_product_count) > $flash_data['count']) {
-	                		return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_flash_count'), $flash_data['count'])]));
-	                    }
-	                }
-	            }
+            foreach ($product_options as $product_option) {
+                if ($product_option['required'] && empty($option[$product_option['product_option_id']])) {
+                	return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_required'), $product_option['name'])]));
+                }
+            }
 
-	            $this->cart->setCartBuyType($buy_type);
+            $cart_product_count 		= $this->cart->getCartProductCount($product_id);
+            $flash_data 				= Flash::getSingleton()->getFlashPriceAndCount($product_id);
+            if ($flash_data) {
+                if (!$flash_data['checkout']) {
+                	return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_flash_out'), $flash_data['count'])]));
+                } else {
+                    if ($flash_data && $flash_data['count'] && ($quantity + $cart_product_count) > $flash_data['count']) {
+                		return $this->response->setOutput($this->returnData(['msg'=>sprintf($this->language->get('error_flash_count'), $flash_data['count'])]));
+                    }
+                }
+            }
 
-	            if ($buy_type == 1) $this->cart->clear();
+            $this->cart->setCartBuyType($buy_type);
 
-	            $this->cart->add($product_id, $quantity, $option);
+            if ($buy_type == 1) $this->cart->clear();
 
-                $json['info'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $product_id), $product_info['name'], $this->url->link('checkout/cart'));
+            $this->cart->add($product_id, $quantity, $option);
 
-                // Unset all shipping and payment methods
-                unset($this->session->data['shipping_method']);
-                unset($this->session->data['shipping_methods']);
-                unset($this->session->data['payment_method']);
-                unset($this->session->data['payment_methods']);
+            $json['info'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $product_id), $product_info['name'], $this->url->link('checkout/cart'));
 
-                $json['total'] 			= $this->formatted_total_text();
-                $json['cart_nums'] 		= $this->cart->countProducts();
+            // Unset all shipping and payment methods
+            unset($this->session->data['shipping_method']);
+            unset($this->session->data['shipping_methods']);
+            unset($this->session->data['payment_method']);
+            unset($this->session->data['payment_methods']);
 
-                $data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>$json]);
-	        }
-        }else{
-            $data       = $this->returnData(['msg'=>'fail:sign error']);
+            $json['total'] 			= $this->formatted_total_text();
+            $json['cart_nums'] 		= $this->cart->countProducts();
+
+            $data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>$json]);
         }
 
         return $this->response->setOutput($data);
 	}
 
-	public function update_quantity() {
+	public function update_quantity()
+	{
         $this->response->addHeader('Content-Type: application/json');
 		$this->load->language('checkout/cart');
 
@@ -194,7 +202,11 @@ class ControllerApiCart extends Controller {
         $req_data       = $this->dataFilter($allowKey);
 
         if (!$this->checkSign($req_data)) {
-        	return $this->response->setOutput($this->returnData());
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+        
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
         if (!(isset($req_data['cart_id']) && intval($req_data['cart_id']) >=1)) {
@@ -214,7 +226,8 @@ class ControllerApiCart extends Controller {
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'cart update success']));
     }
 
-	public function edit() {
+	public function edit()
+	{
 		$this->load->language('api/cart');
 
 		$json = array();

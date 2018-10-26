@@ -9,7 +9,7 @@
 
 class ModelCustomercouponCoupon extends Model
 {
-    public function getCouponsByCustomer($customer = null, $view_expire = false)
+    public function getCouponsByCustomer($customer = null, $view_expire = false,$seller_id = 0)
     {
         $customer = !empty($customer) ? $customer : $this->customer;
         $customer_group_id = $customer->getGroupId();
@@ -36,9 +36,9 @@ class ModelCustomercouponCoupon extends Model
         }
         if (!empty($coupon_list)) {
             if ($view_expire) {
-                $coupon_query = $this->db->query('SELECT c.* FROM `'.DB_PREFIX."coupon` AS c WHERE c.status = '1' AND c.coupon_id IN (".implode(',', $coupon_list).')');
+                $coupon_query = $this->db->query('SELECT c.* FROM `'.DB_PREFIX."coupon` AS c WHERE c.status = '1' AND c.seller_id = '" . (int) $seller_id . "' AND c.coupon_id IN (".implode(',', $coupon_list).')');
             } else {
-                $coupon_query = $this->db->query('SELECT c.* FROM `'.DB_PREFIX."coupon` AS c WHERE ((c.date_start = '0000-00-00' OR c.date_start < NOW()) AND (DATE_ADD(c.date_end,INTERVAL 1 DAY ) = '0000-00-00' OR c.date_end > NOW())) AND c.status = '1' AND c.coupon_id IN (".implode(',', $coupon_list).')');
+                $coupon_query = $this->db->query('SELECT c.* FROM `'.DB_PREFIX."coupon` AS c WHERE ((c.date_start = '0000-00-00' OR c.date_start < NOW()) AND (DATE_ADD(c.date_end,INTERVAL 1 DAY ) = '0000-00-00' OR c.date_end > NOW())) AND c.status = '1' AND c.seller_id = '" . (int) $seller_id . "' AND c.coupon_id IN (".implode(',', $coupon_list).')');
             }
 
             if ($coupon_query->num_rows > 0) {

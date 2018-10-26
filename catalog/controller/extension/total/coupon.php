@@ -60,4 +60,24 @@ class ControllerExtensionTotalCoupon extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+	public function getCouponForApi($data) {
+		if ($this->config->get('total_coupon_status'))
+		{
+            $this->load->model("customercoupon/coupon");
+            $this->load->model('extension/total/coupon');
+
+            $customer_coupons 			= $this->model_customercoupon_coupon->getCouponsByCustomer($this->customer, true,(isset($data['seller_id']) ? (int)$data['seller_id'] : 0));
+            if($customer_coupons){
+                foreach($customer_coupons as $key => $value){
+                    $coupon_info 		= $this->model_extension_total_coupon->getCoupon($value['code']);
+                    if(!$coupon_info){
+                        unset($customer_coupons[$key]);
+                    }
+                }
+            }
+
+			return $customer_coupons ? $customer_coupons : array();;
+		}
+	}
 }

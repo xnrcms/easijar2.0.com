@@ -52,6 +52,13 @@
       <li><a {{ route == 'seller/shipping_cost' or route == 'seller/shipping_cost/edit' or route == 'seller/shipping_cost/add' ? 'class="active"' }} href="{{ helper.url.link('seller/shipping_cost') }}">
         <i class="iconfont left">&#xe600;</i>{{ text_shipping }}<i class="iconfont right">&#xe6a7;</i>
       </a></li>
+
+
+      <li>
+        <a {{ route == 'seller/coupon' or route == 'seller/coupon/edit' or route == 'seller/coupon/add' ? 'class="active"' }} href="{{ helper.url.link('seller/coupon') }}">
+        <i class="iconfont left">&#xe600;</i>{{ text_coupon }}<i class="iconfont right">&#xe6a7;</i>
+      </a></li>
+
       <li><a href="{{ helper.url.link('account/logout') }}">
         <i class="iconfont left">&#xe60d;</i>{{ text_logout }}<i class="iconfont right">&#xe6a7;</i>
       </a></li>

@@ -37,13 +37,12 @@ class ControllerSellerEvent extends Controller {
                     if (isset($products[$seller_id])) {
                         $products[$seller_id]['products'][]     = $product;
                     } else {
-                        $products[$seller_id] = array(
+                        $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
                             'store_name'    => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
-                            'coupon'        => 0,
                             'shipping'      => 0,
                             'products'      => array($product),
-                        );
+                        ];
                     }
                 }
             }
@@ -83,8 +82,10 @@ class ControllerSellerEvent extends Controller {
 				);
 			}
 
-            $seller_info = $this->model_multiseller_seller->getSellerByProductId($product['product_id']);
-            $seller_id = $seller_info ? $seller_info['seller_id'] : 0;
+            $seller_info        = $this->model_multiseller_seller->getSellerByProductId($product['product_id']);
+            $seller_id          = $seller_info ? $seller_info['seller_id'] : 0;
+            $tax_class_id       = $product['tax_class_id'];
+            
 			$product = array(
 				'cart_id'    => $product['cart_id'],
 				'product_id' => $product['product_id'],
@@ -94,14 +95,26 @@ class ControllerSellerEvent extends Controller {
 				'option'     => $option_data,
 				'quantity'   => $product['quantity'],
 				'subtract'   => $product['subtract'],
-				'price'      => $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']),
-				'total'      => $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')) * $product['quantity'], $this->session->data['currency']),
+				'price'      => $this->currency->format($this->tax->calculate($product['price'], $tax_class_id, $this->config->get('config_tax')), $this->session->data['currency']),
+				'total'      => $this->currency->format($this->tax->calculate($product['price'], $tax_class_id, $this->config->get('config_tax')) * $product['quantity'], $this->session->data['currency']),
 				'href'       => $this->url->link('product/product', 'product_id=' . $product['product_id'])
 			);
 			if (!isset($products[$seller_id])) {
-			    $products[$seller_id] = array(
-			        'store_name'    => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
-                    'products'      => array($product)
+                $coupons                 = $this->load->controller('extension/total/coupon/getCouponForApi',['seller_id'=>$seller_id]);
+                $coupon                  = [];
+
+                foreach ($coupons as $key => $value) {
+                    $coupon[]            = [
+                        'coupon_id' =>$value['coupon_id'],
+                        'name'      =>$value['name'],
+                        'discount'  =>$this->currency->format($this->tax->calculate($value['discount'], $tax_class_id, $this->config->get('config_tax')), $this->session->data['currency']),
+                    ];
+                }
+
+			    $products[$seller_id]    = array(
+			        'store_name'        => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
+                    'coupon'            => $coupon,
+                    'products'          => array($product)
                 );
             } else {
 			    $products[$seller_id]['products'][] = $product;

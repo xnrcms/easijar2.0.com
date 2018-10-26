@@ -38,6 +38,20 @@ class ControllerAccountLogin extends Controller {
 					unset($this->session->data['wishlist'][$key]);
 				}
 			}
+			
+			// getCouponList
+			if (isset($this->session->data['getCouponList']) && is_array($this->session->data['getCouponList'])) {
+				$this->load->model('marketing/coupon');
+
+				foreach ($this->session->data['getCouponList'] as $key => $coupon_id)
+				{
+					if ( $this->model_marketing_coupon->isGetCoupon($coupon_id,$this->customer->getId()) <= 0 ) {
+			        	$this->model_marketing_coupon->insertCoupon($coupon_id,$this->customer->getId());
+			        }
+
+					unset($this->session->data['wishlist'][$key]);
+				}
+			}
 
 			// Log the IP info
 			$this->model_account_customer->addLogin($this->customer->getId(), $this->request->server['REMOTE_ADDR']);

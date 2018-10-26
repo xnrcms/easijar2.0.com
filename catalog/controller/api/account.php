@@ -16,6 +16,10 @@ class ControllerApiAccount extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
         if (!$this->customer->isLogged()){
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
@@ -45,6 +49,10 @@ class ControllerApiAccount extends Controller {
 
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
         if (!$this->customer->isLogged()){
@@ -78,6 +86,10 @@ class ControllerApiAccount extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+        
         if (!$this->customer->isLogged()){
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
