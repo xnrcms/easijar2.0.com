@@ -217,12 +217,8 @@ class ControllerApiUser extends Controller {
 			return ['msg'=>$this->language->get('error_confirm')];
 		}
 
-		if (
-			(utf8_strlen(html_entity_decode($req_data['verification_code'], ENT_QUOTES, 'UTF-8')) != 6) || 
-			!isset($this->session->data['smscode'][$req_data['email']]) || 
-			$req_data['verification_code'] != $this->session->data['smscode'][$req_data['email']]['code'] || 
-			$this->session->data['smscode'][$req_data['email']]['expiry_time'] < time()
-		){
+        $keys 										= md5('smscode-' . $req_data['email'] . '-1');
+		if ((utf8_strlen(html_entity_decode($req_data['verification_code'], ENT_QUOTES, 'UTF-8')) != 6) || !isset($this->session->data['smscode'][$keys]) || $req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] ||  $this->session->data['smscode'][$keys]['expiry_time'] < time()){
 			return ['msg'=>$this->language->get('error_smscode')];
 		}
 
@@ -311,7 +307,7 @@ class ControllerApiUser extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('account/register');
 
-        $allowKey       = ['api_token','email'];
+        $allowKey       = ['api_token','email','scene'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
@@ -337,18 +333,18 @@ class ControllerApiUser extends Controller {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:send too fast']));
         }
 
-        $this->load->model('account/customer');
+        if ( isset($req_data['scene']) && (int)$req_data['scene'] == 2)
+        {
+        	$this->load->model('account/customer');
+        	if ($this->model_account_customer->getTotalCustomersByEmail($email))
+        	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_exists_email')]) );
+        }
 
-		if ($this->model_account_customer->getTotalCustomersByEmail($email)) {
-            return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_exists_email')]) );
-		}
+        if (isset($this->session->data['smscode']))  unset($this->session->data['smscode']);
 
         $code 										= mt_rand(100000, 999999); //生成校验码
-        $this->session->data['smscode'][$email] 	= [
-        	'code'      	=> $code,
-            'send_time'		=> time()+(60*2),
-            'expiry_time'   => time()+(60*10)
-        ];
+        $keys 										= md5('smscode-'.$email.'-'.$req_data['scene']);
+        $this->session->data['smscode'][$keys] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
 
         $this->load->language('mail/email_code');
 
