@@ -319,7 +319,8 @@ class ControllerApiUser extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:token is error']));
         }
 
-        $email 			= array_get($req_data, 'email','');
+        $email 						= array_get($req_data, 'email','');
+        $tags 						= md5('smscode-'.$email.'-'.$req_data['scene']);
 
         if (empty($email)) {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:email is empty']));
@@ -329,11 +330,11 @@ class ControllerApiUser extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_email')]));
 		}
 
-        if (isset($this->session->data['smscode']) && ($this->session->data['smscode'][$email]['send_time']) >= time() ) {
+        if (isset($this->session->data['smscode']) && ($this->session->data['smscode'][$tags]['send_time']) >= time() ) {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:send too fast']));
         }
 
-        if ( isset($req_data['scene']) && (int)$req_data['scene'] == 2)
+        if ( isset($req_data['scene']) && (int)$req_data['scene'] == 1)
         {
         	$this->load->model('account/customer');
         	if ($this->model_account_customer->getTotalCustomersByEmail($email))
@@ -343,8 +344,7 @@ class ControllerApiUser extends Controller {
         if (isset($this->session->data['smscode']))  unset($this->session->data['smscode']);
 
         $code 										= mt_rand(100000, 999999); //生成校验码
-        $keys 										= md5('smscode-'.$email.'-'.$req_data['scene']);
-        $this->session->data['smscode'][$keys] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
+        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
 
         $this->load->language('mail/email_code');
 
