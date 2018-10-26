@@ -115,6 +115,10 @@ class ControllerApiUser extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
         if (!(isset($req_data['regtype']) && in_array(intval($req_data['regtype']), [1,2]))) {
         	return $this->response->setOutput($this->returnData(['msg'=>'regtype is error']));
 		}
@@ -177,34 +181,108 @@ class ControllerApiUser extends Controller {
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
-        if ($this->checkSign($req_data)){
-
-        	if ($this->customer->isLogged()) {
-
-	        	$this->customer->logout();
-
-				unset($this->session->data['shipping_address']);
-				unset($this->session->data['shipping_method']);
-				unset($this->session->data['shipping_methods']);
-				unset($this->session->data['payment_address']);
-				unset($this->session->data['payment_method']);
-				unset($this->session->data['payment_methods']);
-				unset($this->session->data['comment']);
-				unset($this->session->data['order_id']);
-				unset($this->session->data['coupon']);
-				//unset($this->session->data['getCouponList']);
-				unset($this->session->data['reward']);
-				unset($this->session->data['voucher']);
-				unset($this->session->data['vouchers']);
-				unset($this->session->data['credit']);
-        	}
-
-        	$data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>'loginout success']);
-        }else{
-            $data       = $this->returnData(['msg'=>'fail:sign error']);
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
+    	if ($this->customer->isLogged()) {
+
+        	$this->customer->logout();
+
+			unset($this->session->data['shipping_address']);
+			unset($this->session->data['shipping_method']);
+			unset($this->session->data['shipping_methods']);
+			unset($this->session->data['payment_address']);
+			unset($this->session->data['payment_method']);
+			unset($this->session->data['payment_methods']);
+			unset($this->session->data['comment']);
+			unset($this->session->data['order_id']);
+			unset($this->session->data['coupon']);
+			//unset($this->session->data['getCouponList']);
+			unset($this->session->data['reward']);
+			unset($this->session->data['voucher']);
+			unset($this->session->data['vouchers']);
+			unset($this->session->data['credit']);
+    	}
+
+    	$data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>'loginout success']);
+
         return $this->response->setOutput($data);
+	}
+
+	//通过邮箱账号修改密码
+	public function forget_by_email()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+		$this->load->language('account/register');
+
+        $allowKey       = ['api_token','account','verification_code','new_password','confirm_password','step'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+        
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!isset($req_data['account']) || empty($req_data['account'])) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:account is empty']));
+        }
+
+        $step 			= isset($req_data['step']) ? (int)$req_data['step'] : 0;
+        if (!in_array($step, [0,1,2])) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:step is error']));
+        }
+
+        $this->load->model('account/customer');
+
+    	if ( !$this->model_account_customer->getTotalCustomersByEmail($req_data['account']) ) {
+    		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_not_email')]));
+		}
+		
+		if ($step == 0) {
+			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'account check success']));
+		}
+
+		if (!(isset($req_data['verification_code']) && !empty($req_data['verification_code']) && strlen($req_data['verification_code']) == 6)) {
+    		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
+		}
+
+		$keys 										= md5('smscode-' . $req_data['account'] . '-2');
+		if ($req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
+			return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
+		}
+
+		if ($step == 1) {
+			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'verification_code check success']));
+		}
+
+		if (!(isset($req_data['new_password']) && !empty($req_data['new_password']))) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:new_password is empty']));
+		}
+
+		if (!(isset($req_data['confirm_password']) && !empty($req_data['confirm_password']))) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:confirm_password is empty']));
+		}
+ 		
+ 		if ((utf8_strlen(html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8')) > 40)) {
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password')]));
+		}
+
+ 		if (!( md5($req_data['new_password']) === md5($req_data['confirm_password']))) {
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_confirm')]));
+ 		}
+
+ 		$customer_info 				= $this->model_account_customer->getCustomerByEmail($req_data['account']);
+
+ 		if (!empty($customer_info) && isset($customer_info['customer_id']) && (int)$customer_info['customer_id'] > 0) {
+ 			$this->model_account_customer->editPassword($customer_info['customer_id'], $req_data['new_password']);
+ 			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'password update success']));
+ 		}
+		return $this->response->setOutput($data);
 	}
 
 	private function register_validate($req_data = [])
@@ -323,7 +401,7 @@ class ControllerApiUser extends Controller {
         $tags 						= md5('smscode-'.$email.'-'.$req_data['scene']);
 
         if (empty($email)) {
-            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:email is empty']));
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:email is empty']));
         }
 
         if ( utf8_strlen($email) > 96 || !filter_var($email, FILTER_VALIDATE_EMAIL) ) {
@@ -339,6 +417,10 @@ class ControllerApiUser extends Controller {
         	$this->load->model('account/customer');
         	if ($this->model_account_customer->getTotalCustomersByEmail($email))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_exists_email')]) );
+        }elseif ( isset($req_data['scene']) && (int)$req_data['scene'] == 2) {
+        	$this->load->model('account/customer');
+        	if (!$this->model_account_customer->getTotalCustomersByEmail($email))
+        	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_not_email')]) );
         }
 
         if (isset($this->session->data['smscode']))  unset($this->session->data['smscode']);

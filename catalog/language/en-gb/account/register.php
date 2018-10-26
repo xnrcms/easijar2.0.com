@@ -45,3 +45,4 @@ $_['error_telephone_exists']         = 'Warning: Telephone number is already reg
 $_['error_telephone_format']         = 'Telephone number does not appear to be valid!';
 $_['error_smscode']        = 'The verification code error!';
 $_['error_telephone_eq']   = 'Telephone number error! The telephone number must be the telephone that received verification code';
+$_['error_not_email']      = 'Error: the mailbox address is not registered, please change an e-mail address！';
