@@ -330,7 +330,7 @@ class ControllerApiUser extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_email')]));
 		}
 
-        if (isset($this->session->data['smscode']) && ($this->session->data['smscode'][$tags]['send_time']) >= time() ) {
+        if (isset($this->session->data['smscode']) && isset($this->session->data['smscode'][$tags]) && ($this->session->data['smscode'][$tags]['send_time']) >= time() ) {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:send too fast']));
         }
 
