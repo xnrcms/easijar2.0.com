@@ -20,13 +20,17 @@ $_['text_no_results']       = 'You have not made any previous orders!';
 $_['text_error']            = 'The order you requested could not be found!';
 $_['text_express']           = 'Express Info';
 $_['text_kd_comment']       = 'Comment:';
-$_['button_review']         = 'Review';
+$_['text_order_cancel']     = 'Are you sure you want to cancel the order?';
+$_['text_order_confirm']    = 'Are we sure receipt?';
+$_['text_customer_cancel']  = 'Users voluntarily cancel the order';
+$_['text_customer_confirm'] = 'User acknowledgment receipt';
 $_['text_pickup_info']      = 'Pickup Information';
 $_['text_pickup_name']      = 'Pickup Station:';
 $_['text_pickup_telephone'] = 'Telephone:';
 $_['text_pickup_address']   = 'Address:';
 $_['text_pickup_open']      = 'Open:';
 $_['text_pickup_comment']   = 'Comment:';
+$_['text_aftership_info']   = 'Logistics information';
 
 // Column
 $_['column_order_id']       = 'Order ID';

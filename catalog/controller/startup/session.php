@@ -32,5 +32,8 @@ class ControllerStartupSession extends Controller {
 			
 			setcookie($this->config->get('session_name'), $this->session->getId(), (ini_get('session.cookie_lifetime') ? (time() + ini_get('session.cookie_lifetime')) : 0), ini_get('session.cookie_path'), ini_get('session.cookie_domain'));
 		}
+
+		//处理超出48小时未付款的订单 标记为已取消
+		$this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET `order_status_id`= '7' WHERE `order_status_id` <= 1 AND `order_id` IN (SELECT `order_id` FROM `" . DB_PREFIX . "order` WHERE TIMESTAMPADD(HOUR, 48, date_added) < NOW())");
 	}
 }
