@@ -144,6 +144,7 @@ class ControllerApiMyorder extends Controller {
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
 
+        $order_info 					= $order_info['order_info'];
         if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id') && $order_info['payment_code'] != 'cod') {
             $this->session->data['order_id'] = $order_id;
             $payment = $this->load->controller('extension/payment/' . $order_info['payment_code']);

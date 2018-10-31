@@ -652,6 +652,29 @@ if (!function_exists('get_calling_codes')) {
         return $calling_codes;
     }
 }
+if (!function_exists('format_find_field'))
+{
+    function format_find_field($filed = '',$prefix = '')
+    {
+        $prefix     = !empty($prefix) ? $prefix . '.' : '';
+        if (empty($filed))  return $prefix . '*';
+
+        $filed  = is_array($filed) ? $filed : explode(',', $filed);
+
+        $f      = [];
+        foreach ($filed as $value) {
+            $ff     = explode('AS', $value);
+            $ff1    = (isset($ff[0]) && !empty($ff[0])) ? trim($ff[0]) : '';
+            $ff2    = (isset($ff[1]) && !empty($ff[1])) ? ' AS ' . $ff[1] : '';
+
+            if(empty($ff1)) continue;
+            
+            $f[]    = $prefix . '`'.$ff1.'`' . $ff2;
+        }
+
+        return implode(',', $f);
+    }
+}
 
 if (!function_exists('wr'))
 {

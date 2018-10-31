@@ -269,7 +269,10 @@ class ControllerApiCheckout extends Controller
 
             // Change order status to Unpaid
             if ($order_data['payment_method'] != 'cod') {
-                $payment_view          = $this->load->controller("extension/payment/" . $order_data['payment_method']);
+
+                $this->session->data['order_sn'] = $this->model_checkout_checkout->getOrderSnByOrderId($order_id);
+
+                $payment_view          = $this->load->controller("extension/payment/" . $order_data['payment_method'] . '/payFormForSm');
                 $this->model_checkout_order->addOrderHistory($order_id, config('config_unpaid_status_id'));
             } else { // cod order does not need unpaid status
                 $payment_view          = '';

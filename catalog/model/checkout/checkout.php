@@ -195,6 +195,10 @@ class ModelCheckoutCheckout extends Model {
         return $order_id;
     }
 
+    public function getOrderSnByOrderId($order_id){
+        $query = $this->db->query("SELECT `order_sn` FROM " . DB_PREFIX . "order WHERE order_id = '" . (int)$order_id . "'");
+        return (isset($query->row['order_sn']) && !empty($query->row['order_sn'])) ? $query->row['order_sn'] : '';
+    }
     // Private
     private function getProducts() {
         $products = array();

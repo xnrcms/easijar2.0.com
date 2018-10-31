@@ -133,6 +133,24 @@ class ModelAccountOrder extends Model {
         return $query->rows;
     }
 
+    public function getOrderProductsNameForMs($order_id = 0, $seller_id = 0)
+    {
+        $order_id           = (int)$order_id;
+        $seller_id          = (int)$seller_id;
+
+        if ($order_id <= 0 )  return [];
+
+        if ($order_id > 0 && $seller_id > 0) {
+            $sql            = "SELECT op.`name` FROM " . DB_PREFIX . "ms_order_product mop LEFT JOIN " . DB_PREFIX . "order_product op ON (op.order_product_id = mop.order_product_id) WHERE op.order_id = '" . (int)$order_id . "' AND mop.seller_id = '" . $seller_id . "'";
+        }else{
+            $sql            = "SELECT `name` FROM " . DB_PREFIX . "order_product WHERE order_id = '" . $order_id . "'";
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
+    }
+
     public function getOrderOptions($order_id, $order_product_id) {
         $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product_id . "'");
 
