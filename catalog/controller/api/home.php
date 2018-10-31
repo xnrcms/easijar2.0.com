@@ -16,26 +16,29 @@ class ControllerApiHome extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
         
+	    $this->load->model('setting/module');
+
 		//获取幻灯片
 		$this->load->model('design/banner');
 	    $this->load->model('tool/image');
 
 	    $data['banners'] 	= [];
-	    $results 			= $this->model_design_banner->getBanner(11);
+	    $setting_info 		= $this->model_setting_module->getModule(35);
+	    $results 			= $this->model_design_banner->getBanner($setting_info['banner_id']);
+	    
 	    if (!empty($results)) {
 	    	foreach ($results as $result) {
 		      if (is_file(DIR_IMAGE . $result['image'])) {
 		        $data['banners'][] = array(
 		          'title' => $result['title'],
 		          'link'  => $result['link'],
-		          'image' => $this->model_tool_image->resize($result['image'], $setting['width'], $setting['height'])
+		          'image' => $this->model_tool_image->resize($result['image'], $setting_info['width'], $setting_info['height'])
 		        );
 		      }
 		    }
 	    }
 
 	    $data['catrgory'] 	= [];
-	    $this->load->model('setting/module');
 
 	    //获取分类
 	    $module_id 					= 51;
@@ -56,7 +59,6 @@ class ControllerApiHome extends Controller {
         //$data['cart_nums'] 		= $this->cart->countProducts();
 
 	    $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
-
 		return $this->response->setOutput($json);
 	}
 

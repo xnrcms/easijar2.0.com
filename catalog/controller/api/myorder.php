@@ -140,11 +140,21 @@ class ControllerApiMyorder extends Controller {
 
         $order_info 					= $this->model_account_order->getOrderForMs($req_data['order_id']);
 
+        //商品信息
+        $order_id 						= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+        $seller_id 						= isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+        $product_info 					= $this->model_account_order->getOrderProductsForMs($order_id,$seller_id);
+
+        $seller_info['avatar'] 			= isset($order_info['avatar']) ? $order_info['avatar'] : '';
+        $seller_info['store_name'] 		= isset($order_info['store_name']) ? $order_info['store_name'] : '';
+
+        unset($order_info['avatar']);
+        unset($order_info['store_name']);
+
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
 
-        $order_info 					= $order_info['order_info'];
         if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id') && $order_info['payment_code'] != 'cod') {
             $this->session->data['order_id'] = $order_id;
             $payment = $this->load->controller('extension/payment/' . $order_info['payment_code']);

@@ -337,24 +337,31 @@ class ModelAccountOrder extends Model {
 
     public function getOrderForMs($order_id = 0)
     {
-        $order_query = $this->db->query("SELECT o.*,mssu.suborder_id as msoid,mssu.total as total,ms.seller_id as seller_id,ms.avatar as ms_avatar,ms.store_name as ms_name,ms.seller_id as ms_id FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+        $order_id       = (int)$order_id;
 
-        if ($order_query->num_rows) {
-            
-            $order_info['order_info']           = !empty($order_query->row) ? $order_query->row : [];
-            //$order_info['order_info']['shipping_address']       = address_format($order_query->row, '{zone}{county}{address_1}', 'shipping');
+        if ( $order_id <= 0 )  return [];
+        $fields         = format_find_field('order_id,payment_code','o');
+        $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
+        $fields         .= ',' . format_find_field('avatar,store_name,','ms');
 
-            $sql  = "SELECT op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`  FROM `" . DB_PREFIX . "order_product` op 
+        $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+wr("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+        return $order_query->num_rows ? $order_query->row : [];
+    }
+
+    public function getOrderProductsForMs($order_id = 0 , $seller_id = 0)
+    {
+            $order_id       = (int)$order_id;
+            $seller_id      = (int)$seller_id;
+
+            if ($order_id <= 0 || $seller_id <= 0)  return [];
+
+            $query = $this->db->query("SELECT op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`  FROM `" . DB_PREFIX . "order_product` op 
                 LEFT JOIN  `" . DB_PREFIX . "ms_order_product` msop ON (op.order_product_id = msop.order_product_id) 
                 LEFT JOIN  `" . DB_PREFIX . "product` p ON (p.product_id = op.product_id) 
-                WHERE msop.seller_id = '" . $order_info['order_info']['seller_id'] . "' AND msop.order_id = '" . $order_info['order_info']['order_id'] . "' ORDER BY op.order_product_id DESC LIMIT 0,100";
-            $query = $this->db->query($sql);
-           
-            $order_info['product_info']         = !empty($query->rows) ? $query->rows : [];
-            return $order_info;
-        }
+                WHERE msop.seller_id = '" . $seller_id . "' AND msop.order_id = '" . $order_id . "' ORDER BY op.order_product_id DESC LIMIT 0,100");
 
-        return [];
+        return !empty($query->rows) ? $query->rows : [];
     }
 
     //商家订单处理
