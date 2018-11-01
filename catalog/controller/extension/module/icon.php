@@ -22,7 +22,7 @@ class ControllerExtensionModuleIcon extends Controller
         }
         array_multisort($sort_order, SORT_ASC, $items);
 
-        $data['items'] = array();wr($items);
+        $data['items'] = array();
         foreach ($items as $item) {
             $image = array_get($item, 'image');
             if (image_exists($image)) {
