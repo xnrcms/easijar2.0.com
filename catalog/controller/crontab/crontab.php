@@ -1,5 +1,5 @@
 <?php
-class ControllerApiCrontab extends Controller {
+class ControllerCrontabCrontab extends Controller {
 
 	//订单支付
 	public function index() 
@@ -10,22 +10,24 @@ class ControllerApiCrontab extends Controller {
 
     private function orderTimeoutProcessing()
     {
-        if($this->executionFrequency(10)){
+        if($this->executionFrequency(10,'orderTimeoutProcessing')){
             wr("\n====" . date('Y-m-d H:i:s',time()) . "===\n");
         }
         return;
     }
 
     //执行频率
-    private function executionFrequency($key='',$time=0)
+    private function executionFrequency($time = 0 , $key = '')
     {
         if (empty($key) || $time <= 0) return true;
 
+        $t                = time();
         $cache_time       = $this->cache->get($key);
+        $cache_time       = !empty($cache_time) ? $cache_time : $t;
 
-        if ($cache_time && $cache_time <= time()) {
+        if ($cache_time && $cache_time < $t) {
 
-            $this->cache->set($key,time() + $time);
+            $this->cache->set($key,$t + $time);
             return true;
         }
 
