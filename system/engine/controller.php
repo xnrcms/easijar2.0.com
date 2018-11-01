@@ -90,6 +90,6 @@ abstract class Controller {
     }
 
     public function returnData($data = []){
-    	return json_encode(array_merge(['code'=>202,'msg'=>'fail:system error','time'=>date('Y-m-d H:i:s',time()),'data'=>''],$data));
+    	return json_encode(array_merge(['code'=>'202','msg'=>'fail:system error','time'=>date('Y-m-d H:i:s',time()),'data'=>''],$data));
     }
 }
