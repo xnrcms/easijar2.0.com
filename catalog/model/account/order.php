@@ -584,7 +584,7 @@ class ModelAccountOrder extends Model {
     }
 
     public function getOrderHistoriesDateForMs($order_id=0,$seller_id=0,$order_status_id=0) {
-        $query = $this->db->query("SELECT date_added FROM " . DB_PREFIX . "ms_suborder_history WHERE order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$seller_id . "' AND order_status_id = '" . (int)$order_status_id . "' ORDER BY date_added LIMIT 1");
+        $query = $this->db->query("SELECT date_added FROM " . DB_PREFIX . "ms_suborder_history WHERE order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$seller_id . "' AND order_status_id = '" . (int)$order_status_id . "' ORDER BY date_added DESC LIMIT 1");
 
         return $query->row;
     }

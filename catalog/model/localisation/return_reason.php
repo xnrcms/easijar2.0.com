@@ -41,4 +41,10 @@ class ModelLocalisationReturnReason extends Model {
 			return $return_reason_data;
 		}
 	}
+
+	public function getRsasonNameByType($reason_id = 0,$reason_type = 0)
+	{
+		$query = $this->db->query("SELECT `name` FROM " . DB_PREFIX . "return_reason WHERE language_id = '" . (int)$this->config->get('config_language_id') . "' AND return_reason_id = '".(int)$reason_id."' AND type = '".(int)$reason_type."'");
+		return $query->row;
+	}
 }

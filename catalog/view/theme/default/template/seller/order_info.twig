@@ -147,7 +147,6 @@
         {% endif %}</div>
     </div>
 
-    {% if order_status_id > 1 %}
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-comment-o"></i> {{ text_history }}</h3>
@@ -281,9 +280,11 @@
               });
             </script>
           {% endif %}
+
           <div class="tab-pane active" id="tab-history">
             <div id="history"></div>
             <br/>
+            {% if order_statuses %}
             <fieldset>
               <legend>{{ text_history_add }}</legend>
               <form class="form-horizontal">
@@ -320,11 +321,12 @@
             <div class="text-right">
               <button id="button-history" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
             </div>
+          {% endif %}
           </div>
         </div>
       </div>
     </div>
-    {% endif %}
+
     <div class="buttons clearfix  mb-1">
       <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
     </div>

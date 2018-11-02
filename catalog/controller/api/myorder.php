@@ -172,7 +172,7 @@ class ControllerApiMyorder extends Controller {
         $this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/order');
 
-        $allowKey       = ['api_token','order_id'];
+        $allowKey       = ['api_token','order_id','reason_id'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -190,8 +190,14 @@ class ControllerApiMyorder extends Controller {
         }
 
         $order_id 					= (isset($req_data['order_id']) && $req_data['order_id']>0) ? (int)$req_data['order_id'] : 0;
+        $reason_id 					= (isset($req_data['reason_id']) && $req_data['reason_id']>0) ? (int)$req_data['reason_id'] : 0;
+
         if ($order_id <= 0 ) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:order_id is error']));
+        }
+
+        if ($reason_id <= 0 ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:reason_id is error']));
         }
 
         $this->load->model('account/order');
@@ -202,38 +208,50 @@ class ControllerApiMyorder extends Controller {
 		$this->model_checkout_order->addOrderHistoryForMs($order_info['order_sn'], 15);*/
 
         $this->load->model('multiseller/checkout');
+		$this->load->model('localisation/return_reason');
 
         //未付款 直接取消
         if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_unpaid_status_id')){
 
-        	$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),t('text_customer_cancel'),false,true);
+        	//取消原因
+        	$reason 			= $this->model_localisation_return_reason->getRsasonNameByType($reason_id,0);
+        	if (!(isset($reason['name']) && !empty($reason['name']) )) {
+        		return $this->response->setOutput($this->returnData(['msg'=>'fail:reason_id is error']));
+        	}
+
+        	$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),$reason['name'],false,true);
 
         	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
 
         //待发货如果取消订单 需要判断商家未发货时间 如果商家超时发货直接取消订单  并退款
         }elseif (isset($order_info['order_status_id']) && (int)$order_info['order_status_id'] === 15) {
 
+        	//取消原因
+        	$reason 			= $this->model_localisation_return_reason->getRsasonNameByType($reason_id,0);
+        	if (!(isset($reason['name']) && !empty($reason['name']) )) {
+        		return $this->response->setOutput($this->returnData(['msg'=>'fail:reason_id is error']));
+        	}
+
         	//获取订单操作历史中操作时间 
         	$history_info 		= $this->model_account_order->getOrderHistoriesDateForMs($order_info['order_id'],$order_info['seller_id'],$order_info['order_status_id']);
         	$history_date 		= isset($history_info['date_added']) ? strtotime($history_info['date_added']) : 0;
 
-        	$overtime 			= $history_date + (3600 * 24 * 3);
+        	$overtime 			= $history_date + 60;
         	$t 					= time();
 
         	//判断是否超过三天
         	if ($history_date >= $t) {
         		//需要买家响应
-        		$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], 3,t('text_customer_cancel_audit'),false,true);
-        		return $this->response->setOutput($this->returnData(['msg'=>'fail:test pay success','data'=>$history_date ]));
+        		$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], 3,$reason['name'],false,true);
         	}else{
         		//直接取消并退款
-        		$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),t('text_customer_cancel'),false,true);
+        		$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),$reason['name'],false,true);
 
         		//退款
         		//------待完善
         	}
 
-        	return $this->response->setOutput($this->returnData(['msg'=>'fail:test pay success2','data'=>$history_date ]));
+        	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
         }
         else{
 

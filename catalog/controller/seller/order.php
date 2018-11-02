@@ -551,7 +551,10 @@ class ControllerSellerOrder extends Controller {
 			//允许商家添加的订单状态
 			if ((int)$order_info['order_status_id'] === 3) {
 				$seller_alow_status 	= [7,15];
-			}else{
+			}elseif (in_array((int)$order_info['order_status_id'], [1,7])) {
+				$seller_alow_status 	= [];
+			}
+			else{
 				$seller_alow_status = array($this->config->get('config_shipped_status_id'));
 			}
 
@@ -561,7 +564,7 @@ class ControllerSellerOrder extends Controller {
 			        $data['order_statuses'][] = $order_status;
                 }
             }
-
+            
 			$data['order_status_id'] = $order_info['order_status_id'];
 
 			$data['account_custom_field'] = $order_info['custom_field'];
