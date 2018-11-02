@@ -549,7 +549,12 @@ class ControllerSellerOrder extends Controller {
 			$order_statuses = $this->model_localisation_order_status->getOrderStatuses();
 
 			//允许商家添加的订单状态
-			$seller_alow_status = array($this->config->get('config_shipped_status_id'));
+			if ((int)$order_info['order_status_id'] === 3) {
+				$seller_alow_status 	= [7,15];
+			}else{
+				$seller_alow_status = array($this->config->get('config_shipped_status_id'));
+			}
+
 			$data['order_statuses'] = array();
 			foreach ($order_statuses as $order_status) {
 			    if (in_array($order_status['order_status_id'], $seller_alow_status)) {

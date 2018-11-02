@@ -331,7 +331,7 @@ class ModelAccountOrder extends Model {
     }
 
     public function getOrderStatusForMs($order_id){
-        $order_query = $this->db->query("SELECT o.order_id,o.customer_id,mssu.suborder_id,mssu.seller_id,mssu.order_status_id FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+        $order_query = $this->db->query("SELECT o.order_id,o.customer_id,mssu.suborder_id,mssu.seller_id,mssu.order_sn,mssu.order_status_id FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
         return $order_query->row;
     }
 
@@ -345,7 +345,7 @@ class ModelAccountOrder extends Model {
         $fields         .= ',' . format_find_field('avatar,store_name,','ms');
 
         $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
-wr("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+
         return $order_query->num_rows ? $order_query->row : [];
     }
 
@@ -581,5 +581,11 @@ wr("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `
 
             $this->cache->delete('product');
         }
+    }
+
+    public function getOrderHistoriesDateForMs($order_id=0,$seller_id=0,$order_status_id=0) {
+        $query = $this->db->query("SELECT date_added FROM " . DB_PREFIX . "ms_suborder_history WHERE order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$seller_id . "' AND order_status_id = '" . (int)$order_status_id . "' ORDER BY date_added LIMIT 1");
+
+        return $query->row;
     }
 }

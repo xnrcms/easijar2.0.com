@@ -23,6 +23,7 @@ $_['text_kd_comment']       = '说明：';
 $_['text_order_cancel']     = '确定要取消订单吗？';
 $_['text_order_confirm']    = '是否确定收货？';
 $_['text_customer_cancel']  = '用户主动取消订单';
+$_['text_customer_cancel_audit']  = '用户主动取消订单-审核中';
 $_['text_customer_confirm'] = '用户确认收货';
 $_['text_pickup_info']      = '提货信息';
 $_['text_pickup_name']      = '自提点：';

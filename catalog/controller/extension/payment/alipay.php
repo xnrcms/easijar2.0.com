@@ -117,7 +117,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
     {
 		$this->load->model('checkout/order');
 
-		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfo($this->session->data['order_sn']);
+		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($this->session->data['order_sn']);
 		if (!$order_info)  return '';
 
 		$config = array (

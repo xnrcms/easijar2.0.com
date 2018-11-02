@@ -7,12 +7,16 @@ $_['text_success']     = 'Success: You have modified return reasons!';
 $_['text_list']        = 'Return Reason List';
 $_['text_add']         = 'Add Return Reason';
 $_['text_edit']        = 'Edit Return Reason';
+$_['text_type1']       = 'Order Cancellation';
+$_['text_type2']       = 'Received Goods';
+$_['text_type3']       = 'No Goods Received';
 
 // Column
 $_['column_name']      = 'Return Reason Name';
 $_['column_action']    = 'Action';
 
 // Entry
+$_['entry_type']       = 'Cause Category';
 $_['entry_name']       = 'Return Reason Name';
 
 // Error

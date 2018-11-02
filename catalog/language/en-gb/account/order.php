@@ -23,6 +23,7 @@ $_['text_kd_comment']       = 'Comment:';
 $_['text_order_cancel']     = 'Are you sure you want to cancel the order?';
 $_['text_order_confirm']    = 'Are we sure receipt?';
 $_['text_customer_cancel']  = 'Users voluntarily cancel the order';
+$_['text_customer_cancel_audit']  = 'Users voluntarily cancel the order-audit';
 $_['text_customer_confirm'] = 'User acknowledgment receipt';
 $_['text_pickup_info']      = 'Pickup Information';
 $_['text_pickup_name']      = 'Pickup Station:';

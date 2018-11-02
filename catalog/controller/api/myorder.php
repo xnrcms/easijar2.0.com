@@ -198,14 +198,53 @@ class ControllerApiMyorder extends Controller {
 
         $order_info 					= $this->model_account_order->getOrderStatusForMs($order_id);
 
-        if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_unpaid_status_id')){
+        /*$this->load->model('checkout/order');
+		$this->model_checkout_order->addOrderHistoryForMs($order_info['order_sn'], 15);*/
 
-        	$this->load->model('multiseller/checkout');
+        $this->load->model('multiseller/checkout');
+
+        //未付款 直接取消
+        if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_unpaid_status_id')){
 
         	$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),t('text_customer_cancel'),false,true);
 
         	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
-        }else{
+
+        //待发货如果取消订单 需要判断商家未发货时间 如果商家超时发货直接取消订单  并退款
+        }elseif (isset($order_info['order_status_id']) && (int)$order_info['order_status_id'] === 15) {
+
+        	//获取订单操作历史中操作时间 
+        	$history_info 		= $this->model_account_order->getOrderHistoriesDateForMs($order_info['order_id'],$order_info['seller_id'],$order_info['order_status_id']);
+        	$history_date 		= isset($history_info['date_added']) ? strtotime($history_info['date_added']) : 0;
+
+        	$overtime 			= $history_date + (3600 * 24 * 3);
+        	$t 					= time();
+
+        	//判断是否超过三天
+        	if ($history_date >= $t) {
+        		//需要买家响应
+        		$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], 3,t('text_customer_cancel_audit'),false,true);
+        		return $this->response->setOutput($this->returnData(['msg'=>'fail:test pay success','data'=>$history_date ]));
+        	}else{
+        		//直接取消并退款
+        		$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),t('text_customer_cancel'),false,true);
+
+        		//退款
+        		//------待完善
+        	}
+
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:test pay success2','data'=>$history_date ]));
+        }
+        else{
+
+        	//提示已经操作的状态
+        	$this->load->model('localisation/order_status');
+        	$order_status = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);
+
+        	if (!empty($order_status) && isset($order_status['name']) && !empty($order_status['name'])) {
+            	return $this->response->setOutput($this->returnData(['msg'=>'fail:' . $order_status['name']]));
+        	}
+
             return $this->response->setOutput($this->returnData(['msg'=>'fail:order_status is error']));
         }
     }
@@ -252,6 +291,14 @@ class ControllerApiMyorder extends Controller {
 
         	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
         }else{
+
+        	$this->load->model('localisation/order_status');
+        	$order_status = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);
+
+        	if (!empty($order_status) && isset($order_status['name']) && !empty($order_status['name'])) {
+            	return $this->response->setOutput($this->returnData(['msg'=>'fail:' . $order_status['name']]));
+        	}
+
             return $this->response->setOutput($this->returnData(['msg'=>'fail:order_status is error']));
         }
     }

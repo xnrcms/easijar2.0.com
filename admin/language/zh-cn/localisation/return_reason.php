@@ -15,12 +15,16 @@ $_['text_success']     = '成功：退货原因已修改！';
 $_['text_list']        = '退货原因列表';
 $_['text_add']         = '添加退货原因';
 $_['text_edit']        = '编辑退货原因';
+$_['text_type1']       = '订单取消';
+$_['text_type2']       = '已收到货';
+$_['text_type3']       = '未收到货';
 
 // Column
 $_['column_name']      = '退货原因名称';
 $_['column_action']    = '管理';
 
 // Entry
+$_['entry_type']       = '原因类别';
 $_['entry_name']       = '退货原因名称';
 
 // Error
