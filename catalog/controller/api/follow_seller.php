@@ -1,5 +1,5 @@
 <?php
-class ControllerApiWishList extends Controller {
+class ControllerApiFollowSeller extends Controller {
     public function index()
     {
         $this->response->addHeader('Content-Type: application/json');
@@ -125,9 +125,9 @@ class ControllerApiWishList extends Controller {
     public function setting()
     {
         $this->response->addHeader('Content-Type: application/json');
-        $this->load->language('account/wishlist');
+        $this->load->language('account/follow_seller');
 
-        $allowKey       = ['api_token','product_id'];
+        $allowKey       = ['api_token','seller_id'];
         $req_data       = $this->dataFilter($allowKey);
         $data           =  $this->returnData();
 
@@ -139,18 +139,19 @@ class ControllerApiWishList extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
-        $this->load->model('catalog/product');
+        $this->load->model('multiseller/seller');
 
-        $product_id = isset($req_data['product_id']) ? $req_data['product_id'] : 0;
-        $product_info = $this->model_catalog_product->getProduct($product_id);
+        $seller_id          = isset($req_data['seller_id']) ? $req_data['seller_id'] : 0;
+        $seller_info        = $this->model_multiseller_seller->getSeller($seller_id);
 
-        if ($product_info) {
+        if ($seller_info) {
             if ($this->customer->isLogged()) {
                 // Edit customers cart
-                $this->load->model('account/wishlist');
+                $this->load->model('account/customer_follow_seller');
 
-                $wish_total     = $this->model_account_wishlist->getIsWishFByProductId((int)$product_id);
+                $wish_total     = $this->model_account_customer_follow_seller->getSellerFollowBySellerId((int)$seller_id);
 
+                return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$wish_total]));
                 //如果存在说明是取消收藏
                 if ($wish_total > 0) {
                     $this->model_account_wishlist->deleteWishlist((int)$product_id);

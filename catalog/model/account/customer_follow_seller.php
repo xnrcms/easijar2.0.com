@@ -1,5 +1,5 @@
 <?php
-class ModelAccountWishlist extends Model {
+class ModelAccountCustomerFollowSeller extends Model {
 	public function addWishlist($product_id) {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "customer_wishlist WHERE customer_id = '" . (int)$this->customer->getId() . "' AND product_id = '" . (int)$product_id . "'");
 
@@ -26,8 +26,8 @@ class ModelAccountWishlist extends Model {
 		return $query->row['total'];
 	}
 
-	public function getIsWishFByProductId($product_id) {
-		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer_wishlist WHERE customer_id = '" . (int)$this->customer->getId() . "' AND product_id = '" . (int)$product_id . "'");
+	public function getSellerFollowBySellerId($seller_id) {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer_follow_seller WHERE customer_id = '" . (int)$this->customer->getId() . "' AND seller_id = '" . (int)$seller_id . "'");
 
 		return $query->row['total'];
 	}

@@ -35,8 +35,10 @@ class ControllerApiPay extends Controller {
         $payment = $this->load->controller('extension/payment/' . $req_data['payment_code'] . '/payFormForSm');
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['payinfo'=>$payment]]));
-        $payinfo = str_replace($this->language->get('button_confirm'), $this->language->get('button_pay_continue'), $payment);
-        
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['payinfo'=>$payinfo]]));
+    }
+
+    public function refund($order_sn)
+    {
+        return $order_sn;
     }
 }

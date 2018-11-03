@@ -4,7 +4,7 @@ class ControllerApiCategory extends Controller {
 	{
 		$this->response->addHeader('Content-Type: application/json');
 
-		$allowKey		= ['page'];
+		$allowKey		= ['api_token'];
 		$req_data 		= $this->dataFilter($allowKey);
 
 		if (!$this->checkSign($req_data)) {
@@ -81,7 +81,7 @@ class ControllerApiCategory extends Controller {
         }
 	
 		$data 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
-
+wr($data);
 		$this->response->setOutput(json_encode($data));
 	}
 }

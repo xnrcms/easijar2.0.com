@@ -26,3 +26,6 @@ $_['column_model']    = '型号';
 $_['column_stock']    = '库存';
 $_['column_price']    = '单价';
 $_['column_action']   = '管理';
+
+// Error
+$_['error_product_id']    = '错误：请勾选需要移除的商品！';
