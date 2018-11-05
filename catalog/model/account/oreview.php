@@ -354,4 +354,83 @@ class ModelAccountOreview extends Model
 
         return $query->row['total'];
     }
+
+    /*
+    * 获取当用户购买完成的订单产品列表，只返回主品论，不包含追加评论
+    * config_complete_status：订单正常成功完成的状态（不包含取消和关闭的订单）
+    */
+    public function getOreviewsForApi($data = array())
+    {
+        $order_statuses = $this->config->get('config_complete_status');
+
+        foreach ($order_statuses as $order_status_id) {
+            $implode[] = "order_status_id = '".(int) $order_status_id."'";
+        }
+
+        $sql = 'SELECT op.*, o.date_added, p.image, p.product_id,p.tax_class_id, opr.author, opr.text, opr.rating, order_product_review_id AS reviewed
+                        FROM ' .DB_PREFIX.'order_product op
+                        LEFT JOIN ' .DB_PREFIX.'order o ON (o.order_id = op.order_id)
+                        LEFT JOIN ' .DB_PREFIX.'product p ON (op.product_id = p.product_id)
+                        LEFT JOIN ' .DB_PREFIX.'order_product_review opr ON (opr.order_product_id = op.order_product_id)
+                        WHERE (' .implode(' OR ', $implode).') AND (opr.parent_id = 0 OR opr.parent_id IS NULL) ';
+
+        $implode = array();
+
+        if (isset($data['filter_reviewed'])) {
+            if ($data['filter_reviewed']) {
+                $implode[] = 'opr.order_product_review_id IS NOT NULL';
+            } else {
+                $implode[] = 'opr.order_product_review_id IS NULL';
+            }
+        }
+
+        if (isset($data['filter_customer_id'])) {
+            $implode[] = "o.customer_id = '".(int) $data['filter_customer_id']."'";
+        }
+
+        if (isset($data['filter_order_id'])) {
+            $implode[] = "o.order_id = '".(int) $data['filter_order_id']."'";
+        }
+
+        if (isset($data['filter_date_added'])) {
+            $implode[] = "DATE(o.date_added) = DATE('".$this->db->escape($data['filter_date_added'])."')";
+        }
+
+        if ($implode) {
+            $sql .= ' AND '.implode(' AND ', $implode);
+        }
+
+        $sort_data = array(
+            'o.order_id',
+            'o.date_added',
+        );
+
+        if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+            $sql .= ' ORDER BY '.$data['sort'];
+        } else {
+            $sql .= ' ORDER BY o.date_added';
+        }
+
+        if (isset($data['order']) && ($data['order'] == 'ASC')) {
+            $sql .= ' ASC';
+        } else {
+            $sql .= ' DESC';
+        }
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 10;
+            }
+
+            $sql .= ' LIMIT '.(int) $data['start'].','.(int) $data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
+    }
 }

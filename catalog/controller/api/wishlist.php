@@ -60,7 +60,7 @@ class ControllerApiWishList extends Controller {
                     }
 
                     $wish_products[] = array(
-                        'product_id' => $product_info['product_id'],
+                        'product_id' => (int)$product_info['product_id'],
                         'thumb'      => $image,
                         'name'       => $product_info['name'],
                         'stock'      => $stock,

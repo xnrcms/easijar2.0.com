@@ -101,6 +101,12 @@ class ControllerApiUser extends Controller {
 					}
 				}
 
+				//添加用户浏览商品记录
+				if (isset($this->session->data['ProductBrowseRecordsForIds']) && is_array($this->session->data['ProductBrowseRecordsForIds'])) {
+					$this->load->model('account/product_browse_records');
+                	$this->model_account_product_browse_records->addProductBrowseRecords($this->session->data['ProductBrowseRecordsForIds']);
+				}
+
 				// Log the IP info
 				$this->model_account_customer->addLogin($this->customer->getId(), $this->request->server['REMOTE_ADDR']);
 
