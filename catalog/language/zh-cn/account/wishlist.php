@@ -29,3 +29,4 @@ $_['column_action']   = '管理';
 
 // Error
 $_['error_product_id']    = '错误：请勾选需要移除的商品！';
+$_['error_no_product']    = '错误：商品不存在！';

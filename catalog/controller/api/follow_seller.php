@@ -3,7 +3,7 @@ class ControllerApiFollowSeller extends Controller {
     public function index()
     {
         $this->response->addHeader('Content-Type: application/json');
-        $this->load->language('account/wishlist');
+        $this->load->language('api/follow_seller');
 
         $allowKey       = ['api_token'];
         $req_data       = $this->dataFilter($allowKey);
@@ -22,66 +22,45 @@ class ControllerApiFollowSeller extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $this->load->model('account/wishlist');
+        $this->load->model('account/customer_follow_seller');
 
-        $results                = $this->model_account_wishlist->getWishlist();
-        $wish_products          = [];
+        $results                = $this->model_account_customer_follow_seller->getSellerFollow();
+        $follow_seller          = [];
 
         if (!empty($results))
         {
-            $this->load->model('catalog/product');
+            $this->load->model('multiseller/seller');
             $this->load->model('tool/image');
 
             foreach ($results as $result)
             {
-                $product_info = $this->model_catalog_product->getProduct($result['product_id']);
-                if ($product_info)
+                $seller_info = $this->model_multiseller_seller->getSeller($result['seller_id']);
+                if ($seller_info)
                 {
-                    $image = $this->model_tool_image->resize($product_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_wishlist_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_wishlist_height'));
+                    $avatar                 = !empty($seller_info['avatar']) ? $seller_info['avatar'] : 'no_image.png';
+                    $avatar                 = $this->model_tool_image->resize($avatar, 100, 100);
 
-                    if ($product_info['quantity'] <= 0) {
-                        $stock = $product_info['stock_status'];
-                    } elseif ($this->config->get('config_stock_display')) {
-                        $stock = $product_info['quantity'];
-                    } else {
-                        $stock = $this->language->get('text_instock');
-                    }
-
-                    if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-                        $price = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-                    } else {
-                        $price = '';
-                    }
-
-                    if ((float)$product_info['special']) {
-                        $special = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-                    } else {
-                        $special = '';
-                    }
-
-                    $wish_products[] = array(
-                        'product_id' => $product_info['product_id'],
-                        'thumb'      => $image,
-                        'name'       => $product_info['name'],
-                        'stock'      => $stock,
-                        'price'      => $price,
-                        'special'    => $special ? $special : $price
-                    );
+                    $follow_seller[]        = [
+                        'seller_id'     => (int)$seller_info['seller_id'],
+                        'thumb'         => $avatar,
+                        'name'          => $seller_info['store_name'],
+                        'new_num'       => 0
+                    ];
                 } else {
-                    $this->model_account_wishlist->deleteWishlist($result['product_id']);
+                    $this->model_multiseller_seller->deleteSellerFollow($seller_info['seller_id']);
                 }
             }
         }
 
-        $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$wish_products]));
+        $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$follow_seller]));
     }
 
     public function remove()
     {
         $this->response->addHeader('Content-Type: application/json');
-        $this->load->language('account/wishlist');
+        $this->load->language('api/follow_seller');
 
-        $allowKey       = ['api_token','product_ids'];
+        $allowKey       = ['api_token','seller_ids'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -98,26 +77,23 @@ class ControllerApiFollowSeller extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $this->load->model('account/wishlist');
-
-        $product_ids         = [];
-        if (!empty($req_data['product_ids'])) {
-            $product_id      = explode(',', $req_data['product_ids']);
+        $seller_ids         = [];
+        if (!empty($req_data['seller_ids'])) {
+            $product_id      = explode(',', $req_data['seller_ids']);
             foreach ($product_id as $value)
             {
-                if ((int)$value > 0) $product_ids[(int)$value]   = (int)$value;
+                if ((int)$value > 0) $seller_ids[(int)$value]   = (int)$value;
             }
         }
 
-        if (empty($product_ids)) {
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_product_id')]));
+        if (empty($seller_ids)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_seller_id')]));
         }
 
-        $product_ids        = implode(',', $product_ids);
-
-        $this->load->model('catalog/product');
+        $seller_ids        = implode(',', $seller_ids);
         
-        $this->model_account_wishlist->deleteWishlists($product_ids);
+        $this->load->model('account/customer_follow_seller');
+        $this->model_account_customer_follow_seller->deleteSellerFollows($seller_ids);
 
         return $this->response->setOutput($this->returnData(['msg'=>'success','data'=>'product delete success']));
     }
@@ -125,7 +101,7 @@ class ControllerApiFollowSeller extends Controller {
     public function setting()
     {
         $this->response->addHeader('Content-Type: application/json');
-        $this->load->language('account/follow_seller');
+        $this->load->language('api/follow_seller');
 
         $allowKey       = ['api_token','seller_id'];
         $req_data       = $this->dataFilter($allowKey);
@@ -151,37 +127,37 @@ class ControllerApiFollowSeller extends Controller {
 
                 $wish_total     = $this->model_account_customer_follow_seller->getSellerFollowBySellerId((int)$seller_id);
 
-                return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$wish_total]));
                 //如果存在说明是取消收藏
                 if ($wish_total > 0) {
-                    $this->model_account_wishlist->deleteWishlist((int)$product_id);
-                    $wtype       = 0;
+                    $this->model_account_customer_follow_seller->deleteSellerFollow((int)$seller_id);
+                    $ftype       = 0;
                 }else{
-                    $this->model_account_wishlist->addWishlist((int)$product_id);
-                    $wtype       = 1;
+                    $this->model_account_customer_follow_seller->addSellerFollow((int)$seller_id);
+                    $ftype       = 1;
                 }
-                
             } else {
-                if (!isset($this->session->data['wishlist'])) $this->session->data['wishlist'] = [];
+                if (!isset($this->session->data['customer_follow_seller'])) $this->session->data['customer_follow_seller'] = [];
 
                 //如果存在说明是取消收藏
-                if (in_array($product_id, $this->session->data['wishlist'])) {
+                if (in_array($seller_id, $this->session->data['customer_follow_seller'])) {
 
-                    foreach ($this->session->data['wishlist'] as $key => $value) {
-                        if ($value == $product_id) unset($this->session->data['wishlist'][$key]);
+                    foreach ($this->session->data['customer_follow_seller'] as $key => $value) {
+                        if ($value == $seller_id) unset($this->session->data['customer_follow_seller'][$key]);
                     }
                     
-                    $wtype       = 0;
+                    $ftype       = 0;
                 }else{
-                    $this->session->data['wishlist'][]  = $product_id;
-                    $this->session->data['wishlist']    = array_unique($this->session->data['wishlist']);
-                    $wtype       = 1;
+                    $this->session->data['customer_follow_seller'][]  = $seller_id;
+                    $this->session->data['customer_follow_seller']    = array_unique($this->session->data['customer_follow_seller']);
+                    $ftype       = 1;
                 }
             }
 
-            $info       = $wtype == 1 ? $this->language->get('text_success') : $this->language->get('text_remove');
-            $data       = ['wtype'=>$wtype,'info'=>$info];
+            $info       = $ftype == 1 ? $this->language->get('text_success') : $this->language->get('text_remove');
+            $data       = ['wtype'=>$ftype,'info'=>$info];
             $data       = $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
+        }else{
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_no_seller')]));
         }
 
         $this->response->setOutput($data);

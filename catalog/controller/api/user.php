@@ -75,6 +75,17 @@ class ControllerApiUser extends Controller {
 						unset($this->session->data['wishlist'][$key]);
 					}
 				}
+
+				// customer_follow_seller
+				if (isset($this->session->data['customer_follow_seller']) && is_array($this->session->data['customer_follow_seller'])) {
+					$this->load->model('account/customer_follow_seller');
+
+					foreach ($this->session->data['customer_follow_seller'] as $key => $seller_id) {
+						$this->model_account_customer_follow_seller->addSellerFollow($seller_id);
+
+						unset($this->session->data['customer_follow_seller'][$key]);
+					}
+				}
 				
 				// getCouponList
 				if (isset($this->session->data['getCouponList']) && is_array($this->session->data['getCouponList'])) {
@@ -203,6 +214,8 @@ class ControllerApiUser extends Controller {
 			unset($this->session->data['voucher']);
 			unset($this->session->data['vouchers']);
 			unset($this->session->data['credit']);
+			unset($this->session->data['wishlist']);
+			unset($this->session->data['customer_follow_seller']);
     	}
 
     	$data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>'loginout success']);

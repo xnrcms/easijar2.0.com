@@ -114,9 +114,6 @@ class ControllerApiWishList extends Controller {
         }
 
         $product_ids        = implode(',', $product_ids);
-
-        $this->load->model('catalog/product');
-        
         $this->model_account_wishlist->deleteWishlists($product_ids);
 
         return $this->response->setOutput($this->returnData(['msg'=>'success','data'=>'product delete success']));
@@ -181,6 +178,8 @@ class ControllerApiWishList extends Controller {
             $info       = $wtype == 1 ? $this->language->get('text_success') : $this->language->get('text_remove');
             $data       = ['wtype'=>$wtype,'info'=>$info];
             $data       = $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
+        }else{
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_no_product')]));
         }
 
         $this->response->setOutput($data);

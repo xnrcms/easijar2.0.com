@@ -34,19 +34,6 @@ class ControllerApiCategory extends Controller {
                 foreach ($children as $child) {
                     $grand_children 		= $this->model_catalog_category->getCategories($child['category_id']);
                     $grand_children_data 	= [];
-                    /*foreach ($grand_children as $grand_child) {
-                        if ($mobile_image = $this->model_mobile_mobile->getCategoryMobileImage($grand_child['category_id'])) {
-                            $image = image_resize($mobile_image, 150, 150);
-                        } else {
-                            $image = image_resize($child['image'], 150, 150);
-                        }
-
-                        $grand_children_data[] = array(
-                            'thumb' => $image,
-                            'name'  => $grand_child['name'],
-                            'href'  => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id'] . '_' . $grand_child['category_id'])
-                        );
-                    }*/
 
                     if ($mobile_image = $this->model_mobile_mobile->getCategoryMobileImage($child['category_id'])) {
                         $image = image_resize($mobile_image, 150, 150);
@@ -58,7 +45,6 @@ class ControllerApiCategory extends Controller {
                 		'cid'     		 => $child['category_id'],
                         'thumb'          => $image,
                         'name'           => $child['name'],
-                        'href'           => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id']),
                         'grand_children' => $grand_children_data
                     );
                 }
@@ -75,13 +61,10 @@ class ControllerApiCategory extends Controller {
                 'cid'     => $category['category_id'],
                 'name'     => $category['name'],
                 'thumb'    => $image,
-                'children' => $children_data,
-                'href'     => $this->url->link('product/category', 'path=' . $category['category_id'])
+                'children' => $children_data
             );
         }
-	
-		$data 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
-wr($data);
-		$this->response->setOutput(json_encode($data));
+	   
+		$this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
 	}
 }

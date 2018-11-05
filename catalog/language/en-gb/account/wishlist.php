@@ -20,4 +20,5 @@ $_['column_price']    = 'Unit Price';
 $_['column_action']   = 'Action';
 
 // Error
-$_['error_product_id']    = 'Error: please check the items that need to be removed.';
+$_['error_product_id']    = 'Error: please check the items that need to be removed!';
+$_['error_no_product']    = 'Error: product do not exist!';

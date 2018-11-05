@@ -8,9 +8,12 @@
  */
 
 // Text
-$_['text_success']     = '成功：购物车商品已修改！';
-
-// Error
+$_['text_success']    = '成功关注该商家！';
+$_['text_remove']     = '成功取消关注该商家！';
 
 // Warning
-$_['warning_login']                  = '您还没有登录，登录才能进入哦。';
+$_['warning_login']      = '您还没有登录，登录才能进入哦。';
+
+// Error
+$_['error_seller_id']    = '错误：请勾选需要移除的商家！';
+$_['error_no_seller']    = '错误：商家不存在！';
