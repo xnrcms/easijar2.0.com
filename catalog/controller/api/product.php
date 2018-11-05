@@ -7,7 +7,7 @@ class ControllerApiProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/category');
 
-		$allowKey		= ['api_token','page','path','sorts'];
+		$allowKey		= ['api_token','page','path','sorts','variant','price','in_stock'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
@@ -69,7 +69,7 @@ class ControllerApiProduct extends Controller {
 			$variants = '';
 		}
 
-		if (isset($req_data['in_stock'])) {
+		if (isset($req_data['in_stock']) && (int)$req_data['in_stock'] > 0) {
 			$inStock = array_get($req_data, 'in_stock');
 		}
 
@@ -101,19 +101,18 @@ class ControllerApiProduct extends Controller {
             foreach ($results as $result) {
                 $categoryIds[] = $result['category_id'];
             }
-            $totals = $this->model_catalog_product_pro->getTotalProductsFromAllCategories();
+            $totals 				= $this->model_catalog_product_pro->getTotalProductsFromAllCategories();
 
 			foreach ($results as $result) {
 				$total = array_get($totals, $result['category_id'], 0);
 				$data['categories'][] = array(
-					'name' => $result['name'] . ($this->config->get('config_product_count') ? ' (' . $total . ')' : ''),
+					'name' 	=> $result['name'] . ($this->config->get('config_product_count') ? ' (' . $total . ')' : ''),
 					'thumb' => $this->model_tool_image->resize($result['image']),
-					'href' => $this->url->link('product/category', array_merge(['path' => $this->request->get['path'] . '_' . $result['category_id']], $url))
+					'path' 	=> $req_data['path'] . '_' . $result['category_id']
 				);
 			}
 
-			$data['products'] = array();
-
+			//$data['products'] = array();
 			$filter_data = array(
 				'filter_category_id'  		=> $category_id,
 				'filter_sub_category' 		=> $this->config->get('config_product_category') ? true : false,
@@ -172,7 +171,27 @@ class ControllerApiProduct extends Controller {
 
 				];
 			}
-			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$pdata]));
+
+			$data  			= [];
+			$data['pdata'] 	= $pdata;
+
+
+			$search_data 	= [];
+			$filter 		= $this->load->controller('extension/module/multi_filter/getFilterForApi');
+
+			$variants 		= isset($filter['variants']) ? $filter['variants'] : [];
+			if (!empty($variants)) {
+				foreach ($variants as $key => $value) {
+					$search_data['variants'][] 	= $value;
+				}
+			}
+
+			$search_data['price_range'] 	= isset($filter['price_range']) ? $filter['price_range'] : [];
+
+
+			$data['filter'] = $search_data;
+
+			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
 		}
 
 		$this->response->setOutput($this->returnData());
