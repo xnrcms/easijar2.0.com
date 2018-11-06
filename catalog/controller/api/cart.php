@@ -124,6 +124,10 @@ class ControllerApiCart extends Controller {
         $product_id = isset($req_data['product_id']) ? $req_data['product_id'] : 0;
     	$buy_type 	= isset($req_data['buy_type']) ? (int)$req_data['buy_type'] : 0;
 
+        if (!$this->customer->isLogged() && $buy_type == 1){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
     	$this->session->data['buy_type'] 		= $buy_type;
     	
     	if ( !in_array($buy_type, [0,1]) ) return $this->response->setOutput($this->returnData());
@@ -174,9 +178,9 @@ class ControllerApiCart extends Controller {
 
             if ($buy_type == 1) $this->cart->clear();
 
-            $this->cart->add($product_id, $quantity, $option);
+            $cart_id        = $this->cart->add($product_id, $quantity, $option);
 
-            $json['info'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $product_id), $product_info['name'], $this->url->link('checkout/cart'));
+            $json['info']   = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $product_id), $product_info['name'], $this->url->link('checkout/cart'));
 
             // Unset all shipping and payment methods
             unset($this->session->data['shipping_method']);
@@ -184,6 +188,7 @@ class ControllerApiCart extends Controller {
             unset($this->session->data['payment_method']);
             unset($this->session->data['payment_methods']);
 
+            $json['cart_id']        = $cart_id;
             $json['total'] 			= $this->formatted_total_text();
             $json['cart_nums'] 		= $this->cart->countProducts();
 

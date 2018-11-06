@@ -310,6 +310,12 @@ class Cart
         }
 
         $this->data = array();
+
+        if ($this->buy_type == 1) {
+            return $this->db->getLastId();
+        }else{
+            return 0;
+        }
     }
 
     public function update($cart_id, $quantity)
