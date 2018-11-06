@@ -64,10 +64,62 @@ class ModelCustomercouponCoupon extends Model
 
         return array();
     }
+
     public function getCouponById($coupon_id)
     {
         $query = $this->db->query('SELECT DISTINCT * FROM '.DB_PREFIX."coupon WHERE coupon_id = '".(int) $coupon_id."'");
 
         return $query->row;
+    }
+
+    public function getCouponsByCustomerIdForApi($data = [])
+    {
+        $customer_id            = (int)array_get($data, 'customer_id');
+        if ($customer_id <= 0)  return [];
+
+        $fields      = format_find_field('coupon_id,name,discount,total,date_start,date_end,explain,seller_id,type','c');
+        $fields     .= ',' . format_find_field('store_name,avatar','ms');
+
+        $sql        = 'SELECT ' . $fields . ',(date_end-CURDATE()) AS over_time FROM `'.DB_PREFIX.'coupon_customer` AS cc LEFT JOIN `'.DB_PREFIX.'coupon` AS c ON (cc.coupon_id = c.coupon_id) LEFT JOIN `'.DB_PREFIX.'ms_seller` AS ms ON (ms.seller_id = c.seller_id) WHERE customer_id='.(int) $customer_id;
+
+        $seller_id            = (int)array_get($data, 'seller_id');
+        if ($seller_id > 0) {
+            $sql    .= ' AND c.seller_id = ' . (int)$seller_id;
+        }
+
+        $sort_data  = [
+            'c.coupon_id',
+            'c.date_added',
+            'c.total',
+            'over_time'
+        ];
+
+        if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+            $sql .= ' ORDER BY '.$data['sort'];
+        } else {
+            $sql .= ' ORDER BY ' . $sort_data[0];
+        }
+
+        if (isset($data['order']) && ($data['order'] == 'ASC')) {
+            $sql .= ' ASC';
+        } else {
+            $sql .= ' DESC';
+        }
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+
+            $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
+        
+        $customer_query = $this->db->query($sql) ;
+
+        return $customer_query->num_rows > 0 ? $customer_query->rows : [];
     }
 }

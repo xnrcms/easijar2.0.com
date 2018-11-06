@@ -39,7 +39,7 @@ class ControllerAccountCoupons extends Controller
         $data['back'] = $this->url->link('account/account');
 
         $this->load->model('customercoupon/coupon');
-        $results = $this->model_customercoupon_coupon->getCouponsByCustomer($this->customer, false);
+        $results = $this->model_customercoupon_coupon->getCouponsByCustomer($this->customer, false,3);
         $data['coupons'] = array();
         foreach ($results as $result) {
             if ($result['type'] == 'F') {

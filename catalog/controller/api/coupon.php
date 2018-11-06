@@ -1,37 +1,70 @@
 <?php
 class ControllerApiCoupon extends Controller {
-	public function index() {
-		$this->load->language('api/coupon');
+	public function index()
+	{
+		$allowKey       = ['api_token','page','dtype','seller_id'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
+        $data 			= [];
 
-		// Delete past coupon in case there is an error
-		unset($this->session->data['coupon']);
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
 
-		$json = array();
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
 
-		if (!isset($this->session->data['api_id'])) {
-			$json['error'] = $this->language->get('error_permission');
-		} else {
-			$this->load->model('extension/total/coupon');
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
 
-			if (isset($this->request->post['coupon'])) {
-				$coupon = $this->request->post['coupon'];
-			} else {
-				$coupon = '';
-			}
+        $page 				= ( !isset($req_data['page']) || (int)$req_data['page'] <= 0 ) ? 1 : (int)$req_data['page'];
+        $dtype 				= ( !isset($req_data['dtype']) || (int)$req_data['dtype'] <= 0 ) ? 0 : (int)$req_data['dtype'];
+        $seller_id 			= ( !isset($req_data['seller_id']) || (int)$req_data['seller_id'] <= 0 ) ? 0 : (int)$req_data['seller_id'];
+        $limit 				= 10;
 
-			$coupon_info = $this->model_extension_total_coupon->getCoupon($coupon);
+        $filter_data 		= [
+        	'customer_id'	=> $this->customer->getId(),
+        	'seller_id'		=> $seller_id,
+        	'dtype' 		=> $dtype,
+        	'sort' 			=> 'over_time',
+        	'order' 		=> 'DESC',
+            'start' 		=> ($page - 1) * $limit,
+            'limit' 		=> $limit,
+        ];
 
-			if ($coupon_info) {
-				$this->session->data['coupon'] = $this->request->post['coupon'];
 
-				$json['success'] = $this->language->get('text_success');
-			} else {
-				$json['error'] = $this->language->get('error_coupon');
-			}
-		}
+        $this->load->model('customercoupon/coupon');
+        $this->load->model('tool/image');
 
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
+        $results 			= $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);
+        $coupon 			= [];
+        if (!empty($results)) {
+        	foreach ($results as $key => $value) {
+        		$avatar                 		= !empty($value['avatar']) ? $value['avatar'] : 'no_image.png';
+		        $value['avatar']        		= $this->model_tool_image->resize($avatar, 100, 100);
+
+		        $overdue 						= $value['over_time'] > 0 ? 1 : 0;
+
+		        if ($value['type'] == 'F') {
+                	$value['discount'] 			= $this->currency->format($value['discount'], $this->session->data['currency']);
+	            } else {
+	                $value['discount'] 			= '-'.round($value['discount']).'%';
+	            }
+
+	            unset($value['type']);
+	            unset($value['over_time']);
+	            unset($value['total']);
+
+		        $coupon[$value['seller_id'].'_'.$overdue]['seller_id'] 	= $value['seller_id'];
+		        $coupon[$value['seller_id'].'_'.$overdue]['store_name']	= $value['store_name'];
+		        $coupon[$value['seller_id'].'_'.$overdue]['avatar']		= $value['avatar'];
+		        $coupon[$value['seller_id'].'_'.$overdue]['coupon'][] 	= $value;
+        	}
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$coupon]));
 	}
 
 	public function lists()

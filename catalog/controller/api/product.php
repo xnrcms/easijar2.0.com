@@ -229,6 +229,7 @@ class ControllerApiProduct extends Controller {
 			$oprice 				= !empty($product_info['special']) ? $product_info['special'] :  $product_info['price'];
 			$pinfo['oprice'] 		= $this->currency->format($this->tax->calculate($oprice, $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
+			$pinfo['stock'] 		= '10';
 			$pinfo['freight'] 		= '10';
 			$pinfo['description'] 	= htmlspecialchars_decode($product_info['description']);
 
@@ -242,12 +243,29 @@ class ControllerApiProduct extends Controller {
 			$variants 							= $productModel->getProductVariantsDetail();
 
 			if ($variants) {
-				$opt['variants'] 				= $variants['variants'];
-				$opt['sku'] 					= $productModel->getVariantKeys();
+				$variants_list 					= [];
+				$product_variants 				= isset($variants['product_variants']) &&!empty($variants['product_variants']) ? $variants['product_variants'] : [];
+				
+				if (isset($variants['variants']) &&!empty($variants['variants'])) {
+					foreach ($variants['variants'] as $kvar=>$vari) {
+						if (isset($vari['values']) &&!empty($vari['values'])) {
+							foreach ($vari['values'] as $kv => $vv) {
+								if (isset($product_variants[$kvar]) && (int)$product_variants[$kvar] === (int)$vv['variant_value_id'] ) {
+									$vari['values'][$kv]['selected'] 	= 1;
+								}else{
+									$vari['values'][$kv]['selected'] 	= 0;
+								}
+							}
+						}
+						$opt[] 		= $vari;
+					}
+				}
+				/*$opt['variants'] 				= $variants['variants'];
+				$opt['sku'] 					= $productModel->getVariantKeys();*/
 				/*$opt['product_variants'] 		= $variants['product_variants'];
 				$opt['skus'] 					= $variants['skus'];*/
 			}
-
+			
 			//所有商品ID 子产品和和主产品
 			$ppid 								= $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
 			$product_ids 						= $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
