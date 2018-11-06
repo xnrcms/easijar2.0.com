@@ -232,6 +232,7 @@ class ControllerApiProduct extends Controller {
 			$pinfo['stock'] 		= '10';
 			$pinfo['freight'] 		= '10';
 			$pinfo['description'] 	= htmlspecialchars_decode($product_info['description']);
+			$pinfo['sku'] 			= '';
 
 			//折扣率计算
 			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price, 4)*100 : 0;
@@ -260,12 +261,15 @@ class ControllerApiProduct extends Controller {
 						$opt[] 		= $vari;
 					}
 				}
+
+				$pinfo['sku'] 					= $productModel->getVariantKeys();
+				
 				/*$opt['variants'] 				= $variants['variants'];
 				$opt['sku'] 					= $productModel->getVariantKeys();*/
 				/*$opt['product_variants'] 		= $variants['product_variants'];
 				$opt['skus'] 					= $variants['skus'];*/
 			}
-			
+
 			//所有商品ID 子产品和和主产品
 			$ppid 								= $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
 			$product_ids 						= $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
@@ -321,6 +325,7 @@ class ControllerApiProduct extends Controller {
 	        	$seller_info['store_name'] 		= $seller['store_name'];
 	        	$seller_info['product_total'] 	= $seller['total'];
 	        	$seller_info['rating'] 			= sprintf("%.1f", $seller['rating']);
+	        	$seller_info['chats'] 			= '80%';
 	        }
 
 			//商品图片

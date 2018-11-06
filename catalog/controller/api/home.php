@@ -55,6 +55,44 @@ class ControllerApiHome extends Controller {
 			}
 		}
 
+		$sort 			= 'p.sort_order';
+		$order 			= 'ASC';
+
+		$filter_data 	= [
+			'sort'  => $sort,
+			'order' => $order,
+			'start' => 0,
+			'limit' => 12
+		];
+
+		$this->load->model('catalog/product');
+		$this->load->model('tool/image');
+
+		$results 					= $this->model_catalog_product->getProductSpecials($filter_data);
+		$data['special'] 			= [];
+		foreach ($results as $key => $value) {
+
+			$image = $this->model_tool_image->resize($value['image'],$this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+
+            $special 			= !empty($value['special']) ? $value['special'] : (!empty($value['price']) ? $value['price'] : '');
+
+            $pinfo 					= [];
+
+            $price 					= $value['price'];
+			$oprice 				= !empty($value['special']) ? $value['special'] :  $value['price'];
+			$currency 				= $this->session->data['currency'];
+
+			$pinfo['product_id'] 	= (int)$value['product_id'];
+			$pinfo['image'] 		= $image;
+			$pinfo['price'] 		= $this->currency->format($this->tax->calculate($price, $value['tax_class_id'], $this->config->get('config_tax')), $currency);
+			$pinfo['oprice'] 		= $this->currency->format($this->tax->calculate($oprice, $value['tax_class_id'], $this->config->get('config_tax')), $currency);
+			
+			//折扣率计算
+			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price, 4)*100 : 0;
+
+			$data['special'][] 		= $pinfo;
+		}
+
 		//购物车数量
         //$data['cart_nums'] 		= $this->cart->countProducts();
 
