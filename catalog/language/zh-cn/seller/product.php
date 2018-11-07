@@ -94,6 +94,7 @@ $_['column_action'] = '操作';
 $_['column_id'] = 'ID';
 
 $_['entry_name'] = '商品名称';
+$_['entry_description'] = '商品描述';
 $_['entry_model'] = '商品型号';
 $_['entry_status'] = '商品状态';
 $_['entry_show_variant'] = '显示子产品';

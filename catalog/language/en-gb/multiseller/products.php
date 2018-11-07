@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 /**
  *
  * @copyright        2017 www.guangdawangluo.com - All Rights Reserved
@@ -11,7 +11,7 @@
 $_['heading_title']     = 'All goods In this shop';
 
 // Text
-$_['text_no_results']   = 'No_results,try something elseï¼';
+$_['text_no_results']   = 'No_results,try something else£¡';
 $_['text_quantity']     = 'Quantity';
 $_['text_manufacturer'] = 'Brand';
 $_['text_model']        = 'Model';

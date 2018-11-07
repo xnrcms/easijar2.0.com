@@ -229,14 +229,12 @@ class ControllerApiProduct extends Controller {
 			$oprice 				= !empty($product_info['special']) ? $product_info['special'] :  $product_info['price'];
 			$pinfo['oprice'] 		= $this->currency->format($this->tax->calculate($oprice, $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
-			$pinfo['stock'] 		= '10';
-			$pinfo['freight'] 		= '10';
+			$pinfo['stock'] 		= isset($product_info['quantity']) ? (int)$product_info['quantity'] : 0;
 			$pinfo['description'] 	= htmlspecialchars_decode($product_info['description']);
 			$pinfo['sku'] 			= '';
 
 			//折扣率计算
 			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price, 4)*100 : 0;
-			$pinfo['free_shipping'] = '包邮';
 
 			//产品属性
 			$opt 								= [];
@@ -316,7 +314,6 @@ class ControllerApiProduct extends Controller {
 
 	        //商家信息
 	        $this->load->model('multiseller/seller');
-
 	        $seller 				= $this->model_multiseller_seller->getSellerByProductIdForOne($product_info['product_id']);
 	        $seller_info 			= [];
 	        if (!empty($seller)) {
@@ -362,6 +359,20 @@ class ControllerApiProduct extends Controller {
 					'discount'   => $this->currency->format($this->tax->calculate($result['discount'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency'])
 				];
 			}
+
+			//获取商品运费
+			$this->load->model('extension/total/multiseller_shipping');
+
+			$address 							= [];
+	        $address['country_id']          	= $this->session->data['country_code'] ? get_country_code($this->session->data['country_code']) : 0;
+	        $address['weight']              	= isset($product_info['weight']) ? $product_info['weight'] : 0;
+	        $address['weight_class_id']     	= isset($product_info['weight_class_id']) ? $product_info['weight_class_id'] : 0;
+	        $address['length']              	= isset($product_info['length']) ? $product_info['length'] : 0;
+	        $address['width']               	= isset($product_info['width']) ? $product_info['width'] : 0;
+	        $address['height']              	= isset($product_info['height']) ? $product_info['height'] : 0;
+	        $address['length_class_id']     	= isset($product_info['length_class_id']) ? $product_info['length_class_id'] : 0;
+			$cost 								= $this->model_extension_total_multiseller_shipping->getShippingCostByAddress($seller_id,$address);
+			$pinfo['freight'] 					= !empty($cost) ? $this->currency->format($cost, $this->session->data['currency']) : '包邮';
 
 			$data['images'] 					= $images;
 			$data['pinfo'] 						= $pinfo;//购物车数量

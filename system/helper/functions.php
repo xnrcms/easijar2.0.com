@@ -760,3 +760,20 @@ if (!function_exists('random_string'))
         return $hash;
     }
 }
+
+if (!function_exists('get_country_code')) 
+{
+    /**
+     * 生成随机数
+     * @param number $length 字符串长度
+     * @param number $type 字符串类型
+     * @return string
+     */
+    function get_country_code($code = 0,$type=0) {
+        $arr    = ['86'=>'44','60'=>'129','63'=>'168','65'=>'188'];
+        if ($type == 1) {
+            $arr    = array_flip($arr);
+        }
+        return isset($arr[$code]) ? $arr[$code] : 0;
+    }
+}

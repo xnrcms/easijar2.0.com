@@ -62,6 +62,55 @@ class ModelExtensionTotalMultisellerShipping extends Model {
 		}
 	}
 
+    public function getShippingCostByAddress($seller_id = 0,$address = 0)
+    {
+        if($seller_id <= 0) return 0;
+
+        $address['zone_id']             = isset($address['zone_id']) ? $address['zone_id'] : 0;
+        $address['country_id']          = isset($address['country_id']) ? $address['country_id'] : 0;
+        $address['quantity']            = isset($address['quantity']) ? $address['quantity'] : 1;
+        $address['weight']              = isset($address['weight']) ? $address['weight'] : 0;
+        $address['weight_class_id']     = isset($address['weight_class_id']) ? $address['weight_class_id'] : 0;
+        $address['length']              = isset($address['length']) ? $address['length'] : 0;
+        $address['width']               = isset($address['width']) ? $address['width'] : 0;
+        $address['height']              = isset($address['height']) ? $address['height'] : 0;
+        $address['length_class_id']     = isset($address['length_class_id']) ? $address['length_class_id'] : 0;
+
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "ms_shipping_cost sc
+                                   LEFT JOIN " . DB_PREFIX . "zone_to_geo_zone gz ON sc.geo_zone_id = gz.geo_zone_id
+                                   WHERE seller_id = '" . (int)$seller_id . "' AND (gz.zone_id = '" . $address['zone_id'] . "' OR gz.zone_id = '0') AND gz.country_id = '" . $address['country_id'] . "'
+                                   ORDER BY sc.sort_order ASC");
+
+        $shipping_cost = $query->row;
+
+        if (!$shipping_cost) {
+            $cost = 0;
+        } else {
+            if ($shipping_cost['type'] == self::TYPE['by_count']) {
+                $quantity   = $address['quantity'];
+                $over       = $quantity - $shipping_cost['initial'];
+                $over       = $over > 0 ? $over : 0;
+                $cost       = $shipping_cost['initial_cost'] + ceil(($over) / $shipping_cost['continue']) * $shipping_cost['continue_cost'];
+            } else if ($shipping_cost['type'] == self::TYPE['by_weight']) {
+                $unit_id    = $shipping_cost['unit_weight'];
+                $weight     = $this->formatWeight($address['weight'], $address['weight_class_id'], $unit_id);
+                $over       = $weight - $shipping_cost['initial'];
+                $over       = $over > 0 ? $over : 0;
+                $cost       = $shipping_cost['initial_cost'] + ceil(($over) / $shipping_cost['continue']) * $shipping_cost['continue_cost'];
+            } else if ($shipping_cost['type'] == self::TYPE['by_volume']) {
+                $unit_id    = $shipping_cost['unit_volume'];
+                $volume     = $this->formatLength($address['length'], $address['length_class_id'], $unit_id) * $this->formatLength($address['width'], $address['length_class_id'], $unit_id) * $this->formatLength($address['height'], $address['length_class_id'], $unit_id);
+                $over       = $volume - $shipping_cost['initial'];
+                $over       = $over > 0 ? $over : 0;
+                $cost       = $shipping_cost['initial_cost'] + ceil(($over) / $shipping_cost['continue']) * $shipping_cost['continue_cost'];
+            } else {
+                $cost = 0;
+            }
+        }
+
+        return $cost;
+    }
+
 	private function getShippingCost($seller_id) {
 	    $address = $this->session->data['shipping_address'];
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "ms_shipping_cost sc

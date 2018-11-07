@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  *
  * @copyright        2017 www.guangdawangluo.com - All Rights Reserved
