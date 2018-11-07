@@ -364,7 +364,7 @@ class ControllerApiProduct extends Controller {
 			$this->load->model('extension/total/multiseller_shipping');
 
 			$address 							= [];
-	        $address['country_id']          	= $this->session->data['country_code'] ? get_country_code($this->session->data['country_code']) : 0;
+	        $address['country_id']          	= isset($this->session->data['country_code']) ? get_country_code($this->session->data['country_code']) : 0;
 	        $address['weight']              	= isset($product_info['weight']) ? $product_info['weight'] : 0;
 	        $address['weight_class_id']     	= isset($product_info['weight_class_id']) ? $product_info['weight_class_id'] : 0;
 	        $address['length']              	= isset($product_info['length']) ? $product_info['length'] : 0;
