@@ -99,32 +99,114 @@ class ControllerApiCheckout extends Controller
 
         $this->log($this->session->data['payment_address']);*/
 
-        $json['logged']                         = $this->isLogged();
-        $json['shipping_required']              = $this->hasShipping();
+        /*$json['logged']                         = $this->isLogged();
+        $json['shipping_required']              = $this->hasShipping();*/
         //$json['payment_address_required']       = $this->isPaymentAddressRequired();
 
         if ($this->hasShipping()) {
-            $json['shipping_address_section']   = $this->renderAddressSection('shipping');
+            $shipping_address_section           = $this->renderAddressSection('shipping');
+            $address                            = isset($shipping_address_section['addresses']) ? $shipping_address_section['addresses'] : [];
+            $shipping_option                    = [];
+            foreach ($address as $key => $value) {
+                $shipping_option[]              = [
+                    'address_id'            => $value['address_id'],
+                    'fullname'              => $value['fullname'],
+                    'telephone'             => $value['telephone'],
+                    'company'               => $value['company'],
+                    'address_1'             => $value['address_1'],
+                    'address_2'             => $value['address_2'],
+                    'postcode'              => $value['postcode'],
+                    'country_id'            => $value['country_id'],
+                    'country'               => $value['country']
+                ];
+            }
+            $json['shipping_address_section']   = $shipping_option;
+        }else{
+            $json['shipping_address_section']   = [];
         }
 
-        if ($this->isPaymentAddressRequired()) {
-            $json['payment_address_section']    = $this->renderAddressSection('payment');
+        $payment_method_section                 = $this->renderPaymentMethodSection();
+        $payment_method                         = isset($payment_method_section['payment_methods']) ? $payment_method_section['payment_methods'] : [];
+        $payment_option                         = [];
+        foreach ($payment_method as $key => $value) {
+            $payment_option[]                   = ['code' => $value['code'],'title' => $value['title']];
         }
+        $json['payment_method_section']         = $payment_option;
+
+        /*if ($this->isPaymentAddressRequired()) {
+            $payment_address_section            = $this->renderAddressSection('payment');
+            $json['payment_address_section']    = $this->renderAddressSection('payment');
+        }else{
+            $json['payment_address_section']    = [];
+        }*/
 
         //$json['if_pickup_section']              = $this->renderIfPickupSection();
         //$json['pickup_section']                 = $this->renderPickupSection();
-        $json['shipping_method_section']        = $this->renderShippingMethodSection();
-        $json['payment_method_section']         = $this->renderPaymentMethodSection();
+        //$json['shipping_method_section']        = $this->renderShippingMethodSection();
+        //$json['payment_method_section']         = $this->renderPaymentMethodSection();
 
         $products                               = $this->renderCartSection();
         $cart_products                          = [];
 
         if ( isset($products['products']) && !empty($products['products'])) {
+
+            $this->load->language('extension/total/multiseller_shipping', 'multiseller');
+            $total_title    = $this->language->get('multiseller')->get('text_multiseller_shipping');
+
+            $totals         = isset($products['totals']) ? $products['totals'] : [];
+            $seller_ship    = [];
+            $ship_del       = [];
+
+            foreach ($totals as $tk => $tv) {
+                if (strpos('&'.$tv['title'], '平台商品运费') >= 1 || strpos('&'.$tv['title'], 'Platform shipping fee') >= 1) {
+                    unset($totals[$tk]);continue;
+                }
+
+                $seller_ship[$tv['title']]  = $tv['text'];
+                $ship_del[$tv['title']]     = $tk;
+            }
+
             foreach ($products['products'] as $key => $value) {
+                //unset($value['href']);
+                $store_name_text         = $value['store_name'] . ' ' . $total_title;
+
+                //删除数组元素
+                if (isset($seller_ship[$store_name_text])) {
+                    $shipping           = $seller_ship[$store_name_text];
+                    unset($totals[$ship_del[$store_name_text]]);
+                }else{
+                    $shipping           = '';
+                }
+
+                $value['shipping']       = $shipping;
+
+                $goods                   = isset($value['products']) ? $value['products'] : [];
+                $ggs                     = [];
+
+                foreach ($goods as $gk => $gv) {
+                    $gopt       = isset($gv['option']) ? $gv['option'] : [];
+                    $opt_text   = '';
+                    foreach ($gopt as $oval) {
+                        $opt_text   .= $oval['name'] . ':' . $oval['value'] . ',';
+                    }
+
+                    $ggs[]              = [
+                        'cart_id'       => $gv['cart_id'],
+                        'name'          => $gv['name'],
+                        'product_id'    => $gv['product_id'],
+                        'image'         => $gv['cart_id'],
+                        'option'        => trim($opt_text,','),
+                    ];
+                }
+
+                $value['products']       = $ggs;
                 $cart_products[]         = $value;
             }
         }
-        
+
+        sort($totals);
+
+        $products['totals']                     = $totals;
         $products['products']                   = $cart_products;
 
         $json['cart_section']                   = $products;
@@ -660,8 +742,8 @@ class ControllerApiCheckout extends Controller
     {
         $this->log(__FUNCTION__);
         $data['products']   = $this->getProducts();
-        $data['vouchers']   = $this->getVouchers();
-        $data['recharges']  = $this->getRecharges();
+        //$data['vouchers']   = $this->getVouchers();
+        //$data['recharges']  = $this->getRecharges();
         $data['totals']     = $this->getTotals();
 
         $this->load->view('checkout/checkout/_confirm', $data);
