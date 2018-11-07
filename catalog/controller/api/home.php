@@ -17,19 +17,19 @@ class ControllerApiHome extends Controller {
         }
         
 	    $this->load->model('setting/module');
+	    $this->load->model('tool/image');
 
 		//获取幻灯片
 		$this->load->model('design/banner');
-	    $this->load->model('tool/image');
 
-	    $data['banners'] 	= [];
+	    $data['broadcast'] 	= [];
 	    $setting_info 		= $this->model_setting_module->getModule(35);
 	    $results 			= $this->model_design_banner->getBanner($setting_info['banner_id']);
 	    
 	    if (!empty($results)) {
 	    	foreach ($results as $result) {
 		      if (is_file(DIR_IMAGE . $result['image'])) {
-		        $data['banners'][] = array(
+		        $data['broadcast'][] = array(
 		          'title' => $result['title'],
 		          'link'  => $result['link'],
 		          'image' => $this->model_tool_image->resize($result['image'], $setting_info['width'], $setting_info['height'])
@@ -65,33 +65,62 @@ class ControllerApiHome extends Controller {
 			'limit' => 12
 		];
 
-		$this->load->model('catalog/product');
 		$this->load->model('tool/image');
 
-		$results 					= $this->model_catalog_product->getProductSpecials($filter_data);
-		$data['special'] 			= [];
-		foreach ($results as $key => $value) {
+		//首页Banner
+	    $module_id 					= 40;
+	    $setting_info 				= $this->model_setting_module->getModule($module_id);
+		$setting_info['module_id'] 	= $module_id;
+		$setting_info['position'] 	= 'content_top';
+		$setting_info['api'] 		= true;
+	    $results 					= $this->load->controller('extension/module/banner', $setting_info);
+		$data['banners'] 			= isset($results['banners']) ? $results['banners'] : [];
 
-			$image = $this->model_tool_image->resize($value['image'],$this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+		//特价商品
+		$module_id 					= 36;
+	    $setting_info 				= $this->model_setting_module->getModule($module_id);
+		$setting_info['module_id'] 	= $module_id;
+		$setting_info['position'] 	= 'content_top';
+		$setting_info['api'] 		= true;
+	    $results 					= $this->load->controller('extension/module/special', $setting_info);
 
-            $special 			= !empty($value['special']) ? $value['special'] : (!empty($value['price']) ? $value['price'] : '');
+	    $discount 					= [];
+	    if (isset($results['products']) && !empty($results['products'])) {
+	    	foreach ($results['products'] as $rval) {
+	    		$discount[] 		= [
+	    			'product_id' 	=> $rval['product_id'],
+	    			'thumb' 		=> $rval['thumb'],
+	    			'price' 		=> $rval['price'],
+	    			'special' 		=> !empty($rval['special']) ? $rval['special'] : $rval['price'],
+	    			'quantity' 		=> $rval['quantity'],
+	    		];
+	    	}
+	    }
 
-            $pinfo 					= [];
+		$data['discount'] 			= $discount;
 
-            $price 					= $value['price'];
-			$oprice 				= !empty($value['special']) ? $value['special'] :  $value['price'];
-			$currency 				= $this->session->data['currency'];
+		//推荐商品
+		$module_id 					= 39;
+	    $setting_info 				= $this->model_setting_module->getModule($module_id);
+		$setting_info['module_id'] 	= $module_id;
+		$setting_info['position'] 	= 'content_top';
+		$setting_info['api'] 		= true;
+	    $results 					= $this->load->controller('extension/module/latest', $setting_info,true);
 
-			$pinfo['product_id'] 	= (int)$value['product_id'];
-			$pinfo['image'] 		= $image;
-			$pinfo['price'] 		= $this->currency->format($this->tax->calculate($price, $value['tax_class_id'], $this->config->get('config_tax')), $currency);
-			$pinfo['oprice'] 		= $this->currency->format($this->tax->calculate($oprice, $value['tax_class_id'], $this->config->get('config_tax')), $currency);
-			
-			//折扣率计算
-			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price, 4)*100 : 0;
+	    $recommend 					= [];
+	    if (isset($results['products']) && !empty($results['products'])) {
+	    	foreach ($results['products'] as $rval) {
+	    		$recommend[] 		= [
+	    			'product_id' 	=> $rval['product_id'],
+	    			'thumb' 		=> $rval['thumb'],
+	    			'price' 		=> $rval['price'],
+	    			'special' 		=> !empty($rval['special']) ? $rval['special'] : $rval['price'],
+	    			'quantity' 		=> $rval['quantity'],
+	    		];
+	    	}
+	    }
 
-			$data['special'][] 		= $pinfo;
-		}
+		$data['recommend'] 			= $recommend;
 
 		//购物车数量
         //$data['cart_nums'] 		= $this->cart->countProducts();

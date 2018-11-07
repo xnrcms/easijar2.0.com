@@ -21,6 +21,8 @@ class ControllerExtensionModuleBanner extends Controller {
       }
     }
 
+    if (isset($setting['api']) && $setting['api']) return $data;
+    
     if ($data['banners']) {
       $data['module'] = $module++;
       return $this->load->view('extension/module/banner', $data);

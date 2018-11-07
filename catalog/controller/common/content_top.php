@@ -70,11 +70,12 @@ class ControllerCommonContentTop extends Controller {
 					}
 				}
 			}
+			print_r([$part,'extension/module/' . $part[0],$setting_info,$output]);
 		}
 
 		$no_back 					= ['common/home','product/search','mobile/categories','checkout/cart','account/account','account/login'];
 		$data['isback'] 			= in_array($route, $no_back) ? false : true;
-
+exit();
 		return $this->load->view('common/content_top', $data);
 	}
 }

@@ -21,7 +21,7 @@ class ControllerExtensionModuleFlashSale extends Controller
         $this->products = $this->config->get('module_flash_sale_products');
     }
 
-    public function index()
+    public function index($setting = [])
     {
         static $module = 0;
 
@@ -96,6 +96,8 @@ class ControllerExtensionModuleFlashSale extends Controller
 
             $data['module'] = $module++;
 
+            if (isset($setting['api']) && $setting['api']) return $data;
+            
             return $this->load->view('extension/module/flash_sale', $data);
         }
     }

@@ -179,6 +179,7 @@ class ControllerApiCheckout extends Controller
                 }
 
                 $value['shipping']       = $shipping;
+                $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
 
                 $goods                   = isset($value['products']) ? $value['products'] : [];
                 $ggs                     = [];
@@ -193,6 +194,7 @@ class ControllerApiCheckout extends Controller
                     $ggs[]              = [
                         'cart_id'       => $gv['cart_id'],
                         'name'          => $gv['name'],
+                        'quantity'      => $gv['quantity'],
                         'product_id'    => $gv['product_id'],
                         'image'         => $gv['cart_id'],
                         'option'        => trim($opt_text,','),

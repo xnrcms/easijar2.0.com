@@ -215,17 +215,17 @@ class ControllerApiCart extends Controller {
         }
 
         if (!(isset($req_data['cart_id']) && intval($req_data['cart_id']) >=1)) {
-        	return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>'cart_id is error']));
+        	return $this->response->setOutput($this->returnData(['msg'=>'cart_id is error']));
         }
 
         if (!(isset($req_data['quantity']) && intval($req_data['quantity']) >=1)) {
-        	return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>'quantity is error']));
+        	return $this->response->setOutput($this->returnData(['msg'=>'quantity is error']));
         }
 
         $this->cart->update($req_data['cart_id'], $req_data['quantity']);
 
         if (!$this->cart->hasStock() && (!config('config_stock_checkout') || config('config_stock_warning'))) {
-            return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>$this->language->get('error_stock')]));
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_stock')]));
         }
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'cart update success']));
@@ -255,32 +255,42 @@ class ControllerApiCart extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function remove() {
-		$this->load->language('api/cart');
+	public function remove()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('api/cart');
 
-		$json = array();
+        $allowKey       = ['api_token','cart_id'];
+        $req_data       = $this->dataFilter($allowKey);
 
-		if (!isset($this->session->data['api_id'])) {
-			$json['error'] = $this->language->get('error_permission');
-		} else {
-			// Remove
-			if (isset($this->request->post['key'])) {
-				$this->cart->remove($this->request->post['key']);
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+        
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
 
-				unset($this->session->data['vouchers'][$this->request->post['key']]);
+        if (!(isset($req_data['cart_id']) && intval($req_data['cart_id']) >=1)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'cart_id is error']));
+        }
+		
+        $this->cart->remove($req_data['cart_id']);
 
-				$json['success'] = $this->language->get('text_success');
+        unset($this->session->data['vouchers'][$req_data['cart_id']]);
+        unset($this->session->data['recharges'][$req_data['cart_id']]);
+        unset($this->session->data['shipping_method']);
+        unset($this->session->data['shipping_methods']);
+        unset($this->session->data['payment_method']);
+        unset($this->session->data['payment_methods']);
+        unset($this->session->data['reward']);
+        unset($this->session->data['credit']);
 
-				unset($this->session->data['shipping_method']);
-				unset($this->session->data['shipping_methods']);
-				unset($this->session->data['payment_method']);
-				unset($this->session->data['payment_methods']);
-				unset($this->session->data['reward']);
-			}
-		}
+        if (!$this->cart->hasStock() && (!config('config_stock_checkout') || config('config_stock_warning'))) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_stock')]));
+        }
 
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'cart update success']));
 	}
 
 	public function products() {

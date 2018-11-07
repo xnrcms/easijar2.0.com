@@ -23,6 +23,8 @@ class ControllerExtensionModuleLatest extends Controller {
 		foreach ($results as $result) {
 			$data['products'][] = $this->model_catalog_product->handleSingleProduct($result, $setting['width'], $setting['height']);
 		}
+		
+		if (isset($setting['api']) && $setting['api']) return $data;
 
 		return $this->load->view('extension/module/latest', $data);
 	}
