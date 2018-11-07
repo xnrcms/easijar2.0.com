@@ -116,7 +116,21 @@ class ControllerApiCheckout extends Controller
         $json['shipping_method_section']        = $this->renderShippingMethodSection();
         $json['payment_method_section']         = $this->renderPaymentMethodSection();
 
-        $json['cart_section']                   = $this->renderCartSection();
+        $products                               = $this->renderCartSection();
+        $cart_products                          = [];
+
+        if ( isset($products['products']) && !empty($products['products'])) {
+            foreach ($products['products'] as $key => $value) {
+                $cart_products[]         = $value;
+            }
+        }
+        
+        $products['products']                   = $cart_products;
+
+        $json['cart_section']                   = $products;
+
+
+
         //$json['comment_section']                = $this->renderCommentSection();
         //$json['agree_section']                  = $this->renderAgreeSection();
 
