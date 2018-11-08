@@ -4,6 +4,10 @@ class ModelLocalisationReturnReason extends Model {
 		if ($data) {
 			$sql = "SELECT * FROM " . DB_PREFIX . "return_reason WHERE language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
+			if (isset($data['type'])) {
+				$sql 	.= " AND type = '" . (int)$data['type'] . "'";
+			}
+
 			$sql .= " ORDER BY name";
 
 			if (isset($data['return']) && ($data['return'] == 'DESC')) {

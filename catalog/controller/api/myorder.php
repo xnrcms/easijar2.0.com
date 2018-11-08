@@ -130,6 +130,7 @@ class ControllerApiMyorder extends Controller {
 	public function details()
 	{
 		$this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/order');
 
         $allowKey       = ['api_token','order_id'];
         $req_data       = $this->dataFilter($allowKey);
@@ -155,6 +156,9 @@ class ControllerApiMyorder extends Controller {
         $seller_info 					= [];
 
         $order_info 					= $this->model_account_order->getOrderForMs($req_data['order_id']);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
 
         //商品信息
         $order_id 						= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;

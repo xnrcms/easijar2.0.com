@@ -55,3 +55,4 @@ $_['button_pay_continue']   = 'Pay Continue';
 $_['error_reorder']         = '%s is not currently available to be reordered.';
 $_['error_flash_count']     = 'The maximum this product you can buy is %s!';
 $_['error_flash_out']       = 'You can\'t buy this product cause by flash sale!';
+$_['error_order_info']      = 'Order information does not exist!';
