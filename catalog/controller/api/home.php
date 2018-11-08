@@ -38,7 +38,7 @@ class ControllerApiHome extends Controller {
 		    }
 	    }
 
-	    $data['catrgory'] 	= [];
+	    $data['category'] 	= [];
 
 	    //获取分类
 	    $module_id 					= 51;
@@ -51,7 +51,7 @@ class ControllerApiHome extends Controller {
 			$cat 						= $this->load->controller('extension/module/' . $code, $setting_info,true);
 
 			if ($cat) {
-				$data['catrgory'] = $cat;
+				$data['category'] = $cat;
 			}
 		}
 
@@ -113,11 +113,13 @@ class ControllerApiHome extends Controller {
 	    	foreach ($results['products'] as $rval) {
 	    		$recommend[] 		= [
 	    			'product_id' 	=> $rval['product_id'],
+	    			'name' 			=> $rval['name'],
 	    			'thumb' 		=> $rval['thumb'],
 	    			'price' 		=> $rval['price'],
 	    			'special' 		=> !empty($rval['special']) ? $rval['special'] : $rval['price'],
 	    			'quantity' 		=> $rval['quantity'],
 	    			'rating' 		=> $rval['rating'],
+	    			'reviews' 		=> $rval['reviews'],
 	    		];
 	    	}
 	    }

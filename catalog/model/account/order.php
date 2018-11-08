@@ -381,6 +381,8 @@ class ModelAccountOrder extends Model {
             $limit = 1;
         }
 
+        $order_type         = (int)$order_type;
+
         if ($order_type == 0) {
             $status_where       = "AND o.order_status_id > '0' ";
         }elseif ($order_type == 1) {
@@ -399,12 +401,11 @@ class ModelAccountOrder extends Model {
         }
 
 
-        $sql        = "SELECT o.order_id AS oid,mssu.suborder_id AS soid,ms.store_name,ms.seller_id AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM `" . DB_PREFIX . "ms_suborder` mssu 
+        $sql        = "SELECT o.order_id AS oid,o.order_status_id as status_id,mssu.suborder_id AS soid,ms.store_name,ms.seller_id AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM `" . DB_PREFIX . "ms_suborder` mssu 
         LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id)
         LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id)
         LEFT JOIN `" . DB_PREFIX . "order_status` os ON (o.order_status_id = os.order_status_id) 
         WHERE o.customer_id = '" . (int)$this->customer->getId() . "' " . $status_where . "AND o.store_id = '0' 
-        AND o.order_id = '151'
         AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' 
         ORDER BY mssu.suborder_id 
         DESC LIMIT " . (int)$start . "," . (int)$limit;

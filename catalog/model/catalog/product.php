@@ -610,7 +610,7 @@ class ModelCatalogProduct extends Model {
 			$rating = false;
 		}
 
-		$discount 		= ($price_c > 0 && $price_c >= $special_c) ? round(($price_c - $special_c)/$price_c, 4)*100 : 0;
+		$discount 		= ($price_c > 0 && $price_c >= $special_c) ? round(($price_c - $special_c) / $price_c)*100 : 0;
 
         return array(
             'product_id'  => $product['product_id'],
@@ -626,6 +626,7 @@ class ModelCatalogProduct extends Model {
             'sales'       => (int)$product['sales'],
 			'quantity'    => $product['quantity'],
 			'discount'    => $discount,
+			'reviews'  	  => (int)$product['reviews'],
             'href'        => $href ?: $this->url->link('product/product', 'product_id=' . $product['product_id'])
         );
     }

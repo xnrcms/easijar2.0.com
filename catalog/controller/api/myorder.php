@@ -36,11 +36,23 @@ class ControllerApiMyorder extends Controller {
         //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
         $results = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * 10, 10);
 
-        foreach ($results as $keys =>$result) {
+        foreach ($results as $keys =>$result)
+        {
+            $results[$keys]['oid']     = $result['soid'];
+
+            unset($results[$keys]['currency_code']);
+            unset($results[$keys]['currency_value']);
+            unset($results[$keys]['soid']);
+
+            $results[$keys]['total']   = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+
         	foreach ($result['product_info'] as $reskey => $resval) {
-        		$results[$keys]['product_info'][$reskey]['total2'] 	= $this->currency->format($resval['total'] + ($this->config->get('config_tax') ? ($resval['tax'] * $resval['quantity']) : 0), $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+                $results[$keys]['product_info'][$reskey]['price']   = $this->currency->format($resval['price'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+        		$results[$keys]['product_info'][$reskey]['total'] 	= $this->currency->format($resval['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
 
         		$results[$keys]['product_info'][$reskey]['image'] 	= $this->model_tool_image->resize($resval['image'], 100, 100);
+
+                unset($results[$keys]['product_info'][$reskey]['tax']);
         	}
         }
 
