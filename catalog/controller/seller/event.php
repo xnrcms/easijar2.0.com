@@ -97,6 +97,8 @@ class ControllerSellerEvent extends Controller {
 				'subtract'   => $product['subtract'],
 				'price'      => $this->currency->format($this->tax->calculate($product['price'], $tax_class_id, $this->config->get('config_tax')), $this->session->data['currency']),
 				'total'      => $this->currency->format($this->tax->calculate($product['price'], $tax_class_id, $this->config->get('config_tax')) * $product['quantity'], $this->session->data['currency']),
+                'oprice'=>$product['price'],
+                'ototal'=>$product['total'],
 				'href'       => $this->url->link('product/product', 'product_id=' . $product['product_id'])
 			);
 			if (!isset($products[$seller_id])) {

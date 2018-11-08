@@ -40,9 +40,7 @@ class ControllerApiMyorder extends Controller {
         {
             $results[$keys]['oid']     = $result['soid'];
 
-            unset($results[$keys]['currency_code']);
-            unset($results[$keys]['currency_value']);
-            unset($results[$keys]['soid']);
+            $ms_total                  = $this->model_account_order->getTotalsForMs($result['oid'],$result['msid']);
 
             $results[$keys]['total']   = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
 
@@ -54,6 +52,10 @@ class ControllerApiMyorder extends Controller {
 
                 unset($results[$keys]['product_info'][$reskey]['tax']);
         	}
+
+            unset($results[$keys]['currency_code']);
+            unset($results[$keys]['currency_value']);
+            unset($results[$keys]['soid']);
         }
 
         /*foreach ($results as $result) {

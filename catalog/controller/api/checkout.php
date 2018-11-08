@@ -147,7 +147,7 @@ class ControllerApiCheckout extends Controller
 
         $products                               = $this->renderCartSection();
         $cart_products                          = [];
-
+        
         if ( isset($products['products']) && !empty($products['products'])) {
 
             $this->load->language('extension/total/multiseller_shipping', 'multiseller');
@@ -180,10 +180,10 @@ class ControllerApiCheckout extends Controller
 
                 $value['shipping']       = $shipping;
                 $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
-
+                
                 $goods                   = isset($value['products']) ? $value['products'] : [];
                 $ggs                     = [];
-
+                $ptotal                  = 0;
                 foreach ($goods as $gk => $gv) {
                     $gopt       = isset($gv['option']) ? $gv['option'] : [];
                     $opt_text   = '';
@@ -191,17 +191,22 @@ class ControllerApiCheckout extends Controller
                         $opt_text   .= $oval['name'] . ':' . $oval['value'] . ',';
                     }
 
+                    $ptotal             += $gv['ototal'];
+
                     $ggs[]              = [
                         'cart_id'       => $gv['cart_id'],
                         'name'          => $gv['name'],
                         'quantity'      => $gv['quantity'],
                         'product_id'    => $gv['product_id'],
-                        'image'         => $gv['cart_id'],
+                        'image'         => $gv['image'],
+                        'price'         => $gv['price'],
+                        'total'         => $gv['total'],
                         'option'        => trim($opt_text,','),
                     ];
                 }
 
                 $value['products']       = $ggs;
+                $value['total']          = $this->currency->format($ptotal, $this->session->data['currency']);
                 $cart_products[]         = $value;
             }
         }
@@ -750,7 +755,7 @@ class ControllerApiCheckout extends Controller
 
         $this->load->view('checkout/checkout/_confirm', $data);
 
-        return $this->load->getViewData('products,vouchers,recharges,totals');
+        return $this->load->getViewData('products,totals');
     }
 
     private function renderAgreeSection()

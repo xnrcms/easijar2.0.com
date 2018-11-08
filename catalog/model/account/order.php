@@ -371,6 +371,14 @@ class ModelAccountOrder extends Model {
         return $query->row['total'];
     }
 
+    public function getTotalsForMs($order_id, $seller_id) {
+        $query = $this->db->query("SELECT ot.* FROM `" . DB_PREFIX . "order_total` ot
+                                    LEFT JOIN `" . DB_PREFIX . "ms_order_total` mot ON mot.order_total_id = ot.order_total_id
+                                    WHERE order_id = '" . (int)$order_id . "' AND mot.seller_id = '" . (int)$seller_id . "' ORDER BY sort_order ASC");
+
+        return $query->rows;
+    }
+
     public function getOrdersForMs($order_type = 0,$start = 0, $limit = 20)
     {
         if ($start < 0) {
