@@ -41,8 +41,10 @@ class ControllerApiMyorder extends Controller {
             $results[$keys]['oid']     = $result['soid'];
 
             $ms_total                  = $this->model_account_order->getTotalsForMs($result['oid'],$result['msid']);
+            $shipping                  = isset($ms_total['value']) ? $ms_total['value'] : 0;
 
-            $results[$keys]['total']   = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+            $results[$keys]['total']     = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+            $results[$keys]['shipping']  = $this->currency->format($shipping, $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
 
         	foreach ($result['product_info'] as $reskey => $resval) {
                 $results[$keys]['product_info'][$reskey]['price']   = $this->currency->format($resval['price'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);

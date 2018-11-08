@@ -376,7 +376,7 @@ class ModelAccountOrder extends Model {
                                     LEFT JOIN `" . DB_PREFIX . "ms_order_total` mot ON mot.order_total_id = ot.order_total_id
                                     WHERE order_id = '" . (int)$order_id . "' AND mot.seller_id = '" . (int)$seller_id . "' ORDER BY sort_order ASC");
 
-        return $query->rows;
+        return $query->row;
     }
 
     public function getOrdersForMs($order_type = 0,$start = 0, $limit = 20)
