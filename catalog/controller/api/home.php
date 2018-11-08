@@ -93,6 +93,7 @@ class ControllerApiHome extends Controller {
 	    			'price' 		=> $rval['price'],
 	    			'special' 		=> !empty($rval['special']) ? $rval['special'] : $rval['price'],
 	    			'quantity' 		=> $rval['quantity'],
+	    			'discount' 		=> $rval['discount'],
 	    		];
 	    	}
 	    }
@@ -116,6 +117,7 @@ class ControllerApiHome extends Controller {
 	    			'price' 		=> $rval['price'],
 	    			'special' 		=> !empty($rval['special']) ? $rval['special'] : $rval['price'],
 	    			'quantity' 		=> $rval['quantity'],
+	    			'rating' 		=> $rval['rating'],
 	    		];
 	    	}
 	    }

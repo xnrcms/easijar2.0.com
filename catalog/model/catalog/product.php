@@ -573,13 +573,18 @@ class ModelCatalogProduct extends Model {
 		$this->load->model('tool/image');
 		$image = $this->model_tool_image->resize($product['image'], $thumb_width, $thumb_height);
 
+		$price_c 		= 0;
+		$special_c 		= 0;
+
 		if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+			$price_c 	= $product['price'];
 			$price = $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 		} else {
 			$price = false;
 		}
 
 		if ((float)$product['special']) {
+			$special_c 	= $product['special'];
 			$special = $this->currency->format($this->tax->calculate($product['special'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 		} else {
 			$special = false;
@@ -605,6 +610,8 @@ class ModelCatalogProduct extends Model {
 			$rating = false;
 		}
 
+		$discount 		= ($price_c > 0 && $price_c >= $special_c) ? round(($price_c - $special_c)/$price_c, 4)*100 : 0;
+
         return array(
             'product_id'  => $product['product_id'],
             'thumb'       => $image,
@@ -618,6 +625,7 @@ class ModelCatalogProduct extends Model {
             'rating'      => $rating,
             'sales'       => (int)$product['sales'],
 			'quantity'    => $product['quantity'],
+			'discount'    => $discount,
             'href'        => $href ?: $this->url->link('product/product', 'product_id=' . $product['product_id'])
         );
     }
