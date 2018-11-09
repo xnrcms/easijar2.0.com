@@ -156,14 +156,16 @@ class ControllerApiCheckout extends Controller
             $totals         = isset($products['totals']) ? $products['totals'] : [];
             $seller_ship    = [];
             $ship_del       = [];
+            $ship_ototal    = [];
 
             foreach ($totals as $tk => $tv) {
                 if (strpos('&'.$tv['title'], '平台商品运费') >= 1 || strpos('&'.$tv['title'], 'Platform shipping fee') >= 1) {
                     unset($totals[$tk]);continue;
                 }
 
-                $seller_ship[$tv['title']]  = $tv['text'];
-                $ship_del[$tv['title']]     = $tk;
+                $seller_ship[$tv['title']]      = $tv['text'];
+                $ship_del[$tv['title']]         = $tk;
+                $ship_ototal[$tv['title']]      = $tv['ototal'];
             }
 
             foreach ($products['products'] as $key => $value) {
@@ -173,9 +175,11 @@ class ControllerApiCheckout extends Controller
                 //删除数组元素
                 if (isset($seller_ship[$store_name_text])) {
                     $shipping           = $seller_ship[$store_name_text];
+                    $oshipping          = $ship_ototal[$store_name_text];
                     unset($totals[$ship_del[$store_name_text]]);
                 }else{
                     $shipping           = '';
+                    $oshipping          = 0;
                 }
 
                 $value['shipping']       = $shipping;
@@ -183,7 +187,8 @@ class ControllerApiCheckout extends Controller
                 
                 $goods                   = isset($value['products']) ? $value['products'] : [];
                 $ggs                     = [];
-                $ptotal                  = 0;
+                $subtotal                = 0;
+
                 foreach ($goods as $gk => $gv) {
                     $gopt       = isset($gv['option']) ? $gv['option'] : [];
                     $opt_text   = '';
@@ -191,7 +196,7 @@ class ControllerApiCheckout extends Controller
                         $opt_text   .= $oval['name'] . ':' . $oval['value'] . ',';
                     }
 
-                    $ptotal             += $gv['ototal'];
+                    $subtotal           += $gv['ototal'];
 
                     $ggs[]              = [
                         'cart_id'       => $gv['cart_id'],
@@ -205,8 +210,11 @@ class ControllerApiCheckout extends Controller
                     ];
                 }
 
+                $atotal                  = $subtotal + $oshipping;
+
                 $value['products']       = $ggs;
-                $value['total']          = $this->currency->format($ptotal, $this->session->data['currency']);
+                $value['subtotal']       = $this->currency->format($subtotal, $this->session->data['currency']);
+                $value['total']          = $this->currency->format($atotal, $this->session->data['currency']);
                 $cart_products[]         = $value;
             }
         }
@@ -902,8 +910,9 @@ class ControllerApiCheckout extends Controller
 
         foreach ($totals as $total) {
             $results[] = array(
-                'title' => $total['title'],
-                'text' => $this->currency->format($total['value'], $this->session->data['currency'])
+                'title'     => $total['title'],
+                'text'      => $this->currency->format($total['value'], $this->session->data['currency']),
+                'ototal'    =>$total['value']
             );
         }
 
