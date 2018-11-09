@@ -231,6 +231,50 @@ class ControllerApiCart extends Controller {
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'cart update success']));
     }
 
+    public function update_usecoupon()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('checkout/cart');
+
+        $allowKey       = ['api_token','coupon_id','seller_id'];
+        $req_data       = $this->dataFilter($allowKey);
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+        
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!(isset($req_data['coupon_id']) && intval($req_data['coupon_id']) >=1)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'coupon_id is error']));
+        }
+
+        if (!(isset($req_data['seller_id']) && intval($req_data['seller_id']) >=1)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'seller_id is error']));
+        }
+
+        //校验优惠券是否存在 存在获取使用码
+        $this->load->model('extension/total/coupon');
+        
+        $coupon = $this->model_extension_total_coupon->getCouponCodeByIdAndSellerId($req_data['coupon_id'],$req_data['seller_id']);
+        if (empty($coupon)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'no coupon']));
+        }
+
+        if (isset($this->session->data['coupon'][$req_data['seller_id']])) {
+            unset($this->session->data['coupon'][$req_data['seller_id']]);
+        }
+
+        $coupon_info = $this->load->controller('extension/total/coupon/useCouponForApi',$coupon);
+        if (isset($coupon_info['success']) && $coupon_info['success'] === 'success') {
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'coupon use success']));
+        }else{
+            return $this->response->setOutput($this->returnData(['msg'=>$coupon_info['error']]));
+        }
+    }
+
 	public function edit()
 	{
 		$this->load->language('api/cart');

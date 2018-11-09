@@ -183,6 +183,7 @@ class ControllerApiCheckout extends Controller
                 }
 
                 $value['shipping']       = $shipping;
+                $value['seller_id']      = $value['seller_id'];
                 $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
                 
                 $goods                   = isset($value['products']) ? $value['products'] : [];

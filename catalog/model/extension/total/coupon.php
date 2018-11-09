@@ -141,6 +141,7 @@ class ModelExtensionTotalCoupon extends Model {
 			return array(
                 'eccoupon'     => isset($ecchecked)?true:false,
 				'coupon_id'     => $coupon_query->row['coupon_id'],
+				'seller_id'     => isset($coupon_query->row['seller_id']) ? (int)$coupon_query->row['seller_id'] : 0,
 				'code'          => $coupon_query->row['code'],
 				'name'          => $coupon_query->row['name'],
 				'type'          => $coupon_query->row['type'],
@@ -160,62 +161,90 @@ class ModelExtensionTotalCoupon extends Model {
 
 	public function getTotal($total) {
 		if (isset($this->session->data['coupon'])) {
-			$this->load->language('extension/total/coupon', 'coupon');
 
-			$coupon_info = $this->getCoupon($this->session->data['coupon']);
+			$title 			= '';  	//优惠券total标题
+		    $amount_coupon 	= 0;  	//运费金额
 
-			if ($coupon_info) {
-				$discount_total = 0;
+            $this->load->model('multiseller/seller');
+            $this->load->language('extension/total/multiseller_coupon', 'multiseller');
+            $this->load->language('extension/total/coupon', 'coupon');
+
+            $seller_price 	= [];  // 保存商家和商家商品总额
+		    foreach ($this->cart->getProducts() as $product) {
+                $seller_info 	= $this->model_multiseller_seller->getSeller($product['seller_id']);
+                $seller_id 		= $seller_info ? $seller_info['seller_id'] : 0;
+                if ($seller_id == 0) {
+                    continue;
+                }
+		        if (isset($seller_price[$seller_id])) {
+		            $seller_price[$seller_id]['price'] 			+= $product['total'];
+		            $seller_price[$seller_id]['product_id'][] 	= $product['product_id'];
+                } else {
+		            $seller_price[$seller_id]['price'] 			= $product['total'];
+		            $seller_price[$seller_id]['product_id'][] 	= $product['product_id'];
+                    $seller_price[$seller_id]['seller_name'] 	= $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
+                }
+            }
+
+            $title = $this->language->get('multiseller')->get('text_multiseller_coupon');
+
+            foreach ($seller_price as $key => $value) {
+            	if (isset($this->session->data['coupon'][$key]) && !empty($this->session->data['coupon'][$key])) {
+            		$seller_coupon = $this->getShellerCoupon($this->session->data['coupon'][$key],$value,$total);
+            		if ($seller_coupon) {
+	            		$amount_coupon += $seller_coupon;
+	            		$total['totals'][] = array(
+		                    'seller_id'  => $key,
+		                    'code'       => 'multiseller_coupon',
+		                    'title'      => $value['seller_name'] . ' ' . $title,
+		                    'value'      => $seller_coupon,
+							'sort_order' => $this->config->get('total_coupon_sort_order')
+		                );
+            		}
+            	}
+            }
+
+            if ($amount_coupon > 0) {
+            	$total['total'] -= $amount_coupon;
+            }
+		}
+	}
+
+	private function getShellerCoupon($code = '',$products = [],$total)
+	{
+		$coupon_info 		= $this->getCoupon($code);wr("\n================881\n");wr($products);
+		if ($coupon_info && isset($products['price'])) 
+		{
+			$discount_total = 0;
+			$sub_total 		= isset($products['price']) ? $products['price'] : 0;
+
+			if ($coupon_info['type'] == 'F') {
+				$coupon_info['discount'] = min($coupon_info['discount'], $sub_total);
+			}
+
+			foreach ($this->cart->getProducts() as $product) {
+
+				if (!(isset($products['product_id']) && in_array($product['product_id'], $products['product_id']))) {
+					continue;
+				}
+
+				$discount = 0;
 
 				if (!$coupon_info['product']) {
-					$sub_total = $this->cart->getSubTotal();
+					$status = true;
 				} else {
-					$sub_total = 0;
-
-					foreach ($this->cart->getProducts() as $product) {
-						if (in_array($product['product_id'], $coupon_info['product'])) {
-							$sub_total += $product['total'];
-						}
-					}
+					$status = in_array($product['product_id'], $coupon_info['product']);
 				}
 
-				if ($coupon_info['type'] == 'F') {
-					$coupon_info['discount'] = min($coupon_info['discount'], $sub_total);
-				}
-
-				foreach ($this->cart->getProducts() as $product) {
-					$discount = 0;
-
-					if (!$coupon_info['product']) {
-						$status = true;
-					} else {
-						$status = in_array($product['product_id'], $coupon_info['product']);
+				if ($status) {
+					if ($coupon_info['type'] == 'F') {
+						$discount = $coupon_info['discount'] * ($product['total'] / $sub_total);
+					} elseif ($coupon_info['type'] == 'P') {
+						$discount = $product['total'] / 100 * $coupon_info['discount'];
 					}
 
-					if ($status) {
-						if ($coupon_info['type'] == 'F') {
-							$discount = $coupon_info['discount'] * ($product['total'] / $sub_total);
-						} elseif ($coupon_info['type'] == 'P') {
-							$discount = $product['total'] / 100 * $coupon_info['discount'];
-						}
-
-						if ($product['tax_class_id']) {
-							$tax_rates = $this->tax->getRates($product['total'] - ($product['total'] - $discount), $product['tax_class_id']);
-
-							foreach ($tax_rates as $tax_rate) {
-								if ($tax_rate['type'] == 'P') {
-									$total['taxes'][$tax_rate['tax_rate_id']] -= $tax_rate['amount'];
-								}
-							}
-						}
-					}
-
-					$discount_total += $discount;
-				}
-
-				if ($coupon_info['shipping'] && isset($this->session->data['shipping_method'])) {
-					if (!empty($this->session->data['shipping_method']['tax_class_id'])) {
-						$tax_rates = $this->tax->getRates($this->session->data['shipping_method']['cost'], $this->session->data['shipping_method']['tax_class_id']);
+					if ($product['tax_class_id']) {
+						$tax_rates = $this->tax->getRates($product['total'] - ($product['total'] - $discount), $product['tax_class_id']);
 
 						foreach ($tax_rates as $tax_rate) {
 							if ($tax_rate['type'] == 'P') {
@@ -223,26 +252,41 @@ class ModelExtensionTotalCoupon extends Model {
 							}
 						}
 					}
-
-					$discount_total += $this->session->data['shipping_method']['cost'];
 				}
 
-				// If discount greater than total
-				if ($discount_total > $total['total']) {
-					$discount_total = $total['total'];
-				}
-
-				if ($discount_total > 0) {
-					$total['totals'][] = array(
-						'code'       => 'coupon',
-						'title'      => sprintf($this->language->get('coupon')->get('text_coupon'), $this->session->data['coupon']),
-						'value'      => -$discount_total,
-						'sort_order' => $this->config->get('total_coupon_sort_order')
-					);
-
-					$total['total'] -= $discount_total;
-				}
+				$discount_total += $discount;
 			}
+
+			if ($coupon_info['shipping'] && isset($this->session->data['shipping_method'])) {
+				if (!empty($this->session->data['shipping_method']['tax_class_id'])) {
+					$tax_rates = $this->tax->getRates($this->session->data['shipping_method']['cost'], $this->session->data['shipping_method']['tax_class_id']);
+
+					foreach ($tax_rates as $tax_rate) {
+						if ($tax_rate['type'] == 'P') {
+							$total['taxes'][$tax_rate['tax_rate_id']] -= $tax_rate['amount'];
+						}
+					}
+				}
+
+				$discount_total += $this->session->data['shipping_method']['cost'];
+			}
+
+			// If discount greater than total
+			if ($discount_total > $total['total']) {
+				$discount_total = $total['total'];
+			}
+
+			return $discount_total;
+			/*if ($discount_total > 0) {
+				$total['totals'][] = array(
+					'code'       => 'coupon',
+					'title'      => sprintf($this->language->get('coupon')->get('text_coupon'), $this->session->data['coupon']),
+					'value'      => -$discount_total,
+					'sort_order' => $this->config->get('total_coupon_sort_order')
+				);
+
+				$total['total'] -= $discount_total;
+			}*/
 		}
 	}
 
@@ -301,5 +345,12 @@ class ModelExtensionTotalCoupon extends Model {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "coupon_history` ch LEFT JOIN `" . DB_PREFIX . "coupon` c ON (ch.coupon_id = c.coupon_id) WHERE c.code = '" . $this->db->escape($coupon) . "' AND ch.customer_id = '" . (int)$customer_id . "'");
 		
 		return $query->row['total'];
+	}
+
+	public function getCouponCodeByIdAndSellerId($coupon_id = 0,$seller_id = 0)
+	{
+		$query = $this->db->query("SELECT `code` FROM `" . DB_PREFIX . "coupon` WHERE coupon_id = '" . (int)$coupon_id . "' AND seller_id = '" . (int)$seller_id . "'");
+		
+		return (isset($query->row['code']) && !empty($query->row['code'])) ? $query->row['code'] : '';
 	}
 }

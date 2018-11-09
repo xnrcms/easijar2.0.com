@@ -114,6 +114,7 @@ class ControllerSellerEvent extends Controller {
                 }
 
 			    $products[$seller_id]    = array(
+                    'seller_id'         =>$seller_info['seller_id'],
 			        'store_name'        => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
                     'coupon'            => $coupon,
                     'products'          => array($product)
