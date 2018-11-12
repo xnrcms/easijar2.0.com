@@ -10,7 +10,6 @@ class ControllerApiRegion extends Controller {
         $allowKey       = ['api_token','country_id'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
-        $json           = [];
 
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
@@ -21,7 +20,7 @@ class ControllerApiRegion extends Controller {
         }
 
         $country_id         = isset($req_data['country_id']) ? (int)$req_data['country_id'] : 0;
-        $json['region']     = [];
+        $region             = [];
         $results            = [];
 
         if ($country_id <= 0) 
@@ -39,12 +38,12 @@ class ControllerApiRegion extends Controller {
         }
 
         foreach ($results as $result) {
-            $json['region'][] = array(
+            $region[] = array(
                 'region_id'         => $result[$idname],
                 'region_name'       => $result['name']
             );
         }
 
-        return $this->response->setOutput($this->returnData($json));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$region]));
     }
 }

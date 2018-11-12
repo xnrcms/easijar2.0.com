@@ -70,16 +70,16 @@ class ControllerApiCheckout extends Controller
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        if (!$this->isValidCart()){
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:ValidCart is error']));
-        }
-
         //校验是否勾选额购物车商品
         if (isset($req_data['selected']) && !empty($req_data['selected']) && is_string($req_data['selected'])) {
             $selected       = explode(',', $req_data['selected']);
             $this->cart->select($selected);
         } else {
-            return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>'cart select error']));
+            return $this->response->setOutput($this->returnData(['msg'=>'cart select error']));
+        }
+
+        if (!$this->isValidCart()){
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:ValidCart is error']));
         }
 
         // Shipping address
@@ -154,8 +154,10 @@ class ControllerApiCheckout extends Controller
         
         if ( isset($products['products']) && !empty($products['products'])) {
 
-            $this->load->language('extension/total/multiseller_shipping', 'multiseller');
-            $total_title    = $this->language->get('multiseller')->get('text_multiseller_shipping');
+            $this->load->language('extension/total/multiseller_shipping', 'multiseller_shipping');
+            $this->load->language('extension/total/multiseller_coupon', 'multiseller_coupon');
+            $shipping_title  = $this->language->get('multiseller_shipping')->get('text_multiseller_shipping');
+            $coupon_title    = $this->language->get('multiseller_coupon')->get('text_multiseller_coupon');
 
             $totals         = isset($products['totals']) ? $products['totals'] : [];
             $seller_ship    = [];
@@ -174,19 +176,31 @@ class ControllerApiCheckout extends Controller
 
             foreach ($products['products'] as $key => $value) {
                 //unset($value['href']);
-                $store_name_text         = $value['store_name'] . ' ' . $total_title;
+                $store_shipping_text     = $value['store_name'] . ' ' . $shipping_title;
+                $store_coupon_text       = $value['store_name'] . ' ' . $coupon_title;
 
-                //删除数组元素
-                if (isset($seller_ship[$store_name_text])) {
-                    $shipping           = $seller_ship[$store_name_text];
-                    $oshipping          = $ship_ototal[$store_name_text];
-                    unset($totals[$ship_del[$store_name_text]]);
+                //运费
+                if (isset($seller_ship[$store_shipping_text])) {
+                    $shipping           = $seller_ship[$store_shipping_text];
+                    $oshipping          = $ship_ototal[$store_shipping_text];
+                    unset($totals[$ship_del[$store_shipping_text]]);
                 }else{
                     $shipping           = '';
                     $oshipping          = 0;
                 }
 
+                //优惠券
+                if (isset($seller_ship[$store_coupon_text])) {
+                    $coupon           = $seller_ship[$store_coupon_text];
+                    $ocoupon          = $ship_ototal[$store_coupon_text];
+                    unset($totals[$ship_del[$store_coupon_text]]);
+                }else{
+                    $coupon           = '';
+                    $ocoupon          = 0;
+                }
+
                 $value['shipping']       = $shipping;
+                $value['coupon']         = !empty($coupon) ? '-' . $coupon : '';
                 $value['seller_id']      = $value['seller_id'];
                 $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
                 
@@ -215,7 +229,7 @@ class ControllerApiCheckout extends Controller
                     ];
                 }
 
-                $atotal                  = $subtotal + $oshipping;
+                $atotal                  = $subtotal + $oshipping - $ocoupon;
 
                 $value['products']       = $ggs;
                 $value['subtotal']       = $this->currency->format($subtotal, $this->session->data['currency']);
@@ -355,10 +369,6 @@ class ControllerApiCheckout extends Controller
             return $this->response->setOutput($this->returnData(['msg'=>'fail:payment_method is error']));
         }
 
-        $this->log(__FUNCTION__);
-        
-
-        $this->log($this->request->post);
 
         $order_data                         = [];
         $order_data['payment_address']      = [];

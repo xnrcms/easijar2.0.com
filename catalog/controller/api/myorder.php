@@ -60,70 +60,6 @@ class ControllerApiMyorder extends Controller {
             unset($results[$keys]['soid']);
         }
 
-        /*foreach ($results as $result) {
-			$product_total = $this->model_account_order->getTotalOrderProductsByOrderId($result['order_id']);
-			$voucher_total = $this->model_account_order->getTotalOrderVouchersByOrderId($result['order_id']);
-			$recharge_total = $this->model_account_order->getTotalOrderRechargesByOrderId($result['order_id']);
-
-            $product_list = array();
-            $product_results = $this->model_account_order->getOrderProducts($result['order_id']);
-            foreach($product_results as $product) {
-                $product_list[] = array(
-                    'name'  => $product['name'],
-                    'href'  => $this->url->link('product/product', 'product_id=' . $product['product_id']),
-                    'image' => $this->model_tool_image->resize($product['image'], 100, 100),
-                    'total' => $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $result['currency_code'], $result['currency_value'], $this->session->data['currency']),
-                );
-            }
-
-            $voucher_list = array();
-            $voucher_results = $this->model_account_order->getOrderVouchers($result['order_id']);
-            foreach($voucher_results as $voucher) {
-                $voucher_list[] = array(
-                    'name'  => $voucher['description'],
-                    'href'  => '',
-                    'image' => $this->model_tool_image->resize('placeholder.png', 100, 100),
-                    'total' => $this->currency->format($voucher['amount'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']),
-                );
-            }
-
-            $recharge_list = array();
-            $recharge_results = $this->model_account_order->getOrderRecharges($result['order_id']);
-            foreach($recharge_results as $recharge) {
-                $recharge_list[] = array(
-                    'name'  => $recharge['description'],
-                    'href'  => '',
-                    'image' => $this->model_tool_image->resize('placeholder.png', 100, 100),
-                    'total' => $this->currency->format($recharge['amount'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']),
-                );
-            }
-
-            if ($result['order_status_id'] == $this->config->get('config_unpaid_status_id')) {
-                $href_cancel = $this->url->link('account/order/cancel', 'order_id=' . $result['order_id']);
-            } else {
-                $href_cancel = '';
-            }
-
-            if ($result['order_status_id'] == $this->config->get('config_shipped_status_id')) {
-                $href_confirm = $this->url->link('account/order/confirm', 'order_id=' . $result['order_id']);
-            } else {
-                $href_confirm = '';
-            }
-
-			$data['orders'][] = array(
-			    'product_list' => array_merge($product_list, $voucher_list, $recharge_list),
-				'order_id'   => $result['order_id'],
-				'name'       => $result['fullname'],
-				'status'     => $result['status'],
-				'date_added' => date($this->language->get('datetime_format'), strtotime($result['date_added'])),
-				'products'   => ($product_total + $voucher_total + $recharge_total),
-				'total'      => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
-                'cancel'     => $href_cancel,
-                'confirm'    => $href_confirm,
-				'view'       => $this->url->link('account/order/info', 'order_id=' . $result['order_id']),
-			);
-		}*/
-
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$results]));
 	}
 
@@ -174,11 +110,13 @@ class ControllerApiMyorder extends Controller {
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
+        $json['total']                  = $this->model_account_order->getTotalsForMs($order_id,$seller_id);
 
         if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id') && $order_info['payment_code'] != 'cod') {
-            $this->session->data['order_id'] = $order_id;
+            /*$this->session->data['order_id'] = $order_id;
             $payment = $this->load->controller('extension/payment/' . $order_info['payment_code']);
-            $json['payment'] = str_replace($this->language->get('button_confirm'), $this->language->get('button_pay_continue'), $payment);
+            $json['payment'] = str_replace($this->language->get('button_confirm'), $this->language->get('button_pay_continue'), $payment);*/
+            $json['payment'] = $order_info['payment_code'];
         }else{
             $json['payment'] = '';
         }
