@@ -340,7 +340,7 @@ class ModelAccountOrder extends Model {
         $order_id       = (int)$order_id;
 
         if ( $order_id <= 0 )  return [];
-        $fields         = format_find_field('order_id,payment_code','o');
+        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value','o');
         $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
         $fields         .= ',' . format_find_field('avatar,store_name,','ms');
 
@@ -376,7 +376,16 @@ class ModelAccountOrder extends Model {
                                     LEFT JOIN `" . DB_PREFIX . "ms_order_total` mot ON mot.order_total_id = ot.order_total_id
                                     WHERE order_id = '" . (int)$order_id . "' AND mot.seller_id = '" . (int)$seller_id . "' ORDER BY sort_order ASC");
 
-        return $query->row;
+        return $query->rows;
+    }
+
+    public function getTotalsForMsByCode($order_ids,$code) {
+        $order_ids      = (!empty($order_ids) && is_array($order_ids)) ? $order_ids : [0];
+        $query = $this->db->query("SELECT ot.*,mot.seller_id FROM `" . DB_PREFIX . "order_total` ot
+                                    LEFT JOIN `" . DB_PREFIX . "ms_order_total` mot ON mot.order_total_id = ot.order_total_id
+                                    WHERE order_id IN ('" . implode("','",$order_ids) . "') AND ot.code = '" . $code . "' ORDER BY sort_order ASC");
+
+        return $query->rows;
     }
 
     public function getOrdersForMs($order_type = 0,$start = 0, $limit = 20)

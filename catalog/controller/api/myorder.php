@@ -36,12 +36,23 @@ class ControllerApiMyorder extends Controller {
         //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
         $results = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * 10, 10);
 
+
+        $oid        = [];
+        foreach ($results as $key => $value) {
+            $oid[$value['oid']]     = $value['oid'];
+        }
+
+        $ms_total                  = $this->model_account_order->getTotalsForMsByCode($oid,'multiseller_shipping');
+        $shipping                  = [];
+        foreach ($ms_total as $mskey => $msval) {
+            $shipping[$msval['order_id'].'-'.$msval['seller_id']]   = $msval['value'];
+        }
+
         foreach ($results as $keys =>$result)
         {
-            $results[$keys]['oid']     = $result['soid'];
+            $shipping                  = isset($shipping[$result['oid'].'-'.$result['msid']]) ? $shipping[$result['oid'].'-'.$result['msid']] : 0;
 
-            $ms_total                  = $this->model_account_order->getTotalsForMs($result['oid'],$result['msid']);
-            $shipping                  = isset($ms_total['value']) ? $ms_total['value'] : 0;
+            $results[$keys]['oid']     = $result['soid'];
 
             $results[$keys]['total']     = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
             $results[$keys]['shipping']  = $this->currency->format($shipping, $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
@@ -107,11 +118,39 @@ class ControllerApiMyorder extends Controller {
         unset($order_info['avatar']);
         unset($order_info['store_name']);
 
+
+        $subtotal                       = 0;
+        foreach ($product_info as $pkey => $pval) {
+            $subtotal                       += $pval['total'];
+
+            $product_info[$pkey]['price']   = $this->currency->format($pval['price'], $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+            $product_info[$pkey]['total']   = $this->currency->format($pval['total'], $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+        }
+
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
-        $json['total']                  = $this->model_account_order->getTotalsForMs($order_id,$seller_id);
 
+        $ms_total                       = $this->model_account_order->getTotalsForMs($order_id,$seller_id);
+        $shipping                       = 0;
+        $coupon                         = 0;
+
+        foreach ($ms_total as $msto) {
+            if ($msto['code'] == 'multiseller_shipping' && !empty($msto['value'])) {
+                $shipping       = $msto['value'];
+            }
+            if ($msto['code'] == 'multiseller_coupon' && !empty($msto['value'])) {
+                $coupon         = $msto['value'];
+            }
+        }
+
+        $total                          = $subtotal + $shipping - $coupon;
+
+        $json['total']                  = $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+        $json['total_shipping']         = $this->currency->format($shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+        $json['total_coupon']           = $this->currency->format($coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+        $json['subtotal']               = $this->currency->format($subtotal, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+        
         if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id') && $order_info['payment_code'] != 'cod') {
             /*$this->session->data['order_id'] = $order_id;
             $payment = $this->load->controller('extension/payment/' . $order_info['payment_code']);

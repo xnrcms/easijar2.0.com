@@ -22,7 +22,11 @@ class ModelMultisellerCheckout extends Model {
             }
             $order_totals = $this->getSubOrderTotals($order_id, $seller['seller_id']);
             foreach ($order_totals as $order_total) {
-                $total += $order_total['value'];
+                if ($order_total['code'] == 'multiseller_coupon') {
+                    $total -= $order_total['value'];
+                }else{
+                    $total += $order_total['value'];
+                }
             }
 
             $order_sn   = date('YmdHis',time()) . '2' . random_string(10);

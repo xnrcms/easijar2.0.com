@@ -104,7 +104,7 @@ class ControllerApiCheckout extends Controller
         //$json['payment_address_required']       = $this->isPaymentAddressRequired();
 
         if ($this->hasShipping()) {
-            $shipping_address_section           = $this->renderAddressSection('shipping');wr($shipping_address_section);
+            $shipping_address_section           = $this->renderAddressSection('shipping');
             $address                            = isset($shipping_address_section['addresses']) ? $shipping_address_section['addresses'] : [];
             $selected_address                   = isset($shipping_address_section['address_id']) ? (int)$shipping_address_section['address_id'] : 0;
             $shipping_option                    = [];
@@ -478,6 +478,7 @@ class ControllerApiCheckout extends Controller
             $this->session->data['comment'] = $order_data['comment'];
 
             $order_id = $this->model_checkout_checkout->createOrder();
+            
             $this->cart->clear();
 
             // Change order status to Unpaid
