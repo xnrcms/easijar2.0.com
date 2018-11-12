@@ -81,14 +81,9 @@ class ControllerApiAddress extends Controller {
                 $json['address_1']      = $address['address_1'];
                 $json['address_2']      = $address['address_2'];
                 $json['postcode']       = $address['postcode'];
-                //$json['city']           = $address['city'];
+                $json['city']           = $address['city'];
                 $json['zone_id']        = $address['zone_id'];
-                //$json['zone']           = $address['zone'];
-                //$json['zone_code']      = $address['zone_code'];
                 $json['country_id']     = $address['country_id'];
-                //$json['country']        = $address['country'];
-                //$json['city_id']        = $address['city_id'];
-                $json['county_id']      = $address['county_id'];
                 $json['default']        = ($this->customer->getAddressId() == $address['address_id']) ? 1 : 0;
             }
         }else{
@@ -104,7 +99,8 @@ class ControllerApiAddress extends Controller {
         foreach ($results as $result) {
             $json['countries'][] = array(
                 'county_id'     => $result['country_id'],
-                'county_name'   => $result['name']
+                'county_name'   => $result['name'],
+                'selected'      => $result['country_id'] == $address['country_id'] ? 1 : 0,
             );
         }
 
@@ -161,7 +157,7 @@ class ControllerApiAddress extends Controller {
         $req_data['city_id']    = 0;
         $req_data['county_id']  = 0;
         $req_data['company']    = '';
-            
+
         if ($address_id > 0) {
             $this->model_account_address->editAddress($address_id, $req_data);
         } else {
@@ -184,22 +180,75 @@ class ControllerApiAddress extends Controller {
 
         if ($address)
         {
-            $json['address_id']     = $address_id;
+            $json['address_id']     = (int)$address_id;
             $json['fullname']       = $address['fullname'];
             $json['telephone']      = $address['telephone'];
             $json['address_1']      = $address['address_1'];
             $json['address_2']      = $address['address_2'];
             $json['postcode']       = $address['postcode'];
             $json['city']           = $address['city'];
-            $json['zone_id']        = $address['zone_id'];
-            $json['country_id']     = $address['country_id'];
-            $json['county_id']      = $address['county_id'];
+            $json['zone_id']        = (int)$address['zone_id'];
+            $json['country_id']     = (int)$address['country_id'];
             $json['default']        = ($this->customer->getAddressId() == $address['address_id']) ? 1 : 0;
         }
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 
+    public function del_address()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/address');
+
+        $allowKey       = ['api_token','address_id'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $address_id       = isset($req_data['address_id']) ? (int)$req_data['address_id'] : 0;
+        if ($address_id <= 0 ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:address_id is error']));
+        }
+
+        $this->load->model('account/address');
+
+        if ($this->model_account_address->getTotalAddresses() == 1) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_delete')]));
+        }
+
+        if ($this->customer->getAddressId() == $address_id) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_default')]));
+        }
+
+        $this->model_account_address->deleteAddress($address_id);
+
+        // Default Shipping Address
+        if (isset($this->session->data['shipping_address']['address_id']) && ($address_id == $this->session->data['shipping_address']['address_id'])) {
+            unset($this->session->data['shipping_address']);
+            unset($this->session->data['shipping_method']);
+            unset($this->session->data['shipping_methods']);
+        }
+
+        // Default Payment Address
+        if (isset($this->session->data['payment_address']['address_id']) && ($address_id == $this->session->data['payment_address']['address_id'])) {
+            unset($this->session->data['payment_address']);
+            unset($this->session->data['payment_method']);
+            unset($this->session->data['payment_methods']);
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$this->language->get('text_delete')]));
+    }
 
     private function syncAddressSession($type, $address)
     {
