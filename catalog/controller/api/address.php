@@ -134,32 +134,47 @@ class ControllerApiAddress extends Controller {
         }
 
         //数据检验
-        if ((utf8_strlen(trim($req_data['fullname'])) < 1) || (utf8_strlen(trim($req_data['fullname'])) > 32)) return $this->response->setOutput($this->returnData(['msg'=>t('error_fullname')]));
-        if ((utf8_strlen(trim($req_data['telephone'])) < 5) || (utf8_strlen(trim($req_data['telephone'])) > 32)) return $this->response->setOutput($this->returnData(['msg'=>t('error_telephone')]));
-        if ((utf8_strlen(trim($req_data['address_1'])) < 3) || (utf8_strlen(trim($req_data['address_1'])) > 128)) return $this->response->setOutput($this->returnData(['msg'=>t('error_address_1')]));
-        if ((utf8_strlen(trim($req_data['postcode'])) < 2 || utf8_strlen(trim($req_data['postcode'])) > 10)) return t('error_postcode');
-        if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] <= 0 ) return t('error_zone');
-        if ((utf8_strlen(trim($req_data['city'])) < 2) || (utf8_strlen(trim($req_data['city'])) > 128)) return t('error_city');
+        if ((utf8_strlen(trim($req_data['fullname'])) < 1) || (utf8_strlen(trim($req_data['fullname'])) > 32))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_fullname')]));
+
+        if ((utf8_strlen(trim($req_data['telephone'])) < 5) || (utf8_strlen(trim($req_data['telephone'])) > 32))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_telephone')]));
+
+        if ((utf8_strlen(trim($req_data['address_1'])) < 3) || (utf8_strlen(trim($req_data['address_1'])) > 128))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_address_1')]));
+
+        if ((utf8_strlen(trim($req_data['postcode'])) < 2 || utf8_strlen(trim($req_data['postcode'])) > 10))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_postcode')]));
+
+        if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] <= 0 ) 
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_zone')]));
+
+        if ((utf8_strlen(trim($req_data['city'])) < 2) || (utf8_strlen(trim($req_data['city'])) > 128))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_city')]));
 
         $this->load->model('account/address');
 
         $address_id     = (int)array_get($req_data, 'address_id',0);
         $save_type      = (int)$req_data['save_type'] == 2 ? 2 : 1;
 
+
+        $req_data['city_id']    = 0;
+        $req_data['county_id']  = 0;
+        $req_data['company']    = '';
+            
         if ($address_id > 0) {
             $this->model_account_address->editAddress($address_id, $req_data);
         } else {
             $address_id = $this->model_account_address->addAddress($this->customer->getId(), $req_data);
         }
 
+        $address                    = $this->model_account_address->getAddress($address_id);
+        
         //订单处保存需要处理一些数据
         if ($save_type == 2) {
             $this->load->model('checkout/checkout');
 
-            $address        = $this->model_account_address->getAddress($addressId);
             $type           = 'shipping';
-
-            $address        = $this->model_account_address->getAddress($address_id);
             $this->syncAddressSession($type, $address);
 
             if (empty($this->session->data["payment_address"]['address_id'])) {
@@ -167,7 +182,22 @@ class ControllerApiAddress extends Controller {
             }
         }
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'address update success']));
+        if ($address)
+        {
+            $json['address_id']     = $address_id;
+            $json['fullname']       = $address['fullname'];
+            $json['telephone']      = $address['telephone'];
+            $json['address_1']      = $address['address_1'];
+            $json['address_2']      = $address['address_2'];
+            $json['postcode']       = $address['postcode'];
+            $json['city']           = $address['city'];
+            $json['zone_id']        = $address['zone_id'];
+            $json['country_id']     = $address['country_id'];
+            $json['county_id']      = $address['county_id'];
+            $json['default']        = ($this->customer->getAddressId() == $address['address_id']) ? 1 : 0;
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 
 
