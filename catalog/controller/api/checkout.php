@@ -104,8 +104,9 @@ class ControllerApiCheckout extends Controller
         //$json['payment_address_required']       = $this->isPaymentAddressRequired();
 
         if ($this->hasShipping()) {
-            $shipping_address_section           = $this->renderAddressSection('shipping');
+            $shipping_address_section           = $this->renderAddressSection('shipping');wr($shipping_address_section);
             $address                            = isset($shipping_address_section['addresses']) ? $shipping_address_section['addresses'] : [];
+            $selected_address                   = isset($shipping_address_section['address_id']) ? (int)$shipping_address_section['address_id'] : 0;
             $shipping_option                    = [];
             foreach ($address as $key => $value) {
                 $shipping_option[]              = [
@@ -117,7 +118,8 @@ class ControllerApiCheckout extends Controller
                     'address_2'             => $value['address_2'],
                     'postcode'              => $value['postcode'],
                     'country_id'            => $value['country_id'],
-                    'country'               => $value['country']
+                    'country'               => $value['country'],
+                    'selected'              => $selected_address == $value['address_id'] ? 1 : 0,
                 ];
             }
             $json['shipping_address_section']   = $shipping_option;
@@ -127,9 +129,11 @@ class ControllerApiCheckout extends Controller
 
         $payment_method_section                 = $this->renderPaymentMethodSection();
         $payment_method                         = isset($payment_method_section['payment_methods']) ? $payment_method_section['payment_methods'] : [];
+        $selected_code                          = isset($payment_method_section['code']) ? $payment_method_section['code'] : '';
+
         $payment_option                         = [];
         foreach ($payment_method as $key => $value) {
-            $payment_option[]                   = ['code' => $value['code'],'title' => $value['title']];
+            $payment_option[]                   = ['code' => $value['code'],'title' => $value['title'],'selected'=>($selected_code == $value['code']) ? 1 : 0];
         }
         $json['payment_method_section']         = $payment_option;
 
@@ -233,6 +237,93 @@ class ControllerApiCheckout extends Controller
         //$json['agree_section']                  = $this->renderAgreeSection();
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
+    }
+
+    public function update()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('checkout/cart');
+
+        $allowKey       = ['api_token','update_field','update_value'];
+        $req_data       = $this->dataFilter($allowKey);
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+        
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $update_field       = ['shipping_address_id','payment_method'];
+        if (!(isset($req_data['update_field']) && in_array($req_data['update_field'], $update_field))) {
+            return $this->response->setOutput($this->returnData(['msg'=>'update_field is error']));
+        }
+
+        if ($req_data['update_field'] == 'shipping_address_id') {
+            $address_id             = (int)$req_data['update_value'];
+            if ($address_id > 0) {
+                if (!$this->hasShipping()) {
+                    unset($this->session->data['shipping_address']);
+                    unset($this->session->data['shipping_methods']);
+                    unset($this->session->data['shipping_method']);
+                    return $this->response->setOutput($this->returnData(['msg'=>'cart no product']));
+                } else {
+                    
+                    $address = $this->model_account_address->getAddress($address_id);
+
+                    if (!$address) {
+                        return $this->response->setOutput($this->returnData(['msg'=>t('error_address_not_exist')]));
+                    }
+
+                    $this->syncAddressSession('shipping', $address);
+
+                    if (! $this->isPaymentAddressRequired()) {
+                        $this->syncAddressSession('payment', $address);
+                    }
+
+                    $code = array_get($this->session->data, 'shipping_method.code');
+                    if (!$this->model_checkout_checkout->setShippingMethod($code)) {
+                        $this->model_checkout_checkout->setShippingMethod();
+                    }
+
+                    if (! $this->isPaymentAddressRequired()) {
+                        $code = array_get($this->session->data, 'payment_method.code');
+                        if (!$this->model_checkout_checkout->setPaymentMethod($code)) {
+                            $this->model_checkout_checkout->setPaymentMethod();
+                        }
+                    }
+
+                    return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'shipping_address_id set success']));
+                }
+            }
+
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:address_id is error']));
+        }
+
+        // Payment method
+        if ($req_data['update_field'] == 'payment_method') {
+            $code             = $req_data['update_value'];
+            if (empty($code)) {
+                return $this->response->setOutput($this->returnData(['msg'=>'fail:payment_method is error']));
+            }
+
+            if (!array_get($this->session->data, 'payment_address')) {
+                return $this->response->setOutput($this->returnData(['msg'=>'payment_address is error']));
+            }
+
+            if (!$this->model_checkout_checkout->setPaymentMethod($code)) {
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_payment_unavailable')]));
+            }
+
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'payment_method set success']));
+        }
+
+        return $this->response->setOutput($this->returnData());
     }
 
     // Validate and submit order
@@ -635,7 +726,7 @@ class ControllerApiCheckout extends Controller
 
         $this->load->view("checkout/checkout/_{$type}_address", $data);
 
-        return $this->load->getViewData('addresses');
+        return $this->load->getViewData('addresses,address_id');
     }
 
     private function renderPaymentMethodSection()
