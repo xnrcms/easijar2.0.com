@@ -349,6 +349,18 @@ class ModelAccountOrder extends Model {
         return $order_query->num_rows ? $order_query->row : [];
     }
 
+    public function getOrderPayinfoForMs($order_sn = 0)
+    {
+        if ( empty($order_sn) )  return [];
+        
+        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value,payment_country_id,payment_zone_id,payment_county_id,payment_city_id','o');
+        $fields         .= ',' .  format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
+
+        $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_sn = '" .  $this->db->escape($order_sn) . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+
+        return $order_query->num_rows ? $order_query->row : [];
+    }
+
     public function getOrderProductsForMs($order_id = 0 , $seller_id = 0)
     {
             $order_id       = (int)$order_id;

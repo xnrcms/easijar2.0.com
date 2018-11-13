@@ -372,6 +372,47 @@ class ModelCheckoutCheckout extends Model {
         return $payment_methods;
     }
 
+    public function getPaymentMethodsForApi($address) {
+        $payment_methods = array();
+
+        $this->load->model('setting/extension');
+        $results = $this->model_setting_extension->getExtensions('payment');
+        $total = $this->getTotal();
+
+        foreach ($results as $result) {
+            if (!$this->config->get('payment_' . $result['code'] . '_status')) {
+                continue;
+            }
+
+          if($this->config->get('is_weixin') && !in_array($result['code'], $this->config->get('config_weixin_payment'))){
+            continue;
+          }
+          if(($this->config->get('is_tablet') || $this->config->get('is_mobile')) && !$this->config->get('is_weixin') && !in_array($result['code'], $this->config->get('config_mobile_payment'))){ //不是desktop即认为是手机、平板等移动设备。
+            continue;
+          }
+          if($this->config->get('is_desktop') && !in_array($result['code'], $this->config->get('config_pc_payment'))) {
+            continue;
+          }
+
+            $this->load->model('extension/payment/' . $result['code']);
+            $method = $this->{'model_extension_payment_' . $result['code']}->getMethod($address, $total);
+
+            if (!$method) {
+                continue;
+            }
+
+            $payment_methods[$result['code']] = $method;
+        }
+
+        $sort_order = array();
+        foreach ($payment_methods as $key => $value) {
+            $sort_order[$key] = $value['sort_order'];
+        }
+        array_multisort($sort_order, SORT_ASC, $payment_methods);
+
+        return $payment_methods;
+    }
+
     /*
      * $code = 'flat.flat'
      */
@@ -530,5 +571,9 @@ class ModelCheckoutCheckout extends Model {
         } else {
             $this->logger->write($data);
         }
+    }
+
+    public function setPaymentMethodsForMs($order_id,$payment_code = ''){
+        $this->db->query("UPDATE " . DB_PREFIX . "order SET payment_code = '" . $this->db->escape($payment_code) . "' WHERE order_id = '" . (int)$order_id . "'");
     }
 }

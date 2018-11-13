@@ -64,3 +64,4 @@ $_['error_reorder']         = '%s 暂不能再次购买。';
 $_['error_flash_out']       = '由于秒杀商品购买限制，您暂时不能购买该商品';
 $_['error_flash_count']     = '该商品你最多可以购买%s个！';
 $_['error_order_info']      = '订单信息不存在！';
+$_['error_order_status']    = '订单状态异常！';
