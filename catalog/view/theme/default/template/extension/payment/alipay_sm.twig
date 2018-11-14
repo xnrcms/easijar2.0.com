@@ -1,26 +1,19 @@
-<!doctype html>
-<html>
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta charset="utf-8">
-  <script type="text/javascript" src="catalog/view/javascript/other/ap.js"></script>
-</head>
-<body onload="submitForm();">;
-
 <form id="alipaysubmit" name="alipaysubmit" action="{{ action }}" method="POST" hidden="hidden">
   {% for key, value in form_params %}
     <input type="hidden" name="{{ key }}" value="{{ value }}"/>
   {% endfor %}
 </form>
 <script type="text/javascript">
+alert(1111)
+submitForm()
 function submitForm() {
+  alert(222222);
   var queryParam = '';
     Array.prototype.slice.call(document.querySelectorAll("#alipaysubmit input[type=hidden]")).forEach(function (ele) {
       queryParam += '&' + ele.name + "=" + encodeURIComponent(ele.value);
     });
     var gotoUrl = document.querySelector("#alipaysubmit").getAttribute('action') + '?' + queryParam;
     location.href = "{{ pay_url }}" + "&goto=" + _AP.pay(gotoUrl);
+    alert(location.href);
 }
 </script>
-</body>
-</html>

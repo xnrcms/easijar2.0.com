@@ -681,4 +681,21 @@ class ModelCheckoutOrder extends Model {
 
 		return $query->rows;
 	}
+
+	public function getOrderProductMsByProductId($order_sn)
+	{
+		$order_type 		= intval(substr($order_sn, 14,1));
+		if ($order_type !== 2)  return [];
+
+		$fields 		= format_find_field('order_id,customer_id,affiliate_id,commission','o');
+		$fields 		.= ',' . format_find_field('seller_id,order_sn,total,order_status_id','mssu');
+
+		$sql 			= "SELECT " . $fields . ", (SELECT os.name FROM `" . DB_PREFIX . "order_status` os WHERE os.order_status_id = mssu.order_status_id AND os.language_id = o.language_id) AS order_status FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_sn = '" . (string)$order_sn . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'";
+
+		$order_query = $this->db->query($sql);
+
+		$ext_data 		= [];
+
+		return array_merge($order_query->row,$ext_data);
+	}
 }

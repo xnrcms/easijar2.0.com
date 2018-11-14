@@ -165,7 +165,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
 		$data['action'] 		= $config['gateway_url'];
 		$data['form_params'] 	= $response;
 		$data['pay_url'] 		= $this->url->link('extension/payment/alipay/pay');
-
+		wr($this->load->view('extension/payment/alipay_sm', $data));
 		return $this->load->view('extension/payment/alipay_sm', $data);
     }
 }

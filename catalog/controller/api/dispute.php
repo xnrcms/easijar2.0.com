@@ -1,13 +1,13 @@
 <?php
-class ControllerApiPay extends Controller {
+class ControllerApiDispute extends Controller {
 
-	//订单支付
-	public function getorder() 
+	//申请售后
+	public function apply() 
 	{	
 		$this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/order');
 
-        $allowKey       = ['api_token','order_sn'];
+        $allowKey       = ['api_token','order_sn','order_product_id','refund_money','is_receive','is_service','reason_id','evidences'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
@@ -21,16 +21,38 @@ class ControllerApiPay extends Controller {
 
         $this->load->model('account/order');
 
-        $order_payinfo                     = $this->model_account_order->getOrderPayinfoForMs($req_data['order_sn']);
-        if (empty($order_payinfo)) {
+        $order_info                     = $this->model_account_order->getOrderForMs($req_data['order_sn']);
+        if (empty($order_info)) {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
-        $order_info                     = [];
-        $order_info['order_sn']         = $order_payinfo['order_sn'];
-        $order_info['order_money']      = $this->currency->format($order_payinfo['total'], $order_payinfo['currency_code'], $order_payinfo['currency_value'], $this->session->data['currency']);
+        //获取商品信息
+        $product_info                   = $this->model_account_order->getOrderProductForMsByOrderProductId($req_data['order_product_id']);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
+        }
 
-        $address            = [];
+        $returnData                     = [];
+        $returnData['order_id']         = $order_info['order_id'];
+        $returnData['product_id']       = $product_info['product_id'];
+        $returnData['fullname']         = $order_info['fullname'];
+        $returnData['email']            = $order_info['email'];
+        $returnData['telephone']        = $order_info['telephone'];
+        $returnData['product']          = $order_info['product'];
+        $returnData['model']            = $order_info['model'];
+        $returnData['quantity']         = $order_info['quantity'];
+        $returnData['opened']           = $order_info['opened'];
+        $returnData['return_reason_id'] = $order_info['return_reason_id'];
+        $returnData['return_action_id'] = $order_info['return_action_id'];
+        $returnData['return_status_id'] = $order_info['return_status_id'];
+        $returnData['comment']          = $order_info['comment'];
+        $returnData['date_ordered']     = $order_info['date_ordered'];
+        $returnData['date_added']       = $order_info['date_added'];
+        $returnData['date_modified']    = $order_info['date_modified'];
+        $returnData['seller_id']        = $order_info['seller_id'];
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $product_info ]));
+
+        /*$address            = [];
         foreach ($order_payinfo as $key=>$val) {
             if (strpos($key,'payment_') === 0) {
                 $address[ltrim($key,'payment_')]    = (int)$val;
@@ -56,7 +78,7 @@ class ControllerApiPay extends Controller {
         $json                   = [];
         $json['order_info']     = $order_info;
         $json['payment_option'] = $payment_option;
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $json ]));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $order_info ]));*/
     }
 
     //获取支付信息
@@ -95,7 +117,6 @@ class ControllerApiPay extends Controller {
 
         $this->session->data['order_sn'] = $req_data['order_sn'];
 
-        
         //修改支付方式
         $this->load->model('checkout/checkout');
         $this->model_checkout_checkout->setPaymentMethodsForMs($order_payinfo['order_id'],$req_data['payment_code']);

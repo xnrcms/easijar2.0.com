@@ -40,7 +40,7 @@ class ControllerApiInformation extends Controller {
     {
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token'];
+        $allowKey       = ['api_token','dtype'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -57,21 +57,31 @@ class ControllerApiInformation extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
+        $dtype              = (int)$req_data['dtype'];
+
+        if (!in_array($dtype, [0,1,2,3])) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:dtype is error']));
+        }
+
         $this->load->model('localisation/return_reason');
         
         $dataFilter             = [];
         $dataFilter['start']    = 0;
         $dataFilter['limit']    = 100;
+        
+        if ($dtype != 3) {
+            $dataFilter['type']     = $dtype;
+        }
 
         $reason                 = $this->model_localisation_return_reason->getReturnReasons($dataFilter);
         
-        $json['reason0']        = [];
-        $json['reason1']        = [];
-        $json['reason2']        = [];
+        $json                   = [];
         
+        // 0-订单取消 1-已收到货 2-未收到货
         if (!empty($reason)) {
             foreach ($reason as $key => $value) {
-                $json['reason' . $value['type']][]        = ['return_reason_id'=>$value['return_reason_id'],'name'=>$value['name']];
+                $type                   = $dtype == 3 ? $value['type'] : '';
+                $json['reason'.$type][] = ['return_reason_id'=>$value['return_reason_id'],'name'=>$value['name']];
             }
         }
 

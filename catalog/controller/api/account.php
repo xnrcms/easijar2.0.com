@@ -116,7 +116,7 @@ class ControllerApiAccount extends Controller {
 
 	            // Validate the filename length
 	            if ((utf8_strlen($filename) < 2) || (utf8_strlen($filename) > 64)) {
-	                $json['error'] = $this->language->get('error_filename');
+                    return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filename')]));
 	            }
 
 	            // Allowed file extension types

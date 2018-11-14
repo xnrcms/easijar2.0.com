@@ -79,7 +79,7 @@ class ControllerApiMyorder extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/order');
 
-        $allowKey       = ['api_token','order_id'];
+        $allowKey       = ['api_token','order_sn'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -97,12 +97,13 @@ class ControllerApiMyorder extends Controller {
         }
 
         $this->load->model('account/order');
+        $this->load->model('tool/image');
 
         $order_info 					= [];
         $product_info 					= [];
         $seller_info 					= [];
 
-        $order_info 					= $this->model_account_order->getOrderForMs($req_data['order_id']);
+        $order_info 					= $this->model_account_order->getOrderForMs($req_data['order_sn']);
         if (empty($order_info)) {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
@@ -125,6 +126,7 @@ class ControllerApiMyorder extends Controller {
 
             $product_info[$pkey]['price']   = $this->currency->format($pval['price'], $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
             $product_info[$pkey]['total']   = $this->currency->format($pval['total'], $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+            $product_info[$pkey]['image']   = $this->model_tool_image->resize($pval['image'], 100, 100);
         }
 
         $json['order_info'] 			= $order_info;
