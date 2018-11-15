@@ -73,7 +73,11 @@ class ControllerExtensionPaymentAlipay extends Controller {
     }
 
 	public function callback() {
-		$this->log('alipay pay notify:');
+		$this->logger->write('alipay pay notify:');
+
+		/*$this->load->model('checkout/order');
+		$this->model_checkout_order->addOrderHistoryForMs('2018111514465212381382381', 5);*/
+
 		$arr = $_POST;
 		$config = array (
 			'app_id'               => $this->config->get('payment_alipay_app_id'),
@@ -86,17 +90,21 @@ class ControllerExtensionPaymentAlipay extends Controller {
 			'alipay_public_key'    => $this->config->get('payment_alipay_alipay_public_key'),
 		);
 		$this->load->model('extension/payment/alipay');
-		$this->log('POST' . var_export($_POST,true));
+		$this->logger->write('POST' . var_export($_POST,true));
 		$result = $this->model_extension_payment_alipay->check($arr, $config);
 
 		if($result) {//check successed
 			$this->log('Alipay check successed');
-			$order_id = (int)$_POST['out_trade_no'];
+
 			if($_POST['trade_status'] == 'TRADE_FINISHED') {
 			}
 			else if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
+
+				$order_sn = isset($_POST['out_trade_no']) ? explode('-', $_POST['out_trade_no']) : [];
+				$order_sn = isset($order_sn[0]) ? $order_sn[0] : '';
+
 				$this->load->model('checkout/order');
-				$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('payment_alipay_order_status_id'));
+				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
 			}
 			echo "success";	//Do not modified or deleted
 		}else {
@@ -117,7 +125,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
     {
 		$this->load->model('checkout/order');
 
-		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($this->session->data['order_sn']);
+		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($this->session->data['order_sn'],get_order_type($this->session->data['order_sn']));
 		if (!$order_info)  return '';
 
 		$config = array (
@@ -162,10 +170,16 @@ class ControllerExtensionPaymentAlipay extends Controller {
 		$this->load->model('extension/payment/alipay');
 
 		$response 				= $this->model_extension_payment_alipay->pagePay($payRequestBuilder,$config);
+		
+		$queryParam 		= '';
+		foreach ($response as $key => $value) {
+			$queryParam .= '&' . $key . "=" . urlencode(str_replace( "&quot;", "\"",$value));
+		}
+
 		$data['action'] 		= $config['gateway_url'];
-		$data['form_params'] 	= $response;
+		$data['form_params'] 	= $queryParam;
 		$data['pay_url'] 		= $this->url->link('extension/payment/alipay/pay');
-		wr($this->load->view('extension/payment/alipay_sm', $data));
-		return $this->load->view('extension/payment/alipay_sm', $data);
+
+		return $data;
     }
 }

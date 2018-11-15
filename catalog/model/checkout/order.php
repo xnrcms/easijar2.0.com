@@ -472,9 +472,8 @@ class ModelCheckoutOrder extends Model {
 	}
 
 	//获取点单信息用来生成支付信息
-	public function getOrderByOrderSnUsePayInfoForMs($order_sn) {
-
-		$order_type 		= intval(substr($order_sn, 14,1));
+	public function getOrderByOrderSnUsePayInfoForMs($order_sn,$order_type)
+	{
 		if (!in_array($order_type, [1,2]))  return [];
 
 		$fields 		= format_find_field('order_id','o');
@@ -502,18 +501,20 @@ class ModelCheckoutOrder extends Model {
 		return [];
 	}
 
-	public function getOrderByOrderSnForMs($order_sn)
+	public function getOrderByOrderSnForMs($order_sn,$order_type = 0)
 	{
-		$order_type 		= intval(substr($order_sn, 14,1));
-		if ($order_type !== 2)  return [];
+		if (!in_array($order_type, [1,2]))  return [];
 
-		$fields 		= format_find_field('order_id,customer_id,affiliate_id,commission','o');
-		$fields 		.= ',' . format_find_field('seller_id,order_sn,total,order_status_id','mssu');
+		$fields 		= format_find_field('order_id,order_sn,total,customer_id,affiliate_id,commission','o');
+		if ($order_type == 1) {
+			$fields 		.= ',' . format_find_field('order_status_id','o');
+			$sql 			= "SELECT " . $fields . ", (SELECT os.name FROM " . get_tabname('order_status') . " os WHERE os.order_status_id = o.order_status_id AND os.language_id = o.language_id) AS order_status FROM " . get_tabname('order') . " o WHERE o.order_sn = '" . (string)$order_sn . "'";
+		}else{
+			$fields 		.= ',' . format_find_field('suborder_id,seller_id,order_sn,total,order_status_id','mssu');
+			$sql 			= "SELECT " . $fields . ", (SELECT os.name FROM " . get_tabname('order_status') . " os WHERE os.order_status_id = mssu.order_status_id AND os.language_id = o.language_id) AS order_status FROM " . get_tabname('ms_suborder') . " mssu LEFT JOIN " . get_tabname('order') . " o ON (o.order_id = mssu.order_id) WHERE mssu.order_sn = '" . (string)$order_sn . "' AND o.order_status_id > '0'";
+		}
 
-		$sql 			= "SELECT " . $fields . ", (SELECT os.name FROM `" . DB_PREFIX . "order_status` os WHERE os.order_status_id = mssu.order_status_id AND os.language_id = o.language_id) AS order_status FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_sn = '" . (string)$order_sn . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'";
-
-		$order_query = $this->db->query($sql);
-
+		$order_query 	= $this->db->query($sql);
 		$ext_data 		= [];
 
 		return array_merge($order_query->row,$ext_data);
@@ -521,12 +522,19 @@ class ModelCheckoutOrder extends Model {
 
 	public function addOrderHistoryForMs($order_sn, $order_status_id, $comment = '', $notify = false, $override = false)
 	{
-		$order_info = $this->getOrderByOrderSnForMs($order_sn);
+		$order_type 		= get_order_type($order_sn);
+		$order_info 		= $this->getOrderByOrderSnForMs($order_sn,$order_type);
+		$order_id 			= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+		
+		$query 				= $this->db->query("SELECT order_id,seller_id FROM " . get_tabname('ms_suborder') . " WHERE order_id = '" . (int)$order_id . "'");
+		$suborder 			= $query->rows;
 
-		if ($order_info)
+		if ($order_info || $order_id <= 0)
 		{
-			$order_id 			= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
-			
+			foreach ($suborder as $subk => $subv) {
+				$order_status[$subv['seller_id']] = $order_status_id;
+			}
+
 			// Fraud Detection
 			$this->load->model('account/customer');
 			$this->load->language('checkout/checkout');
@@ -561,55 +569,91 @@ class ModelCheckoutOrder extends Model {
 			// 如果当前订单状态未处理或完成，但新状态正在处理或完成，则开始完成订单。
 			if (!in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 
-				// Redeem coupon, vouchers and reward points
-				$order_totals = $this->getOrderTotalsByOrderIdForMs($order_id,$order_info['seller_id']);
+				foreach ($suborder as $subk => $subv) {
+					$order_totals = $this->getOrderTotalsByOrderIdForMs($order_id,$subv['seller_id']);
 
-				foreach ($order_totals as $order_total) {
-					$this->load->model('extension/total/' . $order_total['code']);
+					foreach ($order_totals as $order_total) {
+						$this->load->model('extension/total/' . $order_total['code']);
 
-					if (property_exists($this->{'model_extension_total_' . $order_total['code']}, 'confirm')) {
-						// Confirm coupon, vouchers and reward points
-						$fraud_status_id = $this->{'model_extension_total_' . $order_total['code']}->confirm($order_info, $order_total);
+						if (property_exists($this->{'model_extension_total_' . $order_total['code']}, 'confirm')) {
+							// Confirm coupon, vouchers and reward points
+							$fraud_status_id = $this->{'model_extension_total_' . $order_total['code']}->confirm($order_info, $order_total);
 
-						// If the balance on the coupon, vouchers and reward points is not enough to cover the transaction or has already been used then the fraud order status is returned.
-						if ($fraud_status_id) {
-							$order_status_id = $fraud_status_id;
+							// 如果优惠券、凭证和奖励点数上的余额不足以覆盖交易或已被使用，则返回欺诈订单状态
+							if ($fraud_status_id) {
+								$order_status[$subv['seller_id']] = $fraud_status_id;
+							}
+						}
+					}
+
+					// Stock subtraction
+					$order_products = $this->getOrderProductsByOrderIdForMs($order_id,$subv['seller_id']);
+
+					foreach ($order_products as $order_product) {
+						$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
+
+						$order_options = $this->getOrderOptions($order_id, $order_product['order_product_id']);
+
+						foreach ($order_options as $order_option) {
+							$this->db->query("UPDATE " . DB_PREFIX . "product_option_value SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$order_option['product_option_value_id'] . "' AND subtract = '1'");
 						}
 					}
 				}
 
-				// Stock subtraction
-				$order_products = $this->getOrderProductsByOrderIdForMs($order_id,$order_info['seller_id']);
-				
-				foreach ($order_products as $order_product) {
-					$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
-
-					$order_options = $this->getOrderOptions($order_id, $order_product['order_product_id']);
-
-					foreach ($order_options as $order_option) {
-						$this->db->query("UPDATE " . DB_PREFIX . "product_option_value SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$order_option['product_option_value_id'] . "' AND subtract = '1'");
-					}
-				}
-
 				// Add commission if sale is linked to affiliate referral.
-				if ($order_info['affiliate_id'] && $this->config->get('config_affiliate_auto')) {
+				/*if ($order_info['affiliate_id'] && $this->config->get('config_affiliate_auto')) {
 					$this->load->model('account/customer');
 
 					if (!$this->model_account_customer->getTotalTransactionsByOrderId($order_id)) {
 						$this->model_account_customer->addTransaction($order_info['affiliate_id'], $this->language->get('text_order_id') . ' #' . $order_id, $order_info['commission'], $order_id);
 					}
-				}
+				}*/
 			}
 
-			// Update the DB with the new statuses
-			$this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_sn = '" . (string)$order_sn . "'");
+			//如果是合并订单 需要添加所有子订单状态以及记录
+			if ($order_type == 1) {
+				// Update the DB with the new statuses
+				$sql1 	= "UPDATE " . get_tabname('ms_suborder') ." SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'";
 
-			$this->db->query("INSERT INTO " . DB_PREFIX . "ms_suborder_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', seller_id = '" . (int)$order_info['seller_id'] . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW()");
+				$sql2 	= '';
+				
+				if (!empty($suborder)) {
+					$sql2 	= "INSERT INTO ". get_tabname('ms_suborder_history') . " (order_id,order_status_id,notify,seller_id,comment,date_added) VALUES ";
+					foreach ($suborder as $key => $value) {
+						$sql2 .=  "('".$order_id."','".(int)$order_status_id ."','".(int)$notify . "','".$value['seller_id']."','".$this->db->escape($comment)."',NOW()),";
+					}
 
+					$sql2 	= trim($sql2,',');
+				}
+				
+				$sql3 	= "UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'";
+			}else{
+				// Update the DB with the new statuses
+				$sql1 	= "UPDATE " . get_tabname('ms_suborder') . " SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_sn = '" . (string)$order_sn . "'";
+				$sql2 	= "INSERT INTO " . get_tabname('ms_suborder_history') . " SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', seller_id = '" . (int)$order_info['seller_id'] . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW()";
+			}
+
+			$this->db->query($sql1);
+
+			if (!empty($sql2)) {
+				$this->db->query($sql2);
+			}
+
+			if ($order_type == 1) {
+				$noPay = $this->db->query('SELECT COUNT(*) AS total FROM '.get_tabname('ms_suborder')." WHERE order_id = '".(int) $order_id."' AND order_status_id <= 1");
+				if ($noPay['total'] <= 0) {
+					$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+				}
+			}else{
+					$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+			}
+			
+		
             // If current order status is not complete but new status is complete then get the order's recharges and add the customer transaction balance
-            // 如果当前订单状态不完整，但新状态已完成，则获取订单的充值，并添加客户事务余额
+            // 如果当前订单状态不完整，但新状态已完成，则获取订单的充值，并添加客户事务余额 暂时不做
             /*if (!in_array($order_info['order_status_id'], array_merge($this->config->get('config_complete_status'), $this->config->get('config_paid_status')))
                   && in_array($order_status_id, array_merge($this->config->get('config_complete_status'), $this->config->get('config_paid_status')))) {
+			
                 $recharge_infos = $this->getOrderRecharges($order_id);
 
                 foreach ($recharge_infos as $recharge_info) {
@@ -621,7 +665,7 @@ class ModelCheckoutOrder extends Model {
             }*/
 
             // If current order status is complete but new status is not complete then remove the customer transaction balance
-            // 如果当前订单状态已完成，但新状态未完成，则删除客户事务余额
+            // 如果当前订单状态已完成，但新状态未完成，则删除客户事务余额 暂时不做
             /*if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_complete_status'), $this->config->get('config_paid_status')))
                   && !in_array($order_status_id, array_merge($this->config->get('config_complete_status'), $this->config->get('config_paid_status')))) {
                 $recharge_infos = $this->getOrderRecharges($order_id);
@@ -633,38 +677,42 @@ class ModelCheckoutOrder extends Model {
 
 			// If old order status is the processing or complete status but new status is not then commence restock, and remove coupon, voucher and reward history
 			// 如果旧订单状态是处理或完成状态，但新状态不是，则开始重新上锁，并删除优惠券、凭证和奖励历史
-			/*if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
-				// Restock
-				$order_products = $this->getOrderProducts($order_id);
+			if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 
-				foreach($order_products as $order_product) {
-					$this->db->query("UPDATE `" . DB_PREFIX . "product` SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
+				foreach ($suborder as $key => $value)
+				{
+					// Restock
+					$order_products = $this->getOrderProductsByOrderIdForMs($order_id,$value['seller_id']);
 
-					$order_options = $this->getOrderOptions($order_id, $order_product['order_product_id']);
+					foreach($order_products as $order_product) {
+						$this->db->query("UPDATE `" . DB_PREFIX . "product` SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
 
-					foreach ($order_options as $order_option) {
-						$this->db->query("UPDATE " . DB_PREFIX . "product_option_value SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$order_option['product_option_value_id'] . "' AND subtract = '1'");
+						$order_options = $this->getOrderOptions($order_id, $order_product['order_product_id']);
+
+						foreach ($order_options as $order_option) {
+							$this->db->query("UPDATE " . DB_PREFIX . "product_option_value SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$order_option['product_option_value_id'] . "' AND subtract = '1'");
+						}
 					}
-				}
 
-				// Remove coupon, vouchers and reward points history
-				$order_totals = $this->getOrderTotals($order_id);
+					// Remove coupon, vouchers and reward points history
+					$order_totals = $this->getOrderTotalsByOrderIdForMs($order_id,$value['seller_id']);
 
-				foreach ($order_totals as $order_total) {
-					$this->load->model('extension/total/' . $order_total['code']);
+					foreach ($order_totals as $order_total) {
+						$this->load->model('extension/total/' . $order_total['code']);
 
-					if (property_exists($this->{'model_extension_total_' . $order_total['code']}, 'unconfirm')) {
-						$this->{'model_extension_total_' . $order_total['code']}->unconfirm($order_id);
+						if (property_exists($this->{'model_extension_total_' . $order_total['code']}, 'unconfirm')) {
+							$this->{'model_extension_total_' . $order_total['code']}->unconfirm($order_id);
+						}
 					}
 				}
 
 				// Remove commission if sale is linked to affiliate referral.
-				if ($order_info['affiliate_id']) {
+				/*if ($order_info['affiliate_id']) {
 					$this->load->model('account/customer');
 
 					$this->model_account_customer->deleteTransactionByOrderId($order_id);
-				}
-			}*/
+				}*/
+			}
 
 			$this->cache->delete('product');
 		}

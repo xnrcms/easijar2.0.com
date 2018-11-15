@@ -40,7 +40,7 @@ class ModelExtensionTotalMultisellerShipping extends Model {
                 $total['totals'][] = array(
                     'seller_id'  => $key,
                     'code'       => 'multiseller_shipping',
-                    'title'      => $value['seller_name'] . ' ' . $title,
+                    'title'      => $value['seller_name'] . '&'.$key.'multiseller_shipping&' . $title,
                     'value'      => $shipping_cost,
                     'sort_order' => $this->config->get('total_multiseller_shipping_sort_order')
                 );

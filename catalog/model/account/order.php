@@ -330,8 +330,8 @@ class ModelAccountOrder extends Model {
         return $query->row;
     }
 
-    public function getOrderStatusForMs($order_id){
-        $order_query = $this->db->query("SELECT o.order_id,o.customer_id,mssu.suborder_id,mssu.seller_id,mssu.order_sn,mssu.order_status_id FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.suborder_id = '" . (int)$order_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+    public function getOrderStatusForMs($order_sn){
+        $order_query = $this->db->query("SELECT o.order_id,o.customer_id,mssu.suborder_id,mssu.seller_id,mssu.order_sn,mssu.order_status_id FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_sn = '" . $order_sn . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
         return $order_query->row;
     }
 

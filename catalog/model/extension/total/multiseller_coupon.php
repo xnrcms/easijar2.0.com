@@ -1,5 +1,5 @@
 <?php
-class ModelExtensionTotalCoupon extends Model {
+class ModelExtensionTotalMultisellerCoupon extends Model {
 	public function getCoupon($code,$total=0) {
 		$status = true;
 
@@ -163,9 +163,10 @@ class ModelExtensionTotalCoupon extends Model {
 		if (isset($this->session->data['coupon'])) {
 
 			$title 			= '';  	//优惠券total标题
-		    $amount_coupon 	= 0;  	//优惠券金额
+		    $amount_coupon 	= 0;  	//运费金额
 
             $this->load->model('multiseller/seller');
+            $this->load->language('extension/total/multiseller_coupon', 'multiseller');
             $this->load->language('extension/total/coupon', 'coupon');
 
             $seller_price 	= [];  // 保存商家和商家商品总额
@@ -185,16 +186,17 @@ class ModelExtensionTotalCoupon extends Model {
                 }
             }
 
+            $title = $this->language->get('multiseller')->get('text_multiseller_coupon');
+
             foreach ($seller_price as $key => $value) {
             	if (isset($this->session->data['coupon'][$key]) && !empty($this->session->data['coupon'][$key])) {
-            		$seller_coupon 		= $this->getShellerCoupon($this->session->data['coupon'][$key],$value,$total);
-            		$title 				= sprintf($this->language->get('coupon')->get('text_coupon'), $this->session->data['coupon'][$key]);
+            		$seller_coupon = $this->getShellerCoupon($this->session->data['coupon'][$key],$value,$total);
             		if ($seller_coupon) {
 	            		$amount_coupon += $seller_coupon;
 	            		$total['totals'][] = array(
 		                    'seller_id'  => $key,
 		                    'code'       => 'multiseller_coupon',
-		                    'title'      => $value['seller_name'] . '&'.$key.'multiseller_coupon&' . $title,
+		                    'title'      => $value['seller_name'] . ' ' . $title,
 		                    'value'      => $seller_coupon,
 							'sort_order' => $this->config->get('total_coupon_sort_order')
 		                );
@@ -210,7 +212,7 @@ class ModelExtensionTotalCoupon extends Model {
 
 	private function getShellerCoupon($code = '',$products = [],$total)
 	{
-		$coupon_info 		= $this->getCoupon($code);
+		$coupon_info 		= $this->getCoupon($code);wr("\n================881\n");wr($products);
 		if ($coupon_info && isset($products['price'])) 
 		{
 			$discount_total = 0;

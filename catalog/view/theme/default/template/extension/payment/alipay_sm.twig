@@ -4,16 +4,15 @@
   {% endfor %}
 </form>
 <script type="text/javascript">
-alert(1111)
 submitForm()
 function submitForm() {
-  alert(222222);
   var queryParam = '';
-    Array.prototype.slice.call(document.querySelectorAll("#alipaysubmit input[type=hidden]")).forEach(function (ele) {
-      queryParam += '&' + ele.name + "=" + encodeURIComponent(ele.value);
-    });
+  $("#alipaysubmit input[type=hidden]").each(function(){
+    queryParam += '&' + $(this).attr("name") + "=" + encodeURIComponent($(this).attr("value"));
+  });
+  alert(queryParam);
+
     var gotoUrl = document.querySelector("#alipaysubmit").getAttribute('action') + '?' + queryParam;
     location.href = "{{ pay_url }}" + "&goto=" + _AP.pay(gotoUrl);
-    alert(location.href);
 }
 </script>

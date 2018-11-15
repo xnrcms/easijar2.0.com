@@ -151,7 +151,7 @@ class ControllerApiCheckout extends Controller
 
         $products                               = $this->renderCartSection();
         $cart_products                          = [];
-        
+
         if ( isset($products['products']) && !empty($products['products'])) {
 
             $this->load->language('extension/total/multiseller_shipping', 'multiseller_shipping');
@@ -169,31 +169,35 @@ class ControllerApiCheckout extends Controller
                     unset($totals[$tk]);continue;
                 }
 
-                $seller_ship[$tv['title']]      = $tv['text'];
-                $ship_del[$tv['title']]         = $tk;
-                $ship_ototal[$tv['title']]      = $tv['ototal'];
+                $tt                             = explode('&', $tv['title']);
+                if (count($tt) == 3 && (int)$tt[1] > 0 ) {
+                    $seller_ship[$tt[1]]      = $tv['text'];
+                    $ship_del[$tt[1]]         = $tk;
+                    $ship_ototal[$tt[1]]      = $tv['ototal'];
+                }
             }
 
             foreach ($products['products'] as $key => $value) {
+
                 //unset($value['href']);
                 $store_shipping_text     = $value['store_name'] . ' ' . $shipping_title;
                 $store_coupon_text       = $value['store_name'] . ' ' . $coupon_title;
 
                 //运费
-                if (isset($seller_ship[$store_shipping_text])) {
-                    $shipping           = $seller_ship[$store_shipping_text];
-                    $oshipping          = $ship_ototal[$store_shipping_text];
-                    unset($totals[$ship_del[$store_shipping_text]]);
+                if (isset($seller_ship[$value['seller_id'].'multiseller_shipping'])) {
+                    $shipping           = $seller_ship[$value['seller_id'].'multiseller_shipping'];
+                    $oshipping          = $ship_ototal[$value['seller_id'].'multiseller_shipping'];
+                    unset($totals[$ship_del[$value['seller_id'].'multiseller_shipping']]);
                 }else{
                     $shipping           = '';
                     $oshipping          = 0;
                 }
 
                 //优惠券
-                if (isset($seller_ship[$store_coupon_text])) {
-                    $coupon           = $seller_ship[$store_coupon_text];
-                    $ocoupon          = $ship_ototal[$store_coupon_text];
-                    unset($totals[$ship_del[$store_coupon_text]]);
+                if (isset($seller_ship[$value['seller_id'].'multiseller_coupon'])) {
+                    $coupon           = $seller_ship[$value['seller_id'].'multiseller_coupon'];
+                    $ocoupon          = $ship_ototal[$value['seller_id'].'multiseller_coupon'];
+                    unset($totals[$ship_del[$value['seller_id'].'multiseller_coupon']]);
                 }else{
                     $coupon           = '';
                     $ocoupon          = 0;
@@ -479,7 +483,7 @@ class ControllerApiCheckout extends Controller
 
             $order_id = $this->model_checkout_checkout->createOrder();
             
-            $this->cart->clear();
+            //$this->cart->clear();
 
             // Change order status to Unpaid
             if ($order_data['payment_method'] != 'cod') {
