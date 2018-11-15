@@ -10,7 +10,7 @@ class ModelAccountProductBrowseRecords extends Model {
 			}
 
 			$sql 		= trim($sql,',');
-			wr($sql);
+
 			$this->db->query($sql);
 		}
 	}

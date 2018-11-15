@@ -644,10 +644,12 @@ class ModelCheckoutOrder extends Model {
 				if ($noPay['total'] <= 0) {
 					$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 				}
+				wr($noPay);
 			}else{
 					$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 			}
-			
+
+			wr($order_type);
 		
             // If current order status is not complete but new status is complete then get the order's recharges and add the customer transaction balance
             // 如果当前订单状态不完整，但新状态已完成，则获取订单的充值，并添加客户事务余额 暂时不做

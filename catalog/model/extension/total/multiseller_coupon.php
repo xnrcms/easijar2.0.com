@@ -212,7 +212,7 @@ class ModelExtensionTotalMultisellerCoupon extends Model {
 
 	private function getShellerCoupon($code = '',$products = [],$total)
 	{
-		$coupon_info 		= $this->getCoupon($code);wr("\n================881\n");wr($products);
+		$coupon_info 		= $this->getCoupon($code);
 		if ($coupon_info && isset($products['price'])) 
 		{
 			$discount_total = 0;
