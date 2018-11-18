@@ -40,6 +40,7 @@ class ModelExtensionModuleSocial extends Model
                 ]
             );
             header('location:' . $url);
+            return;
         }
 
         $socialite = $this->initSocialite();

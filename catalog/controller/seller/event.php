@@ -85,13 +85,14 @@ class ControllerSellerEvent extends Controller {
             $seller_info        = $this->model_multiseller_seller->getSellerByProductId($product['product_id']);
             $seller_id          = $seller_info ? $seller_info['seller_id'] : 0;
             $tax_class_id       = $product['tax_class_id'];
-            
+
 			$product = array(
 				'cart_id'    => $product['cart_id'],
 				'product_id' => $product['product_id'],
 				'image'      => $image,
 				'name'       => $product['name'],
 				'model'      => $product['model'],
+                'sku'        => $product['sku'],
 				'option'     => $option_data,
 				'quantity'   => $product['quantity'],
 				'subtract'   => $product['subtract'],

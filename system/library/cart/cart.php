@@ -288,14 +288,15 @@ class Cart
                         'width' => $product_query->row['width'],
                         'height' => $product_query->row['height'],
                         'length_class_id' => $product_query->row['length_class_id'],
-                        'recurring' => $recurring
+                        'recurring' => $recurring,
+                        'sku'        => $this->getProductSku($product_query->row['product_id'])
                     );
                 } else {
                     $this->remove($cart['cart_id']);
                 }
             }
         }
-
+        
         return $this->data;
     }
 
@@ -541,5 +542,19 @@ class Cart
     public function setCartBuyType($buy_type = 0)
     {
         $this->buy_type  = $buy_type;
+    }
+
+    private function getProductSku($product_id = 0)
+    {
+        $product_id                     = (int)$product_id;
+        if ($product_id <= 0)  return '';
+
+        $option_data                    = \Models\Product::find($product_id)->getVariantLabels();
+        $sku                            = [];
+        foreach ($option_data as $okey => $ovalue) {
+            $sku[]      = $ovalue['name'] . ':' . $ovalue['value'];
+        }
+
+        return !empty($sku) ? implode(',', $sku) : '';
     }
 }

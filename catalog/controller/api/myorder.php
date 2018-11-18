@@ -70,7 +70,7 @@ class ControllerApiMyorder extends Controller {
             unset($results[$keys]['currency_value']);
             unset($results[$keys]['soid']);
         }
-
+        wr($results);
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$results]));
 	}
 

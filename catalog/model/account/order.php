@@ -341,7 +341,8 @@ class ModelAccountOrder extends Model {
         if ( $product_id <= 0 )  return [];
 
         $fields         = format_find_field('order_id,currency_code,currency_value','o');
-        $fields         .= ',' . format_find_field('quantity,price,total,','op');
+        $fields         .= ',' . format_find_field('quantity,price,total,name,image,sku','op');
+        $fields         .= ',' . format_find_field('seller_id','msop');
 
         $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_order_product` msop LEFT JOIN  `" . DB_PREFIX . "order_product` op ON (op.order_product_id = msop.order_product_id) LEFT JOIN `" . DB_PREFIX . "order` o ON (o.order_id = op.order_id) WHERE msop.order_product_id = '" . $product_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
 
@@ -352,7 +353,7 @@ class ModelAccountOrder extends Model {
     {
         if ( empty($order_sn) )  return [];
 
-        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value','o');
+        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value,fullname,telephone,email,date_added','o');
         $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
         $fields         .= ',' . format_find_field('avatar,store_name,','ms');
 
@@ -442,10 +443,10 @@ class ModelAccountOrder extends Model {
         }
 
 
-        $sql        = "SELECT o.order_id AS oid,o.order_status_id as status_id,mssu.suborder_id AS soid,ms.store_name,ms.seller_id AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM `" . DB_PREFIX . "ms_suborder` mssu 
-        LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id)
-        LEFT JOIN `" . DB_PREFIX . "ms_seller` ms ON (ms.seller_id = mssu.seller_id)
-        LEFT JOIN `" . DB_PREFIX . "order_status` os ON (o.order_status_id = os.order_status_id) 
+        $sql        = "SELECT o.`order_id` AS oid,o.`order_status_id` as status_id,mssu.`order_sn`,mssu.`suborder_id` AS soid,ms.`store_name`,ms.`seller_id` AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM " . get_tabname('ms_suborder') . " mssu 
+        LEFT JOIN  " . get_tabname('order') . " o ON (o.order_id = mssu.order_id)
+        LEFT JOIN " . get_tabname('ms_seller') . " ms ON (ms.seller_id = mssu.seller_id)
+        LEFT JOIN " . get_tabname('order_status') . " os ON (o.order_status_id = os.order_status_id) 
         WHERE o.customer_id = '" . (int)$this->customer->getId() . "' " . $status_where . "AND o.store_id = '0' 
         AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' 
         ORDER BY mssu.suborder_id 

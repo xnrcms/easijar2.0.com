@@ -6,8 +6,9 @@ class ControllerApiDispute extends Controller {
 	{	
 		$this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/order');
+        $this->load->language('account/return');
 
-        $allowKey       = ['api_token','order_sn','order_product_id','refund_money','is_receive','is_service','reason_id','evidences'];
+        $allowKey       = ['api_token','order_sn','order_product_id','refund_money','is_receive','is_service','reason_id','evidences','quantity','comment'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
@@ -28,65 +29,68 @@ class ControllerApiDispute extends Controller {
 
         //获取商品信息
         $product_info                   = $this->model_account_order->getOrderProductForMsByOrderProductId($req_data['order_product_id']);
-        if (empty($order_info)) {
+        if (empty($product_info) || !((int)$product_info['seller_id'] > 0 && (int)$product_info['seller_id'] === (int)$order_info['seller_id'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
+        }
+
+        $pnum               = (int)$product_info['quantity'];
+        $ptotal             = (float)($product_info['price'] * $pnum);
+        $refund_money       = ((float)$req_data['refund_money'] <= 0 || (float)$req_data['refund_money'] >= $ptotal) ? $ptotal : (float)$req_data['refund_money'];
+        $quantity           = ((int)$req_data['quantity'] <= 0 || (int)$req_data['quantity'] >= $pnum) ? $pnum : (int)$req_data['quantity'];
+
+        $this->load->model('account/return');
+
+        //判断是否已经有了售后申请
+        if ($this->model_account_return->getReturnRecord($order_info['order_id'],$req_data['order_product_id']) > 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_return_already')]));
         }
 
         $returnData                     = [];
         $returnData['order_id']         = $order_info['order_id'];
-        $returnData['product_id']       = $product_info['product_id'];
+        $returnData['product_id']       = $req_data['order_product_id'];
         $returnData['fullname']         = $order_info['fullname'];
         $returnData['email']            = $order_info['email'];
         $returnData['telephone']        = $order_info['telephone'];
-        $returnData['product']          = $order_info['product'];
-        $returnData['model']            = $order_info['model'];
-        $returnData['quantity']         = $order_info['quantity'];
-        $returnData['opened']           = $order_info['opened'];
-        $returnData['return_reason_id'] = $order_info['return_reason_id'];
-        $returnData['return_action_id'] = $order_info['return_action_id'];
-        $returnData['return_status_id'] = $order_info['return_status_id'];
-        $returnData['comment']          = $order_info['comment'];
-        $returnData['date_ordered']     = $order_info['date_ordered'];
-        $returnData['date_added']       = $order_info['date_added'];
-        $returnData['date_modified']    = $order_info['date_modified'];
+        $returnData['product']          = $product_info['name'];
+        $returnData['model']            = $product_info['sku'];
+        $returnData['quantity']         = $quantity;
+        $returnData['opened']           = 0;
+        $returnData['is_receive']       = (int)$req_data['is_receive'];
+        $returnData['is_service']       = (int)$req_data['is_service'];
+        $returnData['return_reason_id'] = (int)$req_data['reason_id'];
+        $returnData['return_action_id'] = 0;
+        $returnData['return_status_id'] = 1;
+        $returnData['comment']          = $req_data['comment'];
+        $returnData['date_ordered']     = $order_info['date_added'];
         $returnData['seller_id']        = $order_info['seller_id'];
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $product_info ]));
+        $returnData['image']            = $product_info['image'];
+        $returnData['return_money']     = $refund_money;
 
-        /*$address            = [];
-        foreach ($order_payinfo as $key=>$val) {
-            if (strpos($key,'payment_') === 0) {
-                $address[ltrim($key,'payment_')]    = (int)$val;
-            }
-        }
+        $return_id                      = $this->model_account_return->addReturn($returnData);
+        $evidences                      = (isset($req_data['evidences']) && !empty($req_data['evidences'])) ? $req_data['evidences'] : '';
+        
+        /*//图片处理
+        $image                          = (isset($req_data['evidences']) && !empty($req_data['evidences'])) ? explode(',', $req_data['evidences']) : [];
+        $this->model_account_return->deleteReturnImagesByReturnId($return_id,$image);
+        $this->model_account_return->addReturnImagesByReturnId($return_id,$image);*/
 
-        $this->load->model('checkout/checkout');
+        //添加历史记录
+        $comment                        = $returnData['comment'];
+        $return_reason_id               = (int)$returnData['return_reason_id'];
+        $proposal                       = $returnData['is_service'] == 1 ? 6 : 7;
 
-        $payment_methods            = $this->model_checkout_checkout->getPaymentMethodsForApi($address);
+        $this->load->model('multiseller/return');
+        $this->model_multiseller_return->addReturnHistoryForMs($return_id, 1,$proposal,$return_reason_id, $comment, $evidences,0);
 
-        $payment_option             = [];
-        $selected_pay               = [];
-        foreach ($payment_methods as $key => $value) {
-            if ($address['code'] == $value['code']) {
-                $selected_pay[]           = ['code' => $value['code'],'title' => $value['title']];
-            }else{
-                $payment_option[]       = ['code' => $value['code'],'title' => $value['title']];
-            }
-        }
-
-        $payment_option         = array_merge($selected_pay,$payment_option);
-
-        $json                   = [];
-        $json['order_info']     = $order_info;
-        $json['payment_option'] = $payment_option;
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $order_info ]));*/
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['return_id'=> $return_id]]));
     }
 
-    //获取支付信息
-    public function getpay() 
-    {   
+    //获取退货退款详细信息
+    public function return_info() 
+    {
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token','order_sn','payment_code'];
+        $allowKey       = ['api_token','return_id'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -103,42 +107,176 @@ class ControllerApiDispute extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
         
-        //验证支付订单
-        $this->load->model('account/order');
-
-        $order_payinfo                     = $this->model_account_order->getOrderPayinfoForMs($req_data['order_sn']);
-        if (empty($order_payinfo)) {
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        $return_id      = (int)$req_data['return_id'];
+        if ($return_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_id is error']));
         }
 
-        if (!isset($order_payinfo['order_status_id']) || $order_payinfo['order_status_id'] != 1) {
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_status')]));
+        $this->load->model('account/return');
+        $this->load->model('tool/image');
+
+        $return_info            = $this->model_account_return->getReturnForMs($return_id);
+
+        $return_info['image']   = $this->model_tool_image->resize((!empty($return_info['image']) ? $return_info['image'] : 'no_image.png'), 100, 100);
+
+        $order_id               = isset($return_info['order_id']) ? (int)$return_info['order_id'] : 0;
+        $seller_id              = isset($return_info['seller_id']) ? (int)$return_info['seller_id'] : 0;
+        $order_info             = $this->model_account_return->getSuborderInfo($order_id,$seller_id);
+
+        $return_info            = array_merge($return_info,$order_info);
+
+        unset($return_info['comment']);
+        unset($return_info['date_added']);
+        unset($return_info['date_modified']);
+        unset($return_info['reason']);
+        unset($return_info['action']);
+        unset($return_info['telephone']);
+        unset($return_info['email']);
+        unset($return_info['fullname']);
+        unset($return_info['order_id']);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$return_info]));
+    }
+
+    //修改申请
+    public function update()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','return_id','is_service','reason_id','comment','evidences'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
-        $this->session->data['order_sn'] = $req_data['order_sn'];
-
-        //修改支付方式
-        $this->load->model('checkout/checkout');
-        $this->model_checkout_checkout->setPaymentMethodsForMs($order_payinfo['order_id'],$req_data['payment_code']);
-
-        if ($req_data['payment_code'] == 'cod')
-        {
-            $this->load->model('checkout/order');
-            
-            $payment            = '';
-            $this->model_checkout_order->addOrderHistoryForMs($req_data['order_sn'],15, '买家用户中心发起支付');
-        } else {
-            $payment = $this->load->controller('extension/payment/' . $req_data['payment_code'] . '/payFormForSm');
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
         }
 
-        $json                   = [];
-        $json['payment']        = $req_data['payment_code'];
-        $json['payinfo']        = $payment;
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $return_id      = (int)$req_data['return_id'];
+        if ($return_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_id is error']));
+        }
+
+        $this->load->model('account/return');
+
+        //获取申请信息
+        $return_info                    = $this->model_account_return->getReturnForMs($return_id);
+
+        if ($return_info['return_status_id'] != 1) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_status is error']));
+        }
+
+        //获取最近一次记录ID
+        $return_history_id              = $this->model_account_return->getReturnHistoryIdForMsByLast($return_id);
+        if ($return_history_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_history is error']));
+        }
+
+        $returnData                     = [];
+        $returnData['proposal']         = (int)$req_data['is_service'] == 1 ? 6 : 7;
+        $returnData['return_reason_id'] = (int)$req_data['reason_id'];
+        $returnData['comment']          = $req_data['comment'];
+        $returnData['evidences']        = $req_data['evidences'];
+
+        $return_id                      = $this->model_account_return->editReturnHistoryForMsByLast($return_history_id,$returnData);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'update Success']));
+    }
+
+    public function return_history()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','return_id'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $return_id      = (int)$req_data['return_id'];
+        if ($return_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_id is error']));
+        }
+
+        $this->load->model('account/return');
+
+        //获取申请信息
+        $rinfo                          = $this->model_account_return->getReturnForMs($return_id);
+        if (empty($rinfo)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return info is error']));
+        }
+
+        $return_history                 = $this->model_account_return->getReturnHistorysForMs($return_id);
+
+        $return_info                    = [];
+        $return_info['return_id']       = $rinfo['return_id'];
+        $return_info['seller_id']       = $rinfo['seller_id'];
+
+        $json['return_info']            = $return_info;
+        $json['return_history']         = $return_history;
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 
-    public function refund($order_sn)
+    public function return_cancle()
     {
-        return $order_sn;
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','return_id'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $return_id      = (int)$req_data['return_id'];
+        if ($return_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_id is error']));
+        }
+
+        $this->load->model('account/return');
+
+        //获取申请信息
+        $rinfo                          = $this->model_account_return->getReturnForMs($return_id);
+        if (empty($rinfo)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return info is error']));
+        }
+
+        if ($rinfo['return_status_id'] == 8) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:after sale application has been withdrawn']));
+        }
+
+        $this->load->model('multiseller/return');
+        $this->model_multiseller_return->addReturnHistoryForMs($return_id, 8,8,$rinfo['return_reason_id']);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'after sale application has been withdrawn']));
     }
 }

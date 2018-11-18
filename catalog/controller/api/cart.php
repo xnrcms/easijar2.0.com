@@ -41,7 +41,6 @@ class ControllerApiCart extends Controller {
 
             $products 				= $this->cart->getCartProducts();
 
-
             foreach ($products as $product) {
                 $product_total = 0;
 

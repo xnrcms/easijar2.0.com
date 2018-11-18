@@ -233,6 +233,7 @@ class ModelCheckoutCheckout extends Model {
                 'product_id' => $product['product_id'],
                 'name'       => $product['name'],
                 'model'      => $product['model'],
+                'image'      => $product['image'],
                 'option'     => $option_data,
                 'variant'    => $variantData,
                 'download'   => $product['download'],
@@ -241,7 +242,8 @@ class ModelCheckoutCheckout extends Model {
                 'price'      => $product['price'],
                 'total'      => $product['total'],
                 'tax'        => $this->tax->getTax($product['price'], $product['tax_class_id']),
-                'reward'     => $product['reward']
+                'reward'     => $product['reward'],
+                'sku'        => $product['sku']
             );
         }
 

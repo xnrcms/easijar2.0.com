@@ -1,7 +1,6 @@
 <?php
 class ControllerApiRegion extends Controller {
 
-	//用户中心首页
 	public function index() 
 	{	
 		$this->response->addHeader('Content-Type: application/json');

@@ -213,11 +213,6 @@ class ControllerApiCheckout extends Controller
                 $subtotal                = 0;
 
                 foreach ($goods as $gk => $gv) {
-                    $gopt       = isset($gv['option']) ? $gv['option'] : [];
-                    $opt_text   = '';
-                    foreach ($gopt as $oval) {
-                        $opt_text   .= $oval['name'] . ':' . $oval['value'] . ',';
-                    }
 
                     $subtotal           += $gv['ototal'];
 
@@ -229,7 +224,7 @@ class ControllerApiCheckout extends Controller
                         'image'         => $gv['image'],
                         'price'         => $gv['price'],
                         'total'         => $gv['total'],
-                        'option'        => trim($opt_text,','),
+                        'option'        => $gv['sku'],
                     ];
                 }
 

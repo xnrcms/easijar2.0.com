@@ -19,7 +19,7 @@ class ModelCheckoutOrder extends Model {
 		// Products
 		if (isset($data['products'])) {
 			foreach ($data['products'] as $product) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "order_product SET order_id = '" . (int)$order_id . "', product_id = '" . (int)$product['product_id'] . "', name = '" . $this->db->escape($product['name']) . "', model = '" . $this->db->escape($product['model']) . "', quantity = '" . (int)$product['quantity'] . "', price = '" . (float)$product['price'] . "', total = '" . (float)$product['total'] . "', tax = '" . (float)$product['tax'] . "', reward = '" . (int)$product['reward'] . "'");
+				$this->db->query("INSERT INTO " . DB_PREFIX . "order_product SET order_id = '" . (int)$order_id . "', product_id = '" . (int)$product['product_id'] . "', name = '" . $this->db->escape($product['name']) . "', model = '" . $this->db->escape($product['model']) . "', quantity = '" . (int)$product['quantity'] . "', price = '" . (float)$product['price'] . "', total = '" . (float)$product['total'] . "', tax = '" . (float)$product['tax'] . "', reward = '" . (int)$product['reward'] . "', sku = '" . $this->db->escape($product['sku']) . "',image = '" . $this->db->escape($product['image']) . "'");
 
 				$order_product_id = $this->db->getLastId();
 				// flash sale
@@ -641,15 +641,12 @@ class ModelCheckoutOrder extends Model {
 
 			if ($order_type == 1) {
 				$noPay = $this->db->query('SELECT COUNT(*) AS total FROM '.get_tabname('ms_suborder')." WHERE order_id = '".(int) $order_id."' AND order_status_id <= 1");
-				if ($noPay['total'] <= 0) {
+				if ($noPay->row['total'] <= 0) {
 					$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 				}
-				wr($noPay);
 			}else{
 					$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 			}
-
-			wr($order_type);
 		
             // If current order status is not complete but new status is complete then get the order's recharges and add the customer transaction balance
             // 如果当前订单状态不完整，但新状态已完成，则获取订单的充值，并添加客户事务余额 暂时不做
