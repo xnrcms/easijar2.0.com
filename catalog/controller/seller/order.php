@@ -795,7 +795,7 @@ class ControllerSellerOrder extends Controller {
 
             $typeCom = $express_code; //快递公司
             $typeNu = $tracking_number;  //快递单号
-            $track = $this->url->link('seller/order/getTrace', 'com='.$typeCom.'&nu='.$typeNu.'&user_token='.$this->session->data['user_token']);
+            $track = $this->url->link('seller/order/getTrace', 'com='.$typeCom.'&nu='.$typeNu);
 
             $name = '';
             foreach ($tracking_datas as $item) {
@@ -814,7 +814,6 @@ class ControllerSellerOrder extends Controller {
             );
         }
 
-        $data['user_token'] = $this->session->data['user_token'];
         $data['order_id'] = $this->request->get['order_id'];
 
         $history_total = $this->model_multiseller_order->getTotalOrderShippingtracks($this->request->get['order_id']);

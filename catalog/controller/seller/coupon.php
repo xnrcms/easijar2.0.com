@@ -328,8 +328,6 @@ class ControllerSellerCoupon extends Controller {
 	protected function getForm() {
 		$data['text_form'] = !isset($this->request->get['coupon_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 
-		$data['user_token'] = $this->session->data['user_token'];
-
 		if (isset($this->request->get['coupon_id'])) {
 			$data['coupon_id'] = (int)$this->request->get['coupon_id'];
 		} else {

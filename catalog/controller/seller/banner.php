@@ -71,12 +71,12 @@ class ControllerSellerBanner extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
+			'href' => $this->url->link('common/dashboard')
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('design/banner', 'user_token=' . $this->session->data['user_token'] . $url)
+			'href' => $this->url->link('design/banner', $url)
 		);
 
 		if (!isset($this->request->get['banner_id'])) {
