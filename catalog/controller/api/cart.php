@@ -86,11 +86,14 @@ class ControllerApiCart extends Controller {
             $this->load->view('checkout/cart', $data);
 
             //格式化一下数组
-            $products 			= [];
-            foreach ($this->load->getViewData('products') as $key => $value) {
+            $products 			= $this->load->getViewData('products');wr($products);
+            $products           = isset($products['products']) ? $products['products'] : [];
+            /*foreach ($products as $key => $value) {
                 sort($value);
             	$products[] 	= $value;
-            }
+            }*/
+
+            sort($products);
 
             $data['products'] 	= $products;
 
