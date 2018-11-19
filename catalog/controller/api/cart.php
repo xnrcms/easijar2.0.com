@@ -36,7 +36,7 @@ class ControllerApiCart extends Controller {
             $this->load->model('tool/upload');
 
             $data['cart_nums'] 		= $this->cart->countProducts();
-            $data['currency'] 		= $this->session->data['currency'];
+            $data['currency'] 		= trim($this->currency->format(1, $this->session->data['currency']),'1.00');
             $data['products'] 		= [];
 
             $products 				= $this->cart->getCartProducts();
@@ -86,7 +86,7 @@ class ControllerApiCart extends Controller {
             $this->load->view('checkout/cart', $data);
 
             //格式化一下数组
-            $products 			= $this->load->getViewData('products');wr($products);
+            $products 			= $this->load->getViewData('products');
             $products           = isset($products['products']) ? $products['products'] : [];
             /*foreach ($products as $key => $value) {
                 sort($value);
