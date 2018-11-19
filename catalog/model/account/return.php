@@ -32,6 +32,28 @@ class ModelAccountReturn extends Model {
 		return $query->row['total'];
 	}
 
+
+
+	public function getReturnsForMs($start = 0, $limit = 20)
+	{
+		if ($start < 0) {
+			$start = 0;
+		}
+
+		if ($limit < 1) {
+			$limit = 20;
+		}
+
+		$fields 		= format_find_field('return_id,order_id,product,model,quantity,image,seller_id,is_service','r');
+		$fields 		.= "," . format_find_field('product_id','op');
+		$fields 		.= "," . format_find_field('store_name','ms');
+		$fields 		.= ",(SELECT ra.name FROM " . get_tabname('return_action') . " ra WHERE ra.return_action_id = (r.is_service + 5) AND ra.language_id = '" . (int)$this->config->get('config_language_id') . "') AS action";
+
+		$query = $this->db->query("SELECT " . $fields . " FROM " . get_tabname('return') . " r LEFT JOIN " . get_tabname('order_product') . " op ON (r.product_id = op.order_product_id) LEFT JOIN " . get_tabname('ms_seller') . " ms ON (r.seller_id = ms.seller_id) WHERE r.customer_id = '" . $this->customer->getId() . "' ORDER BY r.return_id DESC LIMIT " . (int)$start . "," . (int)$limit);
+
+		return $query->rows;
+	}
+
 	public function getReturnHistories($return_id) {
 		$query = $this->db->query("SELECT rh.date_added, rs.name AS status, rh.comment FROM " . DB_PREFIX . "return_history rh LEFT JOIN " . DB_PREFIX . "return_status rs ON rh.return_status_id = rs.return_status_id WHERE rh.return_id = '" . (int)$return_id . "' AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY rh.date_added ASC");
 

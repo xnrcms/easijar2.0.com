@@ -1,6 +1,70 @@
 <?php
 class ControllerApiOreview extends Controller {
 
+    //订单商品评价
+    public function add()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/oreview');
+
+        $allowKey       = ['api_token','order_product_id','content','rating','images'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $order_product_id                   = (int)$req_data['order_product_id'];
+        $content                            = (string)$req_data['content'];
+        $rating                             = (int)$req_data['rating'];
+
+        $this->load->model('account/oreview');
+        $this->load->model('account/order');
+
+        $order_status                      = $this->model_account_order->checkOrderProductStatusForMs($order_product_id,5);
+
+        if ($order_status == 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_not_found')]));
+        }
+
+        if ($order_status == 1) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_order_status')]));
+        }
+
+        if ($this->model_account_oreview->isReviewed($order_product_id)) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_alredy_reviewed')]));
+        }
+
+        if ((utf8_strlen($content) < 5) || (utf8_strlen($content) > 1000)) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_text')]));
+        }
+
+        if ($rating < 0 || $rating > 5) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_rating')]));
+        }
+
+        $req_data['text']                   = $content;
+        $req_data['code']                   = !empty($req_data['images']) ? explode(',', $req_data['images']) : [];
+        
+        $result                             = $this->model_account_oreview->addOreview($order_product_id, $req_data);
+        if ($result) {
+            $notice                         = $this->config->get('config_review_approve') ? t('text_success_unapproved') : t('text_success_approved');
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$notice]));
+        } else {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_alredy_reviewed')]));
+        }
+    }
+
     //已评价列表
     public function have_oreview()
     {

@@ -245,6 +245,96 @@ class ModelAccountOreview extends Model
         return $query->row['total'];
     }
 
+    public function getOreviewsForMs($data = array())
+    {
+        $order_statuses = $this->config->get('config_complete_status');
+
+        foreach ($order_statuses as $order_status_id) {
+            $implode[] = "order_status_id = '".(int) $order_status_id."'";
+        }
+
+        /*$sql        = "SELECT o.`order_id` AS oid,o.`order_status_id` as status_id,mssu.`order_sn`,mssu.`suborder_id` AS soid,ms.`store_name`,ms.`seller_id` AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM " . get_tabname('ms_suborder') . " mssu 
+        LEFT JOIN  " . get_tabname('order') . " o ON (o.order_id = mssu.order_id)
+        LEFT JOIN " . get_tabname('ms_seller') . " ms ON (ms.seller_id = mssu.seller_id)
+        LEFT JOIN " . get_tabname('order_status') . " os ON (o.order_status_id = os.order_status_id) 
+        WHERE o.customer_id = '" . (int)$this->customer->getId() . "' " . $status_where . "AND o.store_id = '0' 
+        AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' 
+        ORDER BY mssu.suborder_id 
+        DESC LIMIT " . (int)$start . "," . (int)$limit;*/
+
+        $fields         = format_find_field('order_id,date_added,currency_code,currency_value','o');
+        $fields         .= ',' . format_find_field('product_id,image','p');
+        $fields         .= ',' . format_find_field('author,text,rating,order_product_review_id AS reviewed','opr');
+        $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');
+
+        $sql = 'SELECT op.*, ' . $fields . ' FROM ' . get_tabname('order_product') . ' op
+                        LEFT JOIN ' . get_tabname('ms_order_product') .' msop ON (msop.order_product_id = op.order_product_id)
+                        LEFT JOIN ' . get_tabname('ms_seller') . ' ms ON (ms.seller_id = msop.seller_id)
+                        LEFT JOIN ' . get_tabname('order') .' o ON (o.order_id = op.order_id)
+                        LEFT JOIN ' . get_tabname('product') .' p ON (op.product_id = p.product_id)
+                        LEFT JOIN ' . get_tabname('order_product_review') .' opr ON (opr.order_product_id = op.order_product_id)
+                        WHERE (' .implode(' OR ', $implode).') AND (opr.parent_id = 0 OR opr.parent_id IS NULL) ';
+
+        $implode = array();
+
+        if (isset($data['filter_reviewed'])) {
+            if ($data['filter_reviewed']) {
+                $implode[] = 'opr.order_product_review_id IS NOT NULL';
+            } else {
+                $implode[] = 'opr.order_product_review_id IS NULL';
+            }
+        }
+
+        if (isset($data['filter_customer_id'])) {
+            $implode[] = "o.customer_id = '".(int) $data['filter_customer_id']."'";
+        }
+
+        if (isset($data['filter_order_id'])) {
+            $implode[] = "o.order_id = '".(int) $data['filter_order_id']."'";
+        }
+
+        if (isset($data['filter_date_added'])) {
+            $implode[] = "DATE(o.date_added) = DATE('".$this->db->escape($data['filter_date_added'])."')";
+        }
+
+        if ($implode) {
+            $sql .= ' AND '.implode(' AND ', $implode);
+        }
+
+        $sort_data = array(
+            'o.order_id',
+            'o.date_added',
+        );
+
+        if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+            $sql .= ' ORDER BY '.$data['sort'];
+        } else {
+            $sql .= ' ORDER BY o.date_added';
+        }
+
+        if (isset($data['order']) && ($data['order'] == 'ASC')) {
+            $sql .= ' ASC';
+        } else {
+            $sql .= ' DESC';
+        }
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 10;
+            }
+
+            $sql .= ' LIMIT '.(int) $data['start'].','.(int) $data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
+    }
+
     public function getOreview($order_product_review_id)
     {
         $query = $this->db->query('SELECT * FROM '.DB_PREFIX."order_product_review WHERE order_product_review_id = '".(int) $order_product_review_id."'");

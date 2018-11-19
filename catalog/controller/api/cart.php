@@ -88,6 +88,7 @@ class ControllerApiCart extends Controller {
             //格式化一下数组
             $products 			= [];
             foreach ($this->load->getViewData('products') as $key => $value) {
+                sort($value);
             	$products[] 	= $value;
             }
 

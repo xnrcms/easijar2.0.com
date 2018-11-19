@@ -335,6 +335,31 @@ class ModelAccountOrder extends Model {
         return $order_query->row;
     }
 
+    public function checkOrderProductStatusForMs($order_product_id = 0,$status = 0)
+    {
+        $order_product_id   = (int)$order_product_id;
+        if ( $order_product_id <= 0 )  return [];
+
+        $fields         = format_find_field('order_id,order_product_id','op');
+        $fields         .= ',' . format_find_field('seller_id','msop');
+
+        $order_query = $this->db->query("SELECT " . $fields . " FROM " . get_tabname('order_product') . " op LEFT JOIN " . get_tabname('ms_order_product') . " msop ON (op.order_product_id = msop.order_product_id) WHERE op.order_product_id = '" . $order_product_id . "'");
+
+        $product_info   = $order_query->num_rows ? $order_query->row : [];
+        if (!empty($product_info)) {
+
+            $order_query = $this->db->query("SELECT o.`order_id`,mssu.`order_status_id` FROM " . get_tabname('ms_suborder') . " mssu LEFT JOIN " . get_tabname('order') . " o ON (o.order_id = mssu.order_id) WHERE mssu.order_id = '" . $product_info['order_id'] . "' AND mssu.seller_id = '" . $product_info['seller_id'] . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");
+            
+            foreach ($order_query->rows as $value) {
+                if ($value['order_status_id'] != $status) return 1;
+            }
+
+            return 2;
+        }else{
+            return 0;
+        }
+    }
+
     public function getOrderProductForMsByOrderProductId($product_id = 0)
     {
         $product_id = (int)$product_id;
@@ -426,9 +451,9 @@ class ModelAccountOrder extends Model {
         $order_type         = (int)$order_type;
 
         if ($order_type == 0) {
-            $status_where       = "AND o.order_status_id > '0' ";
+            $status_where       = "AND mssu.order_status_id > '0' ";
         }elseif ($order_type == 1) {
-            $status_where   = "AND o.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' ";
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' ";
         }elseif ($order_type == 2) {
 
             $unshipped_status = $this->config->get('config_paid_status');
@@ -437,13 +462,24 @@ class ModelAccountOrder extends Model {
                 $unshipped_status[] = $this->config->get('payment_cod_order_status_id');
             }
 
-            $status_where   = "AND o.order_status_id in ('" . implode("','",$unshipped_status) . "') ";
+            $status_where   = "AND mssu.order_status_id in ('" . implode("','",$unshipped_status) . "') ";
         }elseif ($order_type == 3) {
-            $status_where   = "AND o.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' ";
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' ";
+        }elseif($order_type == 4){
+            $order_statuses = $this->config->get('config_complete_status');
+            foreach ($order_statuses as $order_status_id) {
+                $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
+            }
+
+            $status_where   = "AND " . implode(" OR ",$implode) . ' ';
         }
 
+        $fields         = format_find_field('order_id AS oid,date_added,currency_code,currency_value','o');
+        $fields         .= ',' . format_find_field('order_status_id AS status_id,suborder_id AS soid,order_sn,total','mssu');
+        $fields         .= ',' . format_find_field('name AS status','os');
+        $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');
 
-        $sql        = "SELECT o.`order_id` AS oid,o.`order_status_id` as status_id,mssu.`order_sn`,mssu.`suborder_id` AS soid,ms.`store_name`,ms.`seller_id` AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM " . get_tabname('ms_suborder') . " mssu 
+        $sql        = "SELECT " . $fields . " FROM " . get_tabname('ms_suborder') . " mssu 
         LEFT JOIN  " . get_tabname('order') . " o ON (o.order_id = mssu.order_id)
         LEFT JOIN " . get_tabname('ms_seller') . " ms ON (ms.seller_id = mssu.seller_id)
         LEFT JOIN " . get_tabname('order_status') . " os ON (o.order_status_id = os.order_status_id) 

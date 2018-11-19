@@ -32,11 +32,10 @@ class ControllerApiDispute extends Controller {
         if (empty($product_info) || !((int)$product_info['seller_id'] > 0 && (int)$product_info['seller_id'] === (int)$order_info['seller_id'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
         }
-
-        $pnum               = (int)$product_info['quantity'];
-        $ptotal             = (float)($product_info['price'] * $pnum);
+        
+        $quantity           = ((int)$req_data['quantity'] <= 0 || (int)$req_data['quantity'] >= (int)$product_info['quantity']) ? (int)$product_info['quantity'] : (int)$req_data['quantity'];
+        $ptotal             = (float)($product_info['price'] * $quantity);
         $refund_money       = ((float)$req_data['refund_money'] <= 0 || (float)$req_data['refund_money'] >= $ptotal) ? $ptotal : (float)$req_data['refund_money'];
-        $quantity           = ((int)$req_data['quantity'] <= 0 || (int)$req_data['quantity'] >= $pnum) ? $pnum : (int)$req_data['quantity'];
 
         $this->load->model('account/return');
 

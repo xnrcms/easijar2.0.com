@@ -17,6 +17,7 @@ $_['text_no_reviews']         = '此商品暂无评价。';
 $_['text_note']               = '<span class="text-danger">注意</span> 评价内容不支持HTML代码！';
 $_['text_success_unapproved'] = '感谢您的评价，您的评价将在审核后显示。';
 $_['text_success_approved']   = '感谢您的评价。';
+$_['text_success']        	  = '谢谢你的评论。已提交网站管理员审批。';
 $_['text_empty']              = '没有评价商品';
 $_['text_image_max_5']        = '评价最多只能上传6个图片，您已超出！';
 
@@ -55,3 +56,4 @@ $_['error_captcha']           = '警告：验证码输入错误！';
 $_['error_alredy_reviewed']   = '警告：您已经评价过该商品，不能重复评价';
 $_['error_not_found']         = '错误：没有找到要评价的商品！';
 $_['error_alredy_additional'] = '错误：一个评论只能追评一次！';
+$_['error_order_status']      = '订单状态异常！';

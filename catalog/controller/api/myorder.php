@@ -24,51 +24,82 @@ class ControllerApiMyorder extends Controller {
         }
 
         //允许订单类型
-        if (!in_array($req_data['order_type'], [0,1,2,3])) {
+        if (!in_array($req_data['order_type'], [0,1,2,3,4,5])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:order_type is error']));
         }
 
         $page 			= isset($req_data['page']) ? ((int)$req_data['page'] > 0 ? (int)$req_data['page'] : 1) : 1;
+        $limit          = 10;
 
-        $this->load->model('account/order');
 		$this->load->model('tool/image');
 
-        //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
-        $results = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * 10, 10);
+        if ($req_data['order_type'] == 5) {
+            
+            $this->load->model('account/return');
 
+            $results            = $this->model_account_return->getReturnsForMs(($page - 1) * $limit, $limit);
 
-        $oid        = [];
-        foreach ($results as $key => $value) {
-            $oid[$value['oid']]     = $value['oid'];
-        }
+            foreach ($results as $keys =>$result)
+            {
+                $results[$keys]['image']        = $this->model_tool_image->resize($result['image'], 100, 100);
 
-        $ms_total                  = $this->model_account_order->getTotalsForMsByCode($oid,'multiseller_shipping');
-        $shipping                  = [];
-        foreach ($ms_total as $mskey => $msval) {
-            $shipping[$msval['order_id'].'-'.$msval['seller_id']]   = $msval['value'];
-        }
-
-        foreach ($results as $keys =>$result)
+                unset($results[$keys]['is_service']);
+                unset($results[$keys]['order_id']);
+            }
+        }/*elseif ($req_data['order_type'] == 4)
         {
-            $shipping                  = isset($shipping[$result['oid'].'-'.$result['msid']]) ? $shipping[$result['oid'].'-'.$result['msid']] : 0;
+            $this->load->model('account/oreview');
 
-            $results[$keys]['oid']     = $result['soid'];
+            $filter_data = [
+                'filter_customer_id'    => $this->customer->getId(),
+                'start'                 => ($page - 1) * $limit,
+                'limit'                 => $limit,
+            ];
 
-            $results[$keys]['total']     = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
-            $results[$keys]['shipping']  = $this->currency->format($shipping, $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+            $results = $this->model_account_oreview->getOreviewsForMs($filter_data);
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success11111','data'=>$results]));
+        }*/
+        else
+        {
+            $this->load->model('account/order');
 
-        	foreach ($result['product_info'] as $reskey => $resval) {
-                $results[$keys]['product_info'][$reskey]['price']   = $this->currency->format($resval['price'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
-        		$results[$keys]['product_info'][$reskey]['total'] 	= $this->currency->format($resval['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+            //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
+            $results = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * $limit, $limit);
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success222222','data'=>$results]));
 
-        		$results[$keys]['product_info'][$reskey]['image'] 	= $this->model_tool_image->resize($resval['image'], 100, 100);
+            $oid        = [];
+            foreach ($results as $key => $value) {
+                $oid[$value['oid']]     = $value['oid'];
+            }
 
-                unset($results[$keys]['product_info'][$reskey]['tax']);
-        	}
+            $ms_total                  = $this->model_account_order->getTotalsForMsByCode($oid,'multiseller_shipping');
+            $shipping                  = [];
+            foreach ($ms_total as $mskey => $msval) {
+                $shipping[$msval['order_id'].'-'.$msval['seller_id']]   = $msval['value'];
+            }
 
-            unset($results[$keys]['currency_code']);
-            unset($results[$keys]['currency_value']);
-            unset($results[$keys]['soid']);
+            foreach ($results as $keys =>$result)
+            {
+                $shipping                  = isset($shipping[$result['oid'].'-'.$result['msid']]) ? $shipping[$result['oid'].'-'.$result['msid']] : 0;
+
+                $results[$keys]['oid']     = $result['soid'];
+
+                $results[$keys]['total']     = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+                $results[$keys]['shipping']  = $this->currency->format($shipping, $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+
+                foreach ($result['product_info'] as $reskey => $resval) {
+                    $results[$keys]['product_info'][$reskey]['price']   = $this->currency->format($resval['price'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+                    $results[$keys]['product_info'][$reskey]['total']   = $this->currency->format($resval['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+
+                    $results[$keys]['product_info'][$reskey]['image']   = $this->model_tool_image->resize($resval['image'], 100, 100);
+
+                    unset($results[$keys]['product_info'][$reskey]['tax']);
+                }
+
+                unset($results[$keys]['currency_code']);
+                unset($results[$keys]['currency_value']);
+                unset($results[$keys]['soid']);
+            }
         }
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$results]));
