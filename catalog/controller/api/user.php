@@ -363,7 +363,7 @@ class ControllerApiUser extends Controller {
         $telephone 		= array_get($req_data, 'telephone','');
         $tags 			= md5('smscode-'.$telephone.'-'.$req_data['scene']);
 
-        $telephones 	= explode('-', telephone);
+        $telephones 	= explode('-', $telephone);
         if (count($telephones) < 2 || !strlen($telephones[0]) || !strlen($telephones[1] || strlen($telephones[0]) > 4)) {
         	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
         }
