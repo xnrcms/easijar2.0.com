@@ -787,9 +787,9 @@ if (!function_exists('get_tabname'))
     }
 }
 
-if (!function_exists('is_mobile')) 
+if (!function_exists('is_telephone')) 
 {
-    function is_mobile($mobile)
+    function is_telephone($mobile)
     {
         return (preg_match('/^1(3[0-9]|4[0-9]|5[0-35-9]|7[0-9]|8[0-9])\\d{8}$/', $mobile)) ? true : false;
     }

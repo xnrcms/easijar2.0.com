@@ -362,8 +362,8 @@ class ControllerApiUser extends Controller {
 
         $telephone 		= array_get($req_data, 'telephone','');
         $tags 			= md5('smscode-'.$telephone.'-'.$req_data['scene']);
-
-        if (utf8_strlen($telephone) != 11 || !is_mobile($telephone)) {
+        
+        if (utf8_strlen($telephone) != 11 || !is_telephone($telephone)) {
         	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
         }
 
