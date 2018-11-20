@@ -53,3 +53,4 @@ $_['error_telephone_format']         = '请输入正确格式的手机号码';
 $_['error_smscode']                  = '错误：验证码输入错误！';
 $_['error_telephone_eq']             = '错误：您的手机号码必须是校验手机号码，不能接收校验码后修改为另一个！';
 $_['error_not_email']             	 = '错误：该邮箱地址未被注册、请换一个电子邮箱！';
+$_['error_not_telephone']            = '错误：该手机号未被注册、请换一个手机号！';

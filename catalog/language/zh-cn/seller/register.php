@@ -54,3 +54,14 @@ $_['error_country']             = '请选择国家！';
 $_['error_zone']                = '请选择区域！';
 $_['error_city']                = '请选择城市！';
 $_['error_county']              = '请选择区县！';
+
+
+$_['error_true_name']           = '真实姓名必须在 1 到 10 字符之间！';
+$_['error_address']           	= '详细地址必须在 2 到 40 字符之间！';
+$_['error_experience']          = '店铺经验必须在 1 到 40 字符之间！';
+$_['error_company_type']        = '公司类型选择错误！';
+$_['error_license']        		= '营业执照必须在 15 到 20 字符之间！';
+$_['error_legal_person']        = '法人姓名必须在 1 到 10 字符之间！';
+$_['error_idnum']        		= '身份证格式错误！';
+$_['error_images']        		= '图片上传不完整！';
+$_['error_telephone']           = '手机号码错误，请输入正确电话号码！';

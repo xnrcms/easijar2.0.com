@@ -348,7 +348,7 @@ class ControllerApiUser extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('account/register');
 
-        $allowKey       = ['api_token','telephone','captcha'];
+        $allowKey       = ['api_token','telephone','scene'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
@@ -356,43 +356,36 @@ class ControllerApiUser extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
 
-        $telephone 		= array_get($req_data, 'telephone','');
-
-        if (empty($telephone)) {
-        	return $this->response->setOutput($this->returnData(['msg'=>'fail:telephone is empty']));
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:token is error']));
         }
 
-		if (is_ft()) {
-            $telephones 		= explode('-', $telephone);
-            if (count($telephones) < 2 || !strlen($telephones[0]) || !strlen($telephones[1] || strlen($telephones[0]) > 4)) {
-            	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
-            }
-        } else {
-            if (array_get($this->request->post, 'telephone') && ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32))) {
-                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
-            }
+        $telephone 		= array_get($req_data, 'telephone','');
+        $tags 			= md5('smscode-'.$telephone.'-'.$req_data['scene']);
+
+        if (utf8_strlen($telephone) != 11 || !is_mobile($telephone)) {
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
+        }
+
+        if (isset($this->session->data['smscode']) && isset($this->session->data['smscode'][$tags]) && ($this->session->data['smscode'][$tags]['send_time']) >= time() ) {
+        	return $this->response->setOutput($this->returnData(['msg'=>'fail:send too fast']));
         }
 
         $this->load->model('account/customer');
-        if ($this->model_account_customer->getTotalCustomersByTelephone($telephone)) {
-        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone_exists')]));
+
+        if ( isset($req_data['scene']) && (int)$req_data['scene'] == 1)
+        {
+        	if ($this->model_account_customer->getTotalCustomersByTelephone($telephone))
+        	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_telephone_exists')]) );
+        }elseif ( isset($req_data['scene']) && (int)$req_data['scene'] == 2) {
+        	if (!$this->model_account_customer->getTotalCustomersByEmail($telephone))
+        	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_not_telephone')]) );
         }
 
-		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('register', (array)$this->config->get('config_captcha_page'))) {
-            $this->load->language('extension/captcha/basic', 'captcha');
-            if (!isset($this->session->data['captcha']) || empty($this->session->data['captcha'])
-                || !isset($this->request->post['captcha']) || ($this->session->data['captcha'] != $this->request->post['captcha'])
-            ) {
-        		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('captcha')->get('error_captcha')]));
-            }
-        }
+        if (isset($this->session->data['smscode']))  unset($this->session->data['smscode']);
 
         $code 										= mt_rand(100000, 999999); //生成校验码
-        $this->session->data['smscode'][$email] 	= [
-        	'code'      	=> $code,
-            'send_time'		=> time()+(60*2),
-            'expiry_time'   => time()+(60*10)
-        ];
+        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
 
         $this->load->model('notify/notify');
         $ret = $this->model_notify_notify->customerRegisterVerify($telephone, $code);

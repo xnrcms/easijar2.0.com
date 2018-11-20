@@ -54,3 +54,13 @@ $_['error_country']             = 'Please select a country';
 $_['error_zone']                = 'Please select a zone';
 $_['error_city']                = 'Please select a city';
 $_['error_county']              = 'Please select a county';
+
+$_['error_true_name']           = 'Real names must be between 1 and 10 characters!';
+$_['error_address']           	= 'The detailed address must be between 2 and 40 characters!';
+$_['error_experience']          = 'Store experience must be between 1 and 40 characters!';
+$_['error_company_type']        = 'Wrong choice of company type!';
+$_['error_license']        		= 'The business license must be between 15 and 20 characters!';
+$_['error_legal_person']        = "The legal person's name must be between 1 and 10 characters!";
+$_['error_idnum']        		= 'Wrong identity card format!';
+$_['error_images']        		= 'Picture upload is incomplete!';
+$_['error_telephone']           = 'Wrong phone number, please enter the correct phone number!';

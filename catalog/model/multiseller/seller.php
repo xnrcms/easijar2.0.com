@@ -12,6 +12,53 @@ class ModelMultisellerSeller extends Model {
 		$this->db->query("UPDATE " . DB_PREFIX . "ms_seller SET store_name = '" . $this->db->escape((string)$data['store_name']) . "', company = '" . $this->db->escape((string)$data['company']) . "', description = '" . $this->db->escape((string)$data['description']) . "', country_id = '" . (int)$data['country_id'] . "', zone_id = '" . (int)$data['zone_id'] . "', city_id = '" . (int)$data['city_id'] . "', county_id = '" . (int)$data['county_id'] . "', avatar = '" . $this->db->escape((string)$data['avatar']) . "', banner = '" . $this->db->escape((string)$data['banner']) . "', alipay = '" . $this->db->escape((string)$data['alipay']) . "', date_modified = NOW() WHERE `seller_id` = '" . (int)$seller_id . "'");
 	}
 
+	public function saveSeller($seller_id, $data)
+	{
+		//根据seller_id查找是否有商家信息
+		$query 				= $this->db->query("SELECT `seller_id` FROM `" . DB_PREFIX . "ms_seller` WHERE `seller_id` = '" . (int)$seller_id . "'");
+
+		if (isset($query->row['seller_id']) && $query->row['seller_id'] > 0)
+		{
+			$seller_id 		= $query->row['seller_id'];
+
+			$sql 			= "UPDATE " . get_tabname('ms_seller') . " SET ";
+			$sql 			.= isset($data['store_name']) ? ",`store_name` = '" . $this->db->escape((string)$data['store_name']) . "'" : '';
+			$sql 			.= isset($data['company']) ? ",`company` = '" . $this->db->escape((string)$data['company']) . "'" : '';
+			$sql 			.= isset($data['description']) ? ",`description` = '" . $this->db->escape((string)$data['description']) . "'" : '';
+			$sql 			.= isset($data['country_id']) ? ",`country_id` = '" . (int)$data['country_id'] . "'" : '';
+			$sql 			.= isset($data['zone_id']) ? ",`zone_id` = '" . (int)$data['zone_id'] . "'" : '';
+			$sql 			.= isset($data['city_id']) ? ",`city_id` = '" . (int)$data['city_id'] . "'" : '';
+			$sql 			.= isset($data['county_id']) ? ",`county_id` = '" . (int)$data['county_id'] . "'" : '';
+			$sql 			.= isset($data['avatar']) ? ",`avatar` = '" . $this->db->escape((string)$data['avatar']) . "'" : '';
+			$sql 			.= ",`date_modified` = NOW() WHERE `seller_id` = '" . (int)$seller_id . "'";
+
+			$this->db->query($sql);
+		}
+		else
+		{
+			$sql 			= "INSERT INTO " . get_tabname('ms_seller') . " SET `seller_id` = '" . (int)$seller_id . "'";
+			$sql 			.= isset($data['store_name']) ? ",`store_name` = '" . $this->db->escape((string)$data['store_name']) . "'" : '';
+			$sql 			.= isset($data['company']) ? ",`company` = '" . $this->db->escape((string)$data['company']) . "'" : '';
+			$sql 			.= ",`seller_group_id` = '" . (int)$this->config->get('module_multiseller_seller_group') . "'";
+			$sql 			.= isset($data['alipay']) ? ",`alipay` = '" . $this->db->escape((string)$data['alipay']) . "'" : '';
+			$sql 			.= ",`product_validation` = '" . (int)!$this->config->get('module_multiseller_product_validation') . "'";
+			$sql 			.= isset($data['country_id']) ? ",`country_id` = '" . (int)$data['country_id'] . "'" : '';
+			$sql 			.= isset($data['city_id']) ? ",`city_id` = '" . (int)$data['city_id'] . "'" : '';
+			$sql 			.= isset($data['zone_id']) ? ",`zone_id` = '" . (int)$data['zone_id'] . "'" : '';
+			$sql 			.= isset($data['county_id']) ? ",`county_id` = '" . (int)$data['county_id'] . "'" : '';
+			$sql 			.= ",`status` = '" . (int)!$this->config->get('module_multiseller_seller_approval') . "'";
+			$sql 			.= isset($data['source']) ? ",`source` = '" . $this->db->escape((string)$data['source']) . "'" : '';
+			$sql 			.= ",`date_added` = NOW(), date_modified = NOW()";
+
+			$this->db->query($sql);
+
+			if ($this->config->get('module_multiseller_seller_approval')) {
+				$this->db->query("INSERT INTO `" . DB_PREFIX . "customer_approval` SET customer_id = '" . (int)$seller_id . "', type = 'seller', date_added = NOW()");
+			}
+		}
+
+		return $seller_id;
+	}
 	public function getSeller($seller_id) {
 		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "ms_seller` WHERE `seller_id` = '" . (int)$seller_id . "'");
 
