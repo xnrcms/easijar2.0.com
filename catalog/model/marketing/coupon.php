@@ -136,4 +136,10 @@ class ModelMarketingCoupon extends Model {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "coupon_customer` WHERE `coupon_id` = '" . (int)$coupon_id . "' AND customer_id = '" . (int)$customer_id . "'");
 		return $query->row['total'];
 	}
+
+	public function getCustomerCoupons()
+	{
+		$query = $this->db->query("SELECT `coupon_id` FROM " . get_tabname('coupon_customer') . " WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+		return $query->rows;
+	}
 }

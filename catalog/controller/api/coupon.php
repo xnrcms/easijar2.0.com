@@ -98,13 +98,25 @@ class ControllerApiCoupon extends Controller {
 			'date' => 1
 		];
 
-		$results = $this->model_marketing_coupon->getCoupons($filter_data,$req_data['seller_id']);
+        //获取用户已经领取的优惠券
+        $getCouponList              = [];
+        if ($this->customer->isLogged()) {
+            $coupons            = $this->model_marketing_coupon->getCustomerCoupons();
+            foreach ($coupons as $value) {
+                $getCouponList[]    = $value['coupon_id'];
+            }
+        }else{
+            $getCouponList    =  isset($this->session->data['getCouponList']) ? $this->session->data['getCouponList'] : [];
+        }
 
+        //商家优惠券列表
+		$results = $this->model_marketing_coupon->getCoupons($filter_data,$req_data['seller_id']);
 		foreach ($results as $result) {
 			$data['business'][] = array(
 				'coupon_id'  => $result['coupon_id'],
 				'name'       => $result['name'],
 				'discount'   => $result['discount'],
+                'get_status' => in_array($result['coupon_id'], $getCouponList) ? 1 : 0,
 				'date_start' => date($this->language->get('date_format_short'), strtotime($result['date_start'])),
 				'date_end'   => date($this->language->get('date_format_short'), strtotime($result['date_end'])),
 			);

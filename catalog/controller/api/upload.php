@@ -1,105 +1,114 @@
 <?php
-class ControllerToolUploadImg extends Controller {
-    public function index() {
+class ControllerApiUpload extends Controller{
+    public function image()
+    {
+        $this->response->addHeader('Content-Type: application/json');
         $this->load->language('tool/upload');
 
-        $json = array();
+        $allowKey       = ['api_token','tag'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
 
-        if (!empty($this->request->files['file']['name']) && is_file($this->request->files['file']['tmp_name']))
-        {
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z0-9_]{1,10}$/",$req_data['tag'])) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:tag is error']));
+        }
+
+        if (empty($username) || preg_match_all("/^[a-zA-Z0-9_]{6,18}$/",$username,$data) < 1){
+
+        }
+
+        $dirname        = $req_data['tag'] . '/';
+
+        if (!empty($this->request->files['file']['name']) && is_file($this->request->files['file']['tmp_name'])) {
             // Sanitize the filename
             $filename = basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($this->request->files['file']['name'], ENT_QUOTES, 'UTF-8')));
 
             // Validate the filename length
             if ((utf8_strlen($filename) < 2) || (utf8_strlen($filename) > 64)) {
-                $json['error'] = $this->language->get('error_filename');
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filename')]));
             }
 
             // Allowed file extension types
-            $allowed = array();
-
+            $allowed           = [];
             $extension_allowed = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_ext_allowed'));
-
-            $filetypes = explode("\n", $extension_allowed);
+            $filetypes         = explode("\n", $extension_allowed);
 
             foreach ($filetypes as $filetype) {
                 $allowed[] = trim($filetype);
             }
 
             if (!in_array(strtolower(substr(strrchr($filename, '.'), 1)), $allowed)) {
-                $json['error'] = $this->language->get('error_filetype');
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filename')]));
             }
 
             // Allowed file mime types
-            $allowed = array();
-
-            $mime_allowed = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_mime_allowed'));
-
-            $filetypes = explode("\n", $mime_allowed);
+            $allowed           = [];
+            $mime_allowed      = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_mime_allowed'));
+            $filetypes         = explode("\n", $mime_allowed);
 
             foreach ($filetypes as $filetype) {
-                $allowed[] = trim($filetype);
+                $allowed[]     = trim($filetype);
             }
 
             if (!in_array($this->request->files['file']['type'], $allowed)) {
-                $json['error'] = $this->language->get('error_filetype');
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filetype')]));
             }
 
             // Check to see if any PHP files are trying to be uploaded
-            $content = file_get_contents($this->request->files['file']['tmp_name']);
+            $content           = file_get_contents($this->request->files['file']['tmp_name']);
 
             if (preg_match('/\<\?php/i', $content)) {
-                $json['error'] = $this->language->get('error_filetype');
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filetype')]));
             }
 
             // Return any upload error
             if ($this->request->files['file']['error'] != UPLOAD_ERR_OK) {
-                $json['error'] = $this->language->get('error_upload_' . $this->request->files['file']['error']);
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload_' . $this->request->files['file']['error'])]));
             }
         } else {
-            $json['error'] = $this->language->get('error_upload');
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload')]));
         }
 
-        if (!$json) {
-            $file = $filename . '.' . token(32);
-            //文件名扰码由扩展名后改为扩展名前
-            $file = 'temp' . '.' . utf8_substr(mb_strrchr($filename, '.'), 1);
+        $file = $filename . '.' . token(32);
 
-            move_uploaded_file($this->request->files['file']['tmp_name'], DIR_IMAGE . 'review/' . $file);
+        //文件名扰码由扩展名后改为扩展名前
+        $file = 'temp' . '.' . utf8_substr(mb_strrchr($filename, '.'), 1);
 
-            $img = $this->resize('review/' . $file, 600, 600);
-            unlink(DIR_IMAGE . 'review/' . $file);
+        move_uploaded_file($this->request->files['file']['tmp_name'], DIR_IMAGE . $dirname . $file);
 
-            if ($this->request->server['HTTPS']) {
-                $json['imgurl'] =  $this->config->get('config_ssl') . 'image/' . $img;
-            } else {
-                $json['imgurl'] =  $this->config->get('config_url') . 'image/' . $img;
-            }
+        $img = $this->resize($dirname . $file, 600, 600,trim($dirname,'/'));
+        unlink(DIR_IMAGE . $dirname . $file);
 
-
-            // Hide the uploaded file name so people can not link to it directly.
-            $this->load->model('tool/upload');
-
-            $json['code'] = $img;
-
-            $json['success'] = $this->language->get('text_upload');
+        if ($this->request->server['HTTPS']) {
+            $json['imgurl'] =  $this->config->get('config_ssl') . 'image/' . $img;
+        } else {
+            $json['imgurl'] =  $this->config->get('config_url') . 'image/' . $img;
         }
 
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
+        $json['code'] = md5($img);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>$this->language->get('text_upload'),'data'=>$json]));
     }
 
-    public function resize($filename, $width, $height) {
-        if (!is_file(DIR_IMAGE . $filename)) {
-            return;
-        }
+    public function resize($filename, $width, $height,$dirname) 
+    {
+        if (!is_file(DIR_IMAGE . $filename)) return;
 
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
-
         $image_old = $filename;
-        $image_new = 'review/review-image-' . time() . '-' . (int)$width . 'x' . (int)$height . '.' . $extension;
+        $image_new = $dirname . '/' . $dirname . '-image-' . time() . '-' . (int)$width . 'x' . (int)$height . '.' . $extension;
 
-        if (!is_file(DIR_IMAGE . $image_new)) {
+        if (!is_file(DIR_IMAGE . $image_new))
+        {
             list($width_orig, $height_orig, $image_type) = getimagesize(DIR_IMAGE . $image_old);
                  
             if (!in_array($image_type, array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF))) { 
