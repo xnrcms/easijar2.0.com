@@ -93,7 +93,7 @@ class ModelAccountCustomer extends Model {
 		return $query->row['total'];
 	}
 
-	public function getTotalCustomersByTelephone($telephone) {
+	public function getTotalCustomersByTelephone($telephone) {wr($telephone);
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer WHERE telephone = '" . $this->db->escape($telephone) . "'");
 
 		return $query->row['total'];

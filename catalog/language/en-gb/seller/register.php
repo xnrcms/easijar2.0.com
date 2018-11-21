@@ -40,6 +40,7 @@ $_['entry_zone']                = 'Zone';
 
 // Error
 $_['error_exists']              = 'Warning: E-Mail Address is already registered!';
+$_['error_exists_telephone']  	= 'Warning: Telephone Number is already registered!';
 $_['error_fullname']            = 'Full name must be between 1 and 32 characters!';
 $_['error_email']               = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']           = 'Telephone must be between 3 and 32 characters!';
@@ -55,7 +56,7 @@ $_['error_zone']                = 'Please select a zone';
 $_['error_city']                = 'Please select a city';
 $_['error_county']              = 'Please select a county';
 
-$_['error_true_name']           = 'Real names must be between 1 and 10 characters!';
+$_['error_true_name']           = 'Real names must be between 2 and 10 characters!';
 $_['error_address']           	= 'The detailed address must be between 2 and 40 characters!';
 $_['error_experience']          = 'Store experience must be between 1 and 40 characters!';
 $_['error_company_type']        = 'Wrong choice of company type!';

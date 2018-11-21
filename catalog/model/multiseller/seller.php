@@ -21,7 +21,7 @@ class ModelMultisellerSeller extends Model {
 		{
 			$seller_id 		= $query->row['seller_id'];
 
-			$sql 			= "UPDATE " . get_tabname('ms_seller') . " SET ";
+			$sql 			= '';
 			$sql 			.= isset($data['store_name']) ? ",`store_name` = '" . $this->db->escape((string)$data['store_name']) . "'" : '';
 			$sql 			.= isset($data['company']) ? ",`company` = '" . $this->db->escape((string)$data['company']) . "'" : '';
 			$sql 			.= isset($data['description']) ? ",`description` = '" . $this->db->escape((string)$data['description']) . "'" : '';
@@ -30,24 +30,34 @@ class ModelMultisellerSeller extends Model {
 			$sql 			.= isset($data['city_id']) ? ",`city_id` = '" . (int)$data['city_id'] . "'" : '';
 			$sql 			.= isset($data['county_id']) ? ",`county_id` = '" . (int)$data['county_id'] . "'" : '';
 			$sql 			.= isset($data['avatar']) ? ",`avatar` = '" . $this->db->escape((string)$data['avatar']) . "'" : '';
+			$sql 			.= isset($data['true_name']) ? ",`ext_true_name` = '" . $this->db->escape((string)$data['true_name']) . "'" : '';
+			$sql 			.= isset($data['address']) ? ",`ext_address` = '" . $this->db->escape((string)$data['address']) . "'" : '';
+			$sql 			.= isset($data['experience']) ? ",`ext_experience` = '" . $this->db->escape((string)$data['experience']) . "'" : '';
+			$sql 			.= isset($data['company_type']) ? ",`ext_company_type` = '" . (int)$data['company_type'] . "'" : '';
+			$sql 			.= isset($data['license']) ? ",`ext_license` = '" . $this->db->escape((string)$data['license']) . "'" : '';
+			$sql 			.= isset($data['legal_person']) ? ",`ext_legal_person` = '" . $this->db->escape((string)$data['legal_person']) . "'" : '';
+			$sql 			.= isset($data['idnum']) ? ",`ext_idnum` = '" . $this->db->escape((string)$data['idnum']) . "'" : '';
+			$sql 			.= isset($data['images']) ? ",`ext_image` = '" . $this->db->escape((string)$data['images']) . "'" : '';
 			$sql 			.= ",`date_modified` = NOW() WHERE `seller_id` = '" . (int)$seller_id . "'";
-
-			$this->db->query($sql);
+			$sql 			= trim($sql,',');
+			if (!empty($sql)) {
+				$this->db->query("UPDATE " . get_tabname('ms_seller') . " SET " . $sql);
+			}
 		}
 		else
 		{
 			$sql 			= "INSERT INTO " . get_tabname('ms_seller') . " SET `seller_id` = '" . (int)$seller_id . "'";
 			$sql 			.= isset($data['store_name']) ? ",`store_name` = '" . $this->db->escape((string)$data['store_name']) . "'" : '';
 			$sql 			.= isset($data['company']) ? ",`company` = '" . $this->db->escape((string)$data['company']) . "'" : '';
-			$sql 			.= ",`seller_group_id` = '" . (int)$this->config->get('module_multiseller_seller_group') . "'";
 			$sql 			.= isset($data['alipay']) ? ",`alipay` = '" . $this->db->escape((string)$data['alipay']) . "'" : '';
-			$sql 			.= ",`product_validation` = '" . (int)!$this->config->get('module_multiseller_product_validation') . "'";
 			$sql 			.= isset($data['country_id']) ? ",`country_id` = '" . (int)$data['country_id'] . "'" : '';
 			$sql 			.= isset($data['city_id']) ? ",`city_id` = '" . (int)$data['city_id'] . "'" : '';
 			$sql 			.= isset($data['zone_id']) ? ",`zone_id` = '" . (int)$data['zone_id'] . "'" : '';
 			$sql 			.= isset($data['county_id']) ? ",`county_id` = '" . (int)$data['county_id'] . "'" : '';
+			$sql 			.= isset($data['source']) ? ",`ext_source` = '" . $this->db->escape((string)$data['source']) . "'" : '';
+			$sql 			.= ",`product_validation` = '" . (int)!$this->config->get('module_multiseller_product_validation') . "'";
+			$sql 			.= ",`seller_group_id` = '" . (int)$this->config->get('module_multiseller_seller_group') . "'";
 			$sql 			.= ",`status` = '" . (int)!$this->config->get('module_multiseller_seller_approval') . "'";
-			$sql 			.= isset($data['source']) ? ",`source` = '" . $this->db->escape((string)$data['source']) . "'" : '';
 			$sql 			.= ",`date_added` = NOW(), date_modified = NOW()";
 
 			$this->db->query($sql);

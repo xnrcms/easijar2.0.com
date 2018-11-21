@@ -18,15 +18,11 @@ class ControllerApiUpload extends Controller{
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
-        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z0-9_]{1,10}$/",$req_data['tag'])) {
+        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z]{1}[a-zA-Z0-9_]{9}$/",$req_data['tag'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:tag is error']));
         }
 
-        if (empty($username) || preg_match_all("/^[a-zA-Z0-9_]{6,18}$/",$username,$data) < 1){
-
-        }
-
-        $dirname        = $req_data['tag'] . '/';
+        $dirname                        = $req_data['tag'] . '/';
 
         if (!empty($this->request->files['file']['name']) && is_file($this->request->files['file']['tmp_name'])) {
             // Sanitize the filename

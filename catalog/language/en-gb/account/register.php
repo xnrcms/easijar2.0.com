@@ -47,3 +47,4 @@ $_['error_smscode']        		= 'The verification code error!';
 $_['error_telephone_eq']   		= 'Telephone number error! The telephone number must be the telephone that received verification code';
 $_['error_not_email']      		= 'Error: the mailbox address is not registered, please change an e-mail address£¡';;
 $_['error_not_telephone']      	= 'Error: the phone number has not been registered, please change a mobile phone number';
+$_['error_address']           	= 'Error: the detailed address must be between 2 and 10 characters.';

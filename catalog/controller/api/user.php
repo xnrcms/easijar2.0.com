@@ -360,7 +360,7 @@ class ControllerApiUser extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:token is error']));
         }
 
-        $telephone 		= array_get($req_data, 'telephone','');
+        $telephone 		= trim(array_get($req_data, 'telephone',''),'+');
         $tags 			= md5('smscode-'.$telephone.'-'.$req_data['scene']);
 
         $telephones 	= explode('-', $telephone);
