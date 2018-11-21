@@ -35,12 +35,14 @@ class ControllerSellerEvent extends Controller {
                     $seller_id          = $seller_info ? $seller_info['seller_id'] : 0;
 
                     if (isset($products[$seller_id])) {
+                        $products[$seller_id]['checked']        += (int)$product['checked'];
                         $products[$seller_id]['products'][]     = $product;
                     } else {
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
                             'store_name'    => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
                             'shipping'      => 0,
+                            'checked'       => (int)$product['checked'],
                             'products'      => array($product),
                         ];
                     }

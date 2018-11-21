@@ -73,6 +73,7 @@ class ControllerApiCart extends Controller {
 
                 $data['products'][] = array(
                     'cart_id'   => $product['cart_id'],
+                    'checked'   => (int)$product['selected'],
                     'thumb'     => $image,
                     'name'      => $product['name'],
                     'quantity'  => $product['quantity'],
