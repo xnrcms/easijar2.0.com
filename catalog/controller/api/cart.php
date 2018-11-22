@@ -72,15 +72,16 @@ class ControllerApiCart extends Controller {
                 }
 
                 $data['products'][] = array(
-                    'cart_id'   => $product['cart_id'],
-                    'checked'   => (bool)$product['selected'],
-                    'thumb'     => $image,
-                    'name'      => $product['name'],
-                    'quantity'  => $product['quantity'],
-                    'stock'     => $product['stock'] ? true : !(!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning')),
-                    'price'     => $price,
-                    'nprice'    => $nprice,
-                    'oprice'    => $oprice,
+                    'product_id'    => (int)$product['product_id'],
+                    'cart_id'       => $product['cart_id'],
+                    'checked'       => (bool)$product['selected'],
+                    'thumb'         => $image,
+                    'name'          => $product['name'],
+                    'quantity'      => $product['quantity'],
+                    'stock'         => $product['stock'] ? true : !(!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning')),
+                    'price'         => $price,
+                    'nprice'        => $nprice,
+                    'oprice'        => $oprice,
                 );
             }
 
