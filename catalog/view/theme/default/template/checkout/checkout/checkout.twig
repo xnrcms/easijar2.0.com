@@ -258,7 +258,7 @@ function submit() {
   {% if not logged %}
   data['account'] = account_type;
   {% endif %}
-  $('.quick-checkout-wrapper input[type="hidden"], .quick-checkout-wrapper input[type="text"], .quick-checkout-wrapper input[type="password"], .quick-checkout-wrapper select, .quick-checkout-wrapper input:checked, .quick-checkout-wrapper textarea[name="comment"]').each(function () {
+  $('.quick-checkout-wrapper input[type="hidden"], .quick-checkout-wrapper input[type="text"], .quick-checkout-wrapper input[type="password"], .quick-checkout-wrapper select, .quick-checkout-wrapper input:checked, .quick-checkout-wrapper textarea').each(function () {
     data[$(this).attr('name')] = $(this).val();
   });
 

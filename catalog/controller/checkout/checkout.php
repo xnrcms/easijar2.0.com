@@ -295,7 +295,7 @@ class ControllerCheckoutCheckout extends Controller
         }
 
         $this->log($this->request->post);
-print_r($this->request->post);exit();
+
         $order_data = array();
 
         $order_data['payment_address'] = array();
@@ -392,8 +392,15 @@ print_r($this->request->post);exit();
             unset($this->session->data['shipping_method']);
         }
 
-        // Comment
-        $order_data['comment'] = array_get($this->request->post, 'comment', '');
+        // Commentcomment_
+        $comment            = [];
+        foreach ($this->request->post as $key => $value) {
+            if (strpos($key, 'comment_') === 0) {
+                $comment[trim($key,'comment_')]     = $value;
+            }
+        }
+
+        $order_data['comment'] = $comment;
 
         // Terms & conditions agreement
         if ($this->config->get('config_checkout_id')) {
@@ -419,7 +426,7 @@ print_r($this->request->post);exit();
 
         try {
             // Comment
-            $this->session->data['comment'] = $order_data['comment'];
+            $this->session->data['comment'] = json_encode($order_data['comment']);
 
             $order_id = $this->model_checkout_checkout->createOrder();
             $this->cart->clear();

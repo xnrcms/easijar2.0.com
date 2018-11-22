@@ -297,7 +297,7 @@ class Cart
             }
         }
         
-        return $this->data[$this->buy_type];
+        return isset($this->data[$this->buy_type]) ? $this->data[$this->buy_type] : [];
     }
 
     public function add($product_id, $quantity = 1, $option = array(), $recurring_id = 0)
