@@ -35,14 +35,14 @@ class ControllerSellerEvent extends Controller {
                     $seller_id          = $seller_info ? $seller_info['seller_id'] : 0;
 
                     if (isset($products[$seller_id])) {
-                        $products[$seller_id]['checked']        = ($products[$seller_id]['checked']) ? true : (bool)$product['checked'];
+                        $products[$seller_id]['checked']        = ($products[$seller_id]['checked']) ? true : (bool)(isset($product['checked']) ? $product['checked'] : 0);
                         $products[$seller_id]['products'][]     = $product;
                     } else {
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
                             'store_name'    => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
                             'shipping'      => 0,
-                            'checked'       => (bool)$product['checked'],
+                            'checked'       => (bool)(isset($product['checked']) ? $product['checked'] : 0),
                             'products'      => array($product),
                         ];
                     }
@@ -61,7 +61,7 @@ class ControllerSellerEvent extends Controller {
 
 		$this->load->model('tool/image');
 		$products = array();
-
+        
 		foreach ($this->cart->getProducts() as $product) {
 			$image = $this->model_tool_image->resize($product['image'] ?: 'placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_height'));
 

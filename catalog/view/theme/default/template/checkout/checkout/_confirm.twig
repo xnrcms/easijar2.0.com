@@ -34,6 +34,14 @@
               <td class="text-right">{{ product.total }}</td>
             </tr>
             {% endfor %}
+            <tr>
+              <td colspan="6">
+                <div class="checkout-section" id="comment-section">
+                  <h2>{{ text_comments }}</h2>
+                  <textarea name="comment" rows="2" class="form-control">{{ comment }}</textarea>
+                </div>
+              </td>
+            </tr>
             {% for voucher in vouchers %}
             <tr>
               <td></td>

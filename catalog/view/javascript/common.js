@@ -571,43 +571,24 @@ $(document).on('click', '.agree', function(e) {
     ajax: function(settings, $element) {
       if ( !settings.data.length ) return;
       $.ajax({
-        url: 'index.php?route=checkout/cart/add',
+        url: 'index.php?route=checkout/cart/add&buy_type=1',
         type: 'post',
         data: $(settings.data.join(',')),
         dataType: 'json',
         success: function(json) {
-
-          if ( settings.cartSuccessFn ) {
-            settings.cartSuccessFn($element);
+          if (json['error']) {
+            layer.msg(json['error'], {icon: 2},function(){
+              if (json['redirect']) { location.href = json['redirect']; }
+            });
             return;
           }
 
-          $('.alert-dismissible, .text-danger').remove();
-          $('.form-group').removeClass('has-error');
-
-          if (json['error']) {
-            if (json['error']['option']) {
-              for (i in json['error']['option']) {
-                var element = $('#input-option' + i.replace('_', '-'));
-
-                if (element.parent().hasClass('input-group')) {
-                  element.parent().after('<div class="text-danger">' + json['error']['option'][i] + '</div>');
-                } else {
-                  element.after('<div class="text-danger">' + json['error']['option'][i] + '</div>');
-                }
-              }
-            }
-
-            $('.text-danger').parent().addClass('has-error');
-
-            if (json['error']['flash_count']) {
-              layer.msg(json['error']['flash_count'], {icon: 2});
-            }
-          }
-
           if (json['success']) {
-            cart_ajax_load_html();
-            layer.msg(json['success']);
+
+            layer.msg(json['success'],{icon: 6,time:1000},function(){
+              if ( settings.cartSuccessFn ) { settings.cartSuccessFn($element);}
+            });
+            return;
           }
         },
       });

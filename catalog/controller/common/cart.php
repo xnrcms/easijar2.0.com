@@ -48,7 +48,7 @@ class ControllerCommonCart extends Controller {
 		}
 
 		$data['text_items'] = sprintf($this->language->get('text_items'), $this->cart->countProducts() + (isset($this->session->data['vouchers']) ? count($this->session->data['vouchers']) : 0) + (isset($this->session->data['recharges']) ? count($this->session->data['recharges']) : 0), $this->currency->format($total, $this->session->data['currency']));
-
+		$this->cart->setCartBuyType(0);
 		$data['cart_total_number'] = $this->cart->countProducts() + (isset($this->session->data['vouchers']) ? count($this->session->data['vouchers']) : 0) + (isset($this->session->data['recharges']) ? count($this->session->data['recharges']) : 0);
 
 		$this->load->model('tool/image');
@@ -135,8 +135,15 @@ class ControllerCommonCart extends Controller {
 		$data['totals'] = array();
 
 		foreach ($totals as $total) {
+			$title          = $total['title'];
+            if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
+                $titles     = explode('&', $title);
+                $title      = $titles[0] . $titles[2];
+            }
+            if ($total['code'] == 'shipping') continue;
+
 			$data['totals'][] = array(
-				'title' => $total['title'],
+				'title' => $title,
 				'text'  => $this->currency->format($total['value'], $this->session->data['currency']),
 			);
 		}

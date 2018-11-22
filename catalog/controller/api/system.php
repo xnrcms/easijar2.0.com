@@ -128,6 +128,8 @@ class ControllerApiSystem extends Controller {
         $json['country']            = [];
         $results                    = get_calling_codes();
 
+        $this->session->data['country_code']    = isset($this->session->data['country_code']) ? $this->session->data['country_code'] : '65';
+
         foreach ($results as $result) {
             $name       = explode('(',$result['name']);
             $json['country'][] = array(

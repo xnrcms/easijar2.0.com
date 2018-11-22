@@ -131,10 +131,10 @@ class ControllerApiCart extends Controller {
         if (!$this->customer->isLogged() && $buy_type == 1){
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
-
-    	$this->session->data['buy_type'] 		= $buy_type;
     	
     	if ( !in_array($buy_type, [0,1]) ) return $this->response->setOutput($this->returnData());
+
+        $this->session->data['buy_type']        = $buy_type;
 
     	$this->load->model('catalog/product');
 

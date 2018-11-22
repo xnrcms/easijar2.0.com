@@ -47,7 +47,7 @@ class Cart
 
     public function getCartProducts()
     {
-        if (!$this->data) {
+        if (!isset($this->data[$this->buy_type]) || !$this->data[$this->buy_type]) {
 
             $cart_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "cart WHERE (customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "') AND buy_type = '" . $this->buy_type . "'");
 
@@ -262,7 +262,7 @@ class Cart
                         $recurring = false;
                     }
 
-                    $this->data[] = array(
+                    $this->data[$this->buy_type][] = array(
                         'cart_id' => $cart['cart_id'],
                         'product_id' => $product_query->row['product_id'],
                         'name' => $product_query->row['name'],
@@ -297,7 +297,7 @@ class Cart
             }
         }
         
-        return $this->data;
+        return $this->data[$this->buy_type];
     }
 
     public function add($product_id, $quantity = 1, $option = array(), $recurring_id = 0)
@@ -310,7 +310,7 @@ class Cart
             $this->db->query("UPDATE " . DB_PREFIX . "cart SET quantity = (quantity + " . (int)$quantity . "), selected = '1' WHERE api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "' AND product_id = '" . (int)$product_id . "' AND recurring_id = '" . (int)$recurring_id . "' AND `option` = '" . $this->db->escape(json_encode($option)) . "' AND buy_type = '" . $this->buy_type . "'");
         }
 
-        $this->data = array();
+        $this->data[$this->buy_type] = [];
 
         if ($this->buy_type == 1) {
             return $this->db->getLastId();
@@ -324,15 +324,21 @@ class Cart
         if (\Flash::getSingleton()->canUpdateCart($cart_id, $quantity)) {
             $this->db->query("UPDATE " . DB_PREFIX . "cart SET quantity = '" . (int)$quantity . "' WHERE cart_id = '" . (int)$cart_id /*. "' AND api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) */. "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'");
 
-            $this->data = array();
+            $this->data[$this->buy_type] = [];
         }
     }
 
     public function remove($cart_id)
     {
-        $this->db->query("DELETE FROM " . DB_PREFIX . "cart WHERE cart_id = '" . (int)$cart_id . "' AND api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'");
+        $customer_id        = (int)$this->customer->getId();
+        if ($customer_id > 0) {
+            $sql = "DELETE FROM " . DB_PREFIX . "cart WHERE cart_id = '" . (int)$cart_id . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'";
+        }else{
+            $sql = "DELETE FROM " . DB_PREFIX . "cart WHERE cart_id = '" . (int)$cart_id . "' AND api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'";
+        }
 
-        $this->data = array();
+        $this->db->query($sql);
+        $this->data[$this->buy_type] = [];
     }
 
     public function clear()
@@ -350,7 +356,7 @@ class Cart
     {
         $this->db->query("DELETE FROM " . DB_PREFIX . "cart WHERE api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'");
 
-        $this->data = array();
+        $this->data[$this->buy_type] = [];
     }
 
     public function getRecurringProducts()
@@ -510,7 +516,7 @@ class Cart
                 $this->db->query("UPDATE " . DB_PREFIX . "cart SET selected = '0' WHERE cart_id = '" . (int)$value['cart_id'] . "'");
             }
         }
-        $this->data = array();
+        $this->data[$this->buy_type] = array();
     }
 
     public function hasCartProducts()

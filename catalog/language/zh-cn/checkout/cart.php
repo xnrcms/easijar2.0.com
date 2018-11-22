@@ -54,3 +54,6 @@ $_['error_recurring_required']                = '请选择分期付款！';
 $_['error_flash_count']                       = '该商品你最多可以购买%s个！';
 $_['error_flash_out']                         = '由于秒杀商品购买限制，您暂时不能购买该商品';
 $_['error_product']                           = '此商品不存在！';
+
+// Warning
+$_['warning_login']                  		  = '您还没有登录，登录后才能继续哦!';

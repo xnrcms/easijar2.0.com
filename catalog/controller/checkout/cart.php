@@ -17,6 +17,8 @@ class ControllerCheckoutCart extends Controller {
             'text' => $this->language->get('heading_title')
         );
 
+        $this->session->data['buy_type']        = 0;
+
         if ($this->cart->hasCartProducts() || !empty($this->session->data['vouchers']) || !empty($this->session->data['recharges'])) {
             if (!$this->cart->hasStock() && (!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning'))) {
                 $data['error_warning'] = $this->language->get('error_stock');
@@ -173,12 +175,19 @@ class ControllerCheckoutCart extends Controller {
             $data['totals'] = array();
             list($total, $totals) = $this->getTotalsValue();
             foreach ($totals as $total) {
+                $title          = $total['title'];
+                if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
+                    $titles     = explode('&', $title);
+                    $title      = $titles[0] . $titles[2];
+                }
+                if ($total['code'] == 'shipping') continue;
+
                 $data['totals'][] = array(
-                    'title' => $total['title'],
+                    'title' => $title,
                     'text'  => $this->currency->format($total['value'], $this->session->data['currency'])
                 );
             }
-
+            
             $data['continue'] = $this->url->link('common/home');
 
             $data['checkout'] = $this->url->link('checkout/checkout');
@@ -233,13 +242,25 @@ class ControllerCheckoutCart extends Controller {
     public function add() {
         $this->load->language('checkout/cart');
 
-        $json = array();
+        $json       = [];
 
         if (isset($this->request->post['product_id'])) {
             $product_id = (int)$this->request->post['product_id'];
         } else {
             $product_id = 0;
         }
+
+        $buy_type                               = (isset($this->request->get['buy_type']) && (int)$this->request->get['buy_type'] == 1) ? 1 : 0;
+
+        if (!$this->customer->isLogged() && $buy_type == 1){
+            $json['redirect']                  = str_replace('&amp;', '&', $this->url->link('account/login'));
+            $json['error']                     = t('warning_login');
+
+            $this->response->addHeader('Content-Type: application/json');
+            return $this->response->setOutput(json_encode($json));
+        }
+
+        $this->session->data['buy_type']        = $buy_type;
 
         $this->load->model('catalog/product');
 
@@ -279,6 +300,11 @@ class ControllerCheckoutCart extends Controller {
             }
 
             if (!$json) {
+
+                $this->cart->setCartBuyType($buy_type);
+
+                if ($buy_type == 1) $this->cart->clear();
+
                 $this->cart->add($this->request->post['product_id'], $quantity, $option);
 
                 $json['success'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']), $product_info['name'], $this->url->link('checkout/cart'));

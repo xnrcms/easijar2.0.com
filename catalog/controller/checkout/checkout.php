@@ -122,7 +122,7 @@ class ControllerCheckoutCheckout extends Controller
         $data['payment_method_section'] = $this->renderPaymentMethodSection();
 
         $data['cart_section'] = $this->renderCartSection();
-        $data['comment_section'] = $this->renderCommentSection();
+        //$data['comment_section'] = $this->renderCommentSection();
         $data['agree_section'] = $this->renderAgreeSection();
 
         $data['column_left'] = $this->load->controller('common/column_left');
@@ -295,7 +295,7 @@ class ControllerCheckoutCheckout extends Controller
         }
 
         $this->log($this->request->post);
-
+print_r($this->request->post);exit();
         $order_data = array();
 
         $order_data['payment_address'] = array();
@@ -455,7 +455,7 @@ class ControllerCheckoutCheckout extends Controller
         $data['payment_method_section'] = $this->renderPaymentMethodSection();
         $data['shipping_method_section'] = $this->renderShippingMethodSection();
         $data['cart_section'] = $this->renderCartSection();
-        $data['comment_section'] = $this->renderCommentSection();
+        //$data['comment_section'] = $this->renderCommentSection();
         $data['agree_section'] = $this->renderAgreeSection();
         $this->response->setOutput($this->load->view('checkout/checkout/_main_section', $data));
     }
@@ -639,6 +639,9 @@ class ControllerCheckoutCheckout extends Controller
 
     private function isValidCart()
     {
+        //设置购物车类型
+        $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
+
         // Validate cart has products and has stock.
         if ((!$this->cart->hasProducts() && empty($this->session->data['vouchers']) && empty($this->session->data['recharges'])) || (!$this->cart->hasStock() && !$this->config->get('config_stock_checkout'))) {
             return false;
@@ -833,6 +836,7 @@ class ControllerCheckoutCheckout extends Controller
         $data['vouchers'] = $this->getVouchers();
         $data['recharges'] = $this->getRecharges();
         $data['totals'] = $this->getTotals();
+        $data['comment_section'] = $this->renderCommentSection();
 
         return $this->load->view('checkout/checkout/_confirm', $data);
     }
@@ -980,8 +984,15 @@ class ControllerCheckoutCheckout extends Controller
         $results = array();
 
         foreach ($totals as $total) {
+            $title          = $total['title'];
+            if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
+                $titles     = explode('&', $title);
+                $title      = $titles[0] . $titles[2];
+            }
+            if ($total['code'] == 'shipping') continue;
+
             $results[] = array(
-                'title' => $total['title'],
+                'title' => $title,
                 'text' => $this->currency->format($total['value'], $this->session->data['currency'])
             );
         }
