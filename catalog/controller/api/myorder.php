@@ -65,7 +65,6 @@ class ControllerApiMyorder extends Controller {
 
             //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
             $results = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * $limit, $limit);
-            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success222222','data'=>$results]));
 
             $oid        = [];
             foreach ($results as $key => $value) {
