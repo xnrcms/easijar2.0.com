@@ -46,7 +46,7 @@ class ControllerApiMyorder extends Controller {
                 unset($results[$keys]['is_service']);
                 unset($results[$keys]['order_id']);
             }
-        }/*elseif ($req_data['order_type'] == 4)
+        }elseif ($req_data['order_type'] == 4)
         {
             $this->load->model('account/oreview');
 
@@ -57,8 +57,7 @@ class ControllerApiMyorder extends Controller {
             ];
 
             $results = $this->model_account_oreview->getOreviewsForMs($filter_data);
-            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success11111','data'=>$results]));
-        }*/
+        }
         else
         {
             $this->load->model('account/order');

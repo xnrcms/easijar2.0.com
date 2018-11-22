@@ -65,7 +65,11 @@ class ControllerApiAccount extends Controller {
 
         $avatar 							= !empty($this->customer->getAvatar()) ? $this->customer->getAvatar() : 'no_image.png';
         $account_info['avatar'] 			= $this->model_tool_image->resize($avatar, 100, 100);
-        $account_info['uname'] 				= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : 'not set nickname';
+        $account_info['uname'] 				= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : '';
+        $account_info['telephone']          = !empty($this->customer->getTelephone()) ? $this->customer->getTelephone() : '';
+        $account_info['email']              = !empty($this->customer->getEmail()) ? $this->customer->getEmail() : '';
+        $account_info['gender']             = !empty($this->customer->getGender()) ? $this->customer->getGender() : 0;
+        $account_info['brithday']           = !empty($this->customer->getBrithday()) ? $this->customer->getBrithday() : '';
 
         $json['account_info'] 				= $account_info;
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
@@ -97,7 +101,7 @@ class ControllerApiAccount extends Controller {
         $field 			= isset($req_data['field']) ? $req_data['field'] : '';
         $val 			= isset($req_data['updata']) ? $req_data['updata'] : '';
 
-        if (!in_array($field, ['avatar','fullname','brithday'])) {
+        if (!in_array($field, ['avatar','fullname','brithday','gender'])) {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:field is error']));
         }
 

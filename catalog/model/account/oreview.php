@@ -263,7 +263,8 @@ class ModelAccountOreview extends Model
         DESC LIMIT " . (int)$start . "," . (int)$limit;*/
 
         $fields         = format_find_field('order_id,date_added,currency_code,currency_value','o');
-        $fields         .= ',' . format_find_field('product_id,image','p');
+        $fields         .= ',' . format_find_field('sku,image,name','op');
+        $fields         .= ',' . format_find_field('product_id','p');
         $fields         .= ',' . format_find_field('author,text,rating,order_product_review_id AS reviewed','opr');
         $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');
 
