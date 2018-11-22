@@ -191,6 +191,11 @@ class ControllerApiAccount extends Controller {
         		$this->model_account_customer->editBrithday($val);
         	}
 
+            if ($field  == 'gender') {
+                $gender            = (int)$val;
+                $gender            = in_array($gender, [0,1,2]) ? $gender : 0;
+                $this->model_account_customer->editGender($val);
+            }
         }
 
         $json['field'] 				         = $field;
