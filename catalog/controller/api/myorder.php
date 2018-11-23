@@ -56,7 +56,26 @@ class ControllerApiMyorder extends Controller {
                 'limit'                 => $limit,
             ];
 
-            $results = $this->model_account_oreview->getOreviewsForMs($filter_data);
+            $result                     = $this->model_account_oreview->getOreviewsForMs($filter_data);
+            $results                    = [];
+            $results1                   = [];
+
+            foreach ($result as $keys =>$value)
+            {
+                $results1[$value['msid']]['seller_id']       = $value['msid']; 
+                $results1[$value['msid']]['store_name']      = $value['store_name'];
+                $results1[$value['msid']]['product'][]       = [
+                    'product_id' => $value['product_id'],
+                    'name' => $value['name'],
+                    'price' => $this->currency->format((float)$value['price'], $value['currency_code'], $value['currency_value'], $this->session->data['currency']),
+                    'quantity' => (int)$value['quantity'],
+                    'sku' => $value['sku'],
+                ];
+            }
+
+            foreach ($results1 as $value1) {
+                $results[]  = $value1;
+            }
         }
         else
         {
