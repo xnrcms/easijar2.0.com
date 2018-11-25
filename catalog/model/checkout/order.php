@@ -476,7 +476,9 @@ class ModelCheckoutOrder extends Model {
 	{
 		if (!in_array($order_type, [1,2]))  return [];
 
-		$fields 		= format_find_field('order_id','o');
+		$shipping_ 		= ',shipping_fullname,shipping_telephone,shipping_company,shipping_address_1,shipping_address_2,shipping_city,shipping_city_id,shipping_postcode,shipping_country,shipping_country_id,shipping_zone,shipping_zone_id,shipping_county,shipping_county_id,shipping_address_format,shipping_method,shipping_code';
+
+		$fields 		= format_find_field('order_id,currency_code,customer_id,language_id' . $shipping_,'o');
 
 		if ($order_type == 1) {
 			$fields 		.= ',' . format_find_field('order_sn,total','o');
@@ -494,7 +496,10 @@ class ModelCheckoutOrder extends Model {
 				'seller_id'               => isset($order_query->row['seller_id']) ? $order_query->row['seller_id'] : 0,
 				'order_type'              => $order_type,
 				'order_sn'                => $order_query->row['order_sn'],
-				'total'                	  => $order_query->row['total']
+				'total'                	  => $order_query->row['total'],
+				'currency_code'           => $order_query->row['currency_code'],
+				'customer_id'             => $order_query->row['customer_id'],
+				'language_id'             => $order_query->row['language_id'],
 			);
 		}
 

@@ -449,6 +449,9 @@ class ControllerCheckoutCheckout extends Controller
 
     public function reload()
     {
+        //设置购物车类型
+        $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
+        
         if ($this->hasShipping()) {
             $data['shipping_address_section'] = $this->renderAddressSection('shipping');
         }

@@ -156,6 +156,14 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
+        $order_info['shipping_address'] = (!empty($order_info['shipping_country']) ? $order_info['shipping_country'] : '') . ' ' .
+        (!empty($order_info['shipping_zone']) ? $order_info['shipping_zone'] : '') . ' ' .
+        (!empty($order_info['shipping_city']) ? $order_info['shipping_city'] : '') . ' ' .
+        (!empty($order_info['shipping_address_1']) ? $order_info['shipping_address_1'] : '');
+
+        $currency_code                  = !empty($order_info['currency_code']) ? $order_info['currency_code'] : '';
+        $currency_value                 = !empty($order_info['currency_value']) ? $order_info['currency_value'] : '';
+
         //商品信息
         $order_id 						= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
         $seller_id 						= isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
@@ -164,18 +172,28 @@ class ControllerApiMyorder extends Controller {
         $seller_info['avatar'] 			= isset($order_info['avatar']) ? $order_info['avatar'] : '';
         $seller_info['store_name'] 		= isset($order_info['store_name']) ? $order_info['store_name'] : '';
 
-        unset($order_info['avatar']);
-        unset($order_info['store_name']);
-
-
         $subtotal                       = 0;
         foreach ($product_info as $pkey => $pval) {
             $subtotal                       += $pval['total'];
 
-            $product_info[$pkey]['price']   = $this->currency->format($pval['price'], $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
-            $product_info[$pkey]['total']   = $this->currency->format($pval['total'], $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+            $product_info[$pkey]['price']   = $this->currency->format($pval['price'], $currency_code, $currency_value, $this->session->data['currency']);
+            $product_info[$pkey]['total']   = $this->currency->format($pval['total'], $currency_code, $currency_value, $this->session->data['currency']);
             $product_info[$pkey]['image']   = $this->model_tool_image->resize($pval['image'], 100, 100);
         }
+
+        unset($order_info['avatar']);
+        unset($order_info['store_name']);
+        unset($order_info['shipping_address_format']);
+        unset($order_info['shipping_address_format']);
+        unset($order_info['shipping_country']);
+        unset($order_info['shipping_zone']);
+        unset($order_info['shipping_city']);
+        unset($order_info['shipping_address_2']);
+        unset($order_info['currency_code']);
+        unset($order_info['email']);
+        unset($order_info['fullname']);
+        unset($order_info['telephone']);
+        unset($order_info['currency_value']);
 
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
@@ -196,10 +214,10 @@ class ControllerApiMyorder extends Controller {
 
         $total                          = $subtotal + $shipping - $coupon;
 
-        $json['total']                  = $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
-        $json['total_shipping']         = $this->currency->format($shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
-        $json['total_coupon']           = $this->currency->format($coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
-        $json['subtotal']               = $this->currency->format($subtotal, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']);
+        $json['total']                  = $this->currency->format($total, $currency_code, $currency_value, $this->session->data['currency']);
+        $json['total_shipping']         = $this->currency->format($shipping, $currency_code, $currency_value, $this->session->data['currency']);
+        $json['total_coupon']           = $this->currency->format($coupon, $currency_code, $currency_value, $this->session->data['currency']);
+        $json['subtotal']               = $this->currency->format($subtotal, $currency_code, $currency_value, $this->session->data['currency']);
         
         if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id') && $order_info['payment_code'] != 'cod') {
             /*$this->session->data['order_id'] = $order_id;

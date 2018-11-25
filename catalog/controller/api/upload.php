@@ -18,15 +18,15 @@ class ControllerApiUpload extends Controller{
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
-        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z]{1}[a-zA-Z0-9_]{9}$/",$req_data['tag'])) {
+        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z]{1}[a-zA-Z0-9_]{1,9}$/",$req_data['tag'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:tag is error']));
         }
 
         $dirname                        = $req_data['tag'] . '/';
 
-        if (!empty($this->request->files['file']['name']) && is_file($this->request->files['file']['tmp_name'])) {
+        if (!empty($this->request->files['files']['name']) && is_file($this->request->files['files']['tmp_name'])) {
             // Sanitize the filename
-            $filename = basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($this->request->files['file']['name'], ENT_QUOTES, 'UTF-8')));
+            $filename = basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($this->request->files['files']['name'], ENT_QUOTES, 'UTF-8')));
 
             // Validate the filename length
             if ((utf8_strlen($filename) < 2) || (utf8_strlen($filename) > 64)) {
@@ -55,20 +55,20 @@ class ControllerApiUpload extends Controller{
                 $allowed[]     = trim($filetype);
             }
 
-            if (!in_array($this->request->files['file']['type'], $allowed)) {
+            if (!in_array($this->request->files['files']['type'], $allowed)) {
                 return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filetype')]));
             }
 
             // Check to see if any PHP files are trying to be uploaded
-            $content           = file_get_contents($this->request->files['file']['tmp_name']);
+            $content           = file_get_contents($this->request->files['files']['tmp_name']);
 
             if (preg_match('/\<\?php/i', $content)) {
                 return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filetype')]));
             }
 
             // Return any upload error
-            if ($this->request->files['file']['error'] != UPLOAD_ERR_OK) {
-                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload_' . $this->request->files['file']['error'])]));
+            if ($this->request->files['files']['error'] != UPLOAD_ERR_OK) {
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload_' . $this->request->files['files']['error'])]));
             }
         } else {
             return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload')]));
@@ -79,7 +79,9 @@ class ControllerApiUpload extends Controller{
         //文件名扰码由扩展名后改为扩展名前
         $file = 'temp' . '.' . utf8_substr(mb_strrchr($filename, '.'), 1);
 
-        move_uploaded_file($this->request->files['file']['tmp_name'], DIR_IMAGE . $dirname . $file);
+        if (!is_dir(DIR_IMAGE . $dirname)) @mkdir(DIR_IMAGE . $dirname, 0777);
+
+        move_uploaded_file($this->request->files['files']['tmp_name'], DIR_IMAGE . $dirname . $file);
 
         $img = $this->resize($dirname . $file, 600, 600,trim($dirname,'/'));
         unlink(DIR_IMAGE . $dirname . $file);
@@ -90,7 +92,7 @@ class ControllerApiUpload extends Controller{
             $json['imgurl'] =  $this->config->get('config_url') . 'image/' . $img;
         }
 
-        $json['code'] = md5($img);
+        $json['path']       = $img;
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>$this->language->get('text_upload'),'data'=>$json]));
     }

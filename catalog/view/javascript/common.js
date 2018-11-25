@@ -584,10 +584,7 @@ $(document).on('click', '.agree', function(e) {
           }
 
           if (json['success']) {
-
-            layer.msg(json['success'],{icon: 6,time:1000},function(){
-              if ( settings.cartSuccessFn ) { settings.cartSuccessFn($element);}
-            });
+            if ( settings.cartSuccessFn ) { settings.cartSuccessFn($element);}
             return;
           }
         },

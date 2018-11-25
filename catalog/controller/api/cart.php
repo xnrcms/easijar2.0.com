@@ -102,7 +102,7 @@ class ControllerApiCart extends Controller {
             $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
         }
         else{
-        	$json       = $this->returnData(['msg'=>$this->language->get('text_empty')]);
+        	$json       = $this->returnData(['code'=>'200','msg'=>$this->language->get('text_empty')]);
         }
 
         return $this->response->setOutput($json);
