@@ -30,6 +30,7 @@
             {% if seller_id %}
               <li><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
               <li><a href="#tab-transaction" data-toggle="tab">{{ tab_transaction }}</a></li>
+              <li><a href="#tab-information" data-toggle="tab">商家资料</a></li>
             {% endif %}
           </ul>
           <div class="tab-content">
@@ -233,6 +234,8 @@
                 <div class="text-right">
                   <button type="button" id="button-transaction" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_transaction_add }}</button>
                 </div>
+              </div>
+              <div class="tab-pane" id="tab-information">aaaaaaaaaaa
               </div>
             {% endif %}
           </div>

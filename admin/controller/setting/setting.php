@@ -995,6 +995,12 @@ class ControllerSettingSetting extends Controller {
 			$data['config_mail_alert_email'] = $this->config->get('config_mail_alert_email');
 		}
 
+		if (isset($this->request->post['config_secure'])) {
+			$data['config_secure'] = $this->request->post['config_secure'];
+		} else {
+			$data['config_secure'] = $this->config->get('config_secure');
+		}
+		
 		if (isset($this->request->post['config_shared'])) {
 			$data['config_shared'] = $this->request->post['config_shared'];
 		} else {

@@ -1,0 +1,65 @@
+
+
+.backend-form fieldset{
+	border: 1px #EEE solid;
+}
+
+.oppcw-controls {
+	display: inline-block;
+}
+
+.backend-form .oppcw-multi-control .oppcw-controls { 
+	display: inline;
+}
+
+.backend-form .oppcw-confirmation-form {
+	text-align: left;
+	margin-top: 10px;
+}
+
+.backend-form .oppcw-control-group {
+	margin-bottom: 15px;
+}
+
+.backend-form .oppcw-control-label {
+	display: inline-block;
+}
+.backend-form .oppcw-control-label .oppcw-required {
+	color: #d80000;
+	font-weight: bold;
+}
+
+.backend-form .oppcw-control-group > .oppcw-controls {
+	vertical-align: top;
+}
+
+.backend-form .oppcw-description {
+	margin-top: 3px;
+}
+
+.backend-form .oppcw-help-block {
+	color: #666;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.backend-form .oppcw-element-scope {
+	margin-left: 190px;
+}
+
+.backend-form .buttons {
+	margin-top: 5px;	
+}
+
+.oppcw-control-group {
+	border-bottom: 1px dotted #CCCCCC;
+	padding-bottom: 5px;
+}
+
+
+.description-label {
+	display: inline-block;
+	padding: 6px 15px;
+	width: 160px;
+	text-align: left;
+}

@@ -1,0 +1,240 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				
+				{%  if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().isCapturePossible()) %}
+					<a href="{{ capture | raw }}" data-toggle="tooltip" class="btn btn-success" title="{{ OPPCw_Translate('Capture Transaction') }}"><i class="fa fa-lock"></i></a>
+				{% endif %}
+				
+				
+				{%  if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().isRefundPossible()) %}
+					<a href="{{ refund | raw }}" data-toggle="tooltip" class="btn btn-danger" title="{{ OPPCw_Translate('Refund Transaction') }}"><i class="fa fa-exchange"></i></a>
+				{% endif %}
+				
+				
+				{%  if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().isCancelPossible()) %}
+					<a href="{{ cancel | raw }}" data-toggle="tooltip" class="btn btn-danger" title="{{ OPPCw_Translate('Cancel Transaction') }}"><i class="fa fa-trash"></i></a>
+				{% endif %}
+				
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+            {%  for breadcrumb in breadcrumbs %}
+            		<li><a href="{{ breadcrumb['href'] | raw }}">{{ breadcrumb['text'] }}</a></li>
+        	{% endfor %}
+      </ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+    {%  if  error_warning %}
+    <div class="alert alert-danger">
+			<i class="fa fa-exclamation-circle"></i>{{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+   	{% elseif  success %}
+     <div class="alert alert-success">
+			<i class="fa fa-exclamation-circle"></i>{{ success }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+    {% endif %}
+    <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<i class="fa fa-pencil"></i>{{ heading_title }}</h3>
+			</div>
+			<div class="panel-body">
+			<table class="table table-bordered table-hover">
+				<tr>
+					<td>{{ OPPCw_Translate('Authorization Status') }}</td>
+					<td>{{ transaction.getAuthorizationStatus() }}</td>
+				</tr>
+
+				<tr>
+					<td>{{ OPPCw_Translate('Transaction ID') }}</td>
+					<td>{{ transaction.getTransactionId() }}</td>
+				</tr>
+				<tr>
+					<td>{{ OPPCw_Translate('Transaction Number') }}</td>
+					<td>{{ transaction.getTransactionExternalId() }}</td>
+				</tr>
+				<tr>
+					<td>{{ OPPCw_Translate('Order ID') }}</td>
+					<td>{{ transaction.getOrderId() }}</td>
+				</tr>
+				<tr>
+					<td>{{ OPPCw_Translate('Created On') }}</td>
+					<td>{{ transaction.getCreatedOn().format(OPPCw_DefaultDateTimeFormat()) }}</td>
+				</tr>
+				<tr>
+					<td>{{ OPPCw_Translate('Updated On') }}</td>
+					<td>{{ transaction.getUpdatedOn().format(OPPCw_DefaultDateTimeFormat()) }}</td>
+				</tr>
+				<tr>
+					<td>{{ OPPCw_Translate('Customer ID') }}</td>
+					<td>{{ transaction.getCustomerId() }}</td>
+				</tr>
+				<tr>
+					<td>{{ OPPCw_Translate('Payment ID') }}</td>
+					<td>{{ transaction.getPaymentId() }}</td>
+				</tr>
+
+				{% if transaction.getTransactionObject() is not null %}
+    				{% for label in transaction.getTransactionObject().getTransactionLabels() %}
+    				<tr>
+    					<td>{%  if label['description'] is defined%} 
+    						<span data-toggle="tooltip" data-container="#tab-general"  title="{{ label['description'] }}">{{ label['label'] }}</span>
+    						</span>
+    					{% else %}
+    						{{ label['label'] }} 
+    					{% endif %}
+    					</td>
+    					<td>{{ label['value'] | escape }}
+    					</td>
+    				</tr>
+					{% endfor %}
+				{% endif %}
+
+				{% if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().isAuthorized() and transaction.getTransactionObject().getPaymentInformation() is not null) %}
+				<tr>
+					<td>{{ OPPCw_Translate('Payment Information') }}</td>
+					<td>{{ OPPCw_HtmlToText(transaction.getTransactionObject().getPaymentInformation()) }}</td>
+				</tr>
+				{% endif %}
+			</table>
+
+			
+			{% if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().getCaptures()|length > 0) %}
+			<h2>{{ OPPCw_Translate('Captures for this transaction') }}</h2>
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td>{{ OPPCw_Translate('Date') }}</td>
+						<td>{{ OPPCw_Translate('Amount') }}</td>
+						<td>{{ OPPCw_Translate('Status') }}</td>
+						<td> </td>
+					</tr>
+				</thead>
+				<tbody>
+					{% for capture in transaction.getTransactionObject().getCaptures() %}
+					<tr>
+						<td>{{ capture.getCaptureDate().format(OPPCw_DefaultDateTimeFormat()) }}</td>
+						<td>{{ capture.getAmount() }}</td>
+						<td>{{ capture.getStatus() }}</td>
+						<td>
+							<a class="btn btn-primary" 
+								data-toggle="tooltip"
+								href="{{ url.link('oppcw/transaction/view_capture', 'user_token=' ~ user_token ~ '&transaction_id=' ~ transaction.getTransactionId() ~ '&capture_id=' ~ capture.getCaptureId(), 'SSL') }}"
+								title="{{ OPPCw_Translate('View') }}"
+							>
+								<i class="fa fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<br />
+			{% endif %}
+			
+			{% if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().getRefunds()|length > 0) %}
+			<h2>{{ OPPCw_Translate('Refunds for this transaction') }}</h2>
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td>{{ OPPCw_Translate('Date') }}</td>
+						<td>{{ OPPCw_Translate('Amount') }}</td>
+						<td>{{ OPPCw_Translate('Status') }}</td>
+						<td> </td>
+					</tr>
+				</thead>
+				<tbody>
+					{% for refund in transaction.getTransactionObject().getRefunds() %}
+					<tr>
+						<td>{{ refund.getRefundedDate().format(OPPCw_DefaultDateTimeFormat()) }}</td>
+						<td>{{ refund.getAmount() }}</td>
+						<td>{{ refund.getStatus() }}</td>
+						<td>
+							<a class="btn btn-primary" 
+								data-toggle="tooltip"
+								href="{{ url.link('oppcw/transaction/view_refund', 'user_token=' ~ user_token ~ '&transaction_id=' ~ transaction.getTransactionId() ~ '&refund_id=' ~ refund.getRefundId(), 'SSL') }}"
+								title="{{ OPPCw_Translate('View') }}"
+							>
+								<i class="fa fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<br />
+			{% endif %}
+			
+			
+			{% if (transaction.getTransactionObject() is not null and transaction.getTransactionObject().getHistoryItems()|length > 0) %}
+			<h2>{{ OPPCw_Translate('Transactions History') }}</h2>
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td>{{ OPPCw_Translate('Date') }}</td>
+						<td>{{ OPPCw_Translate('Action') }}</td>
+						<td>{{ OPPCw_Translate('Message') }}</td>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in transaction.getTransactionObject().getHistoryItems() %}
+					<tr>
+						<td>{{ item.getCreationDate().format(OPPCw_DefaultDateTimeFormat()) }}</td>
+						<td>{{ item.getActionPerformed() }}</td>
+						<td>{{ item.getMessage() }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<br />
+			{% endif %}
+			
+			
+			{% if relatedTransactions|length > 0 %}
+			<h2>{{ OPPCw_Translate('Transactions related to the same order') }}</h2>
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td>{{ OPPCw_Translate('Transaction Number') }}</td>
+						<td>{{ OPPCw_Translate('Is Authorized') }}</td>
+						<td>{{ OPPCw_Translate('Authorization Amount') }}</td>
+						<td></td>
+					</tr>
+				</thead>
+				{% for related in relatedTransactions %}
+					{% if related.getTransactionObject() is not null %}
+					<tr>
+						<td>{{ related.getTransactionExternalId() }}</td>
+						<td>{% if related.getTransactionObject().isAuthorized() %}
+							    {{ OPPCw_Translate('yes') }}
+							{% else %}
+								{{ OPPCw_Translate('no') }}
+							{% endif %}
+						</td>
+						<td>{{ related.getTransactionObject().getAuthorizationAmount() }}</td>
+						<td>
+						<a class="btn btn-primary" 
+								data-toggle="tooltip"
+								href="{{ url.link('oppcw/transaction/view', 'user_token=' ~ user_token ~ '&transaction_id=' ~ related.getTransactionId(), 'SSL') }}"
+								title="{{ OPPCw_Translate('View') }}"
+							>
+								<i class="fa fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+					{% endif %}
+				{% endfor %}
+			</table>
+			<br />
+			{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{{ footer }}

@@ -112,6 +112,7 @@ $_['entry_mail_smtp_port']           = 'SMTP Port';
 $_['entry_mail_smtp_timeout']        = 'SMTP Timeout';
 $_['entry_mail_alert']               = 'Alert Mail';
 $_['entry_mail_alert_email']         = 'Additional Alert Mail';
+$_['entry_secure']                   = 'Use SSL';
 $_['entry_sendcloud_user']           = 'API User';
 $_['entry_sendcloud_key']            = 'API Key';
 $_['entry_shared']                   = 'Use Shared Sessions';
