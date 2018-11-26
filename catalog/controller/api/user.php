@@ -8,7 +8,7 @@ class ControllerApiUser extends Controller {
 		$this->load->language('account/login');
 
         $allowKey       = ['api_token','type','account','password'];
-        $req_data       = $this->dataFilter($allowKey);wr($req_data);
+        $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
 
         if (!$this->checkSign($req_data)) {

@@ -68,7 +68,6 @@ class ControllerExtensionPaymentPayssion extends Controller {
 
 	public function notify() {
 		$track_id = $this->request->post['track_id'];
-		wr([$this->request->server,$this->request->post,$this->request->get]);
 		$this->load->model('checkout/order');
 		if ($this->isValidNotify()) {
 			if (!$this->request->server['HTTPS']) {

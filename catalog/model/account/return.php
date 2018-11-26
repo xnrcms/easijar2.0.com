@@ -62,7 +62,7 @@ class ModelAccountReturn extends Model {
 
 	public function getReturnRecord($order_id = 0,$order_product_id = 0)
 	{
-		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return` WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product_id . "' AND return_status_id > 0");wr(["SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return` WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product_id . "' AND return_status_id > 0 AND return_status_id <> 8"]);
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return` WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$order_product_id . "' AND return_status_id > 0");
 		return $query->row['total'];
 	}
 

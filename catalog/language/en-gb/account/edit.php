@@ -29,3 +29,4 @@ $_['error_email']        = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']    = 'Telephone number is error!';
 $_['error_custom_field'] = '%s required!';
 $_['error_brithday']     = 'birthday format must be in yyyy-mm-dd!';
+$_['error_smscode']      = 'The verification code error!';

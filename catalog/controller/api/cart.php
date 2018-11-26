@@ -149,7 +149,7 @@ class ControllerApiCart extends Controller {
 			$variants 							= $productModel->getProductVariantsDetail();
 
 			$skus 								= isset($variants['skus']) ? $variants['skus'] : [];
-			//wr($skus);
+
 			if ( !array_key_exists(trim($req_data['sku']), $skus) ) {
 				return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_product')]));
 			}

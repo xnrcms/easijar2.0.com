@@ -80,9 +80,17 @@ abstract class Controller {
 	        foreach ($data as $key => $value) {
 	            $signStr  .= $key . $value;
 	        }
-	        //wr([$data]);
+
 	        $signStr  .= (!empty($signKey) ? $signKey : time().mt_rand(1000,10000));
-	        //wr([$signStr]);
+	        
+	        wr([
+	        	'apiUrl'=>isset($this->request->get['route']) ? $this->request->get['route'] : '',
+	        	'hash'=>$hash,
+	        	'signStr'=>$signStr,
+	        	'signKey'=>$signKey,
+	        	'data'=>$data
+	        ],'sign.txt',false);
+
 	        return (!empty($hash) && md5($signStr) === $hash) ? true : false;
         }
 

@@ -101,7 +101,7 @@ class ControllerApiAccount extends Controller {
         $field 			= isset($req_data['field']) ? $req_data['field'] : '';
         $val 			= isset($req_data['updata']) ? $req_data['updata'] : '';
 
-        if (!in_array($field, ['avatar','fullname','brithday','gender'])) {
+        if (!in_array($field, ['avatar','fullname','brithday','gender','telephone'])) {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:field is error']));
         }
 
@@ -195,6 +195,38 @@ class ControllerApiAccount extends Controller {
                 $gender            = (int)$val;
                 $gender            = in_array($gender, [0,1,2]) ? $gender : 0;
                 $this->model_account_customer->editGender($val);
+            }
+
+            if ($field  == 'telephone') {
+                //手机号设置 
+                $updata         = explode('#', $val);
+                if (count($updata) != 2) {
+                    return $this->response->setOutput($this->returnData(['msg'=>'fail:updata is error']));
+                }
+
+                $val            = $updata[0];
+                $smscode        = $updata[1];
+
+                //手机号格式错误
+                $telephones     = explode('-', $val);
+                if (count($telephones) < 2 || !strlen($telephones[0]) || !strlen($telephones[1] || strlen($telephones[0]) > 4)) {
+                    return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_telephone')]));
+                }
+
+                //校验用户手机号是否被占用
+                if ($this->model_account_customer->getTotalCustomersByTelephone($val)) {
+                    return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_exists_telephone')]));
+                }
+
+                //验证码校验
+                $keys                                       = md5('smscode-' . $val . '-2');
+                if (!isset($this->session->data['smscode'][$keys]['code']) || $smscode != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
+                    return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
+                }
+
+                unset($this->session->data['smscode']);
+                
+                $this->model_account_customer->editTelephone($val);
             }
         }
 

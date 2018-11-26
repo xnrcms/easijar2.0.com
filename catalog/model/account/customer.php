@@ -27,6 +27,10 @@ class ModelAccountCustomer extends Model {
 		$this->db->query("UPDATE " . DB_PREFIX . "customer SET fullname = '" . $this->db->escape((string)$data['fullname']) . "', email = '" . $this->db->escape((string)$data['email']) . "', telephone = '" . $this->db->escape((string)$data['telephone']) . "', custom_field = '" . $this->db->escape(isset($data['custom_field']['account']) ? json_encode($data['custom_field']['account']) : '') . "' WHERE customer_id = '" . (int)$customer_id . "'");
 	}
 
+	public function editTelephone($telephone) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "customer` SET telephone = '" . $this->db->escape((string)$telephone) . "' WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+	}
+
 	public function editPassword($customer_id, $password) {
 		$this->db->query("UPDATE " . DB_PREFIX . "customer SET salt = '', password = '" . $this->db->escape(password_hash($password, PASSWORD_DEFAULT)) . "', code = '' WHERE customer_id = '" . (int)$customer_id . "'");
 	}
@@ -97,7 +101,7 @@ class ModelAccountCustomer extends Model {
 		return $query->row['total'];
 	}
 
-	public function getTotalCustomersByTelephone($telephone) {wr($telephone);
+	public function getTotalCustomersByTelephone($telephone) {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer WHERE telephone = '" . $this->db->escape($telephone) . "'");
 
 		return $query->row['total'];
