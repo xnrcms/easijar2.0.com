@@ -283,16 +283,26 @@ class ControllerApiUser extends Controller {
 			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'verification_code check success']));
 		}
 
+		//校验密码复杂程度
+		$password 				= html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8');
+		if (empty($password) || utf8_strlen($password) < 6 || utf8_strlen($password) > 32 ) {
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password')]));
+		}
+
+		if (preg_match_all("/[`~!@#$%^&*()\-_=+{};:<,.>?\/]/",$password) < 1){
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password2')]));
+		}
+
+		if (preg_match_all("/^[a-zA-Z\d_~!@#$%^&*()\-_=+{};:<,.>?\/]{6,32}$/",$password) < 1){
+        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password1')]));
+		}
+		
 		if (!(isset($req_data['new_password']) && !empty($req_data['new_password']))) {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:new_password is empty']));
 		}
 
 		if (!(isset($req_data['confirm_password']) && !empty($req_data['confirm_password']))) {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:confirm_password is empty']));
-		}
- 		
- 		if ((utf8_strlen(html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8')) > 40)) {
-        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password')]));
 		}
 
  		if (!( md5($req_data['new_password']) === md5($req_data['confirm_password']))) {
@@ -310,8 +320,18 @@ class ControllerApiUser extends Controller {
 
 	private function register_validate($req_data = [])
 	{
-		if ((utf8_strlen(html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8')) > 40)) {
+		//校验密码复杂程度
+		$password 				= html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8');
+		if (empty($password) || utf8_strlen($password) < 6 || utf8_strlen($password) > 32 ) {
 			return ['msg'=>$this->language->get('error_password')];
+		}
+
+		if (preg_match_all("/[`~!@#$%^&*()\-_=+{};:<,.>?\/]/",$password) < 1){
+			return ['msg'=>$this->language->get('error_password2')];
+		}
+
+		if (preg_match_all("/^[a-zA-Z\d_~!@#$%^&*()\-_=+{};:<,.>?\/]{6,32}$/",$password) < 1){
+			return ['msg'=>$this->language->get('error_password1')];
 		}
 
 		if ($req_data['confirm'] !== $req_data['password']) {

@@ -37,7 +37,7 @@ $_['error_fullname']      = 'Full Name must be between 1 and 32 characters!';
 $_['error_email']          = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']      = 'Telephone number is error!';
 $_['error_custom_field']   = '%s required!';
-$_['error_password']       = 'Password must be between 4 and 20 characters!';
+$_['error_password']       = 'Password must be between 6 and 32 characters!';
 $_['error_confirm']        = 'Password confirmation does not match password!';
 $_['error_agree']          = 'Warning: You must agree to the %s!';
 $_['error_email_telephone_all_null'] = 'Warning: E-Mail address and Telephone Number fill at least one!';
@@ -48,3 +48,5 @@ $_['error_telephone_eq']   		= 'Telephone number error! The telephone number mus
 $_['error_not_email']      		= 'Error: the mailbox address is not registered, please change an e-mail address£¡';;
 $_['error_not_telephone']      	= 'Error: the phone number has not been registered, please change a mobile phone number';
 $_['error_address']           	= 'Error: the detailed address must be between 2 and 10 characters.';
+$_['error_password1']           = 'Error: The password must be a 6-32-length string of letters, numbers or underscores!';
+$_['error_password2']           = 'Error: A password must contain at least one special symbol:[~!@#$%^&*()\-_=+{};:<,.>?]';

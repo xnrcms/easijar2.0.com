@@ -68,8 +68,18 @@ class ControllerApiSellerRegister extends Controller
             return ['code'=>'205','msg'=>$this->language->get('error_exists')];
         }
 
-        if ((utf8_strlen(html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8')) > 40)) {
+        //校验密码复杂程度
+        $password               = html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8');
+        if (empty($password) || utf8_strlen($password) < 6 || utf8_strlen($password) > 32 ) {
             return ['msg'=>$this->language->get('error_password')];
+        }
+
+        if (preg_match_all("/[`~!@#$%^&*()\-_=+{};:<,.>?\/]/",$password) < 1){
+            return ['msg'=>$this->language->get('error_password2')];
+        }
+
+        if (preg_match_all("/^[a-zA-Z\d_~!@#$%^&*()\-_=+{};:<,.>?\/]{6,32}$/",$password) < 1){
+            return ['msg'=>$this->language->get('error_password1')];
         }
 
         if ($req_data['confirm'] !== $req_data['password']) {
@@ -138,10 +148,10 @@ class ControllerApiSellerRegister extends Controller
             return ['msg'=>$this->language->get('error_exists_telephone')];
         }
 
-        /*$keys                                       = md5('smscode-' . $req_data['telephone'] . '-1');
+        $keys                                       = md5('smscode-' . $req_data['telephone'] . '-1');
         if ((utf8_strlen(html_entity_decode($req_data['verification_code'], ENT_QUOTES, 'UTF-8')) != 6) || !isset($this->session->data['smscode'][$keys]) || $req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] ||  $this->session->data['smscode'][$keys]['expiry_time'] < time()){
             return ['msg'=>$this->language->get('error_smscode')];
-        }*/
+        }
 
         if ((int)$req_data['zone_id'] <= 0) {
             return ['msg'=>$this->language->get('error_zone')];

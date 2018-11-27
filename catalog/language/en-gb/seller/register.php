@@ -45,7 +45,7 @@ $_['error_fullname']            = 'Full name must be between 1 and 32 characters
 $_['error_email']               = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']           = 'Telephone must be between 3 and 32 characters!';
 $_['error_custom_field']        = '%s required';
-$_['error_password']            = 'Password must be between 4 and 20 characters!';
+$_['error_password']            = 'Password must be between 6 and 32 characters!';
 $_['error_confirm']             = 'Password confirmation does not match password!';
 $_['error_agree']               = 'Warning: You must agree to the %s!';
 $_['error_store_name']          = 'Store name must be between 2 and 64 characters!';
@@ -65,3 +65,5 @@ $_['error_legal_person']        = "The legal person's name must be between 1 and
 $_['error_idnum']        		= 'Wrong identity card format!';
 $_['error_images']        		= 'Picture upload is incomplete!';
 $_['error_telephone']           = 'Wrong phone number, please enter the correct phone number!';
+$_['error_password1']           = 'Error: The password must be a 6-32-length string of letters, numbers or underscores!';
+$_['error_password2']           = 'Error: A password must contain at least one special symbol:[~!@#$%^&*()\-_=+{};:<,.>?]';

@@ -44,7 +44,7 @@ $_['error_fullname']                 = '名称必须介于 1 到 32 个字符之
 $_['error_email']                    = '无效的邮箱地址！';
 $_['error_telephone']                = '电话号码错误，请输入正确电话号码！';
 $_['error_custom_field']             = '%s 必填！';
-$_['error_password']                 = '密码必须是 4 至 20 字符之间！';
+$_['error_password']                 = '密码必须是 6 至 32 字符之间！';
 $_['error_confirm']                  = '两次输入的密码不同！';
 $_['error_agree']                    = '警告：您必须同意 %s ！';
 $_['error_email_telephone_all_null'] = '错误：手机号码和邮箱地址不能都为空！';
@@ -54,3 +54,5 @@ $_['error_smscode']                  = '错误：验证码输入错误！';
 $_['error_telephone_eq']             = '错误：您的手机号码必须是校验手机号码，不能接收校验码后修改为另一个！';
 $_['error_not_email']             	 = '错误：该邮箱地址未被注册、请换一个电子邮箱！';
 $_['error_not_telephone']            = '错误：该手机号未被注册、请换一个手机号！';
+$_['error_password1']                = '错误：密码必须是以字母数字或下划线组成的6-32长度的字符串!';
+$_['error_password2']                = '错误：密码必须包含至少一个特殊符号：[~!@#$%^&*()\-_=+{};:<,.>?]';
