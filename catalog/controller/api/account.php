@@ -30,7 +30,7 @@ class ControllerApiAccount extends Controller {
 
         $avatar 							= !empty($this->customer->getAvatar()) ? $this->customer->getAvatar() : 'no_image.png';
         $account_info['avatar'] 			= $this->model_tool_image->resize($avatar, 100, 100);
-        $account_info['uname'] 				= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : 'not set nickname';
+        $account_info['fullname'] 			= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : 'not set nickname';
 
         $json['account_info'] 				= $account_info;
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
