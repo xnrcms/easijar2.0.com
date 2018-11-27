@@ -116,7 +116,7 @@ class ControllerApiAccount extends Controller {
         	if (!empty($this->request->files['files']['name']) && is_file($this->request->files['files']['tmp_name'])) {
 
 	        	// Sanitize the filename
-	            $filename 				= basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($this->request->files[$val]['name'], ENT_QUOTES, 'UTF-8')));
+	            $filename 				= basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($this->request->files['files']['name'], ENT_QUOTES, 'UTF-8')));
 
 	            // Validate the filename length
 	            if ((utf8_strlen($filename) < 2) || (utf8_strlen($filename) > 64)) {
@@ -147,25 +147,25 @@ class ControllerApiAccount extends Controller {
 	                $allowed[] = trim($filetype);
 	            }
 
-	            if (!in_array($this->request->files[$val]['type'], $allowed)) {
+	            if (!in_array($this->request->files['files']['type'], $allowed)) {
 	        		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filetype')]));
 	            }
 
 	            // Check to see if any PHP files are trying to be uploaded
-	            $content 				= file_get_contents($this->request->files[$val]['tmp_name']);
+	            $content 				= file_get_contents($this->request->files['files']['tmp_name']);
 
 	            if (preg_match('/\<\?php/i', $content)) {
 	        		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_filetype')]));
 	            }
 
 	            // Return any upload error
-	            if ($this->request->files[$val]['error'] != UPLOAD_ERR_OK) {
-	        		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload_' . $this->request->files[$val]['error'])]));
+	            if ($this->request->files['files']['error'] != UPLOAD_ERR_OK) {
+	        		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload_' . $this->request->files['files']['error'])]));
 	            }
 
 	            $file 								= $this->customer->getId() . '.jpg';
 
-	            move_uploaded_file($this->request->files[$val]['tmp_name'], DIR_IMAGE . 'avatar/' . $file);
+	            move_uploaded_file($this->request->files['files']['tmp_name'], DIR_IMAGE . 'avatar/' . $file);
 
 	            $val					            = image_resize('avatar/' . $file);
         	}else{
