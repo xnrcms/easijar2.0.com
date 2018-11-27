@@ -231,6 +231,10 @@ class ControllerApiSellerRegister extends Controller
             return ['msg'=>$this->language->get('error_images')];
         }
 
+        foreach ($images as $file) {
+            if (image_exists($file)) return ['msg'=>$this->language->get('error_images')];
+        }
+
         return ['code'=>'200'];
     }
 }
