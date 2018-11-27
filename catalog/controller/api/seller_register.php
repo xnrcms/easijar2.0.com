@@ -128,6 +128,16 @@ class ControllerApiSellerRegister extends Controller
         $this->load->model('multiseller/seller');
         $this->model_multiseller_seller->saveSeller($customer_id, $req_data);
 
+        //删除保存的临时图片
+        if (!empty($req_data['images']))
+        {
+            $this->load->model('tool/image');
+
+            $imgs        = explode(',', $req_data['images']);
+
+            $this->model_tool_image->del_temp_image($imgs);
+        }
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'perfect success']));
     }
 

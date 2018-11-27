@@ -151,7 +151,7 @@ class ControllerApiHome extends Controller {
 				if (isset($cache_data['expire_time']) && $cache_data['expire_time'] >= time()) {
 					$json 				= $this->returnData(['msg'=>'fail:frequent requests']);
 				}else{
-					$json 				= $this->returnData(['code'=>200,'msg'=>'success','data'=>['api_token'=>$this->makeHash($cache_key),'expire_time'=>(int)(time() + 3600)]]);
+					$json 				= $this->returnData(['code'=>'200','msg'=>'success','data'=>['api_token'=>$this->makeHash($cache_key),'expire_time'=>(int)(time() + 3600)]]);
 					$this->cache->set($cache_key, json_encode(['expire_time'=>time() + 10]));
 				}
 			}else{
@@ -161,7 +161,6 @@ class ControllerApiHome extends Controller {
 
 			$json 		= $this->returnData(['msg'=>'fail:sign error']);
 		}
-		
 		
 		return $this->response->setOutput($json);
 	}

@@ -18,7 +18,7 @@ class ControllerApiUpload extends Controller{
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
-        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z]{1}[a-zA-Z0-9_]{1,9}$/",$req_data['tag'])) {
+        if (!(isset($req_data['tag']) && !empty($req_data['tag'])) || !preg_match_all("/^[a-zA-Z]{1}[a-zA-Z0-9_]{1,15}$/",$req_data['tag'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:tag is error']));
         }
 
@@ -93,6 +93,10 @@ class ControllerApiUpload extends Controller{
         }
 
         $json['path']       = $img;
+
+        //临时保存上传的图片
+        $this->load->model('tool/image');
+        $this->model_tool_image->save_temp_image([$img]);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>$this->language->get('text_upload'),'data'=>$json]));
     }

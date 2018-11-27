@@ -114,4 +114,55 @@ class ModelToolImage extends Model {
         unset($img, $url);
         return array('file_name' => $filename, 'save_path' => $save_dir . $filename, 'error' => 0);
     }
+
+    public function delCacheImage($filename = '')
+    {
+        if ( empty($filename) || !image_exists($filename)) {
+            return;
+        }
+
+        if ($filename == 'placeholder.png' && is_file(DIR_IMAGE . 'placeholder/placeholder.png')) {
+            $filename = 'placeholder/' . $filename;
+            $image_old = DIR_IMAGE . $filename;
+        } else {
+            $extension_image = DIR_OCROOT . 'extension/image/' . $filename;
+            if (is_file($extension_image)) {
+                $image_old = $extension_image;
+            } else {
+                $image_old = DIR_IMAGE . $filename;
+            }
+        }
+
+        $extension      = pathinfo($filename, PATHINFO_EXTENSION);
+        $image_new      = DIR_IMAGE . 'cache/' . utf8_substr($filename, 0, utf8_strrpos($filename, '.')) . '-*.' . $extension;
+        $image_list     = glob($image_new);
+        if (!empty($image_list)) {
+            foreach ($image_list as $file) {
+                if (is_file($file))  unlink($file);
+            }
+        }
+
+        if (is_file($image_old))  unlink($image_old);
+    }
+
+    public function save_temp_image($image = [],$invalid_time = 0)
+    {   
+        $invalid_time   = ((int)$invalid_time <= 0 ? 30*60 : (int)$invalid_time) + time();
+
+        $sql    = "INSERT INTO ". get_tabname('temp_image') . " (image,invalid_time) VALUES ";
+        foreach ($image as $path) {
+            $sql .=  "('".(string)$path ."','".(int)$invalid_time . "'),";
+        }
+
+        $sql    = trim($sql,',');
+
+        $this->db->query($sql);
+    }
+
+    public function del_temp_image($image = [])
+    {
+        if (empty($image))  return;
+
+        $this->db->query("DELETE FROM " . get_tabname('temp_image') . " WHERE image IN (" . $image . ") ");
+    }
 }

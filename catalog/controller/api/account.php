@@ -64,7 +64,7 @@ class ControllerApiAccount extends Controller {
         $json['account_info'] 				= [];
 
         $avatar 							= !empty($this->customer->getAvatar()) ? $this->customer->getAvatar() : 'no_image.png';
-        $account_info['avatar'] 			= $this->model_tool_image->resize($avatar, 100, 100);
+        $account_info['avatar'] 			= $this->model_tool_image->resize($avatar, 100, 100)  . '?t=' . time();
         $account_info['fullname'] 		    = !empty($this->customer->getFullName()) ? $this->customer->getFullName() : '';
         $account_info['telephone']          = !empty($this->customer->getTelephone()) ? $this->customer->getTelephone() : '';
         $account_info['email']              = !empty($this->customer->getEmail()) ? $this->customer->getEmail() : '';
@@ -167,7 +167,7 @@ class ControllerApiAccount extends Controller {
 
 	            move_uploaded_file($this->request->files['files']['tmp_name'], DIR_IMAGE . 'avatar/' . $file);
 
-	            $val					            = image_resize('avatar/' . $file);
+	            $val					            = image_resize('avatar/' . $file) . '?t=' . time();
         	}else{
         		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_upload')]));
         	}
