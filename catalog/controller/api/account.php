@@ -65,7 +65,7 @@ class ControllerApiAccount extends Controller {
 
         $avatar 							= !empty($this->customer->getAvatar()) ? $this->customer->getAvatar() : 'no_image.png';
         $account_info['avatar'] 			= $this->model_tool_image->resize($avatar, 100, 100);
-        $account_info['uname'] 				= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : '';
+        $account_info['fullname'] 		    = !empty($this->customer->getFullName()) ? $this->customer->getFullName() : '';
         $account_info['telephone']          = !empty($this->customer->getTelephone()) ? $this->customer->getTelephone() : '';
         $account_info['email']              = !empty($this->customer->getEmail()) ? $this->customer->getEmail() : '';
         $account_info['gender']             = !empty($this->customer->getGender()) ? $this->customer->getGender() : 0;
@@ -113,7 +113,7 @@ class ControllerApiAccount extends Controller {
         {
         	$this->load->language('tool/upload');
 
-        	if (!empty($this->request->files[$val]['name']) && is_file($this->request->files[$val]['tmp_name'])) {
+        	if (!empty($this->request->files['files']['name']) && is_file($this->request->files['files']['tmp_name'])) {
 
 	        	// Sanitize the filename
 	            $filename 				= basename(preg_replace('/[^a-zA-Z0-9\.\-\s+]/', '', html_entity_decode($this->request->files[$val]['name'], ENT_QUOTES, 'UTF-8')));
