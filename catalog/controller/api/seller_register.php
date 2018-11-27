@@ -232,7 +232,7 @@ class ControllerApiSellerRegister extends Controller
         }
 
         foreach ($images as $file) {
-            if (image_exists($file)) return ['msg'=>$this->language->get('error_images')];
+            if (!image_exists($file)) return ['msg'=>$this->language->get('error_images')];
         }
 
         return ['code'=>'200'];
