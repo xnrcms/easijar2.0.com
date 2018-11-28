@@ -745,6 +745,32 @@ class ControllerMultisellerSeller extends Controller {
 			$data['status'] = true;
 		}
 
+		$ext_field 	= ['ext_source','ext_true_name','ext_address','ext_experience','ext_company_type','ext_license','ext_legal_person','ext_idnum','ext_image'];
+		foreach ($ext_field as $value) {
+			if (!empty($seller_info) && isset($seller_info[$value])) {
+				if ($value == 'ext_image') {
+					$ext_image 		= explode(',', $seller_info[$value]);
+					for ($i=0; $i < 4; $i++) { 
+						$data['ext_image_' . $i] 	= isset($ext_image[$i]) ? $this->model_tool_image->resize($ext_image[$i], 100, 100) : '';
+					}
+				}elseif ($value == 'ext_company_type') {
+					$ctype 			= ['生产厂商','品牌商','代理商','经销商'];
+					$data[$value] 	= isset($ctype[$seller_info[$value]]) ? $ctype[$seller_info[$value]] : '';
+				}
+				else{
+					$data[$value] 	= $seller_info[$value];
+				}
+			}else{
+				if ($value == 'ext_image') {
+					for ($i=0; $i < 4; $i++) { 
+						$data['ext_image_' . $i] 	= '';
+					}
+				}else{
+					$data[$value] 	= '';
+				}
+			}
+		}
+
 		$this->load->model('localisation/country');
 
 		$data['countries'] = $this->model_localisation_country->getCountries();
