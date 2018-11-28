@@ -172,7 +172,7 @@ class ControllerSellerLogin extends Controller {
             $seller_info = $this->model_multiseller_seller->getSeller($customer_info['customer_id']);
 
             //是否商家入驻
-            if (!$seller_info) {
+            if (!$seller_info || !isset($seller_info['store_name']) || empty($seller_info['store_name'])) {
                 //$this->error['warning'] = $this->language->get('error_not_seller');
 
                 if (isset($this->request->post['ucode']) && !empty($this->request->post['ucode']) )
