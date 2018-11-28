@@ -42,4 +42,9 @@ class ModelAccountApi extends Model {
 		$query = $this->db->query("SELECT `api_id`,`username`,`key`,`status` FROM `" . DB_PREFIX . "api` WHERE `code` = '" . $this->db->escape($code) . "' AND status = '1'");
 		return $query->row;
 	}
+
+	public function getApiIdByToken($token = ''){
+		$api_query = $this->db->query("SELECT DISTINCT a.`api_id` FROM " . get_tabname('api') . " `a` LEFT JOIN " . get_tabname('api_session') . " `as` ON (a.api_id = as.api_id) LEFT JOIN " . get_tabname('api_ip') . " `ai` ON (a.api_id = ai.api_id) WHERE a.status = '1' AND `as`.`session_id` = '" . $this->db->escape((string)$token) . "'");
+		return isset($api_query->row['api_id']) ? (int)$api_query->row['api_id'] : '';
+	}
 }

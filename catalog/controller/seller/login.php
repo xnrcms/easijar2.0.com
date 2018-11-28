@@ -133,6 +133,11 @@ class ControllerSellerLogin extends Controller {
 			$data['password'] = '';
 		}
 
+		$data['ucode'] = '';
+		if (isset($this->request->get['isattract']) && (int)$this->request->get['isattract'] === 1 && isset($this->request->get['code']) && !empty($this->request->get['code'])) {
+			$data['ucode'] = $this->request->get['code'];
+		}
+
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');
 		$data['content_top'] = $this->load->controller('common/content_top');
@@ -166,8 +171,23 @@ class ControllerSellerLogin extends Controller {
 		    $this->load->model('multiseller/seller');
             $seller_info = $this->model_multiseller_seller->getSeller($customer_info['customer_id']);
 
+            //是否商家入驻
             if (!$seller_info) {
-                $this->error['warning'] = $this->language->get('error_not_seller');
+                //$this->error['warning'] = $this->language->get('error_not_seller');
+
+                if (isset($this->request->post['ucode']) && !empty($this->request->post['ucode']) )
+                {
+                	$this->load->model('account/api');
+
+                	$api_id 			= (int)$this->model_account_api->getApiIdByToken($this->request->post['ucode']);
+
+                	if ($api_id > 0) {
+	                	$this->session->start($this->request->post['ucode']);
+	                	$this->session->data['customer_id'] 	= $customer_info['customer_id'];
+                	}
+                }
+                
+                $this->response->redirect('http://attract.easijar.com?form=sellerlogin');
             } else if (!$seller_info['status']) {
                 $this->error['warning'] = $this->language->get('error_approved');
             }
