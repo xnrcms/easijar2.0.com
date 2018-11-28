@@ -187,7 +187,7 @@ class ControllerSellerLogin extends Controller {
                 	}
                 }
                 
-                $this->response->redirect('http://attract.easijar.com?form=sellerlogin');
+                $this->response->redirect('http://attract.easijar.com?from=sellerlogin');
             } else if (!$seller_info['status']) {
                 $this->error['warning'] = $this->language->get('error_approved');
             }
