@@ -142,7 +142,7 @@ class ControllerApiHome extends Controller {
 
 		if ($this->checkSign($req_data)) {
 
-			$terminalDefLang 	= [1=>'zh-cn',6=>'zh-cn'];
+			$terminalDefLang 	= [6=>'zh-cn'];
 	        $lang 				= isset($terminalDefLang[$req_data['terminal']]) ? $terminalDefLang[$req_data['terminal']] : '';
 
 			if (isset($req_data['code']) && strlen($req_data['code']) === 256 || strlen($req_data['code']) === 32) {
@@ -205,7 +205,7 @@ class ControllerApiHome extends Controller {
 		if (!empty($language)) {
 			$this->session->data['language']      = $language;
 		}
-		
+
 		return $this->session->getId();
 	}
 }
