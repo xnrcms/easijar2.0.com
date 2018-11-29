@@ -14,6 +14,10 @@ class ControllerApiProduct extends Controller {
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
 		
 		if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
@@ -208,6 +212,10 @@ class ControllerApiProduct extends Controller {
 
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
         }
 		
 		if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
