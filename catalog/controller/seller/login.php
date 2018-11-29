@@ -175,7 +175,7 @@ class ControllerSellerLogin extends Controller {
             if (!$seller_info || !isset($seller_info['store_name']) || empty($seller_info['store_name'])) {
                 //$this->error['warning'] = $this->language->get('error_not_seller');
 
-            	$session_id 							= $this->load->controller('api/home/makeHash');
+            	$session_id 							= $this->load->controller('api/home/makeHash','','zh-cn');
                 $this->session->start($session_id);
 
 	            $this->session->data['customer_id'] 	= $customer_info['customer_id'];
