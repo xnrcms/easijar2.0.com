@@ -1,7 +1,7 @@
 <?php
 $origin 		= isset($_SERVER['HTTP_ORIGIN'])? $_SERVER['HTTP_ORIGIN'] : '';  
 $allow_origin 	= [
-	'http://10.5.107.159'
+	'http://attract.easijar.com'
 ];  
   
 if(in_array($origin, $allow_origin)){  
