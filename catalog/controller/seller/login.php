@@ -175,19 +175,11 @@ class ControllerSellerLogin extends Controller {
             if (!$seller_info || !isset($seller_info['store_name']) || empty($seller_info['store_name'])) {
                 //$this->error['warning'] = $this->language->get('error_not_seller');
 
-                if (isset($this->request->post['ucode']) && !empty($this->request->post['ucode']) )
-                {
-                	$this->load->model('account/api');
+            	$session_id 							= $this->load->controller('api/home/makeHash');
+                $this->session->start($session_id);
 
-                	$api_id 			= (int)$this->model_account_api->getApiIdByToken($this->request->post['ucode']);
-
-                	if ($api_id > 0) {
-	                	$this->session->start($this->request->post['ucode']);
-	                	$this->session->data['customer_id'] 	= $customer_info['customer_id'];
-                	}
-                }
-                
-                $this->response->redirect('http://attract.easijar.com/#/join');
+	            $this->session->data['customer_id'] 	= $customer_info['customer_id'];
+                $this->response->redirect('http://attract.easijar.com/#/join?api_token=' . $session_id);
             } else if (!$seller_info['status']) {
                 $this->error['warning'] = $this->language->get('error_approved');
             }

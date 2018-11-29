@@ -148,7 +148,9 @@ final class OPPCw_Util {
 
 	public static function isAliasManagerActive(Customweb_Payment_Authorization_IOrderContext $orderContext) {
 		$paymentMethod = $orderContext->getPaymentMethod();
-		if ($paymentMethod->existsPaymentMethodConfigurationValue('alias_manager') && strtolower($paymentMethod->getPaymentMethodConfigurationValue('alias_manager')) == 'active') {
+		$customerId = trim($orderContext->getCustomerId());
+		if ($paymentMethod->existsPaymentMethodConfigurationValue('alias_manager') && strtolower($paymentMethod->getPaymentMethodConfigurationValue('alias_manager')) == 'active'
+			&& !empty($customerId)) {
 			return true;
 		}
 		else {

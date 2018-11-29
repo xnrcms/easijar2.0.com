@@ -48,7 +48,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 			$data = $adapter->getCheckoutPageHtml($paymentMethod, $orderContext, $this->registry, $failedTransaction);
 			
 			require_once 'Customweb/Licensing/OPPCw/License.php';
-			Customweb_Licensing_OPPCw_License::run('41fdca1lfnq2j68k');
+Customweb_Licensing_OPPCw_License::run('t3o4g8g7g4i1r4r1');
 			$vars = array();
 			$vars['checkout_form'] = $data;
 			return $this->renderView(OPPCw_Template::resolveTemplatePath(OPPCw_Template::PAYMENT_FORM_TEMPLATE), $vars);

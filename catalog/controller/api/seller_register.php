@@ -114,7 +114,7 @@ class ControllerApiSellerRegister extends Controller
 
         $customer_id     = isset($this->session->data['customer_id']) ? (int)$this->session->data['customer_id'] : 0;
         if ($customer_id <= 0) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:user info error']));
+            return $this->response->setOutput($this->returnData(['code'=>'206','msg'=>'fail:user info error']));
         }
 
         $this->load->model('account/customer');

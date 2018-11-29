@@ -52,7 +52,51 @@ class ControllerAccountOrder extends Controller {
 		$this->load->model('account/order');
 		$this->load->model('tool/image');
 
-        switch ($data['type']) {
+		$this->load->model('account/order');
+
+        $limit          = 10;
+
+        //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
+        $otype 			= ['shipped'=>3,'unshipped'=>2,'unpaid'=>1];
+        $order_type 	= isset($otype[$data['type']]) ? $otype[$data['type']] : 0;
+        $results 		= $this->model_account_order->getOrdersForMs($order_type,($page - 1) * $limit, $limit);
+        $order_total 	= $this->model_account_order->getTotalOrdersForMs();
+        
+        /*$oid        = [];
+        foreach ($results as $key => $value) {
+            $oid[$value['oid']]     = $value['oid'];
+        }
+
+        $ms_total                  = $this->model_account_order->getTotalsForMsByCode($oid,'multiseller_shipping');
+        $shipping                  = [];
+        foreach ($ms_total as $mskey => $msval) {
+            $shipping[$msval['order_id'].'-'.$msval['seller_id']]   = $msval['value'];
+        }
+
+        foreach ($results as $keys =>$result)
+        {
+            $shipping                  = isset($shipping[$result['oid'].'-'.$result['msid']]) ? $shipping[$result['oid'].'-'.$result['msid']] : 0;
+
+            $results[$keys]['oid']     = $result['soid'];
+
+            $results[$keys]['total']     = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+            $results[$keys]['shipping']  = $this->currency->format($shipping, $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+
+            foreach ($result['product_info'] as $reskey => $resval) {
+                $results[$keys]['product_info'][$reskey]['price']   = $this->currency->format($resval['price'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+                $results[$keys]['product_info'][$reskey]['total']   = $this->currency->format($resval['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
+
+                $results[$keys]['product_info'][$reskey]['image']   = $this->model_tool_image->resize($resval['image'], 100, 100);
+
+                unset($results[$keys]['product_info'][$reskey]['tax']);
+            }
+
+            unset($results[$keys]['currency_code']);
+            unset($results[$keys]['currency_value']);
+            unset($results[$keys]['soid']);
+        }*/
+
+        /*switch ($data['type']) {
             case 'shipped':
                 $order_total = $this->model_account_order->getTotalShippedOrders();
                 $results = $this->model_account_order->getShippedOrders(($page - 1) * 10, 10);
@@ -69,15 +113,16 @@ class ControllerAccountOrder extends Controller {
                 $order_total = $this->model_account_order->getTotalOrders();
                 $results = $this->model_account_order->getOrders(($page - 1) * 10, 10);
                 break;
-        }
+        }*/
 
 		foreach ($results as $result) {
-			$product_total = $this->model_account_order->getTotalOrderProductsByOrderId($result['order_id']);
-			$voucher_total = $this->model_account_order->getTotalOrderVouchersByOrderId($result['order_id']);
-			$recharge_total = $this->model_account_order->getTotalOrderRechargesByOrderId($result['order_id']);
+			$product_total 	= $this->model_account_order->getTotalOrderProductsByOrderId($result['oid'],$result['msid']);
+			$voucher_total 	= 0;//$this->model_account_order->getTotalOrderVouchersByOrderId($result['order_id']);
+			$recharge_total = 0;//$this->model_account_order->getTotalOrderRechargesByOrderId($result['order_id']);
 
-            $product_list = array();
-            $product_results = $this->model_account_order->getOrderProducts($result['order_id']);
+            $product_list 		= array();
+            $product_results 	= !empty($result['product_info']) ? $result['product_info'] : [];
+            //$this->model_account_order->getOrderProducts($result['order_id']);
             foreach($product_results as $product) {
                 $product_list[] = array(
                     'name'  => $product['name'],
@@ -87,8 +132,8 @@ class ControllerAccountOrder extends Controller {
                 );
             }
 
-            $voucher_list = array();
-            $voucher_results = $this->model_account_order->getOrderVouchers($result['order_id']);
+            $voucher_list 	= [];
+            /*$voucher_results = $this->model_account_order->getOrderVouchers($result['order_id']);
             foreach($voucher_results as $voucher) {
                 $voucher_list[] = array(
                     'name'  => $voucher['description'],
@@ -96,10 +141,10 @@ class ControllerAccountOrder extends Controller {
                     'image' => $this->model_tool_image->resize('placeholder.png', 100, 100),
                     'total' => $this->currency->format($voucher['amount'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']),
                 );
-            }
+            }*/
 
-            $recharge_list = array();
-            $recharge_results = $this->model_account_order->getOrderRecharges($result['order_id']);
+            $recharge_list 	= [];
+            /*$recharge_results = $this->model_account_order->getOrderRecharges($result['order_id']);
             foreach($recharge_results as $recharge) {
                 $recharge_list[] = array(
                     'name'  => $recharge['description'],
@@ -107,23 +152,23 @@ class ControllerAccountOrder extends Controller {
                     'image' => $this->model_tool_image->resize('placeholder.png', 100, 100),
                     'total' => $this->currency->format($recharge['amount'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']),
                 );
-            }
+            }*/
 
-            if ($result['order_status_id'] == $this->config->get('config_unpaid_status_id')) {
-                $href_cancel = $this->url->link('account/order/cancel', 'order_id=' . $result['order_id']);
+            if ($result['status_id'] == $this->config->get('config_unpaid_status_id')) {
+                $href_cancel = $this->url->link('account/order/cancel', 'order_id=' . $result['order_sn']);
             } else {
                 $href_cancel = '';
             }
 
-            if ($result['order_status_id'] == $this->config->get('config_shipped_status_id')) {
-                $href_confirm = $this->url->link('account/order/confirm', 'order_id=' . $result['order_id']);
+            if ($result['status_id'] == $this->config->get('config_shipped_status_id')) {
+                $href_confirm = $this->url->link('account/order/confirm', 'order_id=' . $result['order_sn']);
             } else {
                 $href_confirm = '';
             }
 
 			$data['orders'][] = array(
 			    'product_list' => array_merge($product_list, $voucher_list, $recharge_list),
-				'order_id'   => $result['order_id'],
+				'order_id'   => $result['order_sn'],
 				'name'       => $result['fullname'],
 				'status'     => $result['status'],
 				'date_added' => date($this->language->get('datetime_format'), strtotime($result['date_added'])),
@@ -131,7 +176,7 @@ class ControllerAccountOrder extends Controller {
 				'total'      => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
                 'cancel'     => $href_cancel,
                 'confirm'    => $href_confirm,
-				'view'       => $this->url->link('account/order/info', 'order_id=' . $result['order_id']),
+				'view'       => $this->url->link('account/order/info', 'order_id=' . $result['order_sn']),
 			);
 		}
 
@@ -163,7 +208,7 @@ class ControllerAccountOrder extends Controller {
 		if (isset($this->request->get['order_id'])) {
 			$order_id = $this->request->get['order_id'];
 		} else {
-			$order_id = 0;
+			$order_id = '';
 		}
 
 		if (!$this->customer->isLogged()) {
@@ -174,7 +219,9 @@ class ControllerAccountOrder extends Controller {
 
 		$this->load->model('account/order');
 
-		$order_info = $this->model_account_order->getOrder($order_id);
+		$order_info = $this->model_account_order->getOrderForMs($order_id);
+
+		$data['order_id'] 		= (int)$order_info['order_id'];
 
 		if ($order_info) {
 			$this->document->setTitle($this->language->get('text_order'));
@@ -204,7 +251,7 @@ class ControllerAccountOrder extends Controller {
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_order'),
-				'href' => $this->url->link('account/order/info', 'order_id=' . $this->request->get['order_id'] . $url)
+				'href' => $this->url->link('account/order/info', 'order_id=' . $order_id . $url)
 			);
 
 			if (isset($this->session->data['error'])) {
@@ -229,7 +276,6 @@ class ControllerAccountOrder extends Controller {
 				$data['invoice_no'] = '';
 			}
 
-			$data['order_id'] = (int)$this->request->get['order_id'];
 			$data['date_added'] = date($this->language->get('datetime_format'), strtotime($order_info['date_added']));
 
             if (is_ft()) {
@@ -279,12 +325,12 @@ class ControllerAccountOrder extends Controller {
 			// Products
 			$data['products'] = array();
 
-			$products = $this->model_account_order->getOrderProducts($this->request->get['order_id']);
+			$products = $this->model_account_order->getOrderProductsForMs($order_info['order_id'],$order_info['seller_id']);
 
 			foreach ($products as $product) {
 				$option_data = array();
 
-				$options = $this->model_account_order->getOrderOptions($this->request->get['order_id'], $product['order_product_id']);
+				$options = $this->model_account_order->getOrderOptions($order_info['order_id'], $product['order_product_id']);
 
 				foreach ($options as $option) {
 					if ($option['type'] != 'file') {
@@ -312,7 +358,7 @@ class ControllerAccountOrder extends Controller {
 				$product_info = $this->model_catalog_product->getProduct($product['product_id']);
 
 				if ($product_info) {
-					$reorder = $this->url->link('account/order/reorder', 'order_id=' . $order_id . '&order_product_id=' . $product['order_product_id']);
+					$reorder = $this->url->link('account/order/reorder', 'order_id=' . $order_info['order_id'] . '&order_product_id=' . $product['order_product_id']);
 				} else {
 					$reorder = '';
 				}
@@ -345,35 +391,44 @@ class ControllerAccountOrder extends Controller {
 			// Voucher
 			$data['vouchers'] = array();
 
-			$vouchers = $this->model_account_order->getOrderVouchers($this->request->get['order_id']);
+			/*$vouchers = $this->model_account_order->getOrderVouchers($this->request->get['order_id']);
 
 			foreach ($vouchers as $voucher) {
 				$data['vouchers'][] = array(
 					'description' => $voucher['description'],
 					'amount'      => $this->currency->format($voucher['amount'], $order_info['currency_code'], $order_info['currency_value'])
 				);
-			}
+			}*/
 
 			// Recharge
 			$data['recharges'] = array();
 
-			$recharges = $this->model_account_order->getOrderRecharges($this->request->get['order_id']);
+			/*$recharges = $this->model_account_order->getOrderRecharges($this->request->get['order_id']);
 
 			foreach ($recharges as $recharge) {
 				$data['recharges'][] = array(
 					'description' => $recharge['description'],
 					'amount'      => $this->currency->format($recharge['amount'], $order_info['currency_code'], $order_info['currency_value'])
 				);
-			}
+			}*/
 
 			// Totals
 			$data['totals'] = array();
 
 			$totals = $this->model_account_order->getOrderTotals($this->request->get['order_id']);
 
-			foreach ($totals as $total) {
+			foreach ($totals as $total)
+			{
+	            $title          = $total['title'];
+	            if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
+	                $titles     = explode('&', $title);
+	                $title      = $titles[0] . ' ' . $titles[2];
+	            }
+
+	            if ($total['code'] == 'shipping') continue;
+
 				$data['totals'][] = array(
-					'title' => $total['title'],
+	                'title' => $title,
 					'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']),
 				);
 			}

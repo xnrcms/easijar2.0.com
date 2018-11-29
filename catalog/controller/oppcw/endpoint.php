@@ -29,4 +29,4 @@ require_once 'OPPCw/AbstractController.php';
 
 
 require_once 'Customweb/Licensing/OPPCw/License.php';
-Customweb_Licensing_OPPCw_License::run('7res60etld25d208');
+Customweb_Licensing_OPPCw_License::run('h8nrkr0612k89bmo');

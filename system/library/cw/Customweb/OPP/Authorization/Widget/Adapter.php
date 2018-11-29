@@ -20,8 +20,8 @@
  */
 
 require_once 'Customweb/OPP/Authorization/AbstractAdapter.php';
-require_once 'Customweb/Payment/Authorization/Widget/IAdapter.php';
 require_once 'Customweb/I18n/LocalizableString.php';
+require_once 'Customweb/Payment/Authorization/Widget/IConfirmationRequiredAdapter.php';
 require_once 'Customweb/OPP/Authorization/Widget/ParameterBuilder.php';
 require_once 'Customweb/I18n/Translation.php';
 require_once 'Customweb/OPP/Request.php';
@@ -34,7 +34,7 @@ require_once 'Customweb/Core/Logger/Factory.php';
  * @Bean
  */
 class Customweb_OPP_Authorization_Widget_Adapter extends Customweb_OPP_Authorization_AbstractAdapter implements
-		Customweb_Payment_Authorization_Widget_IAdapter {
+	Customweb_Payment_Authorization_Widget_IConfirmationRequiredAdapter {
 
 	public function getAdapterPriority(){
 		return 50;
@@ -171,4 +171,16 @@ class Customweb_OPP_Authorization_Widget_Adapter extends Customweb_OPP_Authoriza
 	protected function getParameterBuilder(Customweb_Payment_Authorization_ITransaction $transaction){
 		return new Customweb_OPP_Authorization_Widget_ParameterBuilder($this->getContainer(), $transaction);
 	}
+	
+	public function getWidgetConfirmationHTML(Customweb_Payment_Authorization_ITransaction $transaction, array $formData){
+		if ($transaction->getTransactionContext()->getAlias() instanceof Customweb_Payment_Authorization_ITransaction) {
+			$processAliasUrl = $this->getEndpointAdapter()->getUrl('process', 'alias',
+					array(
+						'cw_transaction_id' => $transaction->getExternalTransactionId()
+					));
+			return '<a href="' . $processAliasUrl . '" class="btn btn-confirm btn-success">Confirm</a>';
+		}
+		return $this->getWidgetHTML($transaction, $formData);
+	}
+
 }

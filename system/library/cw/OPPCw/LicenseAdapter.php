@@ -27,4 +27,4 @@ require_once 'OPPCw/Store.php';
 
 
 require_once 'Customweb/Licensing/OPPCw/License.php';
-Customweb_Licensing_OPPCw_License::run('ko0t6ck5hvfpko1p');
+Customweb_Licensing_OPPCw_License::run('6gma0u7kt0lqiu11');

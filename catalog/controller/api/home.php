@@ -168,6 +168,13 @@ class ControllerApiHome extends Controller {
 	public function makeHash($code = '')
 	{
 		$this->load->model('account/api');
+		if (empty($code)) {
+			if (function_exists('random_bytes')) {
+				$code = substr(bin2hex(random_bytes(26)), 0, 26);
+			} else {
+				$code = substr(bin2hex(openssl_random_pseudo_bytes(26)), 0, 26);
+			}
+		}
 
 		$api_info 			= $this->model_account_api->getApiInfoByCode($code);
 
@@ -175,22 +182,12 @@ class ControllerApiHome extends Controller {
 			$api_id 				= $api_info['api_id'];
 			$username 				= $api_info['username'];
 			$key 					= $api_info['key'];
-
-			/*$user_data				= ['username'=>$username,'key'=>$key,'status'=>(int)$api_info['status'],'code'=>$code];
-			$hash 					= $this->encryption->encrypt($key, json_encode($user_data));*/
-
-			/*
-			if (!(isset($api_info['hash']) && !empty($api_info['hash']) && $api_info['hash'] === $hash)) return '';
-			*/
-
 		}else{
 			
 			$username 				= md5(random_string(32,7) . (time()+10));
 			$key 					= md5(random_string(32,7) . time() . $this->config->get('config_encryption'));
 
 			$user_data				= ['username'=>$username,'key'=>$key,'status'=>1,'code'=>$code];
-			//$hash 					= $this->encryption->encrypt($key, json_encode($user_data));
-
 			$api_id 				= $this->model_account_api->addApi($user_data);
 		}
 		

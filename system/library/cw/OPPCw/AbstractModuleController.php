@@ -101,7 +101,7 @@ class OPPCw_AbstractModuleController extends OPPCw_AbstractController
 		$info = $this->model_oppcw_setting->render(new OPPCw_SettingApi('module_oppcw'));
 		
 		require_once 'Customweb/Licensing/OPPCw/License.php';
-Customweb_Licensing_OPPCw_License::run('orj42oqudi9p1nsq');
+Customweb_Licensing_OPPCw_License::run('kjte4fucgcjd3kmm');
 		
 		if (version_compare(VERSION, '2.0.0.0') >= 0) {
 			$this->document->addScript('view/javascript/bootstrap-tab.min.js');

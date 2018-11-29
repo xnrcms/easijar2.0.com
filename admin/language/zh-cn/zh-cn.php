@@ -136,6 +136,7 @@ $_['tab_discount']                  = '批量购买';
 $_['tab_documentation']             = '文档';
 $_['tab_general']                   = '基本信息';
 $_['tab_history']                   = '历史';
+$_['tab_mrchant_information']       = '商家资料';
 $_['tab_authentication']            = '绑定帐号';
 $_['tab_ftp']                       = 'FTP';
 $_['tab_ip']                        = 'IP 地址';

@@ -214,7 +214,7 @@ class ControllerSellerEvent extends Controller {
             if (isset($products[$seller_id])) {
                 $products[$seller_id]['products'][] = $product;
             } else {
-                $suborder_info = $this->model_multiseller_order->getSuborder((int)$this->request->get['order_id'], $seller_id);
+                $suborder_info = $this->model_multiseller_order->getSuborder((int)$data['order_id'], $seller_id);
 
                 $order_status = $this->model_localisation_order_status->getOrderStatus($suborder_info['order_status_id']);
                 $products[$seller_id] = array(

@@ -181,8 +181,14 @@ class ModelAccountOrder extends Model {
         return $query->row['total'];
     }
 
-    public function getTotalOrderProductsByOrderId($order_id) {
-        $query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
+    public function getTotalOrderProductsByOrderId($order_id,$seller_id = 0) {
+        $seller_map     = '';
+        $seller_id      = (int)$seller_id;
+        if ($seller_id > 0) {
+            $query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('ms_order_product') . "msop LEFT JOIN " . get_tabname('order_product') . " op ON (msop.order_product_id = op.order_product_id) WHERE msop.order_id = '" . (int)$order_id . "' AND msop.seller_id = " . $seller_id);
+        }else{
+            $query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
+        }
 
         return $query->row['total'];
     }
@@ -378,7 +384,7 @@ class ModelAccountOrder extends Model {
     {
         if ( empty($order_sn) )  return [];
 
-        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value,fullname,telephone,email,date_added,shipping_method,shipping_country,shipping_zone,shipping_zone,shipping_address_format,shipping_fullname,shipping_telephone,shipping_address_1,shipping_address_2,shipping_city','o');
+        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value,fullname,telephone,email,date_added,shipping_method,shipping_country,shipping_zone,shipping_zone,shipping_address_format,shipping_fullname,shipping_telephone,shipping_address_1,shipping_address_2,shipping_city,invoice_no,payment_address_format,payment_method,shipping_custom_field,comment','o');
         $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
         $fields         .= ',' . format_find_field('avatar,store_name,','ms');
 
@@ -406,7 +412,7 @@ class ModelAccountOrder extends Model {
 
             if ($order_id <= 0 || $seller_id <= 0)  return [];
 
-            $query = $this->db->query("SELECT op.`order_product_id`,op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`  FROM `" . DB_PREFIX . "order_product` op 
+            $query = $this->db->query("SELECT op.`order_product_id`,op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`,op.`model` FROM `" . DB_PREFIX . "order_product` op 
                 LEFT JOIN  `" . DB_PREFIX . "ms_order_product` msop ON (op.order_product_id = msop.order_product_id) 
                 LEFT JOIN  `" . DB_PREFIX . "product` p ON (p.product_id = op.product_id) 
                 WHERE msop.seller_id = '" . $seller_id . "' AND msop.order_id = '" . $order_id . "' ORDER BY op.order_product_id DESC LIMIT 0,100");
@@ -415,8 +421,35 @@ class ModelAccountOrder extends Model {
     }
 
     //商家订单处理
-    public function getTotalOrdersForMs() {
-        $query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `oc_order`o ON (o.order_id = mssu.order_id) WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0' AND o.store_id = '" . (int)$this->config->get('config_store_id') . "'");
+    public function getTotalOrdersForMs($order_type = 0)
+    {
+        $order_type         = (int)$order_type;
+
+        if ($order_type == 0) {
+            $status_where       = "AND mssu.order_status_id > '0' ";
+        }elseif ($order_type == 1) {
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' ";
+        }elseif ($order_type == 2) {
+
+            $unshipped_status = $this->config->get('config_paid_status');
+
+            if ($this->config->get('payment_cod_status')) {
+                $unshipped_status[] = $this->config->get('payment_cod_order_status_id');
+            }
+
+            $status_where   = "AND mssu.order_status_id in ('" . implode("','",$unshipped_status) . "') ";
+        }elseif ($order_type == 3) {
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' ";
+        }elseif($order_type == 4){
+            $order_statuses = $this->config->get('config_complete_status');
+            foreach ($order_statuses as $order_status_id) {
+                $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
+            }
+
+            $status_where   = "AND " . implode(" OR ",$implode) . ' ';
+        }
+
+        $query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('ms_suborder') . " mssu LEFT JOIN  `oc_order`o ON (o.order_id = mssu.order_id) WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0' AND o.store_id = '" . (int)$this->config->get('config_store_id') . "'");
 
         return $query->row['total'];
     }
@@ -474,7 +507,7 @@ class ModelAccountOrder extends Model {
             $status_where   = "AND " . implode(" OR ",$implode) . ' ';
         }
 
-        $fields         = format_find_field('order_id AS oid,date_added,currency_code,currency_value','o');
+        $fields         = format_find_field('order_id AS oid,date_added,currency_code,currency_value,fullname,date_added','o');
         $fields         .= ',' . format_find_field('order_status_id AS status_id,suborder_id AS soid,order_sn,total','mssu');
         $fields         .= ',' . format_find_field('name AS status','os');
         $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');

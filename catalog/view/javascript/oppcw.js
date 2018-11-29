@@ -51,7 +51,7 @@
 			});
 			$.ajax({
 				type: 		'POST',
-				url: 		'index.php?route=checkout/confirm',
+				url: 		'index.php?route=checkout/checkout/connect',
 				data: 		'oppcw_alias=' + $('#oppcw_alias').val(),
 				success: 	function( response ) {
 					var htmlCode = '';
@@ -62,7 +62,7 @@
 					catch (err){
 						htmlCode = response;
 					}
-					
+					console.log(htmlCode);
 					var newPane = $("#oppcw-checkout-form-pane", $(htmlCode));
 					if (newPane.length > 0) {
 						var newContent = newPane.html();
