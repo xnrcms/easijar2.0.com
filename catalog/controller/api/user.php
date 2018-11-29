@@ -399,7 +399,7 @@ class ControllerApiUser extends Controller {
         	if ($this->model_account_customer->getTotalCustomersByTelephone($telephone))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_telephone_exists')]) );
         }elseif ( isset($req_data['scene']) && (int)$req_data['scene'] == 2) {
-        	if (!$this->model_account_customer->getTotalCustomersByEmail($telephone))
+        	if (!$this->model_account_customer->getTotalCustomersByTelephone($telephone))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_not_telephone')]) );
         }
 
@@ -449,13 +449,13 @@ class ControllerApiUser extends Controller {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:send too fast']));
         }
 
+        $this->load->model('account/customer');
+
         if ( isset($req_data['scene']) && (int)$req_data['scene'] == 1)
         {
-        	$this->load->model('account/customer');
         	if ($this->model_account_customer->getTotalCustomersByEmail($email))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_exists_email')]) );
         }elseif ( isset($req_data['scene']) && (int)$req_data['scene'] == 2) {
-        	$this->load->model('account/customer');
         	if (!$this->model_account_customer->getTotalCustomersByEmail($email))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_not_email')]) );
         }

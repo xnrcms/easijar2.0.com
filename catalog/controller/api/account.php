@@ -219,7 +219,7 @@ class ControllerApiAccount extends Controller {
                 }
 
                 //验证码校验
-                $keys                                       = md5('smscode-' . $val . '-2');
+                $keys                                       = md5('smscode-' . $val . '-1');
                 if (!isset($this->session->data['smscode'][$keys]['code']) || $smscode != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
                     return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
                 }
