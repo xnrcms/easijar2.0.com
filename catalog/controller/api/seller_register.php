@@ -136,6 +136,8 @@ class ControllerApiSellerRegister extends Controller
         $this->load->model('multiseller/seller');
         $this->model_multiseller_seller->saveSeller($customer_id, $req_data);
 
+        $this->load->model('account/customer');
+        $this->model_account_customer->editTelephone($req_data['telephone']);
         /*//删除保存的临时图片
         if (!empty($req_data['images']))
         {

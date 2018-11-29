@@ -62,7 +62,7 @@
 					catch (err){
 						htmlCode = response;
 					}
-					console.log(htmlCode);
+					
 					var newPane = $("#oppcw-checkout-form-pane", $(htmlCode));
 					if (newPane.length > 0) {
 						var newContent = newPane.html();
