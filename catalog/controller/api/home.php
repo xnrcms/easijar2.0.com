@@ -142,6 +142,9 @@ class ControllerApiHome extends Controller {
 
 		if ($this->checkSign($req_data)) {
 
+			$terminalDefLang 	= [1=>'zh-cn',6=>'zh-cn'];
+	        $lang 				= isset($terminalDefLang[$req_data['terminal']]) ? $terminalDefLang[$req_data['terminal']] : '';
+
 			if (isset($req_data['code']) && strlen($req_data['code']) === 256 || strlen($req_data['code']) === 32) {
 				//防止时时刷新
 				$cache_key 				= md5($req_data['code']);
@@ -151,7 +154,7 @@ class ControllerApiHome extends Controller {
 				if (isset($cache_data['expire_time']) && $cache_data['expire_time'] >= time()) {
 					$json 				= $this->returnData(['msg'=>'fail:frequent requests']);
 				}else{
-					$json 				= $this->returnData(['code'=>'200','msg'=>'success','data'=>['api_token'=>$this->makeHash($cache_key),'expire_time'=>(int)(time() + 3600)]]);
+					$json 				= $this->returnData(['code'=>'200','msg'=>'success','data'=>['api_token'=>$this->makeHash($cache_key,$lang),'expire_time'=>(int)(time() + 3600)]]);
 					$this->cache->set($cache_key, json_encode(['expire_time'=>time() + 10]));
 				}
 			}else{
@@ -165,7 +168,7 @@ class ControllerApiHome extends Controller {
 		return $this->response->setOutput($json);
 	}
 
-	public function makeHash($code = '')
+	public function makeHash($code = '',$language = '')
 	{
 		$this->load->model('account/api');
 		if (empty($code)) {
@@ -199,6 +202,10 @@ class ControllerApiHome extends Controller {
 		$this->session->data['api_key'] 		= $key;
 		$this->session->data['api_token'] 		= $this->session->getId();
 
+		if (!empty($language)) {
+			$this->session->data['language']      = $language;
+		}
+		
 		return $this->session->getId();
 	}
 }

@@ -578,7 +578,7 @@ class ControllerCheckoutCheckout extends Controller
 
     // Payment connect page when order created
     public function connect()
-    {wr(array_merge($this->request->post,$this->request->get));
+    {
         $this->log(__FUNCTION__);
         if (!isset($this->session->data['order_id']) || (int)$this->session->data['order_id'] <= 0) {
             $this->response->redirect($this->url->link('common/home'));
