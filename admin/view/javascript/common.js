@@ -392,6 +392,29 @@ $(document).ready(function() {
         $('.thumbnail-zoom').remove();
     });
 
+    // Thumbnail image hover
+    $(document).on('mouseover', 'a[data-toggle=\'image2\']', function(e) {
+        $('.thumbnail-zoom').remove();
+        var value = $(this).siblings('input[type="hidden"]').val();
+        if (!value) {
+            return;
+        }
+
+        value = '../image/' + value;
+        var offset = $(this).offset();
+        var scrollTop = $(window).scrollTop();
+
+        var html = '';
+        var style = 'style="left:' + (offset.left + $(this).width() + 20) + 'px;top:' + (offset.top - scrollTop - 20) + 'px;"';
+        var image = '<img class="img-responsive" src="' + value + '" />';
+        html += '<div class="thumbnail-zoom" ' + style + '>' + image + '</div>';
+        $(this).append(html);
+    });
+
+    $(document).on('mouseout', 'a[data-toggle=\'image\']', function() {
+        $('.thumbnail-zoom').remove();
+    });
+
 	// table dropdown responsive fix
 	$('.table-responsive').on('shown.bs.dropdown', function(e) {
 		var t = $(this),
