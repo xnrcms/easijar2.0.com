@@ -175,10 +175,17 @@ class ControllerSellerLogin extends Controller {
             if (!$seller_info || !isset($seller_info['store_name']) || empty($seller_info['store_name'])) {
                 //$this->error['warning'] = $this->language->get('error_not_seller');
 
-            	$session_id 							= $this->load->controller('api/home/makeHash','','zh-cn');
+            	if (function_exists('random_bytes')) {
+					$session_id = substr(bin2hex(random_bytes(26)), 0, 26);
+				} else {
+					$session_id = substr(bin2hex(openssl_random_pseudo_bytes(26)), 0, 26);
+				}
+
                 $this->session->start($session_id);
 
+            	$this->load->controller('api/home/makeHash','','zh-cn');
 	            $this->session->data['customer_id'] 	= $customer_info['customer_id'];
+
                 $this->response->redirect('http://attract.easijar.com/#/join?api_token=' . $session_id);
             } else if (!$seller_info['status']) {
                 $this->error['warning'] = $this->language->get('error_approved');

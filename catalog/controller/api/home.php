@@ -175,14 +175,7 @@ class ControllerApiHome extends Controller {
 	public function makeHash($code = '',$language = '')
 	{
 		$this->load->model('account/api');
-		if (empty($code)) {
-			if (function_exists('random_bytes')) {
-				$code = substr(bin2hex(random_bytes(26)), 0, 26);
-			} else {
-				$code = substr(bin2hex(openssl_random_pseudo_bytes(26)), 0, 26);
-			}
-		}
-
+		
 		$api_info 			= $this->model_account_api->getApiInfoByCode($code);
 
 		if ($api_info) {

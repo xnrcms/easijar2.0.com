@@ -417,7 +417,7 @@ class ControllerApiUser extends Controller {
         if ( isset($req_data['scene']) && (int)$req_data['scene'] == 1)
         {
         	if ($this->model_account_customer->getTotalCustomersByTelephone($telephone))
-        	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_telephone_exists')]) );
+        	return $this->response->setOutput( $this->returnData(['code'=>'204','msg'=>$this->language->get('error_telephone_exists')]) );
         }elseif ( isset($req_data['scene']) && (int)$req_data['scene'] == 2) {
         	if (!$this->model_account_customer->getTotalCustomersByTelephone($telephone))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_not_telephone')]) );
@@ -425,12 +425,15 @@ class ControllerApiUser extends Controller {
 
         if (isset($this->session->data['smscode']))  unset($this->session->data['smscode']);
 
-        $code 										= mt_rand(100000, 999999); //生成校验码
-        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
+        $code 										= mt_rand(100000, 999999);
 
         $this->load->model('notify/notify');
         $ret = $this->model_notify_notify->customerRegisterVerify($telephone, $code);
         if ($ret === true) {
+
+	        //生成校验码
+	        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
+
 			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'telephone smscode get success']));
         } else {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail: '.$ret]));
@@ -478,7 +481,7 @@ class ControllerApiUser extends Controller {
         if ( isset($req_data['scene']) && (int)$req_data['scene'] == 1)
         {
         	if ($this->model_account_customer->getTotalCustomersByEmail($email))
-        	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_exists_email')]) );
+        	return $this->response->setOutput( $this->returnData(['code'=>'205','msg'=>$this->language->get('error_exists_email')]) );
         }elseif ( isset($req_data['scene']) && (int)$req_data['scene'] == 2) {
         	if (!$this->model_account_customer->getTotalCustomersByEmail($email))
         	return $this->response->setOutput( $this->returnData(['msg'=>$this->language->get('error_not_email')]) );

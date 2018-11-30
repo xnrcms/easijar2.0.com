@@ -39,7 +39,7 @@ $_['entry_zone']                = '省份';
 
 
 // Error
-$_['error_exists']              = '错误：该邮箱地址已被注册、请换一个电子邮箱！';
+$_['error_exists_email']        = '错误：该邮箱地址已被注册、请换一个电子邮箱！';
 $_['error_exists_telephone']    = '错误：该手机号码已被注册、请换一个手机号码！';
 $_['error_fullname']           	= '名字必须在 1 到 32 字符之间！';
 $_['error_email']               = '无效的邮箱地址！';

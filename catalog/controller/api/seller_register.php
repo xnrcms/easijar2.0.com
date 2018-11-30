@@ -68,8 +68,8 @@ class ControllerApiSellerRegister extends Controller
             return ['msg'=>$this->language->get('error_email')];
         }
 
-        if (array_get($req_data, 'account') && $this->model_account_customer->getTotalCustomersByEmail($req_data['account'])) {
-            return ['code'=>'205','msg'=>$this->language->get('error_exists')];
+        if ($this->model_account_customer->getTotalCustomersByEmail($req_data['account'])) {
+            return ['code'=>'205','msg'=>$this->language->get('error_exists_email')];
         }
 
         //校验密码复杂程度
@@ -138,6 +138,7 @@ class ControllerApiSellerRegister extends Controller
 
         $this->load->model('account/customer');
         $this->model_account_customer->editTelephone($req_data['telephone']);
+
         /*//删除保存的临时图片
         if (!empty($req_data['images']))
         {
@@ -165,7 +166,7 @@ class ControllerApiSellerRegister extends Controller
         }
 
         if ($this->model_account_customer->getTotalCustomersByTelephone($telephone)) {
-            return ['msg'=>$this->language->get('error_exists_telephone')];
+            return ['code'=>'204','msg'=>$this->language->get('error_exists_telephone')];
         }
 
         $keys                                       = md5('smscode-' . $req_data['telephone'] . '-1');
