@@ -73,14 +73,15 @@
                               <div class="text-danger">{{ error_store_name }}</div>
                             {% endif %}</div>
                         </div>
-                        <div class="form-group required">
+                        <input type="hidden" name="company" value="{{ company }}" id="input-company" class="form-control"/>
+                        {# <div class="form-group required">
                           <label class="col-sm-2 control-label" for="input-company">{{ entry_company }}</label>
                           <div class="col-sm-10">
                             <input type="text" name="company" value="{{ company }}" placeholder="{{ entry_company }}" id="input-company" class="form-control"/>
                             {% if error_company %}
                               <div class="text-danger">{{ error_company }}</div>
                             {% endif %}</div>
-                        </div>
+                        </div> #}
                         <div class="form-group">
                           <label class="col-sm-2 control-label" for="input-description">{{ entry_description }}</label>
                           <div class="col-sm-10">
@@ -238,74 +239,74 @@
               <div class="tab-pane" id="tab-information">
                 <fieldset>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">渠道来源</label>
+                    <label class="col-sm-2 control-label">{{ column_sources }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_source }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">真实姓名</label>
+                    <label class="col-sm-2 control-label">{{ column_real_name }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_true_name }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">详细地址</label>
+                    <label class="col-sm-2 control-label">{{ column_detail_address }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_address }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">开店经验</label>
+                    <label class="col-sm-2 control-label">{{ column_shop_sxperience }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_experience }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">公司类型</label>
+                    <label class="col-sm-2 control-label">{{ column_company_type }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_company_type }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">公司名称</label>
+                    <label class="col-sm-2 control-label">{{ column_corporate_name }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ company }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">营业执照号码</label>
+                    <label class="col-sm-2 control-label">{{ column_license_number }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_license }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">法人姓名</label>
+                    <label class="col-sm-2 control-label">{{ column_legal_person }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_legal_person }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">法人身份证号码</label>
+                    <label class="col-sm-2 control-label">{{ column_legal_identity }}</label>
                     <div class="col-sm-10">
                         <input type="text" value="{{ ext_idnum }}" class="form-control" disabled="disabled" />
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">法人身份证正反两面原件照片</label>
+                    <label class="col-sm-2 control-label">{{ column_legal_photos_card }}</label>
                     <div class="col-sm-10">
                         <img src="{{ ext_image_0 }}">
                         <img src="{{ ext_image_1 }}">
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">营业执照正本/副本原件照片</label>
+                    <label class="col-sm-2 control-label">{{ column_legal_photos_license }}</label>
                     <div class="col-sm-10">
                         <img src="{{ ext_image_2 }}">
                     </div>
                   </div>
                   <div class="form-group">
-                    <label class="col-sm-2 control-label">银行开户许可证原件照片</label>
+                    <label class="col-sm-2 control-label">{{ column_legal_photos_permit }}</label>
                     <div class="col-sm-10">
                         <img src="{{ ext_image_3 }}">
                     </div>

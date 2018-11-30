@@ -44,6 +44,19 @@ $_['column_country']            = 'Country';
 $_['column_action']             = 'Action';
 $_['column_id']                 = 'ID';
 
+$_['column_sources']            = 'Channel Sources';
+$_['column_real_name']          = 'Real Name';
+$_['column_detail_address']     = 'Detailed Address';
+$_['column_shop_sxperience']    = 'Shop Sxperience';
+$_['column_company_type']       = 'Company Type';
+$_['column_corporate_name']     = 'Corporate Name';
+$_['column_license_number']     = 'Business License Number';
+$_['column_legal_person']     	= 'Name Of Legal Person';
+$_['column_legal_identity']     = 'Corporate Identity Card Number';
+$_['column_legal_photos_card']  = 'Photos Of Both Sides Of The Original Legal Person ID Card';
+$_['column_legal_photos_license']     	= 'Photos Of Original/Duplicate Business License';
+$_['column_legal_photos_permit']     	= 'Photos Of Original Bank Account Permit';
+
 // Entry
 $_['entry_seller_group']        = 'Seller Group';
 $_['entry_fullname']            = 'Full Name';

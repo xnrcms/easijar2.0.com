@@ -23,7 +23,7 @@ class ControllerExtensionModuleMultiFilter extends Controller
     public function getFilterForApi()
     {
         $route = current_route();
-        if (!in_array($route, ['api/product/index'])) return;
+        if (!in_array($route, ['api/product/index','api/product/search'])) return;
 
         if ($route == 'api/product/index') {
             if ($path = array_get($this->request->post, 'path')) {
@@ -34,6 +34,15 @@ class ControllerExtensionModuleMultiFilter extends Controller
 
             if ($this->categoryParts) {
                 $this->routeType = 'category';
+                return $this->initFilterForApi();
+            }
+            return;
+        }
+
+        if ($route == 'api/product/search') {
+            if ($keyword = array_get($this->request->post, 'search')) {
+                $this->routeType = 'search';
+                $this->searchKeyword = $keyword;
                 return $this->initFilterForApi();
             }
             return;
@@ -254,45 +263,45 @@ class ControllerExtensionModuleMultiFilter extends Controller
 
     protected function initFilterForApi()
     {
-        $filter = array_get($this->request->get, 'filter', '');
+        $filter = array_get($this->request->post, 'filter', '');
 
-        if ($brand = array_get($this->request->get, 'brand')) {
+        if ($brand = array_get($this->request->post, 'brand')) {
             $selectedBrandIds = parse_filters($brand);
         } else {
             $selectedBrandIds = [];
         }
 
-        if ($variant = array_get($this->request->get, 'variant')) {
+        if ($variant = array_get($this->request->post, 'variant')) {
             $selectedVariantValueIds = parse_filters($variant);
         } else {
             $selectedVariantValueIds = [];
         }
 
-        if ($option = array_get($this->request->get, 'option')) {
+        if ($option = array_get($this->request->post, 'option')) {
             $selectedOptionValueIds = parse_filters($option);
         } else {
             $selectedOptionValueIds = [];
         }
 
-        if ($attr = array_get($this->request->get, 'attr')) {
+        if ($attr = array_get($this->request->post, 'attr')) {
             $selectedAttributes = parse_attributes($attr);
         } else {
             $selectedAttributes = [];
         }
 
-        if (isset($this->request->get['in_stock'])) {
-            $selectedInStock = array_get($this->request->get, 'in_stock');
+        if (isset($this->request->post['in_stock'])) {
+            $selectedInStock = array_get($this->request->post, 'in_stock');
         }
 
-        if ($status = array_get($this->request->get, 'status')) {
+        if ($status = array_get($this->request->post, 'status')) {
             $selectedStockStatusIds = parse_filters($status);
         } else {
             $selectedStockStatusIds = [];
         }
 
-        $keyword = array_get($this->request->get, 'search', '');
+        $keyword = array_get($this->request->post, 'search', '');
 
-        if ($price = array_get($this->request->get, 'price')) {
+        if ($price = array_get($this->request->post, 'price')) {
             $selectedPrices = parse_filters($price);
         } else {
             $selectedPrices = [];

@@ -124,6 +124,7 @@ $_['tab_discount']                  = 'Discount';
 $_['tab_documentation']             = 'Documentation';
 $_['tab_general']                   = 'General';
 $_['tab_history']                   = 'History';
+$_['tab_mrchant_information']       = 'Merchant Information';
 $_['tab_authentication']            = 'Authentication';
 $_['tab_ftp']                       = 'FTP';
 $_['tab_ip']                        = 'IP Addresses';

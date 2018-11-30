@@ -44,6 +44,19 @@ $_['column_country']            = '国家';
 $_['column_action']             = '操作';
 $_['column_id']                 = 'ID';
 
+$_['column_sources']            = '渠道来源';
+$_['column_real_name']          = '真实姓名';
+$_['column_detail_address']     = '详细地址';
+$_['column_shop_sxperience']    = '开店经验';
+$_['column_company_type']       = '公司类型';
+$_['column_corporate_name']     = '公司名称';
+$_['column_license_number']     = '营业执照号码';
+$_['column_legal_person']     	= '法人姓名';
+$_['column_legal_identity']     = '法人身份证号码';
+$_['column_legal_photos_card']  = '法人身份证正反两面原件照片';
+$_['column_legal_photos_license']     	= '营业执照正本/副本原件照片';
+$_['column_legal_photos_permit']     	= '银行开户许可证原件照片';
+
 // Entry
 $_['entry_seller_group']        = '商户群组';
 $_['entry_fullname']            = '姓名';

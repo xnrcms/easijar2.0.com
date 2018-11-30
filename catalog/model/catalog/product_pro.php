@@ -461,7 +461,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
             $productList[] = array_get($productData, $productId);
         }
 
-        $this->setCacheData($cacheKey, $productList);
+        $this->setCacheData($cacheKey, $productList);wr(['productList'=>$productList]);
         return $productList;
     }
 

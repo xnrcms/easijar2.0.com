@@ -28,72 +28,40 @@ class ControllerApiProduct extends Controller {
 		$this->load->model('catalog/product_pro');
 		$this->load->model('tool/image');
 
-		$page 			= (int)$req_data['page'] > 0 ? (int)$req_data['page'] : 1;
-		$limit 			= $this->config->get('theme_' . $this->config->get('config_theme') . '_product_limit');
-		$category_id 	= 0;
-		$sortnum 		= (int)$req_data['sorts'];
-		
-		switch ($sortnum) {
-			case 0:
-				$sort 	= 'p.sort_order';
-				$order 	= 'ASC';
-				break;
-			case 1:
-				$sort 	= 'p.price';
-				$order 	= 'DESC';
-				break;
-			case 2:
-				$sort 	= 'p.price';
-				$order 	= 'ASC';
-				break;
-			default:return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:sorts is error']));break;
-		}
 
-		if (isset($req_data['filter'])) {
-			$filter = $req_data['filter'];
-		} else {
-			$filter = '';
-		}
+		//0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
+		$sortsArr 			= ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
-		if (isset($req_data['attr'])) {
-			$attr = parse_attributes($req_data['attr']);
-		} else {
-			$attr = '';
-		}
+		$filter 			= isset($req_data['filter']) ? (string)$req_data['filter'] : '';
+		$filter 			= urlencode(html_entity_decode($filter, ENT_QUOTES, 'UTF-8'));
 
-		if (isset($req_data['option'])) {
-			$options = parse_ilters($req_data['option']);
-		} else {
-			$options = '';
-		}
+		$attr 				= isset($req_data['attr']) ? (string)$req_data['attr'] : '';
+		$attr 				= urlencode(html_entity_decode($attr, ENT_QUOTES, 'UTF-8'));
 
-		if (isset($req_data['variant'])) {
-			$variants = parse_filters($req_data['variant']);
-		} else {
-			$variants = '';
-		}
+		$options 			= isset($req_data['option']) ? parse_filters($req_data['option']) : '';
+		$variant 			= isset($req_data['variant']) ? parse_filters($req_data['variant']) : '';
+		$filterPrices 		= isset($req_data['price']) ? parse_filters($req_data['price']) : '';
+
+		$sort 				= isset($req_data['sort']) ? (int)$req_data['sort'] : 0;
+		$sort 				= isset($sortsArr[$sort]) ? $sortsArr[$sort] : $sortsArr[0];
+
+		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
+
+		$page 				= isset($req_data['page']) ? (int)$req_data['page'] : 1;
+		$limit 				= isset($req_data['limit']) ? (int)$req_data['limit'] : $this->config->get('theme_'.$this->config->get('config_theme').'_product_limit');
 
 		if (isset($req_data['in_stock']) && (int)$req_data['in_stock'] > 0) {
-			$inStock = array_get($req_data, 'in_stock');
+			$inStock = (int)array_get($req_data, 'in_stock');
 		}
 
-		if (isset($req_data['price'])) {
-			$filterPrices = parse_filters($req_data['price']);
-		} else {
-			$filterPrices = '';
-		}
-
-
-		if (isset($req_data['limit'])) {
-			$limit 			= (int)$this->request->get['limit'];
-		}
+		$category_id 		= 0;
 
 		if (isset($req_data['path']) && !empty($req_data['path'])) {
 			$parts 			= explode('_', (string)$req_data['path']);
 			$category_id 	= (int)array_pop($parts);
 		}
 
-		$category_info = $this->model_catalog_category->getCategory($category_id);
+		$category_info 		= $this->model_catalog_category->getCategory($category_id);
 
 		if ($category_info)
 		{
@@ -124,7 +92,7 @@ class ControllerApiProduct extends Controller {
 				'filter_attributes'   		=> $attr,
 				'parent_id' 				=> 0,
 				'filter_option_value_ids'  	=> $options,
-				'filter_variant_value_ids' 	=> $variants,
+				'filter_variant_value_ids' 	=> $variant,
 				'filter_price'        		=> $filterPrices,
 				'sort'                		=> $sort,
 				'order'               		=> $order,
@@ -136,64 +104,29 @@ class ControllerApiProduct extends Controller {
 				$filter_data['filter_in_stock'] = $inStock;
 			}
 
-			$pdata 			= [];
-			$results 		= $this->model_catalog_product_pro->getProductsForApi($filter_data);
+			$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
+			$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
 
-			foreach ($results as $value) {
+			foreach ($results as $result) {
+				$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
 
-				$price_c 		= 0;
-				$special_c 		= 0;
-
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price') && !empty($value['price'])) {
-                    $price = $this->currency->format($this->tax->calculate($value['price'], $value['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-                    $price_c 		= (float)$value['price'];
-					$special_c 		= $price_c;
-                } else {
-                    $price = '';
-                }
-
-                if ((float)$value['special'] && !empty($value['special'])) {
-                    $special = $this->currency->format($this->tax->calculate($value['special'], $value['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-                    $special_c 	= (float)$value['special'];
-                } else {
-                    $special = '';
-                }
-
-                $discount 		= ($price_c >= $special_c) ? round(($price_c - $special_c)/$price_c, 4)*100 : 0;
-
-                $image = $this->model_tool_image->resize($value['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_wishlist_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_wishlist_height'));
-
-				$pdata[] 		= [
-					'product_id'=> $value['product_id'],
-					'name'		=> $value['name'],
-					'price'		=> $price,
-					'special'	=> $special,
-					'discount' 	=> $discount,
-					'image'	 	=> $image,
+				$products[] 		= [
+					'product_id'=> $product['product_id'],
+					'name'		=> $product['name'],
+					'price'		=> $product['price'],
+					'special'	=> !empty($product['special']) ? $product['special'] : '',
+					'discount' 	=> $product['discount'],
+					'image'	 	=> $product['thumb'],
 					'rating' 	=> 5,
 					'rating_num'=> 10,
-
 				];
 			}
 
-			$data  			= [];
-			$data['pdata'] 	= $pdata;
-
-
-			$search_data 	= [];
-			$filter 		= $this->load->controller('extension/module/multi_filter/getFilterForApi');
-
-			$variants 		= isset($filter['variants']) ? $filter['variants'] : [];
-			if (!empty($variants)) {
-				foreach ($variants as $key => $value) {
-					$search_data['variants'][] 	= $value;
-				}
-			}
-
-			$search_data['price_range'] 	= isset($filter['price_range']) ? $filter['price_range'] : [];
-
-
-			$data['filter'] = $search_data;
+			$data  						= [];
+			$data['sorts'] 				= $this->get_sorts();
+			$data['filter'] 			= $this->get_filter();
+			$data['total_page'] 		= ceil($product_total/$limit);
+			$data['products'] 			= $products;
 
 			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
 		}
@@ -398,5 +331,150 @@ class ControllerApiProduct extends Controller {
 		}
 
 		return $this->response->setOutput($json);
+	}
+
+	public function search()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+		$this->load->language('product/search');
+
+		$allowKey		= ['api_token','search','page'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+		$this->load->model('catalog/category');
+		$this->load->model('catalog/product');
+		$this->load->model('catalog/product_pro');
+		$this->load->model('tool/image');
+
+		//0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
+		$sortsArr 			= ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
+
+		$search 			= isset($req_data['search']) ? (string)$req_data['search'] : '';
+		$search 			= urlencode(html_entity_decode($search, ENT_QUOTES, 'UTF-8'));
+
+		$tag 				= isset($req_data['tag']) ? (string)$req_data['tag'] : (isset($req_data['search']) ? (string)$req_data['search'] : '');
+		$tag 				= urlencode(html_entity_decode($tag, ENT_QUOTES, 'UTF-8'));
+
+		$description 		= isset($req_data['description']) ? (string)$req_data['description'] : '';
+		$description 		= urlencode(html_entity_decode($description, ENT_QUOTES, 'UTF-8'));
+
+		$category_id 		= isset($req_data['category_id']) ? (int)$req_data['category_id'] : 0;
+		$sub_category 		= isset($req_data['sub_category']) ? (int)$req_data['sub_category'] : 0;
+
+		$brandIds 			= isset($req_data['brand']) ? parse_filters($req_data['brand']) : '';
+
+		$attr 				= isset($req_data['attr']) ? (string)$req_data['attr'] : '';
+		$attr 				= urlencode(html_entity_decode($attr, ENT_QUOTES, 'UTF-8'));
+
+		$options 			= isset($req_data['option']) ? parse_filters($req_data['option']) : '';
+		$stockStatusIds 	= isset($req_data['status']) ? parse_filters($req_data['status']) : '';
+		$filterPrices 		= isset($req_data['price']) ? parse_filters($req_data['price']) : '';
+
+		$sort 				= isset($req_data['sort']) ? (int)$req_data['sort'] : 0;
+		$sort 				= isset($sortsArr[$sort]) ? $sortsArr[$sort] : $sortsArr[0];
+
+		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
+
+		$page 				= isset($req_data['page']) ? (int)$req_data['page'] : 1;
+		$limit 				= isset($req_data['limit']) ? (int)$req_data['limit'] : $this->config->get('theme_'.$this->config->get('config_theme').'_product_limit');
+
+
+		$this->load->model('catalog/category');
+
+		// 3 Level Category Search
+		//$data['categories'] = $this->model_catalog_category->getThreeLevelCategories();
+		
+		$products 				= [];
+		$product_total 			= 0;
+
+		if (isset($req_data['search']) || isset($req_data['tag']))
+		{
+			$filter_data = array(
+				'filter_name'         		=> $search,
+				'filter_tag'          		=> $tag,
+				'filter_description'  		=> $description,
+				'filter_category_id'  		=> $category_id,
+				'filter_sub_category' 		=> $sub_category,
+                'filter_brand_ids'    		=> $brandIds,
+				'filter_attributes'   		=> $attr,
+				'parent_id'   				=> 0,
+				'filter_option_value_ids'  	=> $options,
+				'filter_stock_status_ids'  	=> $stockStatusIds,
+				'filter_price'        		=> $filterPrices,
+				'sort'                		=> $sort,
+				'order'               		=> $order,
+				'start'               		=> ($page - 1) * $limit,
+				'limit'               		=> $limit
+			);
+
+			$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
+			$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
+
+			foreach ($results as $result) {
+				$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+
+				$products[] 		= [
+					'product_id'=> $product['product_id'],
+					'name'		=> $product['name'],
+					'price'		=> $product['price'],
+					'special'	=> !empty($product['special']) ? $product['special'] : '',
+					'discount' 	=> $product['discount'],
+					'image'	 	=> $product['thumb'],
+					'rating' 	=> 5,
+					'rating_num'=> 10,
+				];
+			}
+		}
+
+		
+
+		$data['sorts'] 				= $this->get_sorts();
+		$data['filter'] 			= $this->get_filter();
+		$data['total_page'] 		= ceil($product_total/$limit);
+		$data['products'] 			= $products;
+
+		return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
+	}
+
+	private function get_sorts()
+	{
+		//排序定义
+		$sorts 			 = [
+			['keys'=>0,'name'=>$this->language->get('text_default')],
+			['keys'=>1,'name'=>$this->language->get('text_name_asc')],
+			['keys'=>2,'name'=>$this->language->get('text_name_desc')],
+			['keys'=>3,'name'=>$this->language->get('text_price_asc')],
+			['keys'=>4,'name'=>$this->language->get('text_price_desc')],
+			['keys'=>5,'name'=>$this->language->get('text_rating_asc')],
+			['keys'=>6,'name'=>$this->language->get('text_rating_desc')],
+		];
+
+		return $sorts;
+	}
+
+	private function get_filter()
+	{
+		$filter_data 	= $this->load->controller('extension/module/multi_filter/getFilterForApi');
+		$filter 		= [];
+		$variants 		= isset($filter_data['variants']) ? $filter_data['variants'] : [];
+
+		if (!empty($variants)) {
+			foreach ($variants as $key => $value) {
+				$filter['variants'][] 	= $value;
+			}
+		}
+
+		$filter['price_range'] 	= isset($filter_data['price_range']) ? $filter_data['price_range'] : [];
+
+		return $filter;
 	}
 }
