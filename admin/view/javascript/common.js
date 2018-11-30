@@ -411,7 +411,7 @@ $(document).ready(function() {
         $(this).append(html);
     });
 
-    $(document).on('mouseout', 'a[data-toggle=\'image\']', function() {
+    $(document).on('mouseout', 'a[data-toggle=\'image2\']', function() {
         $('.thumbnail-zoom').remove();
     });
 
