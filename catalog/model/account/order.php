@@ -384,7 +384,7 @@ class ModelAccountOrder extends Model {
     {
         if ( empty($order_sn) )  return [];
 
-        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value,fullname,telephone,email,date_added,shipping_method,shipping_country,shipping_zone,shipping_zone,shipping_address_format,shipping_fullname,shipping_telephone,shipping_address_1,shipping_address_2,shipping_city,invoice_no,payment_address_format,payment_method,shipping_custom_field,comment','o');
+        $fields         = format_find_field('order_id,payment_code,currency_code,currency_value,fullname,telephone,email,date_added,shipping_method,shipping_country,shipping_zone,shipping_zone,shipping_address_format,shipping_fullname,shipping_telephone,shipping_address_1,shipping_address_2,shipping_postcode,shipping_city,invoice_no,payment_address_format,payment_method,shipping_custom_field,comment','o');
         $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
         $fields         .= ',' . format_find_field('avatar,store_name,','ms');
 

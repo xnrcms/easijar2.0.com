@@ -82,7 +82,7 @@ class ControllerApiPay extends Controller {
         }
 
         if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
-            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
         if (!$this->customer->isLogged()){
