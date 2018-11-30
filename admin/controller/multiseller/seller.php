@@ -751,6 +751,7 @@ class ControllerMultisellerSeller extends Controller {
 				if ($value == 'ext_image') {
 					$ext_image 		= explode(',', $seller_info[$value]);
 					for ($i=0; $i < 4; $i++) { 
+						$data['ext_image_' . $i.$i] 	= $ext_image[$i];
 						$data['ext_image_' . $i] 	= isset($ext_image[$i]) ? $this->model_tool_image->resize($ext_image[$i], 100, 100) : '';
 					}
 				}elseif ($value == 'ext_company_type') {
@@ -763,7 +764,8 @@ class ControllerMultisellerSeller extends Controller {
 			}else{
 				if ($value == 'ext_image') {
 					for ($i=0; $i < 4; $i++) { 
-						$data['ext_image_' . $i] 	= '';
+						$data['ext_image_' . $i] 		= '';
+						$data['ext_image_' . $i.$i] 	= '';
 					}
 				}else{
 					$data[$value] 	= '';
