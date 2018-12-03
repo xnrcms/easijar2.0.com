@@ -246,7 +246,7 @@ class ControllerApiMyorder extends Controller {
         $this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/order');
 
-        $allowKey       = ['api_token','order_id','reason_id'];
+        $allowKey       = ['api_token','order_sn','reason_id'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -267,7 +267,7 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $order_id 					= (isset($req_data['order_id']) && $req_data['order_id']>0) ? (int)$req_data['order_id'] : 0;
+        $order_sn 					= isset($req_data['order_sn']) ? (string)$req_data['order_sn'] : '';
         $reason_id 					= (isset($req_data['reason_id']) && $req_data['reason_id']>0) ? (int)$req_data['reason_id'] : 0;
 
         if ($order_id <= 0 ) {
@@ -282,7 +282,10 @@ class ControllerApiMyorder extends Controller {
         $this->load->model('multiseller/checkout');
 		$this->load->model('localisation/return_reason');
 
-        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_id);
+        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_sn);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
 
         //未付款 直接取消
         if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_unpaid_status_id')){
@@ -317,7 +320,7 @@ class ControllerApiMyorder extends Controller {
     	$this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/order');
 
-        $allowKey       = ['api_token','order_id'];
+        $allowKey       = ['api_token','order_sn'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -338,14 +341,17 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $order_id 					= (isset($req_data['order_id']) && $req_data['order_id']>0) ? (int)$req_data['order_id'] : 0;
-        if ($order_id <= 0 ) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_id is error']));
+        $order_sn                   = isset($req_data['order_sn']) ? (string)$req_data['order_sn'] : '';
+        if ( empty($order_sn) ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_sn is error']));
         }
 
         $this->load->model('account/order');
 
-        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_id);
+        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_sn);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
 
         if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_shipped_status_id')){
 
@@ -358,7 +364,7 @@ class ControllerApiMyorder extends Controller {
         	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
         }else{
 
-        	$this->load->model('localisation/order_status');
+        	$this->load->model('localisation/order_status');wr($order_info);
         	$order_status = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);
 
         	if (!empty($order_status) && isset($order_status['name']) && !empty($order_status['name'])) {
@@ -396,17 +402,19 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $order_id 					= (isset($req_data['order_id']) && $req_data['order_id']>0) ? (int)$req_data['order_id'] : 0;
-        if ($order_id <= 0 ) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_id is error']));
+        $order_sn                   = isset($req_data['order_sn']) ? (string)$req_data['order_sn'] : '';
+        if ( empty($order_sn) ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_sn is error']));
         }
 
         $this->load->model('account/order');
         $this->load->model('multiseller/checkout');
 		$this->load->model('localisation/return_reason');
 
-        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_id);
-
+        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_sn);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
         /*$this->load->model('checkout/order');
 		$this->model_checkout_order->addOrderHistoryForMs($order_info['order_sn'], 15);
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));*/
