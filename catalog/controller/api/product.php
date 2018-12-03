@@ -102,6 +102,8 @@ class ControllerApiProduct extends Controller {
 
 			if (isset($inStock)) {
 				$filter_data['filter_in_stock'] = $inStock;
+			}else{
+				unset($this->request->post['in_stock']);
 			}
 
 			$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
@@ -338,7 +340,7 @@ class ControllerApiProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/search');
 
-		$allowKey		= ['api_token','search','page'];
+		$allowKey		= ['api_token','page','search','sorts','variant','price','in_stock'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
