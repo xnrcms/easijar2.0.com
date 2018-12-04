@@ -75,6 +75,7 @@ class ControllerApiMyorder extends Controller {
                     'price' => $this->currency->format((float)$value['price'], $value['currency_code'], $value['currency_value'], $this->session->data['currency']),
                     'quantity' => (int)$value['quantity'],
                     'sku' => $value['sku'],
+                    'oreview'   => $is_reviewed || !$complated ? 0 : 1
                 ];
             }
 
@@ -185,9 +186,15 @@ class ControllerApiMyorder extends Controller {
         foreach ($product_info as $pkey => $pval) {
             $subtotal                       += $pval['total'];
 
+            $this->load->model('account/oreview');
+
+            $is_reviewed                    = $this->model_account_oreview->isReviewed($pval['order_product_id']);
+            $complated                      = in_array($order_info['order_status_id'], $this->config->get('config_complete_status'));
+
             $product_info[$pkey]['price']   = $this->currency->format($pval['price'], $currency_code, $currency_value, $this->session->data['currency']);
             $product_info[$pkey]['total']   = $this->currency->format($pval['total'], $currency_code, $currency_value, $this->session->data['currency']);
             $product_info[$pkey]['image']   = $this->model_tool_image->resize($pval['image'], 100, 100);
+            $product_info[$pkey]['oreview'] = ($is_reviewed || !$complated) ? 0 : 1;
         }
 
         unset($order_info['avatar']);

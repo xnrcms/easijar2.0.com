@@ -73,65 +73,13 @@ Customweb_Licensing_OPPCw_License::run('t3o4g8g7g4i1r4r1');
 		
 		$data = $adapter->getCheckoutPageHtml($paymentMethod, $orderContext, $this->registry, $failedTransaction);
 		
-		/*require_once 'Customweb/Licensing/OPPCw/License.php';
-		Customweb_Licensing_OPPCw_License::run('41fdca1lfnq2j68k');*/
+		require_once 'Customweb/Licensing/OPPCw/License.php';
+		Customweb_Licensing_OPPCw_License::run('41fdca1lfnq2j68k');
+		
 		$vars = array();
 		$vars['checkout_form'] = $data;
 
 		return $this->renderView(OPPCw_Template::resolveTemplatePath(OPPCw_Template::PAYMENT_FORM_TEMPLATE), $vars);
-		$config = array (
-			'app_id'               => $this->config->get('payment_alipay_app_id'),
-			'merchant_private_key' => $this->config->get('payment_alipay_merchant_private_key'),
-			'notify_url'           => HTTP_SERVER . "payment_callback/alipay",
-			'return_url'           => $this->url->link('checkout/success'),
-			'charset'              => "UTF-8",
-			'sign_type'            => "RSA2",
-			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",
-			'alipay_public_key'    => $this->config->get('payment_alipay_alipay_public_key'),
-		);
-
-		$out_trade_no 				= trim($order_info['order_sn']) . '-' . time();
-
-		$this->load->model('account/order');
-
-		$products 					= $this->model_account_order->getOrderProductsNameForMs($order_info['order_id'],$order_info['seller_id']);
-
-		$products_name 				= '';
-		foreach ($products as $product) {
-		    if ($products_name) {
-		         $products_name .= ';';
-            }
-		    $products_name .= $product['name'];
-        }
-
-		$subject 				= sub_string($products_name, 250, '');//trim($this->config->get('config_name'));
-        $subject 				= $subject ? $subject : trim($this->config->get('config_name'));
-		$total_amount 			= trim($this->currency->format($order_info['total'], 'CNY', '', false));
-		$body 					= '';//trim($_POST['WIDbody']);
-
-		
-		$payRequestBuilder = array(
-			'body'         => $body,
-			'subject'      => str_replace('&', '-', $subject),
-			'total_amount' => $total_amount,
-			'out_trade_no' => $out_trade_no,
-			'product_code' => 'FAST_INSTANT_TRADE_PAY'
-		);
-
-		$this->load->model('extension/payment/alipay');
-
-		$response 				= $this->model_extension_payment_alipay->pagePay($payRequestBuilder,$config);
-		
-		$queryParam 		= '';
-		foreach ($response as $key => $value) {
-			$queryParam .= '&' . $key . "=" . urlencode(str_replace( "&quot;", "\"",$value));
-		}
-
-		$data['action'] 		= $config['gateway_url'];
-		$data['form_params'] 	= $queryParam;
-		$data['pay_url'] 		= $this->url->link('extension/payment/alipay/pay');
-
-		return $data;
     }
 }
 

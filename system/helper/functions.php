@@ -857,3 +857,18 @@ if (!function_exists('is_idcard'))
       }
     }
 }
+
+if (!function_exists('is_json'))
+{
+    /**
+     * [is_json 判断是否是json格式数据]
+     * @param  [type]  $string [json字符串]
+     * @return boolean
+     */
+    function is_json($string) {
+        
+         json_decode($string);
+         
+         return (json_last_error() == JSON_ERROR_NONE);
+    }
+}

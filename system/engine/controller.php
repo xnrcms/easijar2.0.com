@@ -54,7 +54,7 @@ abstract class Controller {
 		if (!empty($req_data) && !empty($allowKey))
         {
         	foreach ($allowKey as $key => $value) {
-    			$fileter_data[$value] 	= isset($req_data[$value]) ? $req_data[$value] : '';
+    			$fileter_data[$value] 	= isset($req_data[$value]) ? str_replace( "&quot;", "\"",$req_data[$value]) : '';
     		}
         }
 
@@ -78,7 +78,7 @@ abstract class Controller {
 	        //签名串 key value拼接
 	        $signStr    = "";
 	        foreach ($data as $key => $value) {
-	            $signStr  .= $key . $value;
+	            $signStr  .= $key . str_replace( "&quot;", "\"",$value);
 	        }
 
 	        $signStr  .= (!empty($signKey) ? $signKey : time().mt_rand(1000,10000));

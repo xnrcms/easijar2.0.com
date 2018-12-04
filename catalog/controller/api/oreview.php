@@ -1,13 +1,12 @@
 <?php
 class ControllerApiOreview extends Controller {
-
-    //订单商品评价
-    public function add()
+    //可评论商品列表
+    public function product()
     {
         $this->response->addHeader('Content-Type: application/json');
-        $this->load->language('account/oreview');
+        $this->load->language('account/order');
 
-        $allowKey       = ['api_token','order_product_id','content','rating','images'];
+        $allowKey       = ['api_token','order_sn'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -28,45 +27,128 @@ class ControllerApiOreview extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $order_product_id                   = (int)$req_data['order_product_id'];
-        $content                            = (string)$req_data['content'];
-        $rating                             = (int)$req_data['rating'];
+        $this->load->model('account/order');
+        $this->load->model('tool/image');
 
-        $this->load->model('account/oreview');
+        $order_info                     = $this->model_account_order->getOrderForMs($req_data['order_sn']);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
+
+        //商品信息
+        $order_id                       = isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+        $seller_id                      = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+        $product_info                   = $this->model_account_order->getOrderProductsForMs($order_id,$seller_id);
+        $pro_data                       = [];
+
+        foreach ($product_info as $pkey => $pval) {
+            $pro_data[]                 = [
+                'order_product_id'  => (int)$pval['order_product_id'],
+                'image'             =>$this->model_tool_image->resize($pval['image'], 100, 100),
+            ];
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$pro_data]));
+    }
+
+    //订单商品评价
+    public function add()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/oreview');
+
+        $allowKey       = ['api_token','order_sn','oreview_data'];
+        $req_data       = $this->dataFilter($allowKey);wr(json_decode($req_data['oreview_data'],true));
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
         $this->load->model('account/order');
 
-        $order_status                      = $this->model_account_order->checkOrderProductStatusForMs($order_product_id,5);
-
-        if ($order_status == 0) {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_not_found')]));
+        $order_info                         = $this->model_account_order->getOrderForMs($req_data['order_sn']);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
-        if ($order_status == 1) {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_order_status')]));
+         //商品信息
+        $order_id                       = isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+        $seller_id                      = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+        $product_info                   = $this->model_account_order->getOrderProductsForMs($order_id,$seller_id);
+        $pro_data                       = [];
+
+        foreach ($product_info as $pkey => $pval)
+        {
+            $this->load->model('account/oreview');
+
+            $is_reviewed                    = $this->model_account_oreview->isReviewed($pval['order_product_id']);
+            $complated                      = in_array((int)$order_info['order_status_id'], $this->config->get('config_complete_status'));
+            if (!$complated) {
+                return $this->response->setOutput($this->returnData(['msg'=>'fail:order_status is error']));
+            }
+
+            if ($is_reviewed) {
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_alredy_reviewed')]));
+            }
+
+            $pro_data[$pval['order_product_id']]    = $pval['order_product_id'];
         }
 
-        if ($this->model_account_oreview->isReviewed($order_product_id)) {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_alredy_reviewed')]));
+        $pcount                             = count($pro_data);
+
+        //解析评论数据
+        if (!is_json($req_data['oreview_data'])) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:oreview_data is error']));
         }
 
-        if ((utf8_strlen($content) < 5) || (utf8_strlen($content) > 1000)) {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_text')]));
+        $oreview_data                       = json_decode($req_data['oreview_data'],true);
+        if ($pcount !== count($oreview_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:oreview_data is error']));
         }
 
-        if ($rating < 0 || $rating > 5) {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_rating')]));
+        $oreview                            = [];
+        foreach ($oreview_data as $key => $value) {
+            if (!in_array($value['order_product_id'], $pro_data))  continue;
+
+            $code                                   = !empty($value['images']) ? explode(',', $value['images']) : [];
+            $text                                   = $value['content'];
+            $rating                                 = (int)$value['rating'];
+
+            if ((utf8_strlen($text) < 5) || (utf8_strlen($text) > 1000)) {
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_text')]));
+            }
+
+            if ($rating < 0 || $rating > 5) {
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_rating')]));
+            }
+
+            $oreview[$value['order_product_id']]    = ['rating'=>$rating,'text'=>$text,'code'=>$code];
         }
 
-        $req_data['text']                   = $content;
-        $req_data['code']                   = !empty($req_data['images']) ? explode(',', $req_data['images']) : [];
-        
-        $result                             = $this->model_account_oreview->addOreview($order_product_id, $req_data);
-        if ($result) {
-            $notice                         = $this->config->get('config_review_approve') ? t('text_success_unapproved') : t('text_success_approved');
-            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$notice]));
-        } else {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_alredy_reviewed')]));
+        if (!empty($oreview) && $pcount !== count($oreview)) {
+            foreach ($oreview as $key => $value) {
+                $this->model_account_oreview->addOreview($key, $value);
+            }
+        }else{
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:oreview_data is error']));
         }
+
+        $notice                         = $this->config->get('config_review_approve') ? t('text_success_unapproved') : t('text_success_approved');
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$notice]));
     }
 
     //已评价列表

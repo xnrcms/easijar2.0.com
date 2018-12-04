@@ -117,13 +117,9 @@ class ControllerApiCheckout extends Controller
                     'address_id'            => $value['address_id'],
                     'fullname'              => $value['fullname'],
                     'telephone'             => $value['telephone'],
-                    'company'               => $value['company'],
                     'address_1'             => $value['address_1'],
                     'address_2'             => $value['address_2'],
-                    'postcode'              => $value['postcode'],
-                    'country_id'            => $value['country_id'],
-                    'country'               => $value['country'],
-                    'selected'              => $selected_address == $value['address_id'] ? 1 : 0,
+                    'postcode'              => $value['postcode']
                 ];
             }
             $json['shipping_address_section']   = $shipping_option;
