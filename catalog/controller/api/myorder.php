@@ -114,9 +114,10 @@ class ControllerApiMyorder extends Controller {
                     $results[$keys]['product_info'][$reskey]['price']   = $this->currency->format($resval['price'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
                     $results[$keys]['product_info'][$reskey]['total']   = $this->currency->format($resval['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
 
-                    $results[$keys]['product_info'][$reskey]['image']   = $this->model_tool_image->resize($resval['image'], 100, 100);
+                    $results[$keys]['product_info'][$reskey]['image']       = $this->model_tool_image->resize($resval['image'], 100, 100);
 
                     unset($results[$keys]['product_info'][$reskey]['tax']);
+                    unset($results[$keys]['product_info'][$reskey]['order_product_id']);
                 }
 
                 unset($results[$keys]['currency_code']);
@@ -187,14 +188,16 @@ class ControllerApiMyorder extends Controller {
             $subtotal                       += $pval['total'];
 
             $this->load->model('account/oreview');
+            $this->load->model('account/return');
 
-            $is_reviewed                    = $this->model_account_oreview->isReviewed($pval['order_product_id']);
-            $complated                      = in_array($order_info['order_status_id'], $this->config->get('config_complete_status'));
+            $is_reviewed                        = $this->model_account_oreview->isReviewed($pval['order_product_id']);
+            $complated                          = in_array($order_info['order_status_id'], $this->config->get('config_complete_status'));
 
-            $product_info[$pkey]['price']   = $this->currency->format($pval['price'], $currency_code, $currency_value, $this->session->data['currency']);
-            $product_info[$pkey]['total']   = $this->currency->format($pval['total'], $currency_code, $currency_value, $this->session->data['currency']);
-            $product_info[$pkey]['image']   = $this->model_tool_image->resize($pval['image'], 100, 100);
-            $product_info[$pkey]['oreview'] = ($is_reviewed || !$complated) ? 0 : 1;
+            $product_info[$pkey]['price']       = $this->currency->format($pval['price'], $currency_code, $currency_value, $this->session->data['currency']);
+            $product_info[$pkey]['total']       = $this->currency->format($pval['total'], $currency_code, $currency_value, $this->session->data['currency']);
+            $product_info[$pkey]['image']       = $this->model_tool_image->resize($pval['image'], 100, 100);
+            $product_info[$pkey]['oreview']     = ($is_reviewed || !$complated) ? 0 : 1;
+            $product_info[$pkey]['return_id']   = $this->model_account_return->getReturnIdByOrderProductId($order_info['order_id'],$pval['order_product_id']);
         }
 
         unset($order_info['avatar']);

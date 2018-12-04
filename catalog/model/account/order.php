@@ -407,15 +407,15 @@ class ModelAccountOrder extends Model {
 
     public function getOrderProductsForMs($order_id = 0 , $seller_id = 0)
     {
-            $order_id       = (int)$order_id;
-            $seller_id      = (int)$seller_id;
+        $order_id       = (int)$order_id;
+        $seller_id      = (int)$seller_id;
 
-            if ($order_id <= 0 || $seller_id <= 0)  return [];
+        if ($order_id <= 0 || $seller_id <= 0)  return [];
 
-            $query = $this->db->query("SELECT op.`order_product_id`,op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`,op.`model` FROM `" . DB_PREFIX . "order_product` op 
-                LEFT JOIN  `" . DB_PREFIX . "ms_order_product` msop ON (op.order_product_id = msop.order_product_id) 
-                LEFT JOIN  `" . DB_PREFIX . "product` p ON (p.product_id = op.product_id) 
-                WHERE msop.seller_id = '" . $seller_id . "' AND msop.order_id = '" . $order_id . "' ORDER BY op.order_product_id DESC LIMIT 0,100");
+        $query = $this->db->query("SELECT op.`order_product_id`,op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`sku`,op.`tax`,op.`model` FROM `" . DB_PREFIX . "order_product` op 
+            LEFT JOIN  `" . DB_PREFIX . "ms_order_product` msop ON (op.order_product_id = msop.order_product_id) 
+            LEFT JOIN  `" . DB_PREFIX . "product` p ON (p.product_id = op.product_id) 
+            WHERE msop.seller_id = '" . $seller_id . "' AND msop.order_id = '" . $order_id . "' ORDER BY op.order_product_id DESC LIMIT 0,100");
 
         return !empty($query->rows) ? $query->rows : [];
     }
@@ -528,7 +528,7 @@ class ModelAccountOrder extends Model {
             foreach ($query->rows as $key => $value) {
                 $data[$key]['product_info']   = [];
 
-                $sql  = "SELECT op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`  FROM `" . DB_PREFIX . "order_product` op 
+                $sql  = "SELECT op.`order_product_id`,op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`tax`  FROM `" . DB_PREFIX . "order_product` op 
                 LEFT JOIN  `" . DB_PREFIX . "ms_order_product` msop ON (op.order_product_id = msop.order_product_id) 
                 LEFT JOIN  `" . DB_PREFIX . "product` p ON (p.product_id = op.product_id) 
                 WHERE msop.seller_id = '" . $value['msid'] . "' AND msop.order_id = '" . $value['oid'] . "' ORDER BY op.order_product_id DESC LIMIT 0,100";
