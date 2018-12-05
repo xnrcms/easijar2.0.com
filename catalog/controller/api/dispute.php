@@ -32,14 +32,15 @@ class ControllerApiDispute extends Controller {
         }
 
         //获取商品信息
-        $product_info                   = $this->model_account_order->getOrderProductForMsByOrderProductId($req_data['order_product_id']);
+        $product_info       = $this->model_account_order->getOrderProductForMsByOrderProductId($req_data['order_product_id']);
         if (empty($product_info) || !((int)$product_info['seller_id'] > 0 && (int)$product_info['seller_id'] === (int)$order_info['seller_id'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
         }
         
         $quantity           = ((int)$req_data['quantity'] <= 0 || (int)$req_data['quantity'] >= (int)$product_info['quantity']) ? (int)$product_info['quantity'] : (int)$req_data['quantity'];
-        $ptotal             = (float)($product_info['price'] * $quantity);
-        $refund_money       = ((float)$req_data['refund_money'] <= 0 || (float)$req_data['refund_money'] >= $ptotal) ? $ptotal : (float)$req_data['refund_money'];
+        $return_shipping    = $this->get_return_money($order_info['order_id'],$order_info['seller_id'],$product_info['quantity']);
+        $return_money       = (float)$product_info['total'] + $return_shipping;
+        $refund_money       = ((float)$req_data['refund_money'] <= 0 || (float)$req_data['refund_money'] >= $return_money) ? $return_money : (float)$req_data['refund_money'];
 
         $this->load->model('account/return');
 
@@ -297,5 +298,85 @@ class ControllerApiDispute extends Controller {
         $this->model_multiseller_return->addReturnHistoryForMs($return_id, 8,8,$rinfo['return_reason_id']);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'after sale application has been withdrawn']));
+    }
+
+    //获取订单退款的商品信息
+    public function product() 
+    {
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','order_product_id','order_sn'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+        
+        $order_product_id      = (int)$req_data['order_product_id'];
+        if ($order_product_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_product_id is error']));
+        }
+
+        $this->load->model('account/order');
+
+        $order_info                     = $this->model_account_order->getOrderForMs($req_data['order_sn']);
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
+
+        //获取商品信息
+        $product_info                   = $this->model_account_order->getOrderProductForMsByOrderProductId($req_data['order_product_id']);
+        if (empty($product_info) || !((int)$product_info['seller_id'] > 0 && (int)$product_info['seller_id'] === (int)$order_info['seller_id'])) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
+        }
+
+        $return_shipping                = $this->get_return_money($order_info['order_id'],$order_info['seller_id'],$product_info['quantity']);
+
+        $total                          = $product_info['total'];
+        $currency_code                  = $product_info['currency_code'];
+        $currency_value                 = $product_info['currency_value'];
+        $return_money                   = $total + $return_shipping;
+
+        $product_info['total']          = $this->currency->format($total, $currency_code, $currency_value, $this->session->data['currency']);
+        $product_info['return_money']   = $this->currency->format($return_money, $currency_code, $currency_value, $this->session->data['currency']);
+
+        unset($product_info['currency_code']);
+        unset($product_info['currency_value']);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>[$product_info]]));
+    }
+
+    private function get_return_money($order_id = 0,$seller_id = 0,$quantity = 0)
+    {
+        $order_id           = (int)$order_id;
+        $seller_id          = (int)$seller_id;
+        $quantity           = (int)$quantity;
+
+        if ($order_id <= 0 || $seller_id <= 0 || $quantity <= 0)  return 0;
+
+        $totals             = $this->model_account_order->getTotalsForMs($order_id,$seller_id,$quantity);
+
+        $return_shipping    = 0;
+        foreach ($totals as $key => $value) {
+            if ( $value['code'] === 'multiseller_shipping') {
+                    $return_shipping    = round($value['value'] / $quantity,2);
+            }
+        }
+
+        return $return_shipping;
     }
 }
