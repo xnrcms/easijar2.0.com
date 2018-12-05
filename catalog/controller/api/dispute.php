@@ -31,12 +31,18 @@ class ControllerApiDispute extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
+        //状态判断
+        $order_status_id                = isset($order_info['order_status_id']) ? (int)$order_info['order_status_id'] : 0;
+        if ( !in_array($order_status_id, [2,15]) ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_status is error']));
+        }
+
         //获取商品信息
         $product_info       = $this->model_account_order->getOrderProductForMsByOrderProductId($req_data['order_product_id']);
         if (empty($product_info) || !((int)$product_info['seller_id'] > 0 && (int)$product_info['seller_id'] === (int)$order_info['seller_id'])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
         }
-        
+
         $quantity           = ((int)$req_data['quantity'] <= 0 || (int)$req_data['quantity'] >= (int)$product_info['quantity']) ? (int)$product_info['quantity'] : (int)$req_data['quantity'];
         $return_shipping    = $this->get_return_money($order_info['order_id'],$order_info['seller_id'],$product_info['quantity']);
         $return_money       = (float)$product_info['total'] + $return_shipping;
@@ -357,7 +363,7 @@ class ControllerApiDispute extends Controller {
         unset($product_info['currency_code']);
         unset($product_info['currency_value']);
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>[$product_info]]));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$product_info]));
     }
 
     private function get_return_money($order_id = 0,$seller_id = 0,$quantity = 0)
