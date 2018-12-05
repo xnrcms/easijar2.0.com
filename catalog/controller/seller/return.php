@@ -526,7 +526,28 @@ class ControllerSellerReturn extends Controller {
                 $data['return_status_id'] = '';
             }
 
-            $data['return_statuses'] = $this->model_multiseller_return->getReturnStatuses();
+            $return_status_id 			= isset($return_info['return_status_id']) ? (int)$return_info['return_status_id'] : 0;
+            $notAllow 					= [5,8,9];
+
+            switch ($return_status_id) {
+            	case 1: $notAllow 		= array_merge($notAllow,[1,3]);break;
+            	case 2: $notAllow 		= array_merge($notAllow,[1,2,4]);break;
+            	case 6: $notAllow 		= array_merge($notAllow,[1,2,4,6,7,10]);break;
+            	default:$return_status_id = 0;break;
+            }
+
+            $return_statuses 			= $this->model_multiseller_return->getReturnStatuses();
+            $text_status 				= [4=>'拒绝'];
+
+            foreach ($return_statuses as $key => $value) {
+            	if (in_array($value['return_status_id'], $notAllow) || $return_status_id <= 0) {
+            		unset($return_statuses[$key]);
+            	}else{
+            		$return_statuses[$key]['name'] = isset($text_status[$value['return_status_id']]) ? $text_status[$value['return_status_id']] : $value['name'];
+            	}
+            }
+
+            $data['return_statuses'] 	= $return_statuses;
 
             $data['column_left'] = $this->load->controller('common/column_left');
             $data['column_right'] = $this->load->controller('common/column_right');
@@ -589,7 +610,7 @@ class ControllerSellerReturn extends Controller {
 			$json['error'] = $this->language->get('error_permission');
 		} else {
 			$this->load->model('multiseller/return');
-
+			
 			$this->model_multiseller_return->addReturnHistory($this->request->get['return_id'], $this->request->post['return_status_id'], $this->request->post['comment'], $this->request->post['notify']);
 
 			$json['success'] = $this->language->get('text_success');

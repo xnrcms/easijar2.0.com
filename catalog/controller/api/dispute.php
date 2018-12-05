@@ -92,6 +92,19 @@ class ControllerApiDispute extends Controller {
         $this->load->model('multiseller/return');
         $this->model_multiseller_return->addReturnHistoryForMs($return_id, 1,$proposal,$return_reason_id, $comment, $evidences,0);
 
+        if ($order_status_id === 15) {
+            //待发货状态 需要判断发货等待时间，如果距下单时间超过3天 自动处理退款
+            $date_now                   = time();
+            $date_added                 = isset($order_info['date_added']) ? strtotime($order_info['date_added']) : $date_now;
+            $days                       = $date_now - $date_added;
+
+            if ($days >= 86400*3) {
+                //自动添加一条商家处理记录
+                $this->load->model('multiseller/return');
+                $this->model_multiseller_return->addReturnHistory($return_id, 10, t('text_return_comment'),0);
+            }
+        }
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['return_id'=> $return_id]]));
     }
 
@@ -376,13 +389,16 @@ class ControllerApiDispute extends Controller {
 
         $totals             = $this->model_account_order->getTotalsForMs($order_id,$seller_id,$quantity);
 
-        $return_shipping    = 0;
+        $money    = 0;
         foreach ($totals as $key => $value) {
             if ( $value['code'] === 'multiseller_shipping') {
-                    $return_shipping    = round($value['value'] / $quantity,2);
+                    $money    += round($value['value'] / $quantity,2);
+            }
+            if ( $value['code'] === 'multiseller_coupon') {
+                    $money    -= round($value['value'] / $quantity,2);
             }
         }
 
-        return $return_shipping;
+        return $money;
     }
 }
