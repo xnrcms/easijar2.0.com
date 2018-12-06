@@ -21,7 +21,7 @@ class ControllerApiBrowseRecords extends Controller {
         }
 
         if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
-            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error2']));
         }
 
         if (!$this->customer->isLogged()){
@@ -55,10 +55,10 @@ class ControllerApiBrowseRecords extends Controller {
 
                 $product_browse_records[$result['browse_date']][]        = [
                     'product_id'                => (int)$result['product_id'],
-                    'thumb'                     => $image,
+                    'image'                     => $image,
                     'name'                      => $result['name'],
-                    'price'                     => $price,
-                    'special'                   => $special ? $special : $price
+                    'price'                     => $this->currency->format($this->tax->calculate($price, $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']),
+                    'special'                   => $this->currency->format($this->tax->calculate(($special ? $special : $price), $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency'])
                 ];
             }
         }

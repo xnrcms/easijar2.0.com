@@ -17,6 +17,10 @@ class ControllerApiMultiseller extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
         }
 
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
         $seller_id      = isset($req_data['seller_id']) ? (int)$req_data['seller_id']: 0;
 		if ($seller_id <= 0) {
 			return $this->response->setOutput($this->returnData(['msg'=>'fail:seller_id error']));
@@ -91,8 +95,8 @@ class ControllerApiMultiseller extends Controller {
                 'product_id'    => $result['product_id'],
                 'image'         => $this->model_tool_image->resize($image, 100, 100),
                 'name'          => $result['name'],
-                'price'         => !empty($result['price']) ? $result['price'] : '',
-                'special'       => !empty($result['special']) ? $result['special'] : '',
+                'price'         => !empty($result['price']) ? $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
+                'special'       => !empty($result['special']) ? $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
             ];
 		}
 

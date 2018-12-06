@@ -155,7 +155,7 @@ class ControllerApiDispute extends Controller {
         unset($return_info['comment']);
         unset($return_info['date_added']);
         unset($return_info['date_modified']);
-        unset($return_info['reason']);
+        unset($return_info['return_reason_id']);
         unset($return_info['action']);
         unset($return_info['telephone']);
         unset($return_info['email']);
