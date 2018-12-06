@@ -183,7 +183,6 @@ class ControllerApiOreview extends Controller {
 
         $this->load->model('account/oreview');
 
-
         $page 			= (int)array_get($req_data, 'page', 1);
         $limit 			= 10;
 
@@ -248,7 +247,7 @@ class ControllerApiOreview extends Controller {
         $this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/oreview');
 
-        $allowKey       = ['api_token','product_id','page'];
+        $allowKey       = ['api_token','product_id','page','dtype','rating'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -277,12 +276,20 @@ class ControllerApiOreview extends Controller {
         $ppid                               = $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
         $product_ids                        = $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
         $page                               = isset($req_data['page']) ? (int)$req_data['page'] : 1;
+        $is_image                           = isset($req_data['dtype']) ? (int)$req_data['page'] : 1;
+        $rating                             = (isset($req_data['rating']) && in_array((int)$req_data['rating'], [1,2,3,4,5])) ? (int)$req_data['rating'] : 0;
 
         //商品评论
         $this->load->model('account/oreview');
-        $review['total']                    = $this->model_account_oreview->getTotalOreviewsByProductIds($product_ids);
-        $review_data                        = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10);
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$review_data]));
+        $json['total_all']                  = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,0);
+        $json['total_img']                  = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,1,0);
+        $json['total_rat1']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,1);
+        $json['total_rat2']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,2);
+        $json['total_rat3']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,3);
+        $json['total_rat4']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,4);
+        $json['total_rat5']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,5);
+        $json['review_data']                = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10,$is_image,$rating);
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 }

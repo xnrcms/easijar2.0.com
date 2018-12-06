@@ -26,13 +26,16 @@ class ModelAccountOreview extends Model
         if (!$query->row) {
             return 0;
         }
-        $product_id = $query->row['product_id'];
-        $status = $this->config->get('config_review_approve') ? 0 : 1;
-        $this->db->query('INSERT INTO '.DB_PREFIX."order_product_review SET customer_id = '".(int) $this->customer->getId()."', parent_id = '" .  $parent_id .  "', product_id = '".(int) $product_id."', author = '" . $this->customer->getFullName() . "', order_product_id = '".(int) $order_product_id."', text = '".$this->db->escape($data['text'])."', rating = '".(int) $data['rating']."', status = '" . (int)$status . "', date_added = NOW()");
+
+        $codes          = array_get($data, 'code');
+        $product_id     = $query->row['product_id'];
+        $status         = $this->config->get('config_review_approve') ? 0 : 1;
+        $is_image       = ($codes && is_array($codes) && count($codes) > 0) ? 1 : 0;
+
+        $this->db->query('INSERT INTO '.DB_PREFIX."order_product_review SET customer_id = '".(int) $this->customer->getId()."', parent_id = '" .  $parent_id .  "', product_id = '".(int) $product_id."', author = '" . $this->customer->getFullName() . "', order_product_id = '".(int) $order_product_id."', text = '".$this->db->escape($data['text'])."', rating = '".(int) $data['rating']."', status = '" . (int)$status . "', is_image = '" . $is_image . "', date_added = NOW()");
 
         $oreview_id = $this->db->getLastId();
 
-        $codes = array_get($data, 'code');
         if ($codes && is_array($codes)) {
             $this->addOreviewImg($oreview_id, $codes);
         }
@@ -410,7 +413,7 @@ class ModelAccountOreview extends Model
      * @param int $limit
      * @return mixed
      */
-    public function getOreviewsByProductIds($product_id, $start = 0, $limit = 20)
+    public function getOreviewsByProductIds($product_id, $start = 0, $limit = 20,$dtype = 0,$rating = 0)
     {
         if (empty($product_id))  return [];
 
@@ -422,11 +425,22 @@ class ModelAccountOreview extends Model
             $limit = 20;
         }
 
+        $maps          = '';
+        if ($dtype == 1) {
+            $maps      .= "AND r.is_image = '1' ";//有图
+        }else if ($dtype == 2) {
+            $maps      .= "AND r.is_image = '0' ";//无图
+        }
+
+        if (in_array((int)$rating, [1,2,3,4,5])) {
+            $maps      .= "AND r.rating = '" . (int)$rating . "' ";//无图
+        }
+
         $query = $this->db->query('SELECT r.order_product_review_id, r.order_product_id,r.customer_id, r.author, r.rating, r.text, p.product_id, pd.name, p.price, p.image, r.date_added
                                    FROM '.DB_PREFIX.'order_product_review r
                                    LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id)
                                    LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id)
-                                   WHERE p.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'
+                                   WHERE p.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' " . $maps . "AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'
                                    ORDER BY r.date_added DESC LIMIT ".(int)$start * $limit .','.(int) $limit);
 
         return $query->rows;
@@ -437,11 +451,22 @@ class ModelAccountOreview extends Model
      * @param $product_id
      * @return mixed
      */
-    public function getTotalOreviewsByProductIds($product_id)
+    public function getTotalOreviewsByProductIds($product_id,$dtype = 0,$rating = 0)
     {
         if (empty($product_id))  return [];
 
-        $query = $this->db->query('SELECT COUNT(*) AS total FROM '.DB_PREFIX.'order_product_review r LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id) LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id) WHERE r.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'");
+        $maps          = '';
+        if ($dtype == 1) {
+            $maps      = "AND r.is_image = '1' ";//有图
+        }else if ($dtype == 2) {
+            $maps      = "AND r.is_image = '0' ";//无图
+        }
+
+        if (in_array((int)$rating, [1,2,3,4,5])) {
+            $maps      .= "AND r.rating = '" . (int)$rating . "' ";//无图
+        }
+
+        $query = $this->db->query('SELECT COUNT(*) AS total FROM '.DB_PREFIX.'order_product_review r LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id) LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id) WHERE r.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 " . $maps . "AND pd.language_id = '".(int) $this->config->get('config_language_id')."'");
 
         return $query->row['total'];
     }
