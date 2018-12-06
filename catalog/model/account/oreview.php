@@ -457,9 +457,9 @@ class ModelAccountOreview extends Model
 
         $maps          = '';
         if ($dtype == 1) {
-            $maps      = "AND r.is_image = '1' ";//有图
+            $maps      .= "AND r.is_image = '1' ";//有图
         }else if ($dtype == 2) {
-            $maps      = "AND r.is_image = '0' ";//无图
+            $maps      .= "AND r.is_image = '0' ";//无图
         }
 
         if (in_array((int)$rating, [1,2,3,4,5])) {

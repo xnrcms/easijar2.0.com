@@ -290,6 +290,7 @@ class ControllerApiOreview extends Controller {
         $json['total_rat4']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,4);
         $json['total_rat5']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,5);
         $json['review_data']                = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10,$is_image,$rating);
+        
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 }
