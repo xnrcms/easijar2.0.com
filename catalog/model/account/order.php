@@ -515,7 +515,7 @@ class ModelAccountOrder extends Model {
         $sql        = "SELECT " . $fields . " FROM " . get_tabname('ms_suborder') . " mssu 
         LEFT JOIN  " . get_tabname('order') . " o ON (o.order_id = mssu.order_id)
         LEFT JOIN " . get_tabname('ms_seller') . " ms ON (ms.seller_id = mssu.seller_id)
-        LEFT JOIN " . get_tabname('order_status') . " os ON (o.order_status_id = os.order_status_id) 
+        LEFT JOIN " . get_tabname('order_status') . " os ON (mssu.order_status_id = os.order_status_id) 
         WHERE o.customer_id = '" . (int)$this->customer->getId() . "' " . $status_where . "AND o.store_id = '0' 
         AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' 
         ORDER BY mssu.suborder_id 

@@ -29,6 +29,7 @@ class ControllerApiOreview extends Controller {
 
         $this->load->model('account/order');
         $this->load->model('tool/image');
+        $this->load->model('account/oreview');
 
         $order_info                     = $this->model_account_order->getOrderForMs($req_data['order_sn']);
         if (empty($order_info)) {
@@ -42,10 +43,12 @@ class ControllerApiOreview extends Controller {
         $pro_data                       = [];
 
         foreach ($product_info as $pkey => $pval) {
-            $pro_data[]                 = [
-                'order_product_id'  => (int)$pval['order_product_id'],
-                'image'             =>$this->model_tool_image->resize($pval['image'], 100, 100),
-            ];
+            if (!$this->model_account_oreview->isReviewed($pval['order_product_id'])) {
+                $pro_data[]                 = [
+                    'order_product_id'  => (int)$pval['order_product_id'],
+                    'image'             =>$this->model_tool_image->resize($pval['image'], 100, 100),
+                ];
+            }
         }
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$pro_data]));
