@@ -281,6 +281,7 @@ class ControllerApiOreview extends Controller {
 
         //商品评论
         $this->load->model('account/oreview');
+        $this->load->model('tool/image');
 
         $json['total_all']                  = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,0);
         $json['total_img']                  = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,1,0);
@@ -289,7 +290,22 @@ class ControllerApiOreview extends Controller {
         $json['total_rat3']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,3);
         $json['total_rat4']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,4);
         $json['total_rat5']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,5);
-        $json['review_data']                = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10,$is_image,$rating);
+
+        $review_data                        = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10,$is_image,$rating);
+
+        foreach ($review_data as $key => $value) {
+            $result_images      = $this->model_account_oreview->getOreviewImages($value['order_product_review_id']);
+            $images             = [];
+            foreach ($result_images as $result_image) {
+                if (image_exists($result_image['filename'])) {
+                    $images[] = $this->url->imageLink($result_image['filename']);
+                }
+            }
+
+            $review_data[$key]['image']     = $images;
+            $review_data[$key]['avatar']    = $this->model_tool_image->resize($value['customer_id'], 100, 100);
+        }
+        $json['review_data']                = $review_data;
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
