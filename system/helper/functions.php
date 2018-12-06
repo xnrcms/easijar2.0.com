@@ -695,37 +695,45 @@ if (!function_exists('curl_http'))
      */
     function curl_http($url,$body='',$method='DELETE',$headers=array())
     {
-        $httpinfo=array();
-        $ci=curl_init();
+        $httpinfo       = [];
+        $ci             = curl_init();
+
+        curl_setopt($ci, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ci, CURLOPT_URL, $url);
+        curl_setopt($ci, CURLOPT_HTTPHEADER, $headers);
+
+        curl_setopt($ci, CURLOPT_FAILONERROR, false);
+        curl_setopt($ci, CURLOPT_RETURNTRANSFER, TRUE);
+        if (1 == strpos("$".$url, "https://"))
+        {
+            curl_setopt($ci, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ci, CURLOPT_SSL_VERIFYHOST, false);
+        }
+
         /* Curl settings */
         curl_setopt($ci,CURLOPT_HTTP_VERSION,CURL_HTTP_VERSION_1_0);
-        curl_setopt($ci,CURLOPT_USERAGENT,'toqi.net');
         curl_setopt($ci,CURLOPT_CONNECTTIMEOUT,30);
         curl_setopt($ci,CURLOPT_TIMEOUT,30);
-        curl_setopt($ci,CURLOPT_RETURNTRANSFER,TRUE);
         curl_setopt($ci,CURLOPT_ENCODING,'');
-        curl_setopt($ci,CURLOPT_SSL_VERIFYPEER,FALSE);
-        curl_setopt($ci,CURLOPT_HEADER,FALSE);
+        curl_setopt($ci,CURLOPT_HEADER,false);
+
         switch($method){
             case 'POST':
                 curl_setopt($ci,CURLOPT_POST,TRUE);
                 if(!empty($body)){
-                    curl_setopt($ci,CURLOPT_POSTFIELDS,$body);
+                    curl_setopt($ci,CURLOPT_POSTFIELDS,http_build_query($body));
                 }
                 break;
             case 'DELETE':
-                curl_setopt($ci,CURLOPT_CUSTOMREQUEST,'DELETE');
                 if(!empty($body)){
                     $url=$url.'?'.str_replace('amp;', '', http_build_query($body));
                 }
         }
-        curl_setopt($ci,CURLOPT_URL,$url);
-        curl_setopt($ci,CURLOPT_HTTPHEADER,$headers);
-        curl_setopt($ci,CURLINFO_HEADER_OUT,TRUE);
-        $response=curl_exec($ci);
-        $httpcode=curl_getinfo($ci,CURLINFO_HTTP_CODE);
-        $httpinfo=array_merge($httpinfo,curl_getinfo($ci));
+
+        $response   = curl_exec($ci);
+
         curl_close($ci);
+
         return $response;
     }
 }
