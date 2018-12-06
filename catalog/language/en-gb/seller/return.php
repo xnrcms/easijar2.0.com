@@ -71,3 +71,7 @@ $_['error_email']         = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']     = 'Telephone must be between 3 and 32 characters!';
 $_['error_product']       = 'Product Name must be between 3 and 255 characters!';
 $_['error_model']         = 'Product model must be between 3 and 64 characters!';
+$_['error_return_comment']      = 'Warning: Notes cannot be empty';
+$_['error_return_exists'] = 'Warning: Refund information does not exist';
+$_['error_order_exists']  = 'Warning: Order information does not exist';
+$_['error_eturn_status']  = 'Warning: Update refund status exception';

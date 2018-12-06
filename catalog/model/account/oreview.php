@@ -427,7 +427,7 @@ class ModelAccountOreview extends Model
                                    LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id)
                                    LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id)
                                    WHERE p.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'
-                                   ORDER BY r.date_added DESC LIMIT ".(int) $start.','.(int) $limit);
+                                   ORDER BY r.date_added DESC LIMIT ".(int)$start * $limit .','.(int) $limit);
 
         return $query->rows;
     }

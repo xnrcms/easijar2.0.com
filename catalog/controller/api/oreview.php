@@ -58,7 +58,7 @@ class ControllerApiOreview extends Controller {
         $this->load->language('account/oreview');
 
         $allowKey       = ['api_token','order_sn','oreview_data'];
-        $req_data       = $this->dataFilter($allowKey);wr(json_decode($req_data['oreview_data'],true));
+        $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
 
@@ -85,7 +85,7 @@ class ControllerApiOreview extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
-         //商品信息
+        //商品信息
         $order_id                       = isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
         $seller_id                      = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
         $product_info                   = $this->model_account_order->getOrderProductsForMs($order_id,$seller_id);
@@ -139,7 +139,7 @@ class ControllerApiOreview extends Controller {
             $oreview[$value['order_product_id']]    = ['rating'=>$rating,'text'=>$text,'code'=>$code];
         }
 
-        if (!empty($oreview) && $pcount !== count($oreview)) {
+        if (!empty($oreview) && $pcount == count($oreview)) {
             foreach ($oreview as $key => $value) {
                 $this->model_account_oreview->addOreview($key, $value);
             }
@@ -236,6 +236,50 @@ class ControllerApiOreview extends Controller {
             }
         }
 
-        $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$oreview_list]));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$oreview_list]));
+    }
+
+    //商品评价列表
+    public function plist()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/oreview');
+
+        $allowKey       = ['api_token','product_id','page'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        $this->load->model('account/oreview');
+        $this->load->model('catalog/product');
+
+        $product_info           = $this->model_catalog_product->getProduct($req_data['product_id']);
+        if (empty($product_info)){
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:product_info is empty']));
+        }
+
+        //所有商品ID 子产品和和主产品
+        $ppid                               = $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
+        $product_ids                        = $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
+        $page                               = isset($req_data['page']) ? (int)$req_data['page'] : 1;
+
+        //商品评论
+        $this->load->model('account/oreview');
+        $review['total']                    = $this->model_account_oreview->getTotalOreviewsByProductIds($product_ids);
+        $review_data                        = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$review_data]));
     }
 }

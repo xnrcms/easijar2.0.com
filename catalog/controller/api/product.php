@@ -217,7 +217,6 @@ class ControllerApiProduct extends Controller {
 
 			//商品评论
 			$this->load->model('account/oreview');
-			$oreview 							= [];
 			$review['total'] 					= $this->model_account_oreview->getTotalOreviewsByProductIds($product_ids);
 			$review_data 						= $this->model_account_oreview->getOreviewsByProductIds($product_ids, 0, 1);
 

@@ -75,6 +75,8 @@ abstract class Controller {
 	        //按字母排序
 	        ksort($data);
 
+	        wr($data,'sign.txt',false);
+	        
 	        //签名串 key value拼接
 	        $signStr    = "";
 	        foreach ($data as $key => $value) {

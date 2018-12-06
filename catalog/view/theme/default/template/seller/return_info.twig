@@ -110,6 +110,7 @@
                 <div id="history"></div>
               </fieldset>
               <br/>
+              {% if return_statuses %}
               <fieldset>
                 <legend>{{ text_history_add }}</legend>
                 <form class="form-horizontal">
@@ -144,6 +145,7 @@
                   </div>
                 </form>
               </fieldset>
+              {% endif %}
             </div>
         </div>
       </div>

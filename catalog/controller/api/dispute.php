@@ -101,7 +101,7 @@ class ControllerApiDispute extends Controller {
             if ($days >= 86400*3) {
                 //自动添加一条商家处理记录
                 $this->load->model('multiseller/return');
-                $this->model_multiseller_return->addReturnHistory($return_id, 10, t('text_return_comment'),0);
+                $this->model_multiseller_return->addReturnHistoryForMs($return_id, 10,'','', t('text_return_comment'),'',1);
             }
         }
 

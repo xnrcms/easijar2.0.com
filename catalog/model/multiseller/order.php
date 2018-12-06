@@ -381,4 +381,22 @@ class ModelMultisellerOrder extends Model {
 
 		return isset($query->row['seller_id']) ? $query->row['seller_id'] : 0;
     }
+
+
+
+    public function getSuborderByCustomerIdForMs($order_id = 0,$seller_id = 0,$customer_id = 0)
+    {
+        $order_id       = (int)$order_id;
+        $seller_id      = (int)$seller_id;
+        $customer_id    = (int)$customer_id;
+
+        if ( $order_id <= 0 ||  $seller_id <= 0 ||  $customer_id <= 0 )  return [];
+
+        $fields         = format_find_field('order_id,date_added','o');
+        $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
+
+        $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_id = '" . $order_id . "'AND mssu.seller_id = '" . $seller_id . "' AND o.customer_id = '" . $customer_id . "' AND o.order_status_id > '0'");
+
+        return $order_query->num_rows ? $order_query->row : [];
+    }
 }
