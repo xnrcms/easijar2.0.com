@@ -99,11 +99,21 @@ class ControllerApiDispute extends Controller {
             $days                       = $date_now - $date_added;
 
             if ($days >= 86400*3) {
-                //自动添加一条商家处理记录
+                //自动添加一条商家处理记录 
                 $this->load->model('multiseller/return');
                 $this->model_multiseller_return->addReturnHistoryForMs($return_id, 10,'','', t('text_return_comment'),'',1);
+                
+                //商家承担手续费 2
+                $this->model_multiseller_return->editReturnResponsibility($return_id,2);
+            }else{
+                
+                //买家承担手续费 1
+                $this->model_multiseller_return->editReturnResponsibility($return_id,1);
             }
         }
+
+        //用户提交申请需要商家24H处理 超时自动处理 
+        $this->model_multiseller_return->editReturnOvertime($return_id,(time() + 86400*1));
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['return_id'=> $return_id]]));
     }
@@ -169,6 +179,7 @@ class ControllerApiDispute extends Controller {
     public function update()
     {
         $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/return');
 
         $allowKey       = ['api_token','return_id','is_service','reason_id','comment','evidences'];
         $req_data       = $this->dataFilter($allowKey);
@@ -202,22 +213,18 @@ class ControllerApiDispute extends Controller {
         $return_info                    = $this->model_account_return->getReturnForMs($return_id);
 
         if ($return_info['return_status_id'] != 1) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_status is error']));
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info_status')]));
         }
 
-        //获取最近一次记录ID
-        $return_history_id              = $this->model_account_return->getReturnHistoryIdForMsByLast($return_id);
-        if ($return_history_id <= 0) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_history is error']));
-        }
+        $returnData                         = [];
+        $returnData['return_status_id']     = 1;
+        $returnData['return_id']            = $req_data['return_id'];
+        $returnData['proposal']             = (int)$req_data['is_service'] == 1 ? 6 : 7;
+        $returnData['return_reason_id']     = (int)$req_data['reason_id'];
+        $returnData['comment']              = $req_data['comment'];
+        $returnData['evidences']            = (isset($req_data['evidences']) && !empty($req_data['evidences'])) ? $req_data['evidences'] : '';;
 
-        $returnData                     = [];
-        $returnData['proposal']         = (int)$req_data['is_service'] == 1 ? 6 : 7;
-        $returnData['return_reason_id'] = (int)$req_data['reason_id'];
-        $returnData['comment']          = $req_data['comment'];
-        $returnData['evidences']        = $req_data['evidences'];
-
-        $return_id                      = $this->model_account_return->editReturnHistoryForMsByLast($return_history_id,$returnData);
+        $return_id                      = $this->model_account_return->addReturnHistoryForCs($returnData);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'update Success']));
     }

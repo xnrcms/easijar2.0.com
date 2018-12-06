@@ -133,15 +133,11 @@ class ModelAccountReturn extends Model {
 		return $query->rows;
 	}
 
-	public function getReturnHistoryIdForMsByLast($return_id = 0)
+	public function addReturnHistoryForCs($returnData)
 	{
-		$query = $this->db->query("SELECT `return_id` FROM  " . get_tabname('return_history') . " WHERE return_id = '" . (int)$return_id . "' AND customer_id = '" . $this->customer->getId() . "' AND utype = 0");
-		return isset($query->row['return_id']) ? (int)$query->row['return_id'] : 0;
-	}
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$returnData['return_status_id'] . "', date_modified = NOW() WHERE return_id = '" . (int)$returnData['return_id'] . "'");
 
-	public function editReturnHistoryForMsByLast($return_history_id,$returnData)
-	{
-		$this->db->query("UPDATE " . get_tabname('return_history') . " SET comment = '" . $returnData['comment'] . "',proposal = '" . (int)$returnData['proposal'] . "',return_reason_id = '" . $returnData['return_reason_id'] . "',evidences = '" . $returnData['evidences'] . "' WHERE return_history_id = '" . (int)$return_history_id . "'");
+		$this->db->query("INSERT INTO " . get_tabname('return_history') . " SET return_id = '" . (int)$returnData['return_id'] . "', return_status_id = '" . (int)$returnData['return_status_id'] . "', comment = '" . $returnData['comment'] . "',proposal = '" . (int)$returnData['proposal'] . "',return_reason_id = '" . $returnData['return_reason_id'] . "',evidences = '" . $returnData['evidences'] . "', customer_id = '" . (int)$this->customer->getId() . "',date_added = NOW()");
 	}
 
 	public function getReturnIdByOrderProductId($order_id = 0,$product_id = 0)

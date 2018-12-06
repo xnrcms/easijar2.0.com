@@ -61,3 +61,4 @@ $_['error_model']        = 'Product SKU must be greater than 3 and less than 64 
 $_['error_reason']       = 'You must select a return product reason!';
 $_['error_agree']        = 'Warning: You must agree to the %s!';
 $_['error_return_already']      = 'Your application has been submitted. Please be patient!';
+$_['error_return_info_status']  = 'The application has been processed and no modification is allowed!';

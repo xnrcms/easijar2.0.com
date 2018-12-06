@@ -29,6 +29,14 @@ class ModelMultisellerReturn extends Model {
 		return $query->row;
 	}
 
+	public function editReturnOvertime( $return_id = 0,$overtime = 0 ){
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `overtime` = '" . (int)$overtime . "',WHERE return_id = '" . (int)$return_id . "'");
+	}
+
+	public function editReturnResponsibility( $return_id = 0,$responsibility = 0 ){
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `responsibility` = '" . (int)$responsibility . "',WHERE return_id = '" . (int)$return_id . "'");
+	}
+
 	public function getReturns($data = array()) {
 		$sql = "SELECT *, r.fullname AS customer, (SELECT rs.name FROM " . DB_PREFIX . "return_status rs WHERE rs.return_status_id = r.return_status_id AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "') AS return_status FROM `" . DB_PREFIX . "return` r";
 

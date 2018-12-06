@@ -69,3 +69,4 @@ $_['error_model']        = 'SKU必须大于 3 和少于 64 个字符！';
 $_['error_reason']       = '请选择商品退换原因！';
 $_['error_agree']        = '警告：您必须同意 %s！';
 $_['error_return_already']      = '您的申请已经提交过了，请耐心等待！';
+$_['error_return_info_status']  = '申请已处理阶段，不允许修改操作！';
