@@ -259,6 +259,7 @@ class ModelAccountOreview extends Model
         $fields         = format_find_field('order_id,date_added,currency_code,currency_value','o');
         $fields         .= ',' . format_find_field('sku,image,name,product_id','op');
         $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');
+        $fields         .= ',' . format_find_field('order_sn','mssu');
 
         $sql = 'SELECT DISTINCT op.*, ' . $fields . ' FROM ' . get_tabname('order_product') . ' op
                         LEFT JOIN ' . get_tabname('ms_order_product') .' msop ON (msop.order_product_id = op.order_product_id)

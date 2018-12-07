@@ -81,10 +81,12 @@ class ControllerApiMyorder extends Controller {
 
             foreach ($result as $keys =>$value)
             {
-                $results1[$value['msid']]['msid']            = $value['msid']; 
-                $results1[$value['msid']]['store_name']      = $value['store_name'];
-                $results1[$value['msid']]['product_info'][]  = [
+                $results1[$value['msid'].'-'.$value['order_sn']]['msid']            = $value['msid'];
+                $results1[$value['msid'].'-'.$value['order_sn']]['store_name']      = $value['store_name'];
+                $results1[$value['msid'].'-'.$value['order_sn']]['order_sn']        = $value['order_sn'];
+                $results1[$value['msid'].'-'.$value['order_sn']]['product_info'][]  = [
                     'product_id'=> $value['product_id'],
+                    'order_sn'  => $value['order_sn'],
                     'name'      => $value['name'],
                     'image'     => $this->model_tool_image->resize($value['image'], 100, 100),
                     'price'     => $this->currency->format((float)$value['price'], $value['currency_code'], $value['currency_value'], $this->session->data['currency']),
