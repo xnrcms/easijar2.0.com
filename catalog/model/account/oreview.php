@@ -253,31 +253,19 @@ class ModelAccountOreview extends Model
         $order_statuses = $this->config->get('config_complete_status');
 
         foreach ($order_statuses as $order_status_id) {
-            $implode[] = "order_status_id = '".(int) $order_status_id."'";
+            $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
         }
 
-        /*$sql        = "SELECT o.`order_id` AS oid,o.`order_status_id` as status_id,mssu.`order_sn`,mssu.`suborder_id` AS soid,ms.`store_name`,ms.`seller_id` AS msid, os.`name` AS `status`,mssu.`total`,o.`currency_code`,o.`currency_value` FROM " . get_tabname('ms_suborder') . " mssu 
-        LEFT JOIN  " . get_tabname('order') . " o ON (o.order_id = mssu.order_id)
-        LEFT JOIN " . get_tabname('ms_seller') . " ms ON (ms.seller_id = mssu.seller_id)
-        LEFT JOIN " . get_tabname('order_status') . " os ON (o.order_status_id = os.order_status_id) 
-        WHERE o.customer_id = '" . (int)$this->customer->getId() . "' " . $status_where . "AND o.store_id = '0' 
-        AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' 
-        ORDER BY mssu.suborder_id 
-        DESC LIMIT " . (int)$start . "," . (int)$limit;*/
-
         $fields         = format_find_field('order_id,date_added,currency_code,currency_value','o');
-        $fields         .= ',' . format_find_field('sku,image,name','op');
-        $fields         .= ',' . format_find_field('product_id','p');
-        $fields         .= ',' . format_find_field('author,text,rating,order_product_review_id AS reviewed','opr');
+        $fields         .= ',' . format_find_field('sku,image,name,product_id','op');
         $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');
 
-        $sql = 'SELECT op.*, ' . $fields . ' FROM ' . get_tabname('order_product') . ' op
+        $sql = 'SELECT DISTINCT op.*, ' . $fields . ' FROM ' . get_tabname('order_product') . ' op
                         LEFT JOIN ' . get_tabname('ms_order_product') .' msop ON (msop.order_product_id = op.order_product_id)
+                        LEFT JOIN ' . get_tabname('ms_suborder') .' mssu ON (mssu.order_id = msop.order_id)
                         LEFT JOIN ' . get_tabname('ms_seller') . ' ms ON (ms.seller_id = msop.seller_id)
                         LEFT JOIN ' . get_tabname('order') .' o ON (o.order_id = op.order_id)
-                        LEFT JOIN ' . get_tabname('product') .' p ON (op.product_id = p.product_id)
-                        LEFT JOIN ' . get_tabname('order_product_review') .' opr ON (opr.order_product_id = op.order_product_id)
-                        WHERE (' .implode(' OR ', $implode).') AND (opr.parent_id = 0 OR opr.parent_id IS NULL) ';
+                        WHERE (' .implode(' OR ', $implode).') ';
 
         $implode = array();
 

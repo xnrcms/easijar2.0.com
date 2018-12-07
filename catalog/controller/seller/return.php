@@ -549,12 +549,12 @@ class ControllerSellerReturn extends Controller {
 	{
 		if($return_status_id <= 0 || $update_status_id == 0) return [];
 
-        $notAllow 					= [5,8,9];
+        $notAllow 					= [5,8,9,7];
         switch ($return_status_id) {
         	case 1: $notAllow 		= array_merge($notAllow,[1,3]);break;
         	case 2: $notAllow 		= array_merge($notAllow,[1,2,4]);break;
-        	case 6: $notAllow 		= array_merge($notAllow,[1,2,4,6,7,10]);break;
-        	case 10: $notAllow 		= array_merge($notAllow,[1,2,4,6,7,10]);break;
+        	case 6: $notAllow 		= array_merge($notAllow,[1,2,4,6,10]);break;
+        	case 10: $notAllow 		= array_merge($notAllow,[1,2,4,6,10]);break;
         	default:$return_status_id = 0;break;
         }
 

@@ -41,15 +41,35 @@ class ControllerApiMyorder extends Controller {
             
             $this->load->model('account/return');
 
-            $results            = $this->model_account_return->getReturnsForMs(($page - 1) * $limit, $limit);
+            $result                     = $this->model_account_return->getReturnsForMs(($page - 1) * $limit, $limit);
+            $results                    = [];
+            $results1                   = [];
 
-            foreach ($results as $keys =>$result)
+            foreach ($result as $keys =>$value)
+            {
+                $results1[$value['seller_id']]['msid']            = $value['seller_id']; 
+                $results1[$value['seller_id']]['store_name']      = $value['store_name'];
+                $results1[$value['seller_id']]['product_info'][]  = [
+                    'return_id'     => (int)$value['return_id'],
+                    'order_id'      => (int)$value['order_id'],
+                    'product_id'    => (int)$value['product_id'],
+                    'name'          => $value['product'],
+                    'image'         => $this->model_tool_image->resize($value['image'], 100, 100),
+                    'action'        => $value['action'],
+                ];
+            }
+
+            foreach ($results1 as $value1) {
+                $results[]  = $value1;
+            }
+
+            /*foreach ($results as $keys =>$result)
             {
                 $results[$keys]['image']        = $this->model_tool_image->resize($result['image'], 100, 100);
 
                 unset($results[$keys]['is_service']);
                 unset($results[$keys]['order_id']);
-            }
+            }*/
         }
         elseif ($req_data['order_type'] == 4)
         {
@@ -67,15 +87,15 @@ class ControllerApiMyorder extends Controller {
 
             foreach ($result as $keys =>$value)
             {
-                $results1[$value['msid']]['seller_id']       = $value['msid']; 
+                $results1[$value['msid']]['msid']            = $value['msid']; 
                 $results1[$value['msid']]['store_name']      = $value['store_name'];
-                $results1[$value['msid']]['product'][]       = [
+                $results1[$value['msid']]['product_info'][]  = [
                     'product_id' => $value['product_id'],
                     'name' => $value['name'],
+                    'image' => $this->model_tool_image->resize($value['image'], 100, 100),
                     'price' => $this->currency->format((float)$value['price'], $value['currency_code'], $value['currency_value'], $this->session->data['currency']),
                     'quantity' => (int)$value['quantity'],
-                    'sku' => $value['sku'],
-                    'oreview'   => $is_reviewed || !$complated ? 0 : 1
+                    'sku' => $value['sku']
                 ];
             }
 
