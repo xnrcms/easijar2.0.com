@@ -304,6 +304,17 @@ class ControllerApiProduct extends Controller {
 				];
 			}
 
+			//是否被收藏
+			$wish_total     = 0;
+			if (!$this->customer->isLogged()){
+				if (isset($this->session->data['wishlist']) && in_array($product_info['product_id'], $this->session->data['wishlist'])){
+                	$wish_total     = 1;
+				}
+	        }else{
+				$this->load->model('account/wishlist');
+                $wish_total     = $this->model_account_wishlist->getIsWishFByProductId((int)$product_info['product_id']);
+			}
+
 			//获取商品运费
 			$this->load->model('extension/total/multiseller_shipping');
 
@@ -324,7 +335,7 @@ class ControllerApiProduct extends Controller {
 			$data['reviews'] 					= $review;
 	        $data['seller_info'] 				= $seller_info;
 	        $data['variants'] 					= $opt;
-	        //$data['free_shipping'] 				= '10';
+	        $data['is_wish'] 					= (int)$wish_total;
 	        $data['coupons'] 					= $coupons;
 			
 			//添加商品详情浏览记录

@@ -49,9 +49,21 @@ class ControllerApiMultiseller extends Controller {
         $sinfo['avatar']        = $this->model_tool_image->resize($avatar, 100, 100);
         $sinfo['banner']        = $this->model_tool_image->resize($avatar, 100, 100);
 
+        $this->load->model('account/customer_follow_seller');
+
+        //是否被收藏
+        $follow_total           = 0;
+        if (!$this->customer->isLogged()){
+            if (isset($this->session->data['customer_follow_seller']) && in_array($sinfo['seller_id'], $this->session->data['customer_follow_seller'])){
+                $follow_total     = 1;
+            }
+        }else{
+            $follow_total     = $this->model_account_customer_follow_seller->getSellerFollowByCustomerId($sinfo['seller_id']);
+        }
+
         $sinfo['store_name']    = $seller_info['store_name'];
-        $sinfo['is_follow']     = 1;
-        $sinfo['follow_num']    = 1;
+        $sinfo['is_follow']     = (int)$follow_total;
+        $sinfo['follow_num']    = (int)$this->model_account_customer_follow_seller->getSellerFollowBySellerId($sinfo['seller_id']);
 
         $json['seller_info']    = $sinfo;
 

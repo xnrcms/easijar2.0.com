@@ -137,7 +137,7 @@ class ControllerApiFollowSeller extends Controller {
                 // Edit customers cart
                 $this->load->model('account/customer_follow_seller');
 
-                $wish_total     = $this->model_account_customer_follow_seller->getSellerFollowBySellerId((int)$seller_id);
+                $wish_total     = $this->model_account_customer_follow_seller->getSellerFollowByCustomerId((int)$seller_id);
 
                 //如果存在说明是取消收藏
                 if ($wish_total > 0) {
