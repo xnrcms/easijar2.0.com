@@ -120,11 +120,16 @@ class ControllerStartupStartup extends Controller {
 			$code = ($detect) ? $detect : '';
 		}
 
+		if ($this->request->server['REQUEST_URI'] == '/seller') {
+			$code = 'zh-cn';
+		}
+
 		if (!array_key_exists($code, $language_codes)) {
 			$code = $this->config->get('config_language');
 		}
 
 		$code = strtolower($code);
+		
 		if (!isset($this->session->data['language']) || $this->session->data['language'] != $code) {
 			$this->session->data['language'] = $code;
 		}

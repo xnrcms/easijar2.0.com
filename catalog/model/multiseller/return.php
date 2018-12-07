@@ -30,11 +30,11 @@ class ModelMultisellerReturn extends Model {
 	}
 
 	public function editReturnOvertime( $return_id = 0,$overtime = 0 ){
-		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `overtime` = '" . (int)$overtime . "',WHERE return_id = '" . (int)$return_id . "'");
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `overtime` = '" . (int)$overtime . "' WHERE return_id = '" . (int)$return_id . "'");
 	}
 
 	public function editReturnResponsibility( $return_id = 0,$responsibility = 0 ){
-		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `responsibility` = '" . (int)$responsibility . "',WHERE return_id = '" . (int)$return_id . "'");
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `responsibility` = '" . (int)$responsibility . "' WHERE return_id = '" . (int)$return_id . "'");
 	}
 
 	public function getReturns($data = array()) {

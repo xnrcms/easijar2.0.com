@@ -124,11 +124,13 @@ class ControllerApiProduct extends Controller {
 				];
 			}
 
+			$remainder 					= intval($product_total - $limit * $page);
 			$data  						= [];
 			$data['sorts'] 				= $this->get_sorts();
 			$data['filter'] 			= $this->get_filter();
 			$data['total_page'] 		= ceil($product_total/$limit);
-			$data['products'] 			= $products;
+			$data['remainder'] 			= $remainder >= 0 ? $remainder : 0;
+ 			$data['products'] 			= $products;
 
 			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
 		}
