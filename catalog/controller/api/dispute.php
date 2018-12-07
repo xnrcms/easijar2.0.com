@@ -160,7 +160,8 @@ class ControllerApiDispute extends Controller {
         $seller_id              = isset($return_info['seller_id']) ? (int)$return_info['seller_id'] : 0;
         $order_info             = $this->model_account_return->getSuborderInfo($order_id,$seller_id);
 
-        $return_info            = array_merge($return_info,$order_info);
+        $return_info['overtime']    = (int)$return_info['overtime'];
+        $return_info                = array_merge($return_info,$order_info);
 
         unset($return_info['comment']);
         unset($return_info['date_added']);
