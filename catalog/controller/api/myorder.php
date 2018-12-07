@@ -55,6 +55,7 @@ class ControllerApiMyorder extends Controller {
                     'product_id'    => (int)$value['product_id'],
                     'name'          => $value['product'],
                     'image'         => $this->model_tool_image->resize($value['image'], 100, 100),
+                    'option'        => $value['model'],
                     'action'        => $value['action'],
                 ];
             }
@@ -62,14 +63,6 @@ class ControllerApiMyorder extends Controller {
             foreach ($results1 as $value1) {
                 $results[]  = $value1;
             }
-
-            /*foreach ($results as $keys =>$result)
-            {
-                $results[$keys]['image']        = $this->model_tool_image->resize($result['image'], 100, 100);
-
-                unset($results[$keys]['is_service']);
-                unset($results[$keys]['order_id']);
-            }*/
         }
         elseif ($req_data['order_type'] == 4)
         {
@@ -90,12 +83,12 @@ class ControllerApiMyorder extends Controller {
                 $results1[$value['msid']]['msid']            = $value['msid']; 
                 $results1[$value['msid']]['store_name']      = $value['store_name'];
                 $results1[$value['msid']]['product_info'][]  = [
-                    'product_id' => $value['product_id'],
-                    'name' => $value['name'],
-                    'image' => $this->model_tool_image->resize($value['image'], 100, 100),
-                    'price' => $this->currency->format((float)$value['price'], $value['currency_code'], $value['currency_value'], $this->session->data['currency']),
-                    'quantity' => (int)$value['quantity'],
-                    'sku' => $value['sku']
+                    'product_id'=> $value['product_id'],
+                    'name'      => $value['name'],
+                    'image'     => $this->model_tool_image->resize($value['image'], 100, 100),
+                    'price'     => $this->currency->format((float)$value['price'], $value['currency_code'], $value['currency_value'], $this->session->data['currency']),
+                    'quantity'  => (int)$value['quantity'],
+                    'option'    => $value['sku']
                 ];
             }
 
