@@ -54,6 +54,7 @@ class ControllerApiMyorder extends Controller {
                     'order_id'      => (int)$value['order_id'],
                     'product_id'    => (int)$value['product_id'],
                     'name'          => $value['product'],
+                    'quantity'      => (int)$value['quantity'],
                     'image'         => $this->model_tool_image->resize($value['image'], 100, 100),
                     'option'        => $value['model'],
                     'action'        => $value['action'],
