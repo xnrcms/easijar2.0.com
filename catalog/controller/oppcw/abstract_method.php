@@ -61,7 +61,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 	        $registrations 	  = [];
 	        if (!empty($registration_ids)) {
 	        	foreach ($registration_ids as $key => $value) {
-	        		$payData['registrations[' . $key . '].id'] 	= '{' . $value['registrations'] . '}';
+	        		$payData['registrations[' . $key . '].id'] 	=  $value['registrations'] ;
 	        	}
 	        }
 
@@ -74,8 +74,8 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 					
 					$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 					$data 					= [];
-					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard';
-					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard/checkoutId/' . $pay['id'] . '/sign/'. $sign;
+					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&sign='. $sign;
+					$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 					return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
 				}else{
@@ -120,7 +120,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				
 				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 				$data 					= [];
-				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard/checkoutId/' . $pay['id'] . '/sign/'. $sign;
+				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&sign='. $sign;
 				$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 				return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
@@ -130,23 +130,15 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		}
     }
 
-    public function callback() {
-		//$this->logger->write('alipay pay notify:');
-
-		/*$this->load->model('checkout/order');
-		$this->model_checkout_order->addOrderHistoryForMs('2018111514465212381382381', 5);*/
+    public function callback() 
+    {
 		$req_data 					= array_merge($this->request->get,$this->request->post);
-		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($req_data['order_sn'],get_order_type($this->session->data['order_sn']));
-		if (!$order_info)  return '';
-
 		$resourcePath 				= isset($req_data['resourcePath']) ? $req_data['resourcePath'] : '';
 		$checkoutId 				= isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
 		$sign 						= isset($req_data['sign']) ? $req_data['sign'] : '';
 		$id 						= isset($req_data['id']) ? $req_data['id'] : '';
 
-		if (empty($resourcePath) || empty($id) || empty($checkoutId) || empty($sign)) {
-			return 'error1';
-		}
+		if (empty($resourcePath) || empty($id) || empty($checkoutId) || empty($sign)) return 'pay callback parameter error';
 		
 		$entity_id 					= $this->config->get('module_oppcw_global_entity_id');
 		$user_id 					= $this->config->get('module_oppcw_user_id');
@@ -162,59 +154,25 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
 
-		$payid 									= isset($req_data['id']) ? $req_data['id'] : '';
-		$order_sn 								= isset($req_data['merchantTransactionId']) ? $req_data['merchantTransactionId'] : '';
-		$registrationId 						= isset($req_data['registrationId']) ? $req_data['registrationId'] : '';
+		$payid 									= isset($pay['id']) ? $pay['id'] : '';
+		$order_sn 								= isset($pay['merchantTransactionId']) ? $pay['merchantTransactionId'] : '';
+		$registrationId 						= isset($pay['registrationId']) ? $pay['registrationId'] : '';
 
 		//订单合法性校验
+		$this->load->model('checkout/order');
 		$order_info 							= $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($order_sn,get_order_type($order_sn));
-		if (!$order_info) return 'error2';;
-
-		if ($sign !== md5($order_sn . $order_info['customer_id'] . $checkoutId . '~~!!@#@1')) {
-			return 'error3';
-		}
+		
+		if (!$order_info) return 'order info error';
+		if ($sign !== md5($order_sn . $order_info['customer_id'] . $checkoutId . '~~!!@#@1')) return 'order sign error';
 
 		//记录用户支付卡ID
 		$this->load->model('extension/payment/oppcw_creditcard');
         $method = $this->model_extension_payment_oppcw_creditcard->setRegistrationId($order_info['customer_id'], $registrationId);
 
-		print_r($pay);exit();
-		print_r('sssss');exit();
-		/*$arr = $_POST;
-		$config = array (
-			'app_id'               => $this->config->get('payment_alipay_app_id'),
-			'merchant_private_key' => $this->config->get('payment_alipay_merchant_private_key'),
-			'notify_url'           => HTTP_SERVER . "payment_callback/alipay",
-			'return_url'           => $this->url->link('checkout/success'),
-			'charset'              => "UTF-8",
-			'sign_type'            => "RSA2",
-			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",
-			'alipay_public_key'    => $this->config->get('payment_alipay_alipay_public_key'),
-		);
-		$this->load->model('extension/payment/alipay');
-		$this->logger->write('POST' . var_export($_POST,true));
-		$result = $this->model_extension_payment_alipay->check($arr, $config);
+		$this->load->model('checkout/order');
+		$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
 
-		if($result) {//check successed
-			$this->log('Alipay check successed');
-
-			if($_POST['trade_status'] == 'TRADE_FINISHED') {
-			}
-			else if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
-
-				$order_sn = isset($_POST['out_trade_no']) ? explode('-', $_POST['out_trade_no']) : [];
-				$order_sn = isset($order_sn[0]) ? $order_sn[0] : '';
-
-				$this->load->model('checkout/order');
-				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
-			}
-			echo "success";	//Do not modified or deleted
-		}else {
-			$this->log('Alipay check failed');
-			//chedk failed
-			echo "fail";
-
-		}*/
+		return 'success';
 	}
 }
 
