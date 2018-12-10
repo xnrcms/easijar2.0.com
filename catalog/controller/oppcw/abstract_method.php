@@ -19,14 +19,11 @@
  */
 
 require_once DIR_SYSTEM . '/library/cw/OPPCw/init.php';
-
-
 require_once 'OPPCw/Language.php';
 require_once 'OPPCw/IPaymentMethodDefinition.php';
 require_once 'OPPCw/Template.php';
 require_once 'OPPCw/PaymentMethod.php';
 require_once 'OPPCw/AbstractController.php';
-
 
 abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController implements OPPCw_IPaymentMethodDefinition
 {
