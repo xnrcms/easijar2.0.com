@@ -27,7 +27,6 @@ require_once 'OPPCw/AbstractController.php';
 
 abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController implements OPPCw_IPaymentMethodDefinition
 {
-	
 	public function index()
 	{
 		
