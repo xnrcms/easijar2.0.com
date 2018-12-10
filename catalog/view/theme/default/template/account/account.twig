@@ -82,8 +82,16 @@
     {{ column_right }}</div>
 </div>
 ======================
+<script>
+var wpwlOptions = {
+ onReady: function (){
+ var createRegistrationHtml = '<div class="customLabel">Store payment details?</div><div class="customInput"><input type="checkbox" name="createRegistration" value="true"/></div>';
+    $('form.wpwl-form-card').find('.wpwl-button').before(createRegistrationHtml);
+ }
+};
+</script>
 <form action="http://v2.easijar.com/payment_callback/oppcw_creditcard" class="paymentWidgets" data-brands="VISA MASTER"></form>
-<script src="https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=213779531AA7F86F6661B1F8781BC922.uat01-vm-tx02"></script>
+<script src="https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=B3C92AA682AFA54C0437CFC566FF6783.uat01-vm-tx03"></script>
 ======================
 {{ avatar_upload }}
 {{ footer }}

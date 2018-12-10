@@ -38,20 +38,40 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$this->load->model('checkout/order');
 		$orderId = $this->session->data['order_id'];
 		if (!empty($orderId)) {
+			
 			$order_info = $this->model_checkout_order->getOrder($orderId);
-			
-			$failedTransaction = null;
-			$paymentMethod = new OPPCw_PaymentMethod($this);
-			$orderContext = $paymentMethod->newOrderContext($order_info, $this->registry);
-			$adapter = $paymentMethod->getPaymentAdapterByOrderContext($orderContext);
-			
-			$data = $adapter->getCheckoutPageHtml($paymentMethod, $orderContext, $this->registry, $failedTransaction);
-			
-			require_once 'Customweb/Licensing/OPPCw/License.php';
-Customweb_Licensing_OPPCw_License::run('t3o4g8g7g4i1r4r1');
-			$vars = array();
-			$vars['checkout_form'] = $data;
-			return $this->renderView(OPPCw_Template::resolveTemplatePath(OPPCw_Template::PAYMENT_FORM_TEMPLATE), $vars);
+			if (!$order_info)  return '';
+
+			$entity_id 					= $this->config->get('module_oppcw_global_entity_id');
+			$user_id 					= $this->config->get('module_oppcw_user_id');
+			$user_password 				= $this->config->get('module_oppcw_user_password');
+			$url 						= "https://test.oppwa.com/v1/checkouts";
+
+			$payData 								= [];
+			$payData['authentication.userId'] 		= $user_id;
+			$payData['authentication.password'] 	= $user_password;
+			$payData['authentication.entityId'] 	= $entity_id;
+			$payData['amount'] 						= round($order_info['total'],2);
+			$payData['currency'] 					= $order_info['currency_code'];
+			$payData['paymentType'] 				= 'DB';
+
+			$pay  									= curl_http($url,$payData,'POST');
+			$pay 									= !empty($pay) ? json_decode($pay,true) : [];
+
+			if (isset($pay['result']['code']) && !empty($pay['result']['code'])) {
+
+				if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code'])) {
+					
+					$data 					= [];
+					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard';
+					$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
+
+					return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
+				}else{
+					return 'pay fail';
+				}
+			}
+
 		}
 		else {
 			return 'The order ID is not set in the session. This happens when the order could not be 
@@ -69,13 +89,13 @@ Customweb_Licensing_OPPCw_License::run('t3o4g8g7g4i1r4r1');
 		$entity_id 					= $this->config->get('module_oppcw_global_entity_id');
 		$user_id 					= $this->config->get('module_oppcw_user_id');
 		$user_password 				= $this->config->get('module_oppcw_user_password');
-
 		$url 						= "https://test.oppwa.com/v1/checkouts";
-		$payData 					= [];
+
+		$payData 								= [];
 		$payData['authentication.userId'] 		= $user_id;
 		$payData['authentication.password'] 	= $user_password;
 		$payData['authentication.entityId'] 	= $entity_id;
-		$payData['amount'] 						= $order_info['total'];
+		$payData['amount'] 						= round($order_info['total'],2);
 		$payData['currency'] 					= $order_info['currency_code'];
 		$payData['paymentType'] 				= 'DB';
 
@@ -83,35 +103,18 @@ Customweb_Licensing_OPPCw_License::run('t3o4g8g7g4i1r4r1');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
 
 		if (isset($pay['result']['code']) && !empty($pay['result']['code'])) {
-		return $pay;
-			if (preg_match("/000\\.200|800\\.400\\.5|100\\.400\\.500/", $pay['result']['code']) || preg_match("/000\\.400\\.0[^3]|000\\.400\\.100/", $pay['result']['code'])) {
-				return $pay['id'];
+
+			if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code'])) {
+				
+				$data 					= [];
+				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard';
+				$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
+
+				return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
 			}else{
-				return 'no';
+				return 'pay fail';
 			}
 		}
-
-		return json_decode($pay,true);
-
-		$callback 								= 'http://v2.easijar.com/payment_callback/oppcw_creditcard';
-		$html 	 = '<form action="' . $callback . '" class="paymentWidgets" data-brands="VISA MASTER"></form>';
-		$html 	.= '<script src="https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=213779531AA7F86F6661B1F8781BC922.uat01-vm-tx02"></script>';
-		return $html;
-
-		$failedTransaction 			= null;
-		$paymentMethod 				= new OPPCw_PaymentMethod($this);
-		$orderContext 				= $paymentMethod->newOrderContext($order_info, $this->registry);
-		$adapter 					= $paymentMethod->getPaymentAdapterByOrderContext($orderContext);
-		
-		$data = $adapter->getCheckoutPageHtml($paymentMethod, $orderContext, $this->registry, $failedTransaction);
-		
-		require_once 'Customweb/Licensing/OPPCw/License.php';
-		Customweb_Licensing_OPPCw_License::run('41fdca1lfnq2j68k');
-		
-		$vars = array();
-		$vars['checkout_form'] = $data;
-
-		return $this->renderView(OPPCw_Template::resolveTemplatePath(OPPCw_Template::PAYMENT_FORM_TEMPLATE), $vars);
     }
 
     public function callback() {
@@ -119,6 +122,8 @@ Customweb_Licensing_OPPCw_License::run('t3o4g8g7g4i1r4r1');
 
 		/*$this->load->model('checkout/order');
 		$this->model_checkout_order->addOrderHistoryForMs('2018111514465212381382381', 5);*/
+		$req_data 			= array_merge($this->request->get,$this->request->post);
+		print_r($req_data);
 		print_r('sssss');exit();
 		/*$arr = $_POST;
 		$config = array (
