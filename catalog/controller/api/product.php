@@ -402,6 +402,8 @@ class ControllerApiProduct extends Controller {
 		$limit 				= isset($req_data['limit']) ? (int)$req_data['limit'] : $this->config->get('theme_'.$this->config->get('config_theme').'_product_limit');
 
 
+		unset($this->request->post['in_stock']);
+			
 		$this->load->model('catalog/category');
 
 		// 3 Level Category Search
