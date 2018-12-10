@@ -186,7 +186,7 @@ class ControllerSellerLogin extends Controller {
             	$this->load->controller('api/home/makeHash','','zh-cn');
 	            $this->session->data['customer_id'] 	= $customer_info['customer_id'];
 
-                $this->response->redirect('http://attract.easijar.com/#/join?api_token=' . $session_id);
+                $this->response->redirect('http://seller.easijar.com/#/join?api_token=' . $session_id);
             } else if (!$seller_info['status']) {
                 $this->error['warning'] = $this->language->get('error_approved');
             }

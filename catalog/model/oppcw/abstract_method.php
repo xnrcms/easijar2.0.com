@@ -161,4 +161,26 @@ abstract class ModelPaymentOPPCwAbstract extends Model implements OPPCw_IPayment
 		}
 	}
 
+	public function setRegistrationId($customer_id = 0,$registrations = '')
+	{
+		if ((int)$customer_id <= 0 || empty($registrations))  return false;
+
+		//先查找是否存在
+		$query = $this->db->query("SELECT * FROM " . get_tabname('pingpong_registrations') . " WHERE customer_id = '" . (int)$customer_id . "' AND registrations = '" . (string)$registrations . "'");
+		if ($query->num_rows) return false;
+
+		$this->db->query("INSERT INTO " . get_tabname('pingpong_registrations') . " SET `customer_id` = '" . (int)$customer_id . "', `registrations` = '" . $this->db->escape($registrations) . "'");
+
+		return true;
+	}
+
+	public function getRegistrationId($customer_id = 0)
+	{
+		if ((int)$customer_id <= 0 )  return [];
+
+		//先查找是否存在
+		$query = $this->db->query("SELECT * FROM " . get_tabname('pingpong_registrations') . " WHERE customer_id = '" . (int)$customer_id . "'");
+
+		return $query->rows;
+	}
 }

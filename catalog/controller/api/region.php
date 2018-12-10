@@ -47,26 +47,6 @@ class ControllerApiRegion extends Controller {
             );
         }
 
-        /*$json = array();
-        $this->load->model('localisation/zone');
-        $this->load->model('localisation/city');
-        $zoneId = $this->request->get['zone_id'];
-        $isTop = $this->request->get['is_top'];
-
-        if ($isTop) {
-            $zone_info = $this->model_localisation_zone->getZone($zoneId);
-        } else {
-            $zone_info = $this->model_localisation_city->getCity($zoneId);
-        }
-        if ($zone_info) {
-            $json = array(
-                'zone_id'   => $zone_info['zone_id'],
-                'name'      => $zone_info['name'],
-                'city'      => $this->model_localisation_city->getCitiesByZoneId($zoneId, $isTop),
-                'status'    => $zone_info['status']
-            );
-        }*/
-
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$region]));
     }
 

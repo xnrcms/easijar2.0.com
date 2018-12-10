@@ -29,22 +29,21 @@ class ControllerApiAddress extends Controller {
 
         $this->load->model('account/address');
 
-        $json['addresses']  = [];
+        $addresses          = [];
         $results            = $this->model_account_address->getAddresses();
 
         foreach ($results as $result) {
-            $json['addresses'][] = array(
+            $addresses[]    = [
                 'address_id'    => $result['address_id'],
                 'fullname'      => $result['fullname'],
                 'telephone'     => $result['telephone'],
-                //'address'       => address_format($result, $result['address_format']),
                 'address_1'     => !empty($result['address_1']) ? $result['address_1'] : '',
                 'address_2'     => !empty($result['address_2']) ? $result['address_2'] : '',
                 'postcode'      => !empty($result['postcode']) ? $result['postcode'] : ''
-            );
+            ];
         }
 
-        return $this->response->setOutput($this->returnData($json));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$addresses]));
     }
 
     // 获取收货地址详情
@@ -154,8 +153,8 @@ class ControllerApiAddress extends Controller {
         if ((utf8_strlen(trim($req_data['postcode'])) < 2 || utf8_strlen(trim($req_data['postcode'])) > 10))
             return $this->response->setOutput($this->returnData(['msg'=>t('error_postcode')]));
 
-        if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] <= 0 ) 
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_zone')]));
+        /*if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] <= 0 ) 
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_zone')]));*/
 
         if ((utf8_strlen(trim($req_data['city'])) < 2) || (utf8_strlen(trim($req_data['city'])) > 128))
             return $this->response->setOutput($this->returnData(['msg'=>t('error_city')]));
@@ -164,7 +163,6 @@ class ControllerApiAddress extends Controller {
 
         $address_id     = (int)array_get($req_data, 'address_id',0);
         $save_type      = (int)$req_data['save_type'] == 2 ? 2 : 1;
-
 
         $req_data['city_id']    = 0;
         $req_data['county_id']  = 0;

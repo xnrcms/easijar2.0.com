@@ -54,6 +54,16 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 			$payData['amount'] 						= round($order_info['total'],2);
 			$payData['currency'] 					= $order_info['currency_code'];
 			$payData['paymentType'] 				= 'DB';
+			$payData['merchantTransactionId'] 		= $order_info['order_sn'];
+
+			$this->load->model('extension/payment/oppcw_creditcard');
+	        $registration_ids = $this->model_extension_payment_oppcw_creditcard->getRegistrationId($order_info['customer_id']);
+	        $registrations 	  = [];
+	        if (!empty($registration_ids)) {
+	        	foreach ($registration_ids as $key => $value) {
+	        		$payData['registrations[' . $key . '].id'] 	= '{' . $value['registrations'] . '}';
+	        	}
+	        }
 
 			$pay  									= curl_http($url,$payData,'POST');
 			$pay 									= !empty($pay) ? json_decode($pay,true) : [];
@@ -62,9 +72,10 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 				if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code'])) {
 					
+					$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 					$data 					= [];
 					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard';
-					$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
+					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard/checkoutId/' . $pay['id'] . '/sign/'. $sign;
 
 					return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
 				}else{
@@ -98,6 +109,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$payData['amount'] 						= round($order_info['total'],2);
 		$payData['currency'] 					= $order_info['currency_code'];
 		$payData['paymentType'] 				= 'DB';
+		$payData['merchantTransactionId'] 		= $order_info['order_sn'];
 
 		$pay  									= curl_http($url,$payData,'POST');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
@@ -106,8 +118,9 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 			if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code'])) {
 				
+				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 				$data 					= [];
-				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard';
+				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard/checkoutId/' . $pay['id'] . '/sign/'. $sign;
 				$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 				return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
@@ -122,8 +135,50 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 		/*$this->load->model('checkout/order');
 		$this->model_checkout_order->addOrderHistoryForMs('2018111514465212381382381', 5);*/
-		$req_data 			= array_merge($this->request->get,$this->request->post);
-		print_r($req_data);
+		$req_data 					= array_merge($this->request->get,$this->request->post);
+		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($req_data['order_sn'],get_order_type($this->session->data['order_sn']));
+		if (!$order_info)  return '';
+
+		$resourcePath 				= isset($req_data['resourcePath']) ? $req_data['resourcePath'] : '';
+		$checkoutId 				= isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
+		$sign 						= isset($req_data['sign']) ? $req_data['sign'] : '';
+		$id 						= isset($req_data['id']) ? $req_data['id'] : '';
+
+		if (empty($resourcePath) || empty($id) || empty($checkoutId) || empty($sign)) {
+			return 'error1';
+		}
+		
+		$entity_id 					= $this->config->get('module_oppcw_global_entity_id');
+		$user_id 					= $this->config->get('module_oppcw_user_id');
+		$user_password 				= $this->config->get('module_oppcw_user_password');
+		$url 						= "https://test.oppwa.com/v1/checkouts/" . $id . "/payment?";
+
+		$payData 								= [];
+		$payData['authentication.userId'] 		= $user_id;
+		$payData['authentication.password'] 	= $user_password;
+		$payData['authentication.entityId'] 	= $entity_id;
+
+		$url 									= $url . http_build_query($payData);
+		$pay  									= curl_http($url,'','GET');
+		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
+
+		$payid 									= isset($req_data['id']) ? $req_data['id'] : '';
+		$order_sn 								= isset($req_data['merchantTransactionId']) ? $req_data['merchantTransactionId'] : '';
+		$registrationId 						= isset($req_data['registrationId']) ? $req_data['registrationId'] : '';
+
+		//订单合法性校验
+		$order_info 							= $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($order_sn,get_order_type($order_sn));
+		if (!$order_info) return 'error2';;
+
+		if ($sign !== md5($order_sn . $order_info['customer_id'] . $checkoutId . '~~!!@#@1')) {
+			return 'error3';
+		}
+
+		//记录用户支付卡ID
+		$this->load->model('extension/payment/oppcw_creditcard');
+        $method = $this->model_extension_payment_oppcw_creditcard->setRegistrationId($order_info['customer_id'], $registrationId);
+
+		print_r($pay);exit();
 		print_r('sssss');exit();
 		/*$arr = $_POST;
 		$config = array (
