@@ -34,7 +34,7 @@ class ControllerApiShippingtrack extends Controller {
         }
 
 
-        //快递单信息
+        /*//快递单信息
         $this->load->model('extension/module/aftership');
 
         $data['order_tracking']          = array();
@@ -54,8 +54,10 @@ class ControllerApiShippingtrack extends Controller {
                     'comment'          => $item['comment']
                 );
             }
-        }
-
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$order_info]));
+        }*/
+        $this->request->get['slug']         = 'wishpost';
+        $this->request->get['number']       = 'LN676398535CN';
+        $data   = $this->load->controller('extension/module/aftership/getTraceForApi');
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
     }
 }

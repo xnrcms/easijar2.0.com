@@ -62,4 +62,41 @@ class ControllerExtensionModuleAftership extends Controller
         }
         $this->response->setOutput($track);
     }
+
+    public function getTraceForApi()
+    {
+        $this->load->language('extension/module/aftership');
+
+        if (isset($this->request->get['slug'])) {
+            $typeSlug = $this->request->get['slug'];
+        } else {
+            $typeSlug = 0;
+        }
+        if (isset($this->request->get['number'])) {
+            $typeNu = $this->request->get['number'];
+        } else {
+            $typeNu = 0;
+        }
+
+        $json = array();
+
+        try {
+            $trace = new AfterShip\Trackings($this->config->get('tracking_key'));
+            $response = $trace->get($typeSlug, $typeNu);
+        } catch (AftershipException $e) {
+            $json['error'] = $e->getMessage();
+        } catch (Exception $e) {
+            $json['error'] = $e->getMessage();
+        }
+
+        if (isset($json['error'])) {
+            return $json;
+        } else {
+            $json['text_time']      = $this->language->get('text_time');
+            $json['text_time']      = $this->language->get('text_station');
+            $json['data']           = isset($response['data']['tracking']['checkpoints']) ? $response['data']['tracking']['checkpoints'] : [];
+        }
+        
+        return $json;
+    }
 }
