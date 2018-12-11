@@ -120,7 +120,7 @@ class ControllerApiCheckout extends Controller
                     'address_1'             => $value['address_1'],
                     'address_2'             => $value['address_2'],
                     'postcode'              => $value['postcode'],
-                    'is_default'            => $this->customer->getAddressId() == $result['address_id'] ? 1 : 0,
+                    'is_default'            => $this->customer->getAddressId() == $value['address_id'] ? 1 : 0,
                 ];
             }
             $json['shipping_address_section']   = $shipping_option;

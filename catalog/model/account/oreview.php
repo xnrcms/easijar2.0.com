@@ -470,12 +470,13 @@ class ModelAccountOreview extends Model
         $order_statuses = $this->config->get('config_complete_status');
 
         foreach ($order_statuses as $order_status_id) {
-            $implode[] = "order_status_id = '".(int) $order_status_id."'";
+            $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
         }
 
-        $sql = 'SELECT op.*, o.date_added, p.image, p.product_id,p.tax_class_id, opr.author, opr.text, opr.rating, order_product_review_id AS reviewed
+        $sql = 'SELECT DISTINCT op.*, o.date_added, p.image, p.product_id,p.tax_class_id, opr.author, opr.text, opr.rating, order_product_review_id AS reviewed
                         FROM ' .DB_PREFIX.'order_product op
                         LEFT JOIN ' .DB_PREFIX.'order o ON (o.order_id = op.order_id)
+                        LEFT JOIN ' .DB_PREFIX.'ms_suborder mssu ON (o.order_id = mssu.order_id)
                         LEFT JOIN ' .DB_PREFIX.'product p ON (op.product_id = p.product_id)
                         LEFT JOIN ' .DB_PREFIX.'order_product_review opr ON (opr.order_product_id = op.order_product_id)
                         WHERE (' .implode(' OR ', $implode).') AND (opr.parent_id = 0 OR opr.parent_id IS NULL) ';
@@ -534,7 +535,7 @@ class ModelAccountOreview extends Model
 
             $sql .= ' LIMIT '.(int) $data['start'].','.(int) $data['limit'];
         }
-
+wr($sql);
         $query = $this->db->query($sql);
 
         return $query->rows;
