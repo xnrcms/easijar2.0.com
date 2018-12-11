@@ -70,7 +70,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 					
 					$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 					$data 					= [];
-					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&sign='. $sign;
+					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
 					$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 					return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
@@ -116,7 +116,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				
 				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 				$data 					= [];
-				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&sign='. $sign;
+				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
 				$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 				return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
@@ -128,10 +128,21 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
     public function callback() 
     {
+		$res 		= $this->get_callback();
+		if (isset($this->session->data['api_id']) && $this->session->data['api_id'] > 0) return $res;
+		if ($res == 'success') {
+			$this->response->redirect($this->url->link('checkout/success'));
+		}else{
+			$this->response->redirect($this->url->link('checkout/failure'));
+		}
+	}
+
+	private function get_callback()
+	{
 		$req_data 					= array_merge($this->request->get,$this->request->post);
 		$resourcePath 				= isset($req_data['resourcePath']) ? $req_data['resourcePath'] : '';
 		$checkoutId 				= isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
-		$sign 						= isset($req_data['sign']) ? $req_data['sign'] : '';
+		$sign 						= isset($req_data['paysign']) ? $req_data['paysign'] : '';
 		$id 						= isset($req_data['id']) ? $req_data['id'] : '';
 
 		if (empty($resourcePath) || empty($id) || empty($checkoutId) || empty($sign)) return 'pay callback parameter error';
