@@ -377,7 +377,6 @@ class ControllerApiCheckout extends Controller
             return $this->response->setOutput($this->returnData(['msg'=>'fail:payment_method is error']));
         }
 
-
         $order_data                         = [];
         $order_data['payment_address']      = [];
         $order_data['shipping_address']     = [];

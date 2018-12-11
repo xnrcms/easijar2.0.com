@@ -700,4 +700,8 @@ class ModelAccountOrder extends Model {
 
         return $query->row;
     }
+
+    public function deleteSubOrder($order_sn = ''){
+        $this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET order_status_id = '-1', date_modified = NOW() WHERE order_sn = '" . (string)$order_sn . "'");
+    }
 }
