@@ -70,7 +70,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 					
 					$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 					$data 					= [];
-					$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
+					$data['callback'] 		= HTTP_SERVER . 'payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
 					$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 					return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
@@ -140,12 +140,11 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 	private function get_callback()
 	{
 		$req_data 					= array_merge($this->request->get,$this->request->post);
-		$resourcePath 				= isset($req_data['resourcePath']) ? $req_data['resourcePath'] : '';
 		$checkoutId 				= isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
 		$sign 						= isset($req_data['paysign']) ? $req_data['paysign'] : '';
 		$id 						= isset($req_data['id']) ? $req_data['id'] : '';
 
-		if (empty($resourcePath) || empty($id) || empty($checkoutId) || empty($sign)) return 'pay callback parameter error';
+		if (empty($id) || empty($checkoutId) || empty($sign)) return 'pay callback parameter error';
 		
 		$entity_id 					= $this->config->get('module_oppcw_global_entity_id');
 		$user_id 					= $this->config->get('module_oppcw_user_id');
@@ -161,25 +160,36 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
 
-		$payid 									= isset($pay['id']) ? $pay['id'] : '';
-		$order_sn 								= isset($pay['merchantTransactionId']) ? $pay['merchantTransactionId'] : '';
-		$registrationId 						= isset($pay['registrationId']) ? $pay['registrationId'] : '';
+		if (isset($pay['result']['code']) && !empty($pay['result']['code'])) {
 
-		//订单合法性校验
-		$this->load->model('checkout/order');
-		$order_info 							= $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($order_sn,get_order_type($order_sn));
-		
-		if (!$order_info) return 'order info error';
-		if ($sign !== md5($order_sn . $order_info['customer_id'] . $checkoutId . '~~!!@#@1')) return 'order sign error';
+			if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code'])) {
+				
+				$payid 									= isset($pay['id']) ? $pay['id'] : '';
+				$order_sn 								= isset($pay['merchantTransactionId']) ? $pay['merchantTransactionId'] : '';
+				$registrationId 						= isset($pay['registrationId']) ? $pay['registrationId'] : '';
 
-		//记录用户支付卡ID
-		$this->load->model('extension/payment/oppcw_creditcard');
-        $method = $this->model_extension_payment_oppcw_creditcard->setRegistrationId($order_info['customer_id'], $registrationId);
+				//订单合法性校验
+				$this->load->model('checkout/order');
+				$order_info 							= $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($order_sn,get_order_type($order_sn));
+				
+				if (!$order_info) return 'order info error';
+				if ($sign !== md5($order_sn . $order_info['customer_id'] . $checkoutId . '~~!!@#@1')) return 'order sign error';
 
-		$this->load->model('checkout/order');
-		$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
+				//记录用户支付卡ID
+				$this->load->model('extension/payment/oppcw_creditcard');
+		        $method = $this->model_extension_payment_oppcw_creditcard->setRegistrationId($order_info['customer_id'], $registrationId);
 
-		return 'success';
+				$this->load->model('checkout/order');
+				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
+
+				return 'success';
+			}
+		}
+
+		$logger = new Log('pingpong.log');
+		$logger->write('pingpong pay error:'.json_encode($pay));
+
+		return 'pay fail';
 	}
 }
 

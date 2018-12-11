@@ -3,7 +3,7 @@ class ControllerCheckoutSuccess extends Controller {
 	public function index() {
 		$this->load->language('checkout/success');
 
-		if (isset($this->session->data['order_id'])) {
+		if (isset($this->session->data['order_id']) || $this->session->data['order_sn']) {
 			$this->cart->clear();
 
 			unset($this->session->data['shipping_method']);
@@ -13,6 +13,7 @@ class ControllerCheckoutSuccess extends Controller {
 			unset($this->session->data['guest']);
 			unset($this->session->data['comment']);
 			unset($this->session->data['order_id']);
+			unset($this->session->data['order_sn']);
 			unset($this->session->data['coupon']);
 			unset($this->session->data['reward']);
 			unset($this->session->data['voucher']);
@@ -22,6 +23,8 @@ class ControllerCheckoutSuccess extends Controller {
 			unset($this->session->data['recharge']);
 			unset($this->session->data['recharges']);
 		}
+
+		if (isset($this->session->data['api_id']) && $this->session->data['api_id'] > 0) return;
 
 		$this->document->setTitle($this->language->get('heading_title'));
 

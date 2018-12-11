@@ -119,7 +119,8 @@ class ControllerApiCheckout extends Controller
                     'telephone'             => $value['telephone'],
                     'address_1'             => $value['address_1'],
                     'address_2'             => $value['address_2'],
-                    'postcode'              => $value['postcode']
+                    'postcode'              => $value['postcode'],
+                    'is_default'            => $this->customer->getAddressId() == $result['address_id'] ? 1 : 0,
                 ];
             }
             $json['shipping_address_section']   = $shipping_option;
@@ -664,6 +665,8 @@ class ControllerApiCheckout extends Controller
 
     private function hasShipping()
     {
+        //设置购物车类型
+        $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
         return $this->cart->hasShipping();
     }
 

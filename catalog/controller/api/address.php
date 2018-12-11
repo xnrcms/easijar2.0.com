@@ -39,7 +39,8 @@ class ControllerApiAddress extends Controller {
                 'telephone'     => $result['telephone'],
                 'address_1'     => !empty($result['address_1']) ? $result['address_1'] : '',
                 'address_2'     => !empty($result['address_2']) ? $result['address_2'] : '',
-                'postcode'      => !empty($result['postcode']) ? $result['postcode'] : ''
+                'postcode'      => !empty($result['postcode']) ? $result['postcode'] : '',
+                'is_default'    => $this->customer->getAddressId() == $result['address_id'] ? 1 : 0,
             ];
         }
 

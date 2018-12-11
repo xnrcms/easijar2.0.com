@@ -134,7 +134,7 @@ class ControllerApiPay extends Controller {
     {
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token','payment_code'];
+        $allowKey       = ['api_token','checkoutId','paysign','id'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -155,39 +155,16 @@ class ControllerApiPay extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
         
-        //验证支付订单
-        $this->load->model('account/order');
 
-        $order_payinfo                     = $this->model_account_order->getOrderPayinfoForMs($req_data['order_sn']);
-        if (empty($order_payinfo)) {
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        $this->request->post['checkoutId']      = isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
+        $this->request->post['paysign']         = isset($req_data['paysign']) ? $req_data['paysign'] : '';
+        $this->request->post['id']              = isset($req_data['id']) ? $req_data['id'] : '';
+        $res                                    = $this->load->controller('extension/payment/oppcw_creditcard/callback');
+
+        if ($res == 'success') {
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success']));
         }
 
-        if (!isset($order_payinfo['order_status_id']) || $order_payinfo['order_status_id'] != 1) {
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_status')]));
-        }
-
-        $this->session->data['order_sn'] = $req_data['order_sn'];
-
-        
-        //修改支付方式
-        $this->load->model('checkout/checkout');
-        $this->model_checkout_checkout->setPaymentMethodsForMs($order_payinfo['order_id'],$req_data['payment_code']);
-
-        if ($req_data['payment_code'] == 'cod')
-        {
-            $this->load->model('checkout/order');
-            
-            $payment            = '';
-            $this->model_checkout_order->addOrderHistoryForMs($req_data['order_sn'],15, '买家用户中心发起支付');
-        } else {
-            $payment = $this->load->controller('extension/payment/' . $req_data['payment_code'] . '/payFormForSm');
-        }
-
-        $json                   = [];
-        $json['payment']        = $req_data['payment_code'];
-        $json['payinfo']        = !empty($payment) ? $payment : '';
-        $json['path']           = 'extension/payment/' . $req_data['payment_code'] . '/payFormForSm';
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
+        return $this->response->setOutput($this->returnData(['msg'=>$res]));
     }
 }
