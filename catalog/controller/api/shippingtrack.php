@@ -55,9 +55,16 @@ class ControllerApiShippingtrack extends Controller {
                 );
             }
         }*/
+        
         $this->request->get['slug']         = 'wishpost';
         $this->request->get['number']       = 'LN676398535CN';
         $data   = $this->load->controller('extension/module/aftership/getTraceForApi');
+        if (isset($data['data']) && !empty($data['data'])) {
+            $data       = $data['data'];
+        }else{
+            $data       = [];
+        }
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
     }
 }

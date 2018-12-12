@@ -698,7 +698,7 @@ if (!function_exists('curl_http'))
         $httpinfo       = [];
         $ci             = curl_init();
 
-        curl_setopt($ci, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ci, CURLOPT_CUSTOMREQUEST, $method == 'JSON' ? 'POST' : $method);
         curl_setopt($ci, CURLOPT_URL, $url);
         curl_setopt($ci, CURLOPT_HTTPHEADER, $headers);
 
@@ -722,6 +722,12 @@ if (!function_exists('curl_http'))
                 curl_setopt($ci,CURLOPT_POST,TRUE);
                 if(!empty($body)){
                     curl_setopt($ci,CURLOPT_POSTFIELDS,http_build_query($body));
+                }
+                break;
+            case 'JSON':
+                curl_setopt($ci,CURLOPT_POST,TRUE);
+                if(!empty($body)){
+                    curl_setopt($ci,CURLOPT_POSTFIELDS,json_encode($body));
                 }
                 break;
             case 'DELETE':

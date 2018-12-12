@@ -92,9 +92,13 @@ class ControllerExtensionModuleAftership extends Controller
         if (isset($json['error'])) {
             return $json;
         } else {
-            $json['text_time']      = $this->language->get('text_time');
-            $json['text_time']      = $this->language->get('text_station');
-            $json['data']           = isset($response['data']['tracking']['checkpoints']) ? $response['data']['tracking']['checkpoints'] : [];
+            $data                   = isset($response['data']['tracking']['checkpoints']) ? $response['data']['tracking']['checkpoints'] : [];
+            $traces                 = [];
+            foreach ($data as $trace) {
+                $traces[]       = ['checkpoint_time'=>$trace['checkpoint_time'],'message'=>$trace['message']];
+            }
+            
+            $json['data']           = $traces;
         }
         
         return $json;
