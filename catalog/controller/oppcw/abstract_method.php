@@ -116,10 +116,10 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				
 				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . '~~!!@#@1');
 				$data 					= [];
-				$data['callback'] 		= 'http://v2.easijar.com/payment_callback/oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
+				$data['callback'] 		= HTTP_SERVER . 'oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
 				$data['jsurl'] 			= 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
-				return $this->renderView(OPPCw_Template::resolveTemplatePath('template/oppcw/pay'), $data);
+				return $data;
 			}else{
 				return 'pay fail';
 			}
