@@ -95,7 +95,7 @@ class ControllerExtensionModuleAftership extends Controller
             $data                   = isset($response['data']['tracking']['checkpoints']) ? $response['data']['tracking']['checkpoints'] : [];
             $traces                 = [];
             foreach ($data as $trace) {
-                $traces[]       = ['checkpoint_time'=>$trace['checkpoint_time'],'message'=>$trace['message']];
+                $traces[]       = ['checkpoint_time'=>str_replace('T', ' ', $trace['checkpoint_time']),'message'=>$trace['message']];
             }
             
             $json['data']           = $traces;
