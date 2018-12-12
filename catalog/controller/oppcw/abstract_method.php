@@ -181,7 +181,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
-
+				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $payid);
 				return 'success';
 			}
 		}

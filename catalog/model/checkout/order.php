@@ -543,6 +543,26 @@ class ModelCheckoutOrder extends Model {
 		return array_merge($order_query->row,$ext_data);
 	}
 
+	public function updateSubOrderPayCode($order_sn,$paycode)
+	{
+		if (empty($order_sn) || empty($paycode))  return;
+
+		$order_type 		= get_order_type($order_sn);
+		$order_info 		= $this->getOrderByOrderSnForMs($order_sn,$order_type);
+		$order_id 			= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+		if ($order_info && $order_id > 0)
+		{
+			//如果是合并订单 需要添加所有子订单状态以及记录
+			if ($order_type == 1) {
+				$sql 	= "UPDATE " . get_tabname('ms_suborder') ." SET pay_code = '" . (string)$paycode . "' WHERE order_id = '" . (int)$order_id . "'";
+			}else{
+				$sql 	= "UPDATE " . get_tabname('ms_suborder') . " SET pay_code = '" . (string)$paycode . "' WHERE order_sn = '" . (string)$order_sn . "'";
+			}
+
+			$this->db->query($sql);
+		}
+	}
+
 	public function addOrderHistoryForMs($order_sn, $order_status_id, $comment = '', $notify = false, $override = false)
 	{
 		$order_type 		= get_order_type($order_sn);
@@ -552,7 +572,7 @@ class ModelCheckoutOrder extends Model {
 		$query 				= $this->db->query("SELECT order_id,seller_id FROM " . get_tabname('ms_suborder') . " WHERE order_id = '" . (int)$order_id . "'");
 		$suborder 			= $query->rows;
 
-		if ($order_info || $order_id <= 0)
+		if ($order_info && $order_id > 0)
 		{
 			foreach ($suborder as $subk => $subv) {
 				$order_status[$subv['seller_id']] = $order_status_id;
