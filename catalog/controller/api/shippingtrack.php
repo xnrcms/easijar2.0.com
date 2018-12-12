@@ -33,11 +33,9 @@ class ControllerApiShippingtrack extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
-
-        /*//快递单信息
+        //快递单信息
         $this->load->model('extension/module/aftership');
-
-        $data['order_tracking']          = array();
+        $order_tracking     = [1];
         if ($this->config->get('module_aftership_status')) {
             $order_aftership_tracking = $this->model_extension_module_aftership->getOrderShippingTrack($order_id);
             foreach ($order_aftership_tracking as $item) {
@@ -47,15 +45,18 @@ class ControllerApiShippingtrack extends Controller {
                 } else {
                     $show_name = '';
                 }
-                $data['order_tracking'][] = array(
+                $order_tracking[] = array(
                     'tracking_code'    => $item['tracking_code'],
                     'tracking_name'    => $this->model_extension_module_aftership->getTrackingNameByCode($item['tracking_code']) . $show_name,
                     'tracking_number'  => $item['tracking_number'],
                     'comment'          => $item['comment']
                 );
             }
-        }*/
-        
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>2]));
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$order_tracking]));
+
         $this->request->get['slug']         = 'wishpost';
         $this->request->get['number']       = 'LN676398535CN';
         $data   = $this->load->controller('extension/module/aftership/getTraceForApi');
