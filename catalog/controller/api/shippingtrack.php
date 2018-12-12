@@ -35,9 +35,10 @@ class ControllerApiShippingtrack extends Controller {
 
         //快递单信息
         $this->load->model('extension/module/aftership');
-        $order_tracking     = [1];
-        if ($this->config->get('module_aftership_status')) {
-            $order_aftership_tracking = $this->model_extension_module_aftership->getOrderShippingTrack($order_id);
+        $order_tracking     = [];
+        if ($this->config->get('module_aftership_status'))
+        {
+            $order_aftership_tracking       = $this->model_extension_module_aftership->getOrderShippingTrackForMs($order_info['order_id'],$order_info['seller_id']);
             foreach ($order_aftership_tracking as $item) {
                 $seller_name = $this->model_extension_module_aftership->getShippingSellerName($item['seller_id']);
                 if ($seller_name) {
@@ -45,27 +46,24 @@ class ControllerApiShippingtrack extends Controller {
                 } else {
                     $show_name = '';
                 }
+
+                $this->request->get['slug']         = $item['tracking_code'];
+                $this->request->get['number']       = $item['tracking_number'];
+                $tracking_data                      = $this->load->controller('extension/module/aftership/getTraceForApi');
+                if (isset($data['data']) && !empty($data['data'])) {
+                    $tracking_data                  = $data['data'];
+                }else{
+                    $tracking_data                  = [];
+                }
+
                 $order_tracking[] = array(
-                    'tracking_code'    => $item['tracking_code'],
                     'tracking_name'    => $this->model_extension_module_aftership->getTrackingNameByCode($item['tracking_code']) . $show_name,
-                    'tracking_number'  => $item['tracking_number'],
-                    'comment'          => $item['comment']
+                    'comment'          => $item['comment'],
+                    'tracking_data'    => $tracking_data
                 );
             }
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>2]));
         }
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$order_tracking]));
-
-        $this->request->get['slug']         = 'wishpost';
-        $this->request->get['number']       = 'LN676398535CN';
-        $data   = $this->load->controller('extension/module/aftership/getTraceForApi');
-        if (isset($data['data']) && !empty($data['data'])) {
-            $data       = $data['data'];
-        }else{
-            $data       = [];
-        }
-
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
     }
 }

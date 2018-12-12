@@ -41,4 +41,11 @@ class ModelExtensionModuleAftership extends Model
         $row = $this->db->query("select store_name from " . DB_PREFIX . "ms_seller where seller_id=" . (int)$seller_id)->row;
         return array_get($row, 'store_name', '');
     }
+
+    public function getOrderShippingTrackForMs($order_id = 0,$seller_id = 0)
+    {
+        $order_track_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "aftership` WHERE order_id = '" . (int)$order_id . "' AND seller_id = '" . $seller_id . "'");
+
+        return $order_track_query->rows;
+    }
 }
