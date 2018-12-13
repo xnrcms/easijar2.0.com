@@ -89,6 +89,12 @@ class ControllerApiPay extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
         
+        $payid                  = '8ac7a49f679c6d210167a175cdeb2992';
+        $amount                 = '1.00';
+        $currency               = 'USD';
+        $payment                = $this->load->controller('extension/payment/' . $req_data['payment_code'] . '/returnPay',$payid,$amount,$currency);
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$payment]));
+
         //验证支付订单
         $this->load->model('account/order');
 
@@ -103,7 +109,6 @@ class ControllerApiPay extends Controller {
 
         $this->session->data['order_sn'] = $req_data['order_sn'];
 
-        
         //修改支付方式
         $this->load->model('checkout/checkout');
         $this->model_checkout_checkout->setPaymentMethodsForMs($order_payinfo['order_id'],$req_data['payment_code']);

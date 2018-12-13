@@ -35,7 +35,7 @@ class ControllerApiShippingtrack extends Controller {
 
         //快递单信息
         $this->load->model('extension/module/aftership');
-        
+
         $order_tracking     = [];
         if ($this->config->get('module_aftership_status'))
         {
@@ -57,10 +57,10 @@ class ControllerApiShippingtrack extends Controller {
                     $tracking_data                  = [];
                 }
 
-                $order_tracking[] = array(
+                $order_tracking = [
                     'tracking_name'    => $this->model_extension_module_aftership->getTrackingNameByCode($item['tracking_code']) . $show_name,
                     'tracking_data'    => $tracking_data
-                );
+                ];
             }
         }
 

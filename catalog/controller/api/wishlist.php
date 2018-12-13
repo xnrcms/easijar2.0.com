@@ -124,7 +124,7 @@ class ControllerApiWishList extends Controller {
         $product_ids        = implode(',', $product_ids);
         $this->model_account_wishlist->deleteWishlists($product_ids);
 
-        return $this->response->setOutput($this->returnData(['msg'=>'success','data'=>'product delete success']));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'product delete success']));
     }
 
     public function setting()

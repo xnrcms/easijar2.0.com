@@ -6,7 +6,7 @@ class ModelExtensionTotalCoupon extends Model {
 		$coupon_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "coupon` WHERE code = '" . $this->db->escape($code) . "' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW())) AND status = '1'");
 
 		if ($coupon_query->num_rows) {
-			if ($coupon_query->row['total'] > $total) {
+			if ($coupon_query->row['total'] > $this->catr->getSellerTotal($coupon_query->row['seller_id'])) {
 				$status = false;
 			}
 
@@ -122,7 +122,7 @@ class ModelExtensionTotalCoupon extends Model {
                     }
                     $ecchecked = $status;
                 }
-
+                wr([6,$status]);
                 if (!$product_data && ($coupon_product_data || $coupon_category_data) && ($coupon_customer_data || $coupon_customer_group_data)) {
                     $status = false;
                 } elseif (!$product_data && !$coupon_customer_data && !$coupon_customer_group_data) {

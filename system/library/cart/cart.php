@@ -385,10 +385,20 @@ class Cart
         return $weight;
     }
 
+    public function getSellerTotal($seller_id = 0)
+    {
+        $total = 0;
+        foreach ($this->getProducts() as $product) {
+            if ((int)$seller_id > 0 && (int)$seller_id === (isset($product['seller_id']) ? (int)$product['seller_id'] : 0 )) {
+                $total += $product['total'];
+            }
+        }
+
+        return $total;
+    }
     public function getSubTotal()
     {
         $total = 0;
-
         foreach ($this->getProducts() as $product) {
             $total += $product['total'];
         }

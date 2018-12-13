@@ -239,6 +239,8 @@ class ControllerApiCart extends Controller {
         	return $this->response->setOutput($this->returnData(['msg'=>'quantity is error']));
         }
 
+        $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
+        
         $this->cart->update($req_data['cart_id'], $req_data['quantity']);
 
         if (!$this->cart->hasStock() && (!config('config_stock_checkout') || config('config_stock_warning'))) {
@@ -275,6 +277,8 @@ class ControllerApiCart extends Controller {
         if (!(isset($req_data['seller_id']) && intval($req_data['seller_id']) >=1)) {
             return $this->response->setOutput($this->returnData(['msg'=>'seller_id is error']));
         }
+
+        $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
 
         //校验优惠券是否存在 存在获取使用码
         $this->load->model('extension/total/coupon');

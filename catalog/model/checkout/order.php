@@ -550,6 +550,7 @@ class ModelCheckoutOrder extends Model {
 		$order_type 		= get_order_type($order_sn);
 		$order_info 		= $this->getOrderByOrderSnForMs($order_sn,$order_type);
 		$order_id 			= isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+		
 		if ($order_info && $order_id > 0)
 		{
 			//如果是合并订单 需要添加所有子订单状态以及记录

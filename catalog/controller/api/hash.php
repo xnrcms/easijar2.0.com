@@ -25,6 +25,7 @@ class ControllerApiHash extends Controller
 			$signStr  .= (!empty($signKey) ? $signKey : time().mt_rand(1000,10000));
 		}
 
+		$req_data['signStr'] 		= $signStr;
 		$req_data['hash'] 			= md5($signStr);
 		
 		echo '<pre>';
