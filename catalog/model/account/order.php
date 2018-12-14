@@ -449,7 +449,7 @@ class ModelAccountOrder extends Model {
             $status_where   = "AND " . implode(" OR ",$implode) . ' ';
         }
 
-        $query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('ms_suborder') . " mssu LEFT JOIN  `oc_order`o ON (o.order_id = mssu.order_id) WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0' AND o.store_id = '" . (int)$this->config->get('config_store_id') . "'");
+        $query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('ms_suborder') . " mssu LEFT JOIN  `oc_order`o ON (o.order_id = mssu.order_id) WHERE o.customer_id = '" . (int)$this->customer->getId() . "' " . $status_where . "AND o.store_id = '" . (int)$this->config->get('config_store_id') . "'");
 
         return $query->row['total'];
     }

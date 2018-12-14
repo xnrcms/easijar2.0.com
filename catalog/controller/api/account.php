@@ -28,6 +28,7 @@ class ControllerApiAccount extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
+        $this->load->model('account/order');
         $this->load->model('tool/image');
 
         $json['account_info'] 				= [];
@@ -37,10 +38,10 @@ class ControllerApiAccount extends Controller {
         $account_info['fullname'] 			= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : 'not set nickname';
 
         $json['account_info'] 				= $account_info;
-        $json['pay_nums']                   = 0;
-        $json['ship_nums']                  = 0;
-        $json['receive_nums']               = 0;
-        
+        $json['pay_nums']                   = $this->model_account_order->getTotalOrdersForMs(1);
+        $json['ship_nums']                  = $this->model_account_order->getTotalOrdersForMs(3);
+        $json['receive_nums']               = $this->model_account_order->getTotalOrdersForMs(2);
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 

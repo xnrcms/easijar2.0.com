@@ -60,7 +60,7 @@ class ControllerAccountOrder extends Controller {
         $otype 			= ['shipped'=>3,'unshipped'=>2,'unpaid'=>1];
         $order_type 	= isset($otype[$data['type']]) ? $otype[$data['type']] : 0;
         $results 		= $this->model_account_order->getOrdersForMs($order_type,($page - 1) * $limit, $limit);
-        $order_total 	= $this->model_account_order->getTotalOrdersForMs();
+        $order_total 	= $this->model_account_order->getTotalOrdersForMs($order_type);
         
         /*$oid        = [];
         foreach ($results as $key => $value) {
