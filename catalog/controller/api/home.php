@@ -29,7 +29,7 @@ class ControllerApiHome extends Controller {
 	    $data['broadcast'] 	= [];
 	    $setting_info 		= $this->model_setting_module->getModule(35);
 	    $results 			= $this->model_design_banner->getBanner($setting_info['banner_id']);
-	    
+	    wr($setting_info);
 	    if (!empty($results)) {
 	    	foreach ($results as $result) {
 		      if (is_file(DIR_IMAGE . $result['image'])) {

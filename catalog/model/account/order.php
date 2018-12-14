@@ -380,7 +380,7 @@ class ModelAccountOrder extends Model {
         return $order_query->num_rows ? $order_query->row : [];
     }
 
-    public function getOrderForMs($order_sn = 0)
+    public function getOrderForMs($order_sn = '')
     {
         if ( empty($order_sn) )  return [];
 
@@ -393,7 +393,7 @@ class ModelAccountOrder extends Model {
         return $order_query->num_rows ? $order_query->row : [];
     }
 
-    public function getOrderPayinfoForMs($order_sn = 0)
+    public function getOrderPayinfoForMs($order_sn = '')
     {
         if ( empty($order_sn) )  return [];
         
@@ -703,5 +703,35 @@ class ModelAccountOrder extends Model {
 
     public function deleteSubOrder($order_sn = ''){
         $this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET order_status_id = '-1', date_modified = NOW() WHERE order_sn = '" . (string)$order_sn . "'");
+    }
+
+    public function isReturn($order_sn)
+    {
+        $isReturn       = false;
+        $order_info     = $this->getOrderForMs($order_sn);
+
+        if(!empty($order_info)){
+            $order_id       = isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+            $seller_id      = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+
+            $query_product  = $this->db->query("SELECT `order_id`,`order_product_id` FROM " . DB_PREFIX . "ms_order_product WHERE order_id = '" . $order_id . "' AND seller_id = '" . $seller_id . "'");
+
+            if($query_product->num_rows){
+                $order_product_id       = [];
+                foreach ($query_product->rows as $value) {
+                    $order_product_id[$value['order_product_id']]   = $value['order_product_id'];
+                }
+
+                if (!empty($order_product_id)) {
+                    $query_return  = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "return WHERE order_id = '" . $order_id . "' AND product_id IN (" . implode(',', $order_product_id) . ")");
+
+                    if (isset($query_return->row['total']) && $query_return->row['total'] > 0) {
+                        $isReturn   = true;
+                    }
+                }
+            }
+        }
+
+        return $isReturn;
     }
 }

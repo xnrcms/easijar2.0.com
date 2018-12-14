@@ -159,7 +159,109 @@ class ControllerApiDispute extends Controller {
         $order_id               = isset($return_info['order_id']) ? (int)$return_info['order_id'] : 0;
         $seller_id              = isset($return_info['seller_id']) ? (int)$return_info['seller_id'] : 0;
         $order_info             = $this->model_account_return->getSuborderInfo($order_id,$seller_id);
+        
+        //根据订单状态分发信息
+        $overtime               = 0;
+        $status2                = 0;
+        $order_status_id        = isset($order_info['order_status_id']) ? (int)$order_info['order_status_id'] : 0;
+        $responsibility         = isset($order_info['responsibility']) ? (int)$order_info['responsibility'] : 0;
 
+        if ($return_info['return_status_id'] == 1) {//待审核
+            $overtime           = (int)$return_info['overtime'];
+            $status2            = 1;
+        }
+
+        //申请结束或者买家撤销
+        if ($return_info['return_status_id'] == 3 || $return_info['return_status_id'] == 8) {
+            $overtime       = 0;
+            $status2        = 1;
+        }
+
+        //拒绝状态
+        $refuse_nums            = 0;
+        if ($return_info['return_status_id'] == 4) {
+            //拒绝次数
+            $refuse_nums        = $this->model_account_return->getReturnHistoryForRefuseNums($return_id);
+            if ($refuse_nums >= 2) {
+                $overtime       = 0;
+                $status2        = 2;
+            }else{
+                $overtime       = (int)$return_info['overtime'];
+                $status2        = 1;
+            }
+        }
+
+        switch ($order_status_id) {
+            case 15://待发货
+                if ($return_info['return_status_id'] == 10) {//商家自动退款，退款中
+                    if ($responsibility == 1) {//发货时效3内 - 卖家同意
+                        $overtime           = (int)$return_info['overtime'];
+                        $status2            = 1;
+                    }else{
+                        $overtime           = (int)$return_info['overtime'];
+                        $status2            = 3;
+                    }
+                }
+                if ($return_info['return_status_id'] == 4) {//拒绝
+                    if ($responsibility == 1) {//发货时效3内 - 卖家拒绝
+                        $overtime       = 0;
+                        $status2        = 4;
+                    }
+
+                    //平台总裁拒绝
+                    if($refuse_nums >= 3){
+                        $overtime       = 0;
+                        $status2        = 3;
+                    }
+                }
+                break;
+            case 2://待收货
+                if ($return_info['is_service'] == 2) {//退货退款
+
+                    if ($return_info['return_status_id'] == 2) {//等待寄回商品
+                        $overtime       = (int)$return_info['overtime'];
+                        $status2        = 1;//10天内将货品寄回
+                    }
+
+                    if ($return_info['return_status_id'] == 5) {//等待寄回商品
+                        $overtime       = (int)$return_info['overtime'];
+                        $status2        = 1;//10天内将货品寄回
+                    }
+
+                    if ($return_info['return_status_id'] == 6) {//商家已收到退货，退款中
+                        $overtime       = 0;
+                        $status2        = 1;//两天内打款
+                    }
+
+                    if ($return_info['return_status_id'] == 4) {//拒绝
+                        //平台仲裁拒绝
+                        if($refuse_nums >= 3){
+                            if ($responsibility == 1) {
+                                $overtime       = (int)$return_info['overtime'];
+                                $status2        = 2;
+                            }else{
+                                $overtime       = (int)$return_info['overtime'];
+                                $status2        = 3;
+                            }
+                        }
+                    }
+                }else{//仅仅退款
+                    if ($return_info['return_status_id'] == 10) {//退款中
+                        //平台仲裁同意
+                        if ($refuse_nums >= 2) {
+                            $overtime       = 0;
+                            $status2        = 2;//两天内打款
+                        }else{
+                            $overtime       = 0;
+                            $status2        = 1;//两天内打款
+                        }
+                    }
+                }
+                break;
+            default:  break;
+        }
+
+        $return_info['status2']     = (int)$status2;
         $return_info['overtime']    = (int)$return_info['overtime'];
         $return_info                = array_merge($return_info,$order_info);
 
@@ -172,6 +274,7 @@ class ControllerApiDispute extends Controller {
         unset($return_info['email']);
         unset($return_info['fullname']);
         unset($return_info['order_id']);
+        unset($return_info['order_status_id']);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$return_info]));
     }

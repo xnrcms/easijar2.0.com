@@ -79,7 +79,7 @@ class ModelAccountReturn extends Model {
 
 	public function getSuborderInfo($order_id = 0,$seller_id = 0)
 	{
-		$fields 		= format_find_field('suborder_id,order_sn','mssu');
+		$fields 		= format_find_field('suborder_id,order_sn,order_status_id','mssu');
 		$query = $this->db->query("SELECT " . $fields . " FROM  " . get_tabname('ms_suborder') . " mssu WHERE mssu.order_id = '" . (int)$order_id . "' AND mssu.seller_id = '" . (int)$seller_id . "'");
 		return $query->row;
 	}
@@ -145,5 +145,11 @@ class ModelAccountReturn extends Model {
 		$query = $this->db->query("SELECT `return_id`,`return_status_id` FROM `" . DB_PREFIX . "return`WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$product_id . "' ORDER BY return_id DESC LIMIT 1 ");
 
 		return isset($query->row['return_id']) ? (int)$query->row['return_id'] : 0;
+	}
+
+	public function getReturnHistoryForRefuseNums()
+	{
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return_history`WHERE return_id = '" . (int)$return_id . "' AND return_status_id = 4");
+		return isset($query->row['total']) ? (int)$query->row['total'] : 0;
 	}
 }

@@ -313,6 +313,11 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
+        $isReturn                       = $this->model_account_order->isReturn($order_sn);
+        if ($isReturn) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_is_return')]));
+        }
+
         //未付款 直接取消
         if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_unpaid_status_id')){
 
@@ -379,6 +384,11 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
+        $isReturn                       = $this->model_account_order->isReturn($order_sn);
+        if ($isReturn) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_is_return')]));
+        }
+
         if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_shipped_status_id')){
 
         	$this->load->model('multiseller/checkout');
@@ -439,6 +449,11 @@ class ControllerApiMyorder extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
+        $isReturn                       = $this->model_account_order->isReturn($order_sn);
+        if ($isReturn) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_is_return')]));
+        }
+
         $this->model_account_order->deleteSubOrder($order_sn);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order delete success']));
@@ -454,7 +469,9 @@ class ControllerApiMyorder extends Controller {
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
-
+        
+        return $this->response->setOutput($this->returnData(['msg'=>'接口暂时弃用']));
+        
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }

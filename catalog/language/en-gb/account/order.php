@@ -57,3 +57,4 @@ $_['error_flash_count']     = 'The maximum this product you can buy is %s!';
 $_['error_flash_out']       = 'You can\'t buy this product cause by flash sale!';
 $_['error_order_info']      = 'Order information does not exist!';
 $_['error_order_status']    = 'Order status abnormal!';
+$_['error_is_return']    	= 'After-sales or rights protection of orders...';
