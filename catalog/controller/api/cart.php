@@ -240,7 +240,7 @@ class ControllerApiCart extends Controller {
         }
 
         $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
-        
+
         $this->cart->update($req_data['cart_id'], $req_data['quantity']);
 
         if (!$this->cart->hasStock() && (!config('config_stock_checkout') || config('config_stock_warning'))) {
@@ -268,6 +268,14 @@ class ControllerApiCart extends Controller {
         
         if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if ($req_data['coupon_id']  == '-1') {
+            if (isset($this->session->data['coupon'][$req_data['seller_id']])) {
+                unset($this->session->data['coupon'][$req_data['seller_id']]);
+            }
+
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'coupon cancle success']));
         }
 
         if (!(isset($req_data['coupon_id']) && intval($req_data['coupon_id']) >=1)) {

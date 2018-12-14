@@ -140,10 +140,10 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$key 						= hex2bin($key_from_configuration);
 		$iv 						= hex2bin($iv_from_http_header);
 		$cipher_text 				= hex2bin($http_body . $auth_tag_from_http_header);
-		$result 					= \Sodium\crypto_aead_aes256gcm_decrypt($cipher_text, NULL, $iv, $key);
-
+		$result 					= sodium_crypto_aead_aes256gcm_decrypt($cipher_text, NULL, $iv, $key);
+		$result 					= !empty($result) ? json_decode($result,true) : [];
     	wr("==========1");
-    	wr([$key_from_configuration,$iv_from_http_header,$auth_tag_from_http_header,$http_body,$key,$iv,$cipher_text]);
+    	wr([$result]);
     	wr("==========2");
     	return $req_data;
     }

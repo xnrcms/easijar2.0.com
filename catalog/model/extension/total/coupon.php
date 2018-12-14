@@ -122,7 +122,7 @@ class ModelExtensionTotalCoupon extends Model {
                     }
                     $ecchecked = $status;
                 }
-                wr([6,$status]);
+
                 if (!$product_data && ($coupon_product_data || $coupon_category_data) && ($coupon_customer_data || $coupon_customer_group_data)) {
                     $status = false;
                 } elseif (!$product_data && !$coupon_customer_data && !$coupon_customer_group_data) {
