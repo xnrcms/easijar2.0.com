@@ -7,16 +7,22 @@ class ControllerExtensionModuleSpecial extends Controller {
 			'sort'  => 'pd.name',
 			'order' => 'ASC',
 			'start' => 0,
-			'limit' => $setting['limit']
+			'limit' => $setting['limit'],
+			'start' => isset($setting['start']) ? $setting['start'] : 0
 		);
 
-		$results = $this->model_catalog_product->getProductSpecials($filter_data);
+		$product_total 	= $this->model_catalog_product->getTotalProductSpecials();
+		$results 		= $this->model_catalog_product->getProductSpecials($filter_data);
 		if (!$results) {
 			return;
 		}
 
 		$this->load->language('extension/module/special');
-		$data['products'] = array();
+
+		$data 					= [];
+		$data['products'] 		= [];
+		$data['product_total'] 	= $product_total;
+
 		foreach ($results as $result) {
 			$data['products'][] = $this->model_catalog_product->handleSingleProduct($result, $setting['width'], $setting['height']);
 		}

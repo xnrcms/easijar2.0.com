@@ -79,11 +79,17 @@ class ControllerApiHome extends Controller {
 		$data['banners'] 			= isset($results['banners']) ? $results['banners'] : [];
 
 		//特价商品
+		$page 						= 1;
+		$limit 						= 3;
+		$start 						= $limit * ($page-1);
+
 		$module_id 					= 36;
 	    $setting_info 				= $this->model_setting_module->getModule($module_id);
 		$setting_info['module_id'] 	= $module_id;
 		$setting_info['position'] 	= 'content_top';
 		$setting_info['api'] 		= true;
+		$setting_info['limit'] 		= $limit;
+		$setting_info['start'] 		= $start;
 	    $results 					= $this->load->controller('extension/module/special', $setting_info);
 
 	    $discount 					= [];
@@ -102,11 +108,11 @@ class ControllerApiHome extends Controller {
 
 		$data['discount'] 			= $discount;
 
+		//推荐商品
 		$page 						= 1;
 		$limit 						= 10;
 		$start 						= $limit * ($page-1);
 
-		//推荐商品
 		$module_id 					= 39;
 	    $setting_info 				= $this->model_setting_module->getModule($module_id);
 		$setting_info['module_id'] 	= $module_id;

@@ -179,7 +179,7 @@ class ControllerApiProduct extends Controller {
 			$pinfo['sku'] 			= '';
 
 			//折扣率计算
-			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price, 4)*100 : 0;
+			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price)*100 : 0;
 
 			//产品属性
 			$opt 								= [];
@@ -278,7 +278,7 @@ class ControllerApiProduct extends Controller {
 
 				foreach ($product_image as $result) {
 					$images[] = [
-						'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_height'))
+						'thumb' => $this->model_tool_image->resize($result['image'], 600, 600)
 					];
 				}
 			}
@@ -529,8 +529,8 @@ class ControllerApiProduct extends Controller {
 
 	    $product_total 				= isset($results['product_total']) ? (int)$results['product_total'] : 0;
 	    $remainder 					= intval($product_total - $limit * $page);
-
 	    $recommend 					= [];
+
 	    if (isset($results['products']) && !empty($results['products'])) {
 	    	foreach ($results['products'] as $rval) {
 	    		$recommend[] 		= [
@@ -548,6 +548,63 @@ class ControllerApiProduct extends Controller {
 		$data['total_page'] 	= ceil($product_total/$limit);
 		$data['remainder'] 		= $remainder >= 0 ? $remainder : 0;
 		$data['lists'] 			= $recommend;
+
+		return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
+	}
+
+	public function discount()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+
+		$allowKey		= ['api_token','page','limit'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        $page 						= (isset($req_data['page']) && (int)$req_data['page'] > 0) ? (int)$req_data['page'] : 1;
+		$limit 						= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 1;
+		$start 						= $limit * ($page-1);
+
+	    $this->load->model('setting/module');
+	    $this->load->model('tool/image');
+
+		$module_id 					= 36;
+	    $setting_info 				= $this->model_setting_module->getModule($module_id);
+		$setting_info['module_id'] 	= $module_id;
+		$setting_info['position'] 	= 'content_top';
+		$setting_info['api'] 		= true;
+		$setting_info['limit'] 		= $limit;
+		$setting_info['start'] 		= $start;
+	    $results 					= $this->load->controller('extension/module/special', $setting_info);
+
+	    $product_total 				= isset($results['product_total']) ? (int)$results['product_total'] : 0;
+	    $remainder 					= intval($product_total - $limit * $page);
+	    $discount 					= [];
+
+	    if (isset($results['products']) && !empty($results['products'])) {
+	    	foreach ($results['products'] as $rval) {
+	    		$discount[] 		= [
+	    			'product_id' 	=> $rval['product_id'],
+	    			'name' 			=> $rval['name'],
+	    			'thumb' 		=> $rval['thumb'],
+	    			'price' 		=> $rval['price'],
+	    			'special' 		=> !empty($rval['special']) ? $rval['special'] : $rval['price'],
+	    			'discount' 		=> $rval['discount'],
+	    		];
+	    	}
+	    }
+
+	    $data 					= [];
+		$data['total_page'] 	= ceil($product_total/$limit);
+		$data['remainder'] 		= $remainder >= 0 ? $remainder : 0;
+		$data['lists'] 			= $discount;
 
 		return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
 	}
