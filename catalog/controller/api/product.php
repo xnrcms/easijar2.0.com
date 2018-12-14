@@ -7,7 +7,7 @@ class ControllerApiProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/category');
 
-		$allowKey		= ['api_token','page','path','sorts','variant','price','in_stock'];
+		$allowKey		= ['api_token','page','limit','path','sorts','variant','price','in_stock'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
@@ -48,7 +48,7 @@ class ControllerApiProduct extends Controller {
 		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
 
 		$page 				= isset($req_data['page']) ? (int)$req_data['page'] : 1;
-		$limit 				= isset($req_data['limit']) ? (int)$req_data['limit'] : $this->config->get('theme_'.$this->config->get('config_theme').'_product_limit');
+		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
 		if (isset($req_data['in_stock']) && (int)$req_data['in_stock'] > 0) {
 			$inStock = (int)array_get($req_data, 'in_stock');
@@ -352,7 +352,7 @@ class ControllerApiProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/search');
 
-		$allowKey		= ['api_token','page','search','sorts','variant','price','in_stock'];
+		$allowKey		= ['api_token','page','limit','search','sorts','variant','price','in_stock'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
@@ -399,7 +399,7 @@ class ControllerApiProduct extends Controller {
 		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
 
 		$page 				= isset($req_data['page']) ? (int)$req_data['page'] : 1;
-		$limit 				= isset($req_data['limit']) ? (int)$req_data['limit'] : $this->config->get('theme_'.$this->config->get('config_theme').'_product_limit');
+		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
 
 		unset($this->request->post['in_stock']);
