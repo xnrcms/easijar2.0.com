@@ -486,7 +486,7 @@ class ControllerApiCheckout extends Controller
 
             $order_id = $this->model_checkout_checkout->createOrder();
             
-            //$this->cart->clear();
+            $this->cart->clear();
 
             // Change order status to Unpaid
             if ($order_data['payment_method'] != 'cod') {
