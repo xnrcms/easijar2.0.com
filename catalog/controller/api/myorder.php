@@ -296,8 +296,8 @@ class ControllerApiMyorder extends Controller {
         $order_sn 					= isset($req_data['order_sn']) ? (string)$req_data['order_sn'] : '';
         $reason_id 					= (isset($req_data['reason_id']) && $req_data['reason_id']>0) ? (int)$req_data['reason_id'] : 0;
 
-        if ($order_id <= 0 ) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_id is error']));
+        if ( empty($order_sn) ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_sn is error']));
         }
 
         if ($reason_id <= 0 ) {
@@ -440,7 +440,7 @@ class ControllerApiMyorder extends Controller {
         }
 
         $this->model_account_order->deleteSubOrder($order_sn);
-        
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order delete success']));
     }
 

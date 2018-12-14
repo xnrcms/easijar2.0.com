@@ -143,6 +143,11 @@ class ControllerApiCart extends Controller {
     	
     	if ( !in_array($buy_type, [0,1]) ) return $this->response->setOutput($this->returnData());
 
+        $sku                    = trim($req_data['sku']);
+        if ( substr_count($sku,':') <= 0 || substr_count($sku,'|') != (substr_count($sku,':') + 1)) {
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'sku is error']));
+        }
+
         $this->session->data['buy_type']        = $buy_type;
 
     	$this->load->model('catalog/product');
