@@ -37,6 +37,10 @@ class ControllerApiAccount extends Controller {
         $account_info['fullname'] 			= !empty($this->customer->getFullName()) ? $this->customer->getFullName() : 'not set nickname';
 
         $json['account_info'] 				= $account_info;
+        $json['pay_nums']                   = 0;
+        $json['ship_nums']                  = 0;
+        $json['receive_nums']               = 0;
+        
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 

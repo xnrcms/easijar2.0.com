@@ -596,7 +596,6 @@ class ControllerApiCheckout extends Controller
             $data['address_id']             = $address_id;
             $data['type']                   = array_get($req_data, 'type', 'shipping');
 
-
             $json       = $this->returnData(['code'=>'200','msg'=>'success','data'=>$json]);
         }else{
 
