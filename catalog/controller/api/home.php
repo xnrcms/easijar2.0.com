@@ -69,8 +69,6 @@ class ControllerApiHome extends Controller {
 			'limit' => 12
 		];
 
-		$this->load->model('tool/image');
-
 		//首页Banner
 	    $module_id 					= 40;
 	    $setting_info 				= $this->model_setting_module->getModule($module_id);
@@ -104,12 +102,18 @@ class ControllerApiHome extends Controller {
 
 		$data['discount'] 			= $discount;
 
+		$page 						= 1;
+		$limit 						= 10;
+		$start 						= $limit * ($page-1);
+
 		//推荐商品
 		$module_id 					= 39;
 	    $setting_info 				= $this->model_setting_module->getModule($module_id);
 		$setting_info['module_id'] 	= $module_id;
 		$setting_info['position'] 	= 'content_top';
 		$setting_info['api'] 		= true;
+		$setting_info['limit'] 		= $limit;
+		$setting_info['start'] 		= $start;
 	    $results 					= $this->load->controller('extension/module/latest', $setting_info,true);
 
 	    $recommend 					= [];

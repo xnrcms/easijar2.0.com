@@ -9,17 +9,22 @@ class ControllerExtensionModuleLatest extends Controller {
 			'order' => 'DESC',
 			'start' => 0,
 			'parent_id' => 0,
-			'limit' => $setting['limit']
+			'limit' => $setting['limit'],
+			'start' => isset($setting['start']) ? $setting['start'] : 0
 		);
 
-		$results = $this->model_catalog_product_pro->getProducts($filter_data,false);
+		$product_total 	= $this->model_catalog_product_pro->getTotalProducts($filter_data);
+		$results 		= $this->model_catalog_product_pro->getProducts($filter_data,false);
 		if (!$results) {
 			return;
 		}
 
 		$this->load->language('extension/module/latest');
 
-		$data['products'] = array();
+		$data 					= [];
+		$data['products'] 		= [];
+		$data['product_total'] 	= $product_total;
+
 		foreach ($results as $result) {
 			$data['products'][] = $this->model_catalog_product->handleSingleProduct($result, $setting['width'], $setting['height']);
 		}

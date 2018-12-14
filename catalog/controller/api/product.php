@@ -493,4 +493,62 @@ class ControllerApiProduct extends Controller {
 
 		return $filter;
 	}
+
+	public function recommend()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+
+		$allowKey		= ['api_token','page','limit'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        $page 						= (isset($req_data['page']) && (int)$req_data['page'] > 0) ? (int)$req_data['page'] : 1;
+		$limit 						= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 1;
+		$start 						= $limit * ($page-1);
+
+	    $this->load->model('setting/module');
+	    $this->load->model('tool/image');
+
+		//推荐商品
+		$module_id 					= 39;
+	    $setting_info 				= $this->model_setting_module->getModule($module_id);
+		$setting_info['module_id'] 	= $module_id;
+		$setting_info['position'] 	= 'content_top';
+		$setting_info['api'] 		= true;
+		$setting_info['limit'] 		= $limit;
+		$setting_info['start'] 		= $start;
+	    $results 					= $this->load->controller('extension/module/latest', $setting_info,true);
+
+	    $product_total 				= isset($results['product_total']) ? (int)$results['product_total'] : 0;
+	    $remainder 					= intval($product_total - $limit * $page);
+
+	    $recommend 					= [];
+	    if (isset($results['products']) && !empty($results['products'])) {
+	    	foreach ($results['products'] as $rval) {
+	    		$recommend[] 		= [
+	    			'product_id' 	=> $rval['product_id'],
+	    			'name' 			=> $rval['name'],
+	    			'thumb' 		=> $rval['thumb'],
+	    			'price' 		=> $rval['price'],
+	    			'rating' 		=> $rval['rating'],
+	    			'reviews' 		=> $rval['reviews'],
+	    		];
+	    	}
+	    }
+
+	    $data 					= [];
+		$data['total_page'] 	= ceil($product_total/$limit);
+		$data['remainder'] 		= $remainder >= 0 ? $remainder : 0;
+		$data['lists'] 			= $recommend;
+
+		return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
+	}
 }
