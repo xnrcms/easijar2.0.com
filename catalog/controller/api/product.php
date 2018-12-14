@@ -270,7 +270,7 @@ class ControllerApiProduct extends Controller {
 	        }
 
 			//商品图片
-			$product_image 			= $this->model_catalog_product->getProductImages($product_info['product_id']);
+			$product_image 			= $this->model_catalog_product->getProductImages($product_info['product_id'],5);
 			$images 				= [];
 			if (!empty($product_image)) {
 

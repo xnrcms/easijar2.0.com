@@ -413,8 +413,15 @@ class ModelCatalogProduct extends Model {
 		return $query->rows;
 	}
 
-	public function getProductImages($product_id) {
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "' ORDER BY sort_order ASC");
+	public function getProductImages($product_id,$limit = 0) {
+		$limit 		= (int)$limit;
+		$sql_limit 	= '';
+
+		if ($limit > 0) {
+			$sql_limit 	.= ' LIMIT ' . $limit;
+		}
+
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "' ORDER BY sort_order ASC" . $sql_limit);
 
 		return $query->rows;
 	}
