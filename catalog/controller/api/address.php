@@ -154,8 +154,18 @@ class ControllerApiAddress extends Controller {
         if ((utf8_strlen(trim($req_data['postcode'])) < 2 || utf8_strlen(trim($req_data['postcode'])) > 10))
             return $this->response->setOutput($this->returnData(['msg'=>t('error_postcode')]));
 
-        /*if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] <= 0 ) 
-            return $this->response->setOutput($this->returnData(['msg'=>t('error_zone')]));*/
+        if (!in_array($req_data['country_id'], [44,129,168,188])) {
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('error_country')]));
+        }
+
+        if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] > 0 )
+        {
+            $this->load->model('localisation/zone');
+            $zone_info = $this->model_localisation_zone->getZone($req_data['zone_id']);
+            if (empty($zone_info) || $zone_info['country_id'] != $req_data['country_id']) {
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_zone')]));
+            }
+        }
 
         if ((utf8_strlen(trim($req_data['city'])) < 2) || (utf8_strlen(trim($req_data['city'])) > 128))
             return $this->response->setOutput($this->returnData(['msg'=>t('error_city')]));
@@ -263,6 +273,136 @@ class ControllerApiAddress extends Controller {
         }
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$this->language->get('text_delete')]));
+    }
+
+    public function get_order_address()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/order');
+
+        $allowKey       = ['api_token','order_sn'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $this->load->model('checkout/order');
+        $order_info                     = $this->model_checkout_order->getOrderByOrderSnUseAddressInfoForMs($req_data['order_sn'],get_order_type($req_data['order_sn']));
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
+
+        $address                       = [];
+        $address['fullname']           = $order_info['shipping_fullname'];
+        $address['telephone']          = $order_info['shipping_telephone'];
+        $address['address_1']          = $order_info['shipping_address_1'];
+        $address['address_2']          = $order_info['shipping_address_2'];
+        $address['city']               = $order_info['shipping_city'];
+        $address['postcode']           = $order_info['shipping_postcode'];
+        $address['country_id']         = $order_info['shipping_country_id'];
+        $address['zone_id']            = $order_info['shipping_country_id'];
+
+        $this->load->model('localisation/country');
+        $results                                = $this->model_localisation_country->getCountries();
+        $address['countries']                   = [];
+        foreach ($results as $result) {
+            $address['countries'][] = array(
+                'county_id'     => $result['country_id'],
+                'county_name'   => $result['name'],
+                'selected'      => $address['country_id'] == $address['country_id'] ? 1 : 0,
+            );
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$address]));
+    }
+
+    public function set_order_address()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/order');
+
+        $allowKey       = ['api_token','fullname','telephone','address_1','address_2','country_id','zone_id','city','postcode','order_sn'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $this->load->model('checkout/order');
+        $order_info                     = $this->model_checkout_order->getOrderByOrderSnUseAddressInfoForMs($req_data['order_sn'],get_order_type($req_data['order_sn']));
+        if (empty($order_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
+        }
+
+        //数据检验
+        if ((utf8_strlen(trim($req_data['fullname'])) < 1) || (utf8_strlen(trim($req_data['fullname'])) > 32))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_fullname')]));
+
+        if ((utf8_strlen(trim($req_data['telephone'])) < 5) || (utf8_strlen(trim($req_data['telephone'])) > 32))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_telephone')]));
+
+        if ((utf8_strlen(trim($req_data['address_1'])) < 3) || (utf8_strlen(trim($req_data['address_1'])) > 128))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_address_1')]));
+
+        if ((utf8_strlen(trim($req_data['postcode'])) < 2 || utf8_strlen(trim($req_data['postcode'])) > 10))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_postcode')]));
+
+        if (!in_array($req_data['country_id'], [44,129,168,188])) {
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('error_country')]));
+        }
+        
+        if (!isset($req_data['zone_id']) || (int)$req_data['zone_id'] > 0 )
+        {
+            $this->load->model('localisation/zone');
+            $zone_info = $this->model_localisation_zone->getZone($req_data['zone_id']);
+            if (empty($zone_info) || $zone_info['country_id'] != $req_data['country_id']) {
+                return $this->response->setOutput($this->returnData(['msg'=>t('error_zone')]));
+            }
+        }
+
+        if ((utf8_strlen(trim($req_data['city'])) < 2) || (utf8_strlen(trim($req_data['city'])) > 128))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_city')]));
+
+        $address                       = [];
+        $address['fullname']           = $req_data['fullname'];
+        $address['telephone']          = $req_data['telephone'];
+        $address['address_1']          = $req_data['address_1'];
+        $address['address_2']          = $req_data['address_2'];
+        $address['city']               = $req_data['city'];
+        $address['postcode']           = $req_data['postcode'];
+        $address['country_id']         = $req_data['country_id'];
+        $address['zone_id']            = $req_data['zone_id'];
+
+        $this->model_checkout_order->setOrderByOrderSnUseAddressInfoForMs($order_info['order_id'],$address);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$address]));
     }
 
     private function syncAddressSession($type, $address)

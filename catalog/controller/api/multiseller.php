@@ -119,7 +119,7 @@ class ControllerApiMultiseller extends Controller {
     {
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token','seller_id','page'];
+        $allowKey       = ['api_token','seller_id','page','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -148,7 +148,7 @@ class ControllerApiMultiseller extends Controller {
         $json['seller_product'] = [];//商家商品
 
         $page                     = isset($req_data['page']) ? (int)$req_data['page']: 0;
-        $limit                    = 10;
+        $limit                    = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
         $this->load->model('multiseller/seller');
         
@@ -159,12 +159,15 @@ class ControllerApiMultiseller extends Controller {
             'limit'               => $limit
         ];
 
+        $product_total            = $this->model_multiseller_seller->getTotalSellerProducts($seller_id);
         $results                  = $this->model_multiseller_seller->getSellerProducts($seller_id, $filter_data);
+        $products                 = [];
+
         foreach ($results as $result) {
             $href               = $this->url->link('product/product', array_merge(['product_id' => $result['product_id']]));
             $image              = is_file(DIR_IMAGE . $result['image']) ? $result['image'] : 'no_image.png';
 
-            $json['seller_product'][] = [
+            $products[] = [
                 'product_id'    => $result['product_id'],
                 'image'         => $this->model_tool_image->resize($image, 100, 100),
                 'name'          => $result['name'],
@@ -173,6 +176,12 @@ class ControllerApiMultiseller extends Controller {
             ];
         }
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
+        $remainder                  = intval($product_total - $limit * $page);
+        $data                       = [];
+        $data['total_page']         = ceil($product_total/$limit);
+        $data['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $data['products']           = $products;
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
     }
 }

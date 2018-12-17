@@ -486,7 +486,7 @@ class ModelAccountOrder extends Model {
         if ($order_type == 0) {
             $status_where       = "AND mssu.order_status_id > '0' ";
         }elseif ($order_type == 1) {
-            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' ";
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' AND mssu.is_return = '0' ";
         }elseif ($order_type == 2) {
 
             $unshipped_status = $this->config->get('config_paid_status');
@@ -495,7 +495,7 @@ class ModelAccountOrder extends Model {
                 $unshipped_status[] = $this->config->get('payment_cod_order_status_id');
             }
 
-            $status_where   = "AND mssu.order_status_id in ('" . implode("','",$unshipped_status) . "') ";
+            $status_where   = "AND mssu.order_status_id IN ('" . implode("','",$unshipped_status) . "') AND mssu.is_return = '0' ";
         }elseif ($order_type == 3) {
             $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' ";
         }elseif($order_type == 4){
@@ -504,7 +504,7 @@ class ModelAccountOrder extends Model {
                 $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
             }
 
-            $status_where   = "AND " . implode(" OR ",$implode) . ' ';
+            $status_where   = "AND (" . implode(" OR ",$implode) . ") AND mssu.is_return = '0' ";
         }
 
         $fields         = format_find_field('order_id AS oid,date_added,currency_code,currency_value,fullname,date_added','o');
@@ -703,6 +703,13 @@ class ModelAccountOrder extends Model {
 
     public function deleteSubOrder($order_sn = ''){
         $this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET order_status_id = '-1', date_modified = NOW() WHERE order_sn = '" . (string)$order_sn . "'");
+    }
+
+    public function setReturnStatus($is_return,$order_sn)
+    {
+        if (in_array($is_return, [0,1]) && !empty($order_sn)) {
+            $this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET is_return = '" . (int)$is_return . "' WHERE order_sn = '" . (string)$order_sn . "'");
+        }
     }
 
     public function isReturn($order_sn)

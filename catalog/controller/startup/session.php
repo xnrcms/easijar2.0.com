@@ -6,7 +6,7 @@ class ControllerStartupSession extends Controller {
 			$this->config->set('data_sign_key','a2a59c3e76604f1093f701ca670acf61');
 			$this->config->set('data_api_id','f00344bad92dc5ab7b9a4c4d088f6485');
 
-			$this->db->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE TIMESTAMPADD(HOUR, 1, date_modified) < NOW()");
+			$this->db->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE TIMESTAMPADD(HOUR, 2160, date_modified) < NOW()");
 
 			$req_data 			= array_merge($this->request->get,$this->request->post);
 

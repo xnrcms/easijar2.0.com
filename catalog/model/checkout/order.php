@@ -472,6 +472,46 @@ class ModelCheckoutOrder extends Model {
 		}
 	}
 
+	//获取定单信息用来生成地址信息
+	public function getOrderByOrderSnUseAddressInfoForMs($order_sn,$order_type)
+	{
+		if (!in_array($order_type, [1,2]))  return [];
+
+		$shipping_ 		= ',shipping_fullname,shipping_telephone,shipping_company,shipping_address_1,shipping_address_2,shipping_city,shipping_city_id,shipping_postcode,shipping_country,shipping_country_id,shipping_zone,shipping_zone_id,shipping_county,shipping_county_id,shipping_address_format,shipping_method,shipping_code';
+
+		$fields 		= format_find_field('order_id,currency_code,currency_value,customer_id,language_id,email' . $shipping_,'o');
+
+		if ($order_type == 1) {
+			$fields 		.= ',' . format_find_field('order_sn,total','o');
+			$sql 			= "SELECT " . $fields . " FROM `" . DB_PREFIX . "order` o WHERE o.order_sn = '" . (string)$order_sn . "'";
+		}else{
+			$fields 		.= ',' . format_find_field('seller_id,order_sn,total','mssu');
+			$sql 			= "SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_sn = '" . (string)$order_sn . "' AND o.order_status_id > '0'";
+		}
+
+		$order_query = $this->db->query($sql);
+		
+		return $order_query->num_rows > 0 ? $order_query->row : [];
+	}
+
+	//获取定单信息用来生成地址信息
+	public function setOrderByOrderSnUseAddressInfoForMs($order_id,$address)
+	{
+		if ($order_id <= 0 || empty($address))  return;
+
+		$sql 	= "UPDATE " . get_tabname('order') ." SET shipping_fullname = '" . $this->db->escape($address['fullname']) . 
+		"',shipping_telephone = '" . $this->db->escape($address['telephone']) . 
+		"',shipping_address_1 = '" . $this->db->escape($address['address_1']) . 
+		"',shipping_address_2 = '" . $this->db->escape($address['address_2']) . 
+		"',shipping_city = '" . $this->db->escape($address['city']) . 
+		"',shipping_postcode = '" . $this->db->escape($address['postcode']) . 
+		"',shipping_zone_id = '" . (int)$address['zone_id'] . 
+		"',shipping_country_id = '" . (int)$address['country_id'] . 
+		"' WHERE order_id = '" . (int)$order_id . "'";
+
+		$this->db->query($sql);
+	}
+
 	//获取点单信息用来生成支付信息
 	public function getOrderByOrderSnUsePayInfoForMs($order_sn,$order_type)
 	{

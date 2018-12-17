@@ -29,7 +29,7 @@ class ControllerApiHome extends Controller {
 	    $data['broadcast'] 	= [];
 	    $setting_info 		= $this->model_setting_module->getModule(35);
 	    $results 			= $this->model_design_banner->getBanner($setting_info['banner_id']);
-	    wr($setting_info);
+
 	    if (!empty($results)) {
 	    	foreach ($results as $result) {
 		      if (is_file(DIR_IMAGE . $result['image'])) {
@@ -80,7 +80,7 @@ class ControllerApiHome extends Controller {
 
 		//特价商品
 		$page 						= 1;
-		$limit 						= 3;
+		$limit 						= 30;
 		$start 						= $limit * ($page-1);
 
 		$module_id 					= 36;
