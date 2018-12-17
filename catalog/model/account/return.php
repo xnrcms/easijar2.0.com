@@ -140,6 +140,12 @@ class ModelAccountReturn extends Model {
 		$this->db->query("INSERT INTO " . get_tabname('return_history') . " SET return_id = '" . (int)$returnData['return_id'] . "', return_status_id = '" . (int)$returnData['return_status_id'] . "', comment = '" . $returnData['comment'] . "',proposal = '" . (int)$returnData['proposal'] . "',return_reason_id = '" . $returnData['return_reason_id'] . "',evidences = '" . $returnData['evidences'] . "', customer_id = '" . (int)$this->customer->getId() . "',date_added = NOW()");
 	}
 
+
+	public function updateReturnLogistics($returnData)
+	{
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `shipping_telephone` = '" . $this->db->escape((string)$returnData['shipping_telephone']) . "', shipping_company = '" . $this->db->escape((string)$returnData['shipping_company']) . "',shipping_image = '" . $this->db->escape((string)$returnData['shipping_image']) . "',shipping_explain = '" . $this->db->escape((string)$returnData['shipping_explain']) . "',shipping_number = '" . $this->db->escape((string)$returnData['shipping_number']) . "' WHERE return_id = '" . (int)$returnData['return_id'] . "'");
+	}
+
 	public function getReturnIdByOrderProductId($order_id = 0,$product_id = 0)
 	{
 		$query = $this->db->query("SELECT `return_id`,`return_status_id` FROM `" . DB_PREFIX . "return`WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$product_id . "' ORDER BY return_id DESC LIMIT 1 ");

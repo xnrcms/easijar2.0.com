@@ -119,7 +119,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				
 				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . $this->paySingKey);
 				$data 					= [];
-				$data['callback'] 		= $this->callback . 'orderFinish?paycode=oppcw_creditcard&checkoutId=' . $pay['id'] . '&paysign='. $sign;
+				$data['callback'] 		= $this->callback . 'orderFinish?paycode=oppcw_creditcard&checkoutId=' . $pay['id'] . '&paysign='. $sign . '&';
 				$data['jsurl'] 			= $this->payUrl . '/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 				return $data;
@@ -183,7 +183,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$url 									= $url . http_build_query($payData);
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
-
+		wr(['$pay'=>$pay]);
 		if (isset($pay['result']['code']) && !empty($pay['result']['code']))
 		{
 			if (preg_match('/000\\.000\\.|000\\.100\\.1|000\\.[36]/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code']))

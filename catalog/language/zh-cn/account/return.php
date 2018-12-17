@@ -70,3 +70,7 @@ $_['error_reason']       = '请选择商品退换原因！';
 $_['error_agree']        = '警告：您必须同意 %s！';
 $_['error_return_already']      = '您的申请已经提交过了，请耐心等待！';
 $_['error_return_info_status']  = '申请已处理阶段，不允许修改操作！';
+$_['error_return_info']  		= '售后申请不存在！';
+$_['error_shipping_company']  	= '不支持的物流公司';
+$_['error_shipping_number']  	= '物流单号为空或格式错误';
+$_['error_shipping_telephone']  = '联系电话错误';

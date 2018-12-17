@@ -149,4 +149,42 @@ class ControllerApiSystem extends Controller {
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
+
+    public function get_logistics()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','dtype'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
+        }
+
+        $dtype                      = (int)$req_data['dtype'];
+        
+        //快递数据
+        $kd_tracking_data           = $this->config->get('module_express_tracking_data');
+        $allow_tracking             = [];
+
+        foreach ($kd_tracking_data as $key => $value) {
+            if ($value['status'] == 0)  continue;
+
+            if ($dtype == 0 || ($dtype == 1 && $value['sort_order'] > 500) || ($dtype == 2 && $value['sort_order'] <= 500) ) {
+                $allow_tracking[]     = ['code'=>$value['code'],'name'=>$value['name']];
+            }
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$allow_tracking]));
+    }
 }

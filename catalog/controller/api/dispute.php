@@ -315,6 +315,9 @@ class ControllerApiDispute extends Controller {
 
         //获取申请信息
         $return_info                    = $this->model_account_return->getReturnForMs($return_id);
+        if (empty($return_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info')]));
+        }
 
         if ($return_info['return_status_id'] != 1) {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info_status')]));
@@ -368,7 +371,7 @@ class ControllerApiDispute extends Controller {
         //获取申请信息
         $rinfo                          = $this->model_account_return->getReturnForMs($return_id);
         if (empty($rinfo)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:return info is error']));
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info')]));
         }
 
         $return_history                 = $this->model_account_return->getReturnHistorysForMs($return_id);
@@ -417,7 +420,7 @@ class ControllerApiDispute extends Controller {
         //获取申请信息
         $rinfo                          = $this->model_account_return->getReturnForMs($return_id);
         if (empty($rinfo)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:return info is error']));
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info')]));
         }
 
         if ($rinfo['return_status_id'] == 8) {
@@ -428,6 +431,82 @@ class ControllerApiDispute extends Controller {
         $this->model_multiseller_return->addReturnHistoryForMs($return_id, 8,8,$rinfo['return_reason_id']);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'after sale application has been withdrawn']));
+    }
+
+    //保存退款物流信息
+    public function save_logistics()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/return');
+
+        $allowKey       = ['api_token','return_id','shipping_company','shipping_number','shipping_telephone','shipping_explain','shipping_image'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['203','msg'=>'fail:token is error']));
+        }
+
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
+        $return_id      = (int)$req_data['return_id'];
+        if ($return_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:return_id is error']));
+        }
+
+        $this->load->model('account/return');
+
+        //获取申请信息
+        $return_info                    = $this->model_account_return->getReturnForMs($return_id);
+        if (empty($return_info)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info')]));
+        }
+
+        //快递数据
+        $kd_tracking_data           = $this->config->get('module_express_tracking_data');
+        $allow_tracking             = [];
+        foreach ($kd_tracking_data as $key => $value) {
+            if ($value['status'] == 1 && $value['sort_order'] >= 500) {
+                $allow_tracking[$value['code']]     = $value['code'];
+            }
+        }
+
+        //数据检验
+        if (!in_array($req_data['shipping_company'], $allow_tracking)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_shipping_company')]));
+        }
+
+        if ((utf8_strlen(trim($req_data['shipping_number'])) < 3) || (utf8_strlen(trim($req_data['shipping_number'])) > 128))
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_shipping_number')]));
+
+        $telephone      = trim(array_get($req_data, 'shipping_telephone',''),'+');
+        $telephones     = explode('-', $telephone);
+        if (count($telephones) < 2 || !strlen($telephones[0]) || !strlen($telephones[1] || strlen($telephones[0]) > 4)) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_shipping_telephone')]));
+        }
+
+        $returnData                         = [];
+        $returnData['return_id']            = $req_data['return_id'];
+        $returnData['shipping_telephone']   = $req_data['shipping_telephone'];
+        $returnData['shipping_company']     = $req_data['shipping_company'];
+        $returnData['shipping_number']      = $req_data['shipping_number'];
+        $returnData['shipping_explain']     = $req_data['shipping_explain'];
+        $returnData['shipping_image']       = (isset($req_data['shipping_image']) && !empty($req_data['shipping_image'])) ? $req_data['shipping_image'] : '';
+
+        $return_id                      = $this->model_account_return->updateReturnLogistics($returnData);
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Save Success']));
     }
 
     //获取订单退款的商品信息

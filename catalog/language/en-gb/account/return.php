@@ -62,3 +62,7 @@ $_['error_reason']       = 'You must select a return product reason!';
 $_['error_agree']        = 'Warning: You must agree to the %s!';
 $_['error_return_already']      = 'Your application has been submitted. Please be patient!';
 $_['error_return_info_status']  = 'The application has been processed and no modification is allowed!';
+$_['error_return_info']  		= 'After-sales application does not exist！';
+$_['error_shipping_company']  	= 'unsupported logistics company';
+$_['error_shipping_number']  	= 'logistics single number is empty or format error';
+$_['error_shipping_telephone']  = 'Contact phone erro';

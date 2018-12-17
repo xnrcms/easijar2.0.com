@@ -520,9 +520,16 @@ class ControllerSellerOrder extends Controller {
 			}
 
             //快递数据
-            $data['kd_tracking_data'] = $this->config->get('module_express_tracking_data');
+            $kd_tracking_data 			= $this->config->get('module_express_tracking_data');
+            foreach ($kd_tracking_data as $key => $value) {
+            	if ($value['status'] == 0 || $value['sort_order'] > 500) {
+            		unset($kd_tracking_data[$key]);
+            	}
+            }
+
+            $data['kd_tracking_data'] 	= $kd_tracking_data;
             $data['kd_tracking_status'] = $this->config->get('module_express_tracking_status');
-            print_r($data['kd_tracking_data']);exit();
+
 			$data['totals'] = array();
 
 			$totals = $this->model_multiseller_order->getSubOrderTotals($this->request->get['order_id']);

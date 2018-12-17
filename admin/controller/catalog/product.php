@@ -1357,9 +1357,9 @@ class ControllerCatalogProduct extends Controller {
             }
         }
 
-            if ((utf8_strlen($this->request->post['sku']) < 3) || (utf8_strlen($this->request->post['sku']) > 64)) {
+           /* if ((utf8_strlen($this->request->post['sku']) < 3) || (utf8_strlen($this->request->post['sku']) > 64)) {
                 $this->error['sku'] = $this->language->get('error_sku');
-            }
+            }*/
 
         if ($this->request->post['product_seo_url']) {
             $this->load->model('design/seo_url');
