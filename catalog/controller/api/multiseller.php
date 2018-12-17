@@ -144,14 +144,13 @@ class ControllerApiMultiseller extends Controller {
         }
 
         $this->load->model('tool/image');
+        $this->load->model('multiseller/seller');
 
-        $json['seller_product'] = [];//商家商品
+        $json['seller_product']   = [];//商家商品
 
-        $page                     = isset($req_data['page']) ? (int)$req_data['page']: 0;
+        $page                     = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
         $limit                    = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
-        $this->load->model('multiseller/seller');
-        
         $filter_data              = [
             'sort'                => 'p.date_added',
             'order'               => 'DESC',
@@ -167,12 +166,130 @@ class ControllerApiMultiseller extends Controller {
             $href               = $this->url->link('product/product', array_merge(['product_id' => $result['product_id']]));
             $image              = is_file(DIR_IMAGE . $result['image']) ? $result['image'] : 'no_image.png';
 
+            $price_c        = 0;
+            $special_c      = 0;
+
+            if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                $price_c    = $result['price'];
+                $price      = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+            } else {
+                $price = false;
+            }
+
+            if ((float)$result['special']) {
+                $special_c  = $result['special'];
+                $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+            } else {
+                $special = false;
+            }
+
+            $discount       = ($price_c > 0 && $price_c >= $special_c) ? round(($price_c - $special_c) / $price_c)*100 : 0;
+
             $products[] = [
                 'product_id'    => $result['product_id'],
                 'image'         => $this->model_tool_image->resize($image, 100, 100),
                 'name'          => $result['name'],
                 'price'         => !empty($result['price']) ? $result['price'] : '',
                 'special'       => !empty($result['special']) ? $result['special'] : '',
+                'discount'      => $discount,
+                'rating'        => 5,
+                'rating_num'    => 10,
+            ];
+        }
+
+        $remainder                  = intval($product_total - $limit * $page);
+        $data                       = [];
+        $data['total_page']         = ceil($product_total/$limit);
+        $data['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $data['products']           = $products;
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
+    }
+
+    public function search()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('product/search');
+
+        $allowKey       = ['api_token','page','limit','search','seller_id'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        $seller_id      = isset($req_data['seller_id']) ? (int)$req_data['seller_id']: 0;
+        if ($seller_id <= 0) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:seller_id error']));
+        }
+
+        $this->load->model('multiseller/seller');
+        $seller_info        = $this->model_multiseller_seller->getSeller($seller_id);
+        if (!$seller_info) {
+            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('seller_info_error')]));
+        }
+
+        $this->load->model('tool/image');
+        $this->load->model('multiseller/seller');
+
+        //0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
+        $sortsArr           = ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
+
+        $search             = isset($req_data['search']) ? (string)$req_data['search'] : '';
+        $search             = urlencode(html_entity_decode($search, ENT_QUOTES, 'UTF-8'));
+
+        $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
+        
+        $filter_data              = [
+            'sort'                => 'p.date_added',
+            'order'               => 'DESC',
+            'start'               => $page * $limit,
+            'limit'               => $limit,
+            'filter_name'         => $search
+        ];
+
+        $product_total          = $this->model_multiseller_seller->getTotalSellerProducts($seller_id, $filter_data);
+        $results                = $this->model_multiseller_seller->getSellerProducts($seller_id, $filter_data);
+        $products               = [];
+
+        foreach ($results as $result) {
+            $href               = $this->url->link('product/product', array_merge(['product_id' => $result['product_id']]));
+            $image              = is_file(DIR_IMAGE . $result['image']) ? $result['image'] : 'no_image.png';
+
+            $price_c        = 0;
+            $special_c      = 0;
+
+            if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                $price_c    = $result['price'];
+                $price      = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+            } else {
+                $price = false;
+            }
+
+            if ((float)$result['special']) {
+                $special_c  = $result['special'];
+                $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+            } else {
+                $special = false;
+            }
+
+            $discount       = ($price_c > 0 && $price_c >= $special_c) ? round(($price_c - $special_c) / $price_c)*100 : 0;
+
+            $products[] = [
+                'product_id'    => $result['product_id'],
+                'image'         => $this->model_tool_image->resize($image, 100, 100),
+                'name'          => $result['name'],
+                'price'         => !empty($price) ? $price : '',
+                'special'       => !empty($special) ? $special : '',
+                'discount'      => $discount,
+                'rating'        => 5,
+                'rating_num'    => 10,
             ];
         }
 

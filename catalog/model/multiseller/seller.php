@@ -87,7 +87,72 @@ class ModelMultisellerSeller extends Model {
 		return $query->row;
 	}
 
+	private function buildFilterWhereSql($data)
+    {
+        $sql = '';
+
+        $data['filter_name'] 	= isset($data['filter_name']) ? $data['filter_name'] : '';
+        $data['filter_tag'] 	= isset($data['filter_tag']) ? $data['filter_tag'] : '';
+
+        if (!empty($data['filter_name']) || !empty($data['filter_tag'])) {
+            $sql .= " AND (";
+
+            if (!empty($data['filter_name'])) {
+                $implode = array();
+
+                $words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_name'])));
+
+                foreach ($words as $word) {
+                    $implode[] = "(pd.name LIKE '%" . $this->db->escape($word) . "%')";
+                }
+
+                if ($implode) {
+                    $sql .= " " . implode(" AND ", $implode) . "";
+                }
+
+                if (!empty($data['filter_description'])) {
+                    $sql .= " OR pd.description LIKE '%" . $this->db->escape($data['filter_name']) . "%'";
+                }
+            }
+
+            if (!empty($data['filter_name']) && !empty($data['filter_tag'])) {
+                $sql .= " OR ";
+            }
+
+            if (!empty($data['filter_tag'])) {
+                $implode = array();
+
+                $words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_tag'])));
+
+                foreach ($words as $word) {
+                    $implode[] = "pd.tag LIKE '%" . $this->db->escape($word) . "%'";
+                }
+
+                if ($implode) {
+                    $sql .= " " . implode(" AND ", $implode) . "";
+                }
+            }
+
+            if (!empty($data['filter_name'])) {
+                $sql .= " OR LCASE(p.model) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.sku) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.upc) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.ean) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.jan) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.isbn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.mpn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+            }
+
+            $sql .= ")";
+        }
+
+        return $sql;
+    }
+
 	public function getSellerProducts($seller_id, $data = array()) {
+
+		$search_sql 		= $this->buildFilterWhereSql($data);
+
 		$sql = "SELECT DISTINCT ps.product_id, 
                     (
                         SELECT AVG(rating) 
@@ -110,7 +175,7 @@ class ModelMultisellerSeller extends Model {
                 LEFT JOIN " . DB_PREFIX . "product p ON (p.product_id = ps.product_id) 
                 LEFT JOIN " . DB_PREFIX . "product_description pd ON (pd.product_id = ps.product_id) 
                 LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (ps.product_id = p2s.product_id) 
-                WHERE ps.seller_id = '" . $seller_id . "' AND (ps.date_until <= CURDATE() OR ps.date_until = '0000-00-00') AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND status = '1' AND p.date_available <= CURDATE()". (isset($data['parent_id']) ? " AND p.parent_id = '" .$data['parent_id']. "'" : "")." AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'
+                WHERE ps.seller_id = '" . $seller_id . "' AND (ps.date_until <= CURDATE() OR ps.date_until = '0000-00-00') AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND status = '1' AND p.date_available <= CURDATE()" . $search_sql . (isset($data['parent_id']) ? " AND p.parent_id = '" .$data['parent_id']. "'" : "")." AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'
                 GROUP BY .ps.product_id";
 
 		$sort_data = array(
@@ -164,11 +229,13 @@ class ModelMultisellerSeller extends Model {
 		return $product_data;
 	}
 
-	public function getTotalSellerProducts($seller_id) {
+	public function getTotalSellerProducts($seller_id,$data = []) {
+		$search_sql 		= $this->buildFilterWhereSql($data);
 		$sql = "SELECT COUNT(ps.product_id) AS total FROM " . DB_PREFIX . "ms_product_seller ps
                 LEFT JOIN " . DB_PREFIX . "product p ON (p.product_id = ps.product_id) 
+                LEFT JOIN " . DB_PREFIX . "product_description pd ON (pd.product_id = ps.product_id) 
                 LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (ps.product_id = p2s.product_id) 
-                WHERE ps.seller_id = '" . $seller_id . "' AND (ps.date_until >= NOW() OR ps.date_until = '0000-00-00') AND status = '1' AND p.date_available <= NOW() AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'";
+                WHERE ps.seller_id = '" . $seller_id . "' AND (ps.date_until >= NOW() OR ps.date_until = '0000-00-00') AND status = '1' AND p.date_available <= NOW()" . $search_sql ." AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'";
 
 		$query = $this->db->query($sql);
 

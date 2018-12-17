@@ -275,8 +275,8 @@ class ControllerApiOreview extends Controller {
         //所有商品ID 子产品和和主产品
         $ppid                               = $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
         $product_ids                        = $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
-        $page                               = isset($req_data['page']) ? (int)$req_data['page'] : 1;
-        $is_image                           = isset($req_data['dtype']) ? (int)$req_data['page'] : 1;
+        $page                               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $is_image                           = isset($req_data['dtype']) ? (int)$req_data['dtype'] : 1;
         $rating                             = (isset($req_data['rating']) && in_array((int)$req_data['rating'], [1,2,3,4,5])) ? (int)$req_data['rating'] : 0;
 
         //商品评论

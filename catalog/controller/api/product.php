@@ -47,7 +47,7 @@ class ControllerApiProduct extends Controller {
 
 		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
 
-		$page 				= isset($req_data['page']) ? (int)$req_data['page'] : 1;
+        $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
 		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
 		if (isset($req_data['in_stock']) && (int)$req_data['in_stock'] > 0) {
@@ -398,7 +398,7 @@ class ControllerApiProduct extends Controller {
 
 		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
 
-		$page 				= isset($req_data['page']) ? (int)$req_data['page'] : 1;
+		$page 				= (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
 		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
 
