@@ -29,6 +29,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 {
 	private $paySingKey = '~~!!@#@#1';
 	private $payUrl 	= 'https://test.oppwa.com';
+	private $callback 	= 'https://h5.easijar.com/#/';
 
 	public function index()
 	{
@@ -118,7 +119,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				
 				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . $this->paySingKey);
 				$data 					= [];
-				$data['callback'] 		= HTTP_SERVER . 'oppcw_creditcard?checkoutId=' . $pay['id'] . '&paysign='. $sign;
+				$data['callback'] 		= $this->callback . 'orderFinish?paycode=oppcw_creditcard&checkoutId=' . $pay['id'] . '&paysign='. $sign;
 				$data['jsurl'] 			= $this->payUrl . '/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
 
 				return $data;
