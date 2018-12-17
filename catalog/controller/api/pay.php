@@ -166,8 +166,8 @@ class ControllerApiPay extends Controller {
         $this->request->post['id']              = isset($req_data['id']) ? $req_data['id'] : '';
         $res                                    = $this->load->controller('extension/payment/oppcw_creditcard/callback');
 
-        if ($res == 'success') {
-            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success']));
+        if ( isset($res[0]) && $res[0] == 'success') {
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$res[1]]));
         }
 
         return $this->response->setOutput($this->returnData(['msg'=>$res]));
