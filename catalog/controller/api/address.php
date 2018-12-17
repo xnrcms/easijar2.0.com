@@ -323,7 +323,7 @@ class ControllerApiAddress extends Controller {
             $address['countries'][] = array(
                 'county_id'     => $result['country_id'],
                 'county_name'   => $result['name'],
-                'selected'      => $address['country_id'] == $order_info['shipping_country_id'] ? 1 : 0,
+                'selected'      => $result['country_id'] == $order_info['shipping_country_id'] ? 1 : 0,
             );
         }
 
