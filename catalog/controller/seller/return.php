@@ -549,7 +549,7 @@ class ControllerSellerReturn extends Controller {
 	{
 		if($return_status_id <= 0 || $update_status_id == 0) return [];
 
-        $notAllow 					= [5,8,9,7];
+        $notAllow 					= [5,7,8,9];
         switch ($return_status_id) {
         	case 1: $notAllow 		= array_merge($notAllow,[1,3]);break;
         	case 2: $notAllow 		= array_merge($notAllow,[1,2,4]);break;
@@ -644,11 +644,25 @@ class ControllerSellerReturn extends Controller {
 			}
 
 			if (!$this->getReturnStatuses($return_info['return_status_id'],$return_status_id)) {
-				$json['error'] = $this->language->get('error_eturn_status');
+				$json['error'] = $this->language->get('error_return_status');
 			}
 
+			//根据状态处理
+			switch ($return_status_id) {
+				case 2: //等待商品寄回
+					break;
+				case 3: //已退款
+				case 4: //拒绝
+				case 6://已收到退货，退款
+				case 10://退款中
+					# code...
+					break;
+				default:
+					$json['error'] = $this->language->get('error_return_status'); break;
+			}
+			
 			$this->load->model('multiseller/order');
-        	$order_info                     = $this->model_multiseller_order->getSuborderByCustomerIdForMs($return_info['order_id'],$return_info['seller_id'],$return_info['customer_id']);
+        	$order_info            = $this->model_multiseller_order->getSuborderByCustomerIdForMs($return_info['order_id'],$return_info['seller_id'],$return_info['customer_id']);
 
         	if (empty($return_info)) {
 				$json['error'] = $this->language->get('error_order_exists');

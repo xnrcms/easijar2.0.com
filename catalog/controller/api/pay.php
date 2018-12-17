@@ -160,16 +160,15 @@ class ControllerApiPay extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
         
-
         $this->request->post['checkoutId']      = isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
         $this->request->post['paysign']         = isset($req_data['paysign']) ? $req_data['paysign'] : '';
         $this->request->post['id']              = isset($req_data['id']) ? $req_data['id'] : '';
         $res                                    = $this->load->controller('extension/payment/oppcw_creditcard/callback');
-        wr($res);
+
         if ( isset($res[0]) && $res[0] == 'success') {
             return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$res[1]]));
         }
 
-        return $this->response->setOutput($this->returnData(['msg'=>$res]));
+        return $this->response->setOutput($this->returnData(['code'=>'206','msg'=>$res]));
     }
 }
