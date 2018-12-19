@@ -2,7 +2,7 @@
 class ControllerApiCoupon extends Controller {
 	public function index()
 	{
-		$allowKey       = ['api_token','page','dtype','seller_id'];
+		$allowKey       = ['api_token','page','dtype','seller_id','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
         $data 			= [];
@@ -23,10 +23,10 @@ class ControllerApiCoupon extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $page 				= ( !isset($req_data['page']) || (int)$req_data['page'] <= 0 ) ? 1 : (int)$req_data['page'];
         $dtype 				= ( !isset($req_data['dtype']) || (int)$req_data['dtype'] <= 0 ) ? 0 : (int)$req_data['dtype'];
         $seller_id 			= ( !isset($req_data['seller_id']) || (int)$req_data['seller_id'] <= 0 ) ? 0 : (int)$req_data['seller_id'];
-        $limit 				= 10;
+        $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
         $filter_data 		= [
         	'customer_id'	=> $this->customer->getId(),
@@ -42,6 +42,7 @@ class ControllerApiCoupon extends Controller {
         $this->load->model('customercoupon/coupon');
         $this->load->model('tool/image');
 
+        $totals             = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
         $results 			= $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);
         $coupon 			= [];
         if (!empty($results)) {
@@ -68,7 +69,14 @@ class ControllerApiCoupon extends Controller {
         	}
         }
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$coupon]));
+        sort($coupon);
+
+        $remainder                  = intval($totals - $limit * $page);
+        $data['total_page']         = ceil($totals/$limit);
+        $data['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $data['coupon']             = $coupon;
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
 	}
 
 	public function lists()

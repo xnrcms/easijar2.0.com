@@ -160,7 +160,7 @@ class ControllerApiOreview extends Controller {
         $this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/oreview');
 
-        $allowKey       = ['api_token','page'];
+        $allowKey       = ['api_token','page','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -183,16 +183,17 @@ class ControllerApiOreview extends Controller {
 
         $this->load->model('account/oreview');
 
-        $page 			= (int)array_get($req_data, 'page', 1);
-        $limit 			= 10;
+        $page                       = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $limit                      = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
-        $filter_data 	= [
+        $filter_data 	            = [
             'filter_customer_id' 	=> $this->customer->getId(),
             'filter_reviewed' 		=> 1,
             'start' 				=> ($page - 1) * $limit,
             'limit' 				=> $limit,
         ];
 
+        $totals                     = $this->model_account_oreview->getOreviewsTotalForApi($filter_data);
         $results                	= $this->model_account_oreview->getOreviewsForApi($filter_data);
         $oreview_list 				= [];
 
@@ -238,7 +239,11 @@ class ControllerApiOreview extends Controller {
             }
         }
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$oreview_list]));
+        $remainder                  = intval($totals - $limit * $page);
+        $json['total_page']         = ceil($totals/$limit);
+        $json['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $json['oreview_list']       = $oreview_list; 
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 
     //商品评价列表
@@ -247,7 +252,7 @@ class ControllerApiOreview extends Controller {
         $this->response->addHeader('Content-Type: application/json');
         $this->load->language('account/oreview');
 
-        $allowKey       = ['api_token','product_id','page','dtype','rating'];
+        $allowKey       = ['api_token','product_id','page','dtype','rating','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -276,6 +281,7 @@ class ControllerApiOreview extends Controller {
         $ppid                               = $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
         $product_ids                        = $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
         $page                               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $limit                              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
         $is_image                           = isset($req_data['dtype']) ? (int)$req_data['dtype'] : 1;
         $rating                             = (isset($req_data['rating']) && in_array((int)$req_data['rating'], [1,2,3,4,5])) ? (int)$req_data['rating'] : 0;
 
@@ -291,7 +297,7 @@ class ControllerApiOreview extends Controller {
         $json['total_rat4']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,4);
         $json['total_rat5']                 = (int)$this->model_account_oreview->getTotalOreviewsByProductIds($product_ids,0,5);
 
-        $review_data                        = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,10,$is_image,$rating);
+        $review_data                        = $this->model_account_oreview->getOreviewsByProductIds($product_ids, $page-1,$limit,$is_image,$rating);
 
         foreach ($review_data as $key => $value) {
             $result_images      = $this->model_account_oreview->getOreviewImages($value['order_product_review_id']);
@@ -305,7 +311,11 @@ class ControllerApiOreview extends Controller {
             $review_data[$key]['image']     = $images;
             $review_data[$key]['avatar']    = $this->model_tool_image->resize($value['customer_id'], 100, 100);
         }
-        $json['review_data']                = $review_data;
+
+        $remainder                  = intval($json['total_all'] - $limit * $page);
+        $json['total_page']         = ceil($json['total_all']/$limit);
+        $json['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $json['review_data']        = $review_data;
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }

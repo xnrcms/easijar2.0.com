@@ -72,6 +72,23 @@ class ModelCustomercouponCoupon extends Model
         return $query->row;
     }
 
+    public function getCouponsTotalByCustomerIdForApi($data = [])
+    {
+        $customer_id            = (int)array_get($data, 'customer_id');
+        if ($customer_id <= 0)  return 0;
+
+        $sql        = 'SELECT  COUNT(*) AS total FROM `'.DB_PREFIX.'coupon_customer` AS cc LEFT JOIN `'.DB_PREFIX.'coupon` AS c ON (cc.coupon_id = c.coupon_id) LEFT JOIN `'.DB_PREFIX.'ms_seller` AS ms ON (ms.seller_id = c.seller_id) WHERE customer_id='.(int) $customer_id;
+
+        $seller_id            = (int)array_get($data, 'seller_id');
+        if ($seller_id > 0) {
+            $sql    .= ' AND c.seller_id = ' . (int)$seller_id;
+        }
+
+        $customer_query = $this->db->query($sql) ;
+
+        return $customer_query->row['total'];
+    }
+
     public function getCouponsByCustomerIdForApi($data = [])
     {
         $customer_id            = (int)array_get($data, 'customer_id');
