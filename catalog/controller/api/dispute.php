@@ -190,7 +190,6 @@ class ControllerApiDispute extends Controller {
                 $status2        = 1;
             }
         }
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$this->config->get('config_ssl')]));
 
         switch ($order_status_id) {
             case 15://待发货
