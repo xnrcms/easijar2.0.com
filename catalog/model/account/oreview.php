@@ -461,7 +461,7 @@ class ModelAccountOreview extends Model
         return $query->row['total'];
     }
 
-    public function getOreviewsTotalForApi()
+    public function getOreviewsTotalForApi($data = [])
     {
         $order_statuses = $this->config->get('config_complete_status');
 
@@ -488,11 +488,7 @@ class ModelAccountOreview extends Model
         }
 
         if (isset($data['filter_customer_id'])) {
-            $implode[] = "o.customer_id = '".(int) $data['filter_customer_id']."'";
-        }
-
-        if (isset($data['filter_order_id'])) {
-            $implode[] = "o.order_id = '".(int) $data['filter_order_id']."'";
+            $implode[] = "opr.customer_id = '".(int) $data['filter_customer_id']."'";
         }
 
         if (isset($data['filter_date_added'])) {
@@ -512,7 +508,7 @@ class ModelAccountOreview extends Model
     * 获取当用户购买完成的订单产品列表，只返回主品论，不包含追加评论
     * config_complete_status：订单正常成功完成的状态（不包含取消和关闭的订单）
     */
-    public function getOreviewsForApi($data = array())
+    public function getOreviewsForApi($data = [])
     {
         $order_statuses = $this->config->get('config_complete_status');
 
@@ -520,7 +516,7 @@ class ModelAccountOreview extends Model
             $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
         }
 
-        $sql = 'SELECT DISTINCT op.*, o.date_added, p.image, p.product_id,p.tax_class_id, opr.author, opr.text, opr.rating, order_product_review_id AS reviewed
+        $sql = 'SELECT op.*, o.date_added, p.image, p.product_id,p.tax_class_id, opr.author, opr.text, opr.rating, order_product_review_id AS reviewed
                         FROM ' .DB_PREFIX.'order_product op
                         LEFT JOIN ' .DB_PREFIX.'order o ON (o.order_id = op.order_id)
                         LEFT JOIN ' .DB_PREFIX.'ms_suborder mssu ON (o.order_id = mssu.order_id)
@@ -539,7 +535,7 @@ class ModelAccountOreview extends Model
         }
 
         if (isset($data['filter_customer_id'])) {
-            $implode[] = "o.customer_id = '".(int) $data['filter_customer_id']."'";
+            $implode[] = "opr.customer_id = '".(int) $data['filter_customer_id']."'";
         }
 
         if (isset($data['filter_order_id'])) {
@@ -582,7 +578,7 @@ class ModelAccountOreview extends Model
 
             $sql .= ' LIMIT '.(int) $data['start'].','.(int) $data['limit'];
         }
-
+        
         $query = $this->db->query($sql);
 
         return $query->rows;
