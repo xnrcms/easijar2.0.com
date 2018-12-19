@@ -190,6 +190,7 @@ class ControllerApiDispute extends Controller {
                 $status2        = 1;
             }
         }
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$this->config->get('config_ssl')]));
 
         switch ($order_status_id) {
             case 15://待发货
@@ -216,7 +217,7 @@ class ControllerApiDispute extends Controller {
                 }
                 break;
             case 2://待收货
-                if ($return_info['is_service'] == 2) {//退货退款
+                if ((int)$return_info['is_service'] == 2) {//退货退款
 
                     if ($return_info['return_status_id'] == 2) {//等待寄回商品
                         $overtime       = (int)$return_info['overtime'];

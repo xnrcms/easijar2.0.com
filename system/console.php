@@ -161,6 +161,7 @@ if ($config->has('action_pre_action')) {
 $db = $registry->get('db');
 $config->set('config_store_id', 0);
 $config->set('config_url', HTTP_SERVER);
+$config->set('config_ssl', HTTPS_SERVER);
 
 // Settings
 $query = $db->query("SELECT * FROM `" . DB_PREFIX . "setting` WHERE store_id = '0' OR store_id = '" . (int)$config->get('config_store_id') . "' ORDER BY store_id ASC");
