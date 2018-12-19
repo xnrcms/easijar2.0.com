@@ -750,7 +750,7 @@ class ControllerSellerOrder extends Controller {
             $data['aftership_trackings'] = array();
             if ($aftership_trackings) {
                 foreach ($aftership_trackings as $track) {
-                    if($track['status']) {
+                    if($track['status'] && $track['sort_order'] < 500) {
                         $data['aftership_trackings'][] = $track;
                     }
                 }

@@ -174,13 +174,13 @@ class ControllerApiSystem extends Controller {
         $dtype                      = (int)$req_data['dtype'];
         
         //快递数据
-        $kd_tracking_data           = $this->config->get('module_express_tracking_data');
+        $kd_tracking_data           = $this->config->get('module_aftership_data');
         $allow_tracking             = [];
 
         foreach ($kd_tracking_data as $key => $value) {
             if ($value['status'] == 0)  continue;
 
-            if ($dtype == 0 || ($dtype == 1 && $value['sort_order'] > 500) || ($dtype == 2 && $value['sort_order'] <= 500) ) {
+            if ($dtype == 0 || ($dtype == 1 && $value['sort_order'] < 500) || ($dtype == 2 && $value['sort_order'] >= 500) ) {
                 $allow_tracking[]     = ['code'=>$value['code'],'name'=>$value['name']];
             }
         }

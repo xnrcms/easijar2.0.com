@@ -89,6 +89,7 @@ abstract class Controller {
 	        	'apiUrl'=>isset($this->request->get['route']) ? $this->request->get['route'] : '',
 	        	'hash'=>$hash,
 	        	'signStr'=>$signStr,
+	        	'hash2'=>md5($signStr),
 	        	'signKey'=>$signKey,
 	        	'data'=>$data
 	        ],'sign.txt',false);

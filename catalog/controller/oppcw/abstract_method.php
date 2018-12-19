@@ -124,6 +124,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 				return $data;
 			}else{
+				$logger->write(date('Y-m-d H:i:s') . 'pingpong pay error:'.json_encode($pay));
 				return 'pay fail';
 			}
 		}
@@ -183,7 +184,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$url 									= $url . http_build_query($payData);
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
-		wr(['$pay'=>$pay]);
+
 		if (isset($pay['result']['code']) && !empty($pay['result']['code']))
 		{
 			if (preg_match('/000\\.000\\.|000\\.100\\.1|000\\.[36]/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code']))
@@ -206,11 +207,12 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
 				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $payid);
+				
 				return ['success',$order_sn];
 			}
 		}
 
-		$logger->write('pingpong pay error:'.json_encode($pay));
+		$logger->write(date('Y-m-d H:i:s') . 'pingpong pay error:'.json_encode($pay));
 
 		return 'pay fail';
 	}
