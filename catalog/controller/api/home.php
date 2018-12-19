@@ -19,7 +19,7 @@ class ControllerApiHome extends Controller {
 		if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
-        
+
 	    $this->load->model('setting/module');
 	    $this->load->model('tool/image');
 
