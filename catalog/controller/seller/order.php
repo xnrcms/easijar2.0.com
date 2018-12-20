@@ -352,7 +352,7 @@ class ControllerSellerOrder extends Controller {
 		}
 
 		$order_info = $this->model_multiseller_order->getOrder($order_id);
-
+		print_r($order_info);exit();
 		if ($order_info) {
 			$this->load->language('seller/order');
 
@@ -542,8 +542,9 @@ class ControllerSellerOrder extends Controller {
 				);
 			}
 
-			$data['comment'] = nl2br($order_info['comment']);
-
+			/*$comment 		 = !empty($order_info['comment']) ? json_decode($order_info['comment'],true) : [];
+			$data['comment'] = isset($comment[]) nl2br($order_info['comment']);*/
+print_r($data);exit();
 			$this->load->model('localisation/order_status');
 
 			$order_status_info = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);

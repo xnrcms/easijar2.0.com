@@ -1,10 +1,13 @@
-<form action="{{ callback }}" class="paymentWidgets" data-brands="VISA MASTER"></form>
 <script>
 var wpwlOptions = {
  onReady: function (){
  var createRegistrationHtml = '<div class="customLabel">Store payment details?</div><div class="customInput"><input type="checkbox" name="createRegistration" value="true"/></div>';
     $('form.wpwl-form-card').find('.wpwl-button').before(createRegistrationHtml);
- }
+ },
+  registrations: {
+    requireCvv: true
+  }
 };
 </script>
+<form action="{{ callback }}" class="paymentWidgets" data-brands="VISA MASTER"></form>
 <script src="{{ jsurl }}"></script>

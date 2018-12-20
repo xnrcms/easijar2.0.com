@@ -154,7 +154,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
     {
 		$res 		= $this->get_callback();
 		if (isset($this->session->data['api_id']) && $this->session->data['api_id'] > 0) return $res;
-		if ($res == 'success') {
+		if ( isset($res[0]) && $res[0] == 'success') {
 			$this->response->redirect($this->url->link('checkout/success'));
 		}else{
 			$this->response->redirect($this->url->link('checkout/failure'));
