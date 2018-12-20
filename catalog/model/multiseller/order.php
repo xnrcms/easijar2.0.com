@@ -1,7 +1,7 @@
 <?php
 class ModelMultisellerOrder extends Model {
 	public function getOrder($order_id) {
-		$order_query = $this->db->query("SELECT o.*,mssu.order_status_id as morder_status_id, (SELECT c.fullname FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE o.order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$this->customer->getId() . "'");
+		$order_query = $this->db->query("SELECT o.*,mssu.order_status_id as morder_status_id,mssu.order_sn as ms_order_sn, (SELECT c.fullname FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE o.order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$this->customer->getId() . "'");
 
 		if ($order_query->num_rows) {
 			$country_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$order_query->row['payment_country_id'] . "'");
@@ -52,6 +52,7 @@ class ModelMultisellerOrder extends Model {
 
 			return array(
 				'order_id'                => $order_query->row['order_id'],
+				'order_sn'                => $order_query->row['ms_order_sn'],
 				'invoice_no'              => $order_query->row['invoice_no'],
 				'invoice_prefix'          => $order_query->row['invoice_prefix'],
 				'store_id'                => $order_query->row['store_id'],

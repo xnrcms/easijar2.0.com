@@ -101,7 +101,7 @@ class ModelCustomercouponCoupon extends Model
 
         $seller_id            = (int)array_get($data, 'seller_id');
         if ($seller_id > 0) {
-            $sql    .= ' AND c.seller_id = ' . (int)$seller_id;
+            $sql    .= ' AND c.seller_id > 0';
         }
 
         $sort_data  = [

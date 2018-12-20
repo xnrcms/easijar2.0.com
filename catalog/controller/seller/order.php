@@ -449,6 +449,7 @@ class ControllerSellerOrder extends Controller {
 
 			$data['email'] = $order_info['email'];
 			$data['telephone'] = $order_info['telephone'];
+			$data['order_sn'] = $order_info['order_sn'];
 
 			$data['shipping_method'] = $order_info['shipping_method'];
 			$data['payment_method'] = $order_info['payment_method'];
