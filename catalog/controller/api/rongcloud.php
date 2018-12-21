@@ -1,11 +1,10 @@
 <?php
 class ControllerApiRongcloud extends Controller {
 
-	//用户中心首页
+	//注册融云用户信息
 	public function userinfo() 
 	{	
 		$this->response->addHeader('Content-Type: application/json');
-		$this->load->language('account/account');
 
         $allowKey       = ['api_token','seller_id'];
         $req_data       = $this->dataFilter($allowKey);
@@ -71,6 +70,11 @@ class ControllerApiRongcloud extends Controller {
                     
                     $this->model_rongcloud_rongcloud->addUser(array_merge($save_data,$data));
 
+                    //建立聊天关系
+                    if ((int)$req_data['seller_id'] > 0 && !$this->model_rongcloud_rongcloud->isChatUser(['seller_id'=>$req_data['seller_id']])) {
+                        $this->model_rongcloud_rongcloud->addChatUser(['seller_id'=>$req_data['seller_id']]);
+                    }
+
                 }else{
                     return $this->response->setOutput($this->returnData(['msg'=>'fail:']));
                 }
@@ -82,13 +86,11 @@ class ControllerApiRongcloud extends Controller {
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
     }
 
-    //用户资料详情
-	public function details() 
-	{	
-		$this->response->addHeader('Content-Type: application/json');
-		$this->load->language('account/account');
+    public function userlist()
+    {
+        $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token'];
+        $allowKey       = ['api_token','page','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -109,20 +111,35 @@ class ControllerApiRongcloud extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
 
-        $this->load->model('tool/image');
+        $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
-        $json['account_info'] 				= [];
+        $this->load->model('rongcloud/rongcloud');
 
-        $avatar 							= !empty($this->customer->getAvatar()) ? $this->customer->getAvatar() : 'no_image.png';
-        $account_info['avatar'] 			= $this->model_tool_image->resize($avatar, 100, 100)  . '?t=' . time();
-        $account_info['fullname'] 		    = !empty($this->customer->getFullName()) ? $this->customer->getFullName() : '';
-        $account_info['telephone']          = !empty($this->customer->getTelephone()) ? $this->customer->getTelephone() : '';
-        $account_info['email']              = !empty($this->customer->getEmail()) ? $this->customer->getEmail() : '';
-        $account_info['gender']             = !empty($this->customer->getGender()) ? $this->customer->getGender() : 0;
-        $account_info['brithday']           = !empty($this->customer->getBrithday()) ? $this->customer->getBrithday() : '';
+        $filter_data = array(
+            'start'     => ($page - 1) * $limit,
+            'limit'     => $limit
+        );
 
-        $json['account_info'] 				= $account_info;
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
+        $totals         = $this->model_rongcloud_rongcloud->getChatUserTotals($filter_data);
+        $lists          = $this->model_rongcloud_rongcloud->getChatUser($filter_data);
+        $chat_user      = [];
+
+        foreach ($lists as $key => $value) {
+            $chat_user[]       =[
+                'rongcloud_avatar'         => $value['rongcloud_avatar'],
+                'rongcloud_uid'            => $value['rongcloud_uid'],
+                'rongcloud_nickname'       => $value['rongcloud_nickname'],
+            ];
+        }
+
+        $remainder                  = intval($totals - $limit * $page);
+        $data                       = [];
+        $data['total_page']         = ceil($totals/$limit);
+        $data['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $data['lists']              = $chat_user;
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $data ]));
     }
 
     //用户资料详情
