@@ -51,7 +51,7 @@ class ControllerApiRongcloud extends Controller {
             }
 
             $fullname                = !empty($customer['fullname']) ? $customer['fullname'] : 'user_'.$customer['customer_id'];
-            $rongcloud_uid           = md5($customer['customer_id'] . $customer['password']);
+            $rongcloud_uid           = md5($customer['customer_id'] . '~~!!1#@1qaz2wsx');
             $avatar                  = $this->customer->getAvatar($customer['customer_id']);
 
             $data['rongcloud_uid']              = $rongcloud_uid;
