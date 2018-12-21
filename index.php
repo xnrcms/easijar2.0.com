@@ -4,8 +4,9 @@ $allow_origin 	= [
 	'http://seller.easijar.com',
 	'https://h5.easijar.com',
 	'http://10.5.151.185',
+	'http://10.5.151.185:8081',
 ];  
-  
+
 if(in_array($origin, $allow_origin)){  
     header('Access-Control-Allow-Origin:'.$origin);       
 }
