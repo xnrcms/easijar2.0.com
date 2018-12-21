@@ -36,30 +36,7 @@ function showConfirm(message, leftButton, rightButton, callback) {
   });
 }
 
-data['currentStep'] = !data.selected_variants.length ? 1 : 3;
-data['selectedVariantsFormatted'] = [];
-
-// 初始化 处理 用户自定义的 variant 赋值到 selectedVariantsFormatted
-for (variantId in data.custom_variants) {
-  var variant = data.custom_variants[variantId];
-  data['selectedVariantsFormatted'].push({ variantId: variantId, values: variant });
-}
-
-// 初始化 处理 用户不允许被自定义的 variant 追加进 selectedVariantsFormatted
-for (var index = 0; index < data.variants.length; index++) {
-  var variants = data.variants[index];
-  var formattedVariants = data.selectedVariantsFormatted;
-  if ( variants.allow_rename ) continue;
-  if ( formattedVariants.length ) {
-    if ( typeof formattedVariants[index] == 'undefined') {
-      formattedVariants.push({ variantId: variants.id, values: variants.values });
-    } else {
-      formattedVariants[index].values = variants.values;
-    }
-  } else {
-    formattedVariants.push({ variantId: variants.id, values: variants.values });
-  }
-}
+data['isChooseTypeTabSelected'] = !data.selected_variants.length;
 
 var app = new Vue({
   el: '#product-variant-app',
@@ -70,7 +47,6 @@ var app = new Vue({
   },
   computed: {
     addProductButtonEnabled: function () {
-      console.log(data);
       return this.products.length < this.maxVariantPossibilities;
     },
 
@@ -93,18 +69,6 @@ var app = new Vue({
       }
       return names;
     },
-
-    // 判断 FormattedVariants 是否都有value 值
-    isAllFormattedVariantsHaveValues: function () {
-      for (let index = 0; index < this.selectedVariantsFormatted.length; index++) {
-        var variant = this.selectedVariantsFormatted[index];
-        if (!variant.values.length) {
-          return false;
-        }
-      }
-
-      return true;
-    }
   },
   watch: {
     products: {
@@ -112,51 +76,9 @@ var app = new Vue({
         this.validateProducts();
       },
       deep: true
-    },
-    selected_variants: {
-      handler: function (curVal, oldVal) {
-        this.selectedVariantsFormatted = [];
-        for (let index = 0; index < this.selected_variants.length; index++) {
-          var sdVariants = this.selected_variants[index];
-          for (var i = 0; i < this.variants.length; i++) {
-            if ( sdVariants == this.variants[i].id ) { // 判断 variants id 是否相等
-              if (this.variants[i].allow_rename) { // 判断 variants 是否允许用户自定义
-                if ( typeof this.custom_variants[sdVariants] != 'undefined' ) { // 判断用户是否自定义过，如果保存过，则 push custom_variants 对应的值，没有则空数组
-                  this.selectedVariantsFormatted.push({ variantId: sdVariants, values: this.custom_variants[sdVariants] });
-                } else {
-                  this.selectedVariantsFormatted.push({ variantId: sdVariants, values: [] });
-                }
-              } else {
-                this.selectedVariantsFormatted.push({ variantId: sdVariants, values: this.variants[i].values });
-              }
-            }
-          }
-        }
-      },
-      deep: true
-    },
-
+    }
   },
   methods: {
-    addVariantValueToSelectVariant: function(value, variantId) {
-      for (let index = 0; index < this.selectedVariantsFormatted.length; index++) {
-        var variant = this.selectedVariantsFormatted[index];
-        if (variant.variantId == variantId) {
-          for (var i = 0; i < variant.values.length; i++) {
-            var _value = variant.values[i];
-            if (_value.variant_value_id == value.variant_value_id) {
-              variant.values.splice(i, 1);
-              return;
-            }
-          }
-          variant.values.push(Object.assign({}, value));
-          return;
-        }
-      }
-
-      this.selectedVariantsFormatted.push({ variantId: variantId, values: [Object.assign({}, value)] });
-    },
-
     getVariantTypeName: function (variantId) {
       for (let index = 0; index < this.variants.length; index++) {
         var variant = this.variants[index];
@@ -171,27 +93,6 @@ var app = new Vue({
         var variant = this.variants[index];
         if (variant.id == variantId) {
           return variant.values;
-        }
-      }
-      return [];
-    },
-
-    getFormattedVariantValues: function (variantId) {
-      for (let index = 0; index < this.selectedVariantsFormatted.length; index++) {
-        var variant = this.selectedVariantsFormatted[index];
-        if (variant.variantId == variantId) {
-          return variant.values;
-        }
-      }
-      return [];
-    },
-
-    isVariantSelected: function (variant_value_id, variantId) {
-      var _values = this.getFormattedVariantValues(variantId);
-      if ( typeof _values == 'undefined' || !_values.length ) return false;
-      for (var i = 0; i < _values.length; i++) {
-        if (_values[i].variant_value_id == variant_value_id) {
-          return true;
         }
       }
     },
@@ -227,10 +128,6 @@ var app = new Vue({
         this.products[index].validated = validated;
         this.products[index].error = error.join('/');
       }
-    },
-
-    imageSrc: function (image) {
-      return 'index.php?route=seller/product/thumb&image=' + image;
     },
 
     // 检查是否有重复的 variant 组合
@@ -293,30 +190,7 @@ var app = new Vue({
       }
 
       this.validateProducts();
-      ( this.isCurrentStep() ) ? this.currentStep = 2 : this.currentStep = 3;
-    },
-
-    // 点击上一步或下一步 跳转
-    isCurrentStep: function () {
-      var blotterAllow = 0;
-      for (let index = 0; index < this.selected_variants.length; index++) {
-        var sdVariants = this.selected_variants[index];
-        for (var i = 0; i < this.variants.length; i++) {
-          if ( this.variants[i].id == sdVariants ) {
-            blotterAllow += this.variants[i].allow_rename;
-          }
-        }
-      }
-      return blotterAllow;
-    },
-
-    // 在第二步中只显示允许用户自定义的 variant 列
-    isVariantList: function (variantId) {
-      for (var i = 0; i < this.variants.length; i++) {
-        if ( this.variants[i].id == variantId && this.variants[i].allow_rename ) {
-          return true;
-        }
-      }
+      this.isChooseTypeTabSelected = false;
     },
 
     deleteButtonClicked: function (row) {
@@ -395,7 +269,7 @@ var app = new Vue({
       }
 
       showConfirm(i18n.text_confirm_save, i18n.button_save_changes, i18n.button_cancel, function () {
-        var data = { products: app.products, selected: app.selected_variants, custom_variants: app.selectedVariantsFormatted };
+        var data = { products: app.products, selected: app.selected_variants };
 
         $.ajax({
           url: 'index.php?route=seller/product/variant_save&product_id=' + app.parentId,
@@ -445,7 +319,7 @@ var app = new Vue({
         var name = name;
 
         $.ajax({
-          url: 'index.php?route=catalog/variant/addGroup',
+          url: 'index.php?route=catalog/variant/addGroup&user_token=' + user_token,
           method: 'post',
           dataType: 'json',
           data: { name: name, variant_ids: variantIds },
@@ -479,7 +353,7 @@ var app = new Vue({
     removeVariantGroupButtonclicked: function (groupId, row) {
       showConfirm(i18n.text_confirm_delete_group, i18n.button_confirm_delete, i18n.button_cancel, function () {
         $.ajax({
-          url: 'index.php?route=seller/product/deleteGroup',
+          url: 'index.php?route=catalog/variant/deleteGroup&user_token=' + user_token,
           method: 'post',
           dataType: 'json',
           data: { group_id: groupId },

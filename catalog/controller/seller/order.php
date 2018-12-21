@@ -352,7 +352,7 @@ class ControllerSellerOrder extends Controller {
 		}
 
 		$order_info = $this->model_multiseller_order->getOrder($order_id);
-		print_r($order_info);exit();
+
 		if ($order_info) {
 			$this->load->language('seller/order');
 
@@ -536,15 +536,22 @@ class ControllerSellerOrder extends Controller {
 			$totals = $this->model_multiseller_order->getSubOrderTotals($this->request->get['order_id']);
 
 			foreach ($totals as $total) {
+				$tt                             = explode('&', $total['title']);
+                if (count($tt) == 3 && (int)$tt[1] > 0 ) {
+                    $title      = $tt[2];
+                }else{
+                	$title      = $total['title'];
+                }
 				$data['totals'][] = array(
-					'title' => $total['title'],
+					'title' => $title,
 					'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value'])
 				);
 			}
 
-			/*$comment 		 = !empty($order_info['comment']) ? json_decode($order_info['comment'],true) : [];
-			$data['comment'] = isset($comment[]) nl2br($order_info['comment']);*/
-print_r($data);exit();
+			$seller_id 		 = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+			$comment 		 = !empty($order_info['comment']) ? json_decode($order_info['comment'],true) : [];
+			$data['comment'] = isset($comment[$seller_id]) ? nl2br($comment[$seller_id]) : '';
+
 			$this->load->model('localisation/order_status');
 
 			$order_status_info = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);
