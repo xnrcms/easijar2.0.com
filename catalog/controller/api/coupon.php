@@ -58,6 +58,8 @@ class ControllerApiCoupon extends Controller {
 	                $value['discount'] 			= '-'.round($value['discount']).'%';
 	            }
 
+                $value['over_time']             = $overdue;
+                
 	            unset($value['type']);
 	            //unset($value['over_time']);
 	            unset($value['total']);
