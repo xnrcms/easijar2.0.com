@@ -261,7 +261,7 @@ class ControllerApiDispute extends Controller {
             default:  break;
         }
 
-        $return_info['status2']     = (int)$status2;
+        $return_info['status2']     = (string)$status2;
         $return_info['overtime']    = (int)$return_info['overtime'];
         $return_info['comment']     = $this->model_account_return->getReturnHistoryComment(['return_id'=>$return_id,'customer_id'=>$seller_id]);
 

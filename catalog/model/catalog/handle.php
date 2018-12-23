@@ -24,4 +24,30 @@ class ModelCatalogHandle extends Model {
     	$query = $this->db->query($sql);
       	return $query->row;
     }
+
+    public function get_options_description_total()
+    {
+    	$query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "option_description WHERE language_id = 2 AND option_id > 12");
+      	return $query->row['total'];
+    }
+
+    public function get_options_description_list($data)
+    {
+    	$sql 	= "SELECT option_id,name FROM " . DB_PREFIX . "option_description WHERE language_id = 2 AND option_id > 12";
+
+    	if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
+    	$query = $this->db->query($sql);
+      	return $query->row;
+    }
 }
