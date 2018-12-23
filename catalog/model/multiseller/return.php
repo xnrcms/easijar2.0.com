@@ -191,11 +191,11 @@ class ModelMultisellerReturn extends Model {
 		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$return_id . "', return_status_id = '" . (int)$return_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape(strip_tags($comment)) . "', date_added = NOW()");
 	}
 
-	public function addReturnHistoryForMs($return_id, $return_status_id, $proposal = 0,$return_reason_id = 0,$comment = '',$evidences = '',$utype = 0) {
+	public function addReturnHistoryForMs($return_id, $return_status_id, $proposal = 0,$return_reason_id = 0,$comment = '',$evidences = '',$customer_id = 0) {
 
 		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$return_status_id . "', date_modified = NOW() WHERE return_id = '" . (int)$return_id . "'");
 
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$return_id . "', return_status_id = '" . (int)$return_status_id . "', proposal = '" . (int)$proposal . "', comment = '" . $this->db->escape(strip_tags($comment)) . "',customer_id = '" . $this->customer->getId() . "',evidences = '" . $evidences . "',utype = '" . (int)$utype . "',return_reason_id = '" . (int)$return_reason_id . "', date_added = NOW()");
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$return_id . "', return_status_id = '" . (int)$return_status_id . "', proposal = '" . (int)$proposal . "', comment = '" . $this->db->escape(strip_tags($comment)) . "',customer_id = '" . (int)$customer_id . "',evidences = '" . $evidences . "',return_reason_id = '" . (int)$return_reason_id . "', date_added = NOW()");
 	}
 
 	public function getReturnHistories($return_id, $start = 0, $limit = 10) {

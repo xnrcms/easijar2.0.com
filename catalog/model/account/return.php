@@ -148,7 +148,7 @@ class ModelAccountReturn extends Model {
 
 	public function getReturnIdByOrderProductId($order_id = 0,$product_id = 0)
 	{
-		$query = $this->db->query("SELECT `return_id`,`return_status_id` FROM `" . DB_PREFIX . "return`WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$product_id . "' ORDER BY return_id DESC LIMIT 1 ");
+		$query = $this->db->query("SELECT `return_id`,`return_status_id` FROM `" . DB_PREFIX . "return` WHERE customer_id = '" . $this->customer->getId() . "' AND order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$product_id . "' ORDER BY return_id DESC LIMIT 1 ");
 
 		return isset($query->row['return_id']) ? (int)$query->row['return_id'] : 0;
 	}
@@ -157,5 +157,12 @@ class ModelAccountReturn extends Model {
 	{
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return_history`WHERE return_id = '" . (int)$return_id . "' AND return_status_id = 4");
 		return isset($query->row['total']) ? (int)$query->row['total'] : 0;
+	}
+
+	public function getReturnHistoryComment($data)
+	{
+		$query = $this->db->query("SELECT `comment` FROM `" . DB_PREFIX . "return_history` WHERE customer_id = '" . (int)$data['customer_id'] . "' AND return_id = '" . (int)$data['return_id'] . "' ORDER BY return_id DESC LIMIT 1 ");
+
+		return isset($query->row['comment']) ? $query->row['comment'] : '';
 	}
 }

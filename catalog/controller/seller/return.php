@@ -729,7 +729,7 @@ class ControllerSellerReturn extends Controller {
 			
 			if (!isset($json['error']) || empty($json['error'])) {
         		$this->model_multiseller_return->editReturnOvertime($return_id, ($overday > 0 ? (time() + 86400*$overday) : 0));
-                $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',1);
+                $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',$this->customer->getId());
 				$json['success'] = $this->language->get('text_success');
 			}
 		}

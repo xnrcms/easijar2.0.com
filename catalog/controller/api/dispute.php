@@ -90,7 +90,7 @@ class ControllerApiDispute extends Controller {
         $proposal                       = $returnData['is_service'] == 1 ? 6 : 7;
 
         $this->load->model('multiseller/return');
-        $this->model_multiseller_return->addReturnHistoryForMs($return_id, 1,$proposal,$return_reason_id, $comment, $evidences,0);
+        $this->model_multiseller_return->addReturnHistoryForMs($return_id, 1,$proposal,$return_reason_id, $comment, $evidences,$this->customer->getId());
 
         if ($order_status_id === 15) {
             //待发货状态 需要判断发货等待时间，如果距下单时间超过3天 自动处理退款
@@ -101,7 +101,7 @@ class ControllerApiDispute extends Controller {
             if ($days >= 86400*3) {
                 //自动添加一条商家处理记录 
                 $this->load->model('multiseller/return');
-                $this->model_multiseller_return->addReturnHistoryForMs($return_id, 10,'','', t('text_return_comment'),'',1);
+                $this->model_multiseller_return->addReturnHistoryForMs($return_id, 10,'','', t('text_return_comment'),'',$order_info['seller_id']);
                 
                 //商家承担手续费 2
                 $this->model_multiseller_return->editReturnResponsibility($return_id,2);
@@ -263,9 +263,9 @@ class ControllerApiDispute extends Controller {
 
         $return_info['status2']     = (int)$status2;
         $return_info['overtime']    = (int)$return_info['overtime'];
+        $return_info['comment']     = $this->model_account_return->getReturnHistoryComment(['return_id'=>$return_id,'customer_id'=>$seller_id]);
         $return_info                = array_merge($return_info,$order_info);
 
-        unset($return_info['comment']);
         unset($return_info['date_added']);
         unset($return_info['date_modified']);
         unset($return_info['return_reason_id']);
@@ -428,7 +428,7 @@ class ControllerApiDispute extends Controller {
         }
 
         $this->load->model('multiseller/return');
-        $this->model_multiseller_return->addReturnHistoryForMs($return_id, 8,8,$rinfo['return_reason_id']);
+        $this->model_multiseller_return->addReturnHistoryForMs($return_id, 8,8,$rinfo['return_reason_id'],'','',$this->customer->getId());
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'after sale application has been withdrawn']));
     }
