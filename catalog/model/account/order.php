@@ -486,7 +486,7 @@ class ModelAccountOrder extends Model {
         if ($order_type == 0) {
             $status_where       = "AND mssu.order_status_id > '0' ";
         }elseif ($order_type == 1) {
-            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' AND mssu.is_return = '0' ";
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' AND mssu.is_return <= 1 ";
         }elseif ($order_type == 2) {
 
             $unshipped_status = $this->config->get('config_paid_status');
@@ -495,16 +495,16 @@ class ModelAccountOrder extends Model {
                 $unshipped_status[] = $this->config->get('payment_cod_order_status_id');
             }
 
-            $status_where   = "AND mssu.order_status_id IN ('" . implode("','",$unshipped_status) . "') AND mssu.is_return = '0' ";
+            $status_where   = "AND mssu.order_status_id IN ('" . implode("','",$unshipped_status) . "') AND mssu.is_return <= 1 ";
         }elseif ($order_type == 3) {
-            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' ";
+            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' AND mssu.is_return <= 1 ";
         }elseif($order_type == 4){
             $order_statuses = $this->config->get('config_complete_status');
             foreach ($order_statuses as $order_status_id) {
                 $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
             }
 
-            $status_where   = "AND (" . implode(" OR ",$implode) . ") AND mssu.is_return = '0' ";
+            $status_where   = "AND (" . implode(" OR ",$implode) . ") ";
         }
 
         $fields         = format_find_field('order_id AS oid,date_added,currency_code,currency_value,fullname,date_added','o');

@@ -218,7 +218,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 	}
 
 	public function returnPay($payid,$amount,$currency)
-	{
+	{return [$payid,$amount,$currency];
 		if (empty($payid) || $amount <= 0 || empty($currency)) return 'fail';
 
 		$id 									= '8ac7a49f679c6d210167a175cdeb2992';

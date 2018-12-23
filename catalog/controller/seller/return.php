@@ -647,28 +647,88 @@ class ControllerSellerReturn extends Controller {
 				$json['error'] = $this->language->get('error_return_status');
 			}
 
-			//根据状态处理
-			switch ($return_status_id) {
-				case 2: //等待商品寄回
-					break;
-				case 3: //已退款
-				case 4: //拒绝
-				case 6://已收到退货，退款
-				case 10://退款中
-					# code...
-					break;
-				default:
-					$json['error'] = $this->language->get('error_return_status'); break;
+			if ($return_info['return_status_id'] == 3) {
+				$json['error'] = $this->language->get('error_return_status_3');
 			}
-			
+
+			//如果是平台处理中 则不能操作
+			if ($return_info['return_status_id'] == 9) {
+				$json['error'] = $this->language->get('error_return_status_9');
+			}
+
+			if ($return_info['return_status_id'] == 10) {
+				$json['error'] = $this->language->get('error_return_status_10');
+			}
+
 			$this->load->model('multiseller/order');
-        	$order_info            = $this->model_multiseller_order->getSuborderByCustomerIdForMs($return_info['order_id'],$return_info['seller_id'],$return_info['customer_id']);
+        	$order_info       = $this->model_multiseller_order->getSuborderByCustomerIdForMs($return_info['order_id'],$return_info['seller_id'],$return_info['customer_id']);
 
         	if (empty($return_info)) {
 				$json['error'] = $this->language->get('error_order_exists');
 			}
 
-			if (empty($json['error'])) {
+			if ( !isset($json['error']) || empty($json['error'])) {
+				
+				$overtime 		= 0;
+				$payment_code 	= isset($order_info['payment_code']) ? $order_info['payment_code'] : '';
+				//根据状态处理
+				switch ($return_status_id) {
+					case 2: //等待商品寄回
+						$overtime 		= 10;//提示用户10天内将物品寄回
+						break;
+					case 3: //已退款
+						$overtime 		= 0;
+					case 4: //拒绝
+						//判断拒绝次数 次数到达2次 需要上升平台仲裁
+						$this->load->model('account/return');
+						$refuse_nums    = $this->model_account_return->getReturnHistoryForRefuseNums($return_id);
+						if (($refuse_nums + 1) >= 2) {
+							$return_status_id 	= 9;//置为平台处理状态
+						}
+					case 6://已收到退货，退款
+						$return_status_id 	= 10;
+					case 10://退款中
+						//执行退款
+						$pay_code 		= isset($order_info['pay_code']) ? $order_info['pay_code'] : '';
+						$amount 		= isset($return_info['return_money']) ? $return_info['return_money'] : '';
+						$currency 		= isset($order_info['currency_code']) ? $order_info['currency_code'] : '';
+
+						if (empty($pay_code)) {
+							$json['error'] = $this->language->get('error_pay_code');
+						}
+
+						if (empty($currency)) {
+							$json['error'] = $this->language->get('error_pay_currency');
+						}
+
+						if ( !isset($json['error']) || empty($json['error'])) {
+							$res 		= $this->load->controller('extension/payment/' . $payment_code . '/returnPay',$pay_code,$amount,$currency);
+							if (empty($res) || $res == 'fail') {
+								$json['error'] = $this->language->get('error_return_api');
+							}else if ($res == 'success') {
+								//设置退款数量
+								$this->model_multiseller_order->setReturnByOrderProductId($return_info['product_id']);
+
+								//设置部分退款
+								$this->model_multiseller_order->setReturnByOrderSn($order_info['order_sn'],1);
+
+								$notReturn 	= $this->model_multiseller_order->getNotReturnCount($return_info['order_id'],$return_info['seller_id']);
+								if ($notReturn <= 0) {
+									//设置全部退款
+									$this->model_multiseller_order->setReturnByOrderSn($order_info['order_sn'],2);
+								}
+							}
+						}
+
+						break;
+					default:
+						$json['error'] = $this->language->get('error_return_status'); break;
+				}
+
+			}
+			
+			if (!isset($json['error']) || empty($json['error'])) {
+        		$this->model_multiseller_return->editReturnOvertime($return_id, ($overday > 0 ? (time() + 86400*$overday) : 0));
                 $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',1);
 				$json['success'] = $this->language->get('text_success');
 			}

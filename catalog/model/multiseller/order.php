@@ -394,11 +394,28 @@ class ModelMultisellerOrder extends Model {
 
         if ( $order_id <= 0 ||  $seller_id <= 0 ||  $customer_id <= 0 )  return [];
 
-        $fields         = format_find_field('order_id,date_added','o');
-        $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id','mssu');
+        $fields         = format_find_field('order_id,date_added,payment_code,currency_code','o');
+        $fields         .= ',' . format_find_field('suborder_id,order_sn,seller_id,total,order_status_id,pay_code','mssu');
 
         $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_suborder` mssu LEFT JOIN  `" . DB_PREFIX . "order` o ON (o.order_id = mssu.order_id) WHERE mssu.order_id = '" . $order_id . "'AND mssu.seller_id = '" . $seller_id . "' AND o.customer_id = '" . $customer_id . "' AND o.order_status_id > '0'");
 
         return $order_query->num_rows ? $order_query->row : [];
+    }
+
+    public function getNotReturnCount($order_id,$seller_id)
+    {
+    	$query = $this->db->query('SELECT COUNT(*) AS total FROM '.DB_PREFIX."ms_order_product WHERE is_return = '0' AND order_id = '".(int)$order_id."' AND seller_id = '" . (int)$seller_id . "'");
+
+        return $query->row['total'];
+    }
+
+    public function setReturnByOrderProductId($order_product_id)
+    {
+    	$this->db->query("UPDATE " . DB_PREFIX . "ms_order_product SET is_return = 1 WHERE order_product_id = '" . (int)$order_product_id . "'");
+    }
+
+    public function setReturnByOrderSn($order_sn,$is_return = 0)
+    {
+    	$this->db->query("UPDATE " . DB_PREFIX . "ms_suborder SET is_return = '" . $is_return . "' WHERE order_sn = '" . (string)$order_sn . "'");
     }
 }
