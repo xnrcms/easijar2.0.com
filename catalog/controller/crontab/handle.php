@@ -4,7 +4,36 @@ class ControllerCrontabHandle extends Controller {
 	//定时任务
 	public function index() 
 	{
+        $this->load->model('catalog/handle');
         
+        $req_data   = array_merge($this->request->get,$this->request->post);
+        $step       = (isset($req_data['step']) && (int)$req_data['step'] > 0) ? (int)$req_data['step'] : 0;
+
+        if ($step == 0) {
+            $this->session->data['handle_data']     = [];
+
+            //统计需要处理的商品数量
+            $totals   = $this->model_catalog_handle->get_product_option_value_total();
+
+            $this->session->data['handle_data']['totols']   = $totals;
+            $this->response->redirect($this->url->link('crontab/handle','step=1'));
+        }else if ($step == 1) {
+            $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+            $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 1;
+
+            $filter_data = [
+                'start'                     => ($page - 1) * $limit,
+                'limit'                     => $limit
+            ];
+
+            //需要处理的商品列表
+            //$product_info                   = $this->model_catalog_handle->get_product_option_value_list($filter_data);
+            /*echo $this->url->link('crontab/handle','step=1&page=' . ($page + 1));exit();
+            print_r($product_info);*/
+            $this->response->redirect($this->url->link('crontab/handle','step=1&page=' . ($page + 1)));exit();
+        }
+
+        print_r($this->session->data['handle_data']);exit();
         echo "string";exit();
     }
 

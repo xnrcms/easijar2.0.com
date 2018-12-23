@@ -67,7 +67,7 @@ class ModelAccountReturn extends Model {
 	}
 
 	public function getReturnForMs($return_id) {
-		$fields 		= format_find_field('return_id,order_id,fullname,email,telephone,product,model,image,quantity,return_status_id,seller_id,comment,date_ordered,date_added,date_modified,return_reason_id,overtime,is_service','r');
+		$fields 		= format_find_field('return_id,order_id,product_id,fullname,email,telephone,product,model,image,quantity,return_status_id,seller_id,comment,date_ordered,date_added,date_modified,return_reason_id,overtime,is_service','r');
 		$fields 		.= ",(SELECT rr.name FROM " . get_tabname('return_reason') . " rr WHERE rr.return_reason_id = r.return_reason_id AND rr.language_id = '" . (int)$this->config->get('config_language_id') . "') AS reason";
 		$fields 		.= ",(SELECT ra.name FROM " . get_tabname('return_action') . " ra WHERE ra.return_action_id = r.return_action_id AND ra.language_id = '" . (int)$this->config->get('config_language_id') . "') AS action";
 		$fields 		.= ",(SELECT rs.name FROM " . get_tabname('return_status') . " rs WHERE rs.return_status_id = r.return_status_id AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status";

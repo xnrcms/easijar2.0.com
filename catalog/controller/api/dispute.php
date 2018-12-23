@@ -264,7 +264,24 @@ class ControllerApiDispute extends Controller {
         $return_info['status2']     = (int)$status2;
         $return_info['overtime']    = (int)$return_info['overtime'];
         $return_info['comment']     = $this->model_account_return->getReturnHistoryComment(['return_id'=>$return_id,'customer_id'=>$seller_id]);
-        $return_info                = array_merge($return_info,$order_info);
+
+        //获取商品信息 计算最多能退多少钱
+        $this->load->model('account/order');
+
+        $product_info                   = $this->model_account_order->getOrderProductForMsByOrderProductId($return_info['product_id']);
+        if (empty($product_info) || !((int)$product_info['seller_id'] > 0 && (int)$product_info['seller_id'] === $seller_id)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
+        }
+
+        $return_shipping                = $this->get_return_money($return_info['order_id'],$return_info['seller_id'],$return_info['quantity']);
+        $total                          = $product_info['total'];
+        $currency_code                  = $product_info['currency_code'];
+        $currency_value                 = $product_info['currency_value'];
+        $return_money                   = $total + $return_shipping;
+
+        $return_info['return_money']    = $this->currency->format($return_money, $currency_code, $currency_value, $this->session->data['currency']);
+        
+        $return_info                    = array_merge($return_info,$order_info);
 
         unset($return_info['date_added']);
         unset($return_info['date_modified']);
