@@ -383,6 +383,7 @@ class ControllerApiDispute extends Controller {
         }
 
         $this->load->model('account/return');
+        $this->load->model('tool/image');
 
         //获取申请信息
         $rinfo                          = $this->model_account_return->getReturnForMs($return_id);
@@ -396,8 +397,13 @@ class ControllerApiDispute extends Controller {
         $return_info['return_id']       = $rinfo['return_id'];
         $return_info['seller_id']       = $rinfo['seller_id'];
 
+        foreach ($return_history as $key => $value) {
+            $return_history[$key]['avatar']     = $this->model_tool_image->resize($this->customer->getAvatar($value['customer_id']), 100, 100);
+        }
+
         $json['return_info']            = $return_info;
         $json['return_history']         = $return_history;
+        
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 

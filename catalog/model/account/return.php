@@ -128,7 +128,7 @@ class ModelAccountReturn extends Model {
 			$limit = 20;
 		}
 
-		$query = $this->db->query("SELECT rh.`return_history_id`,rh.`return_status_id`,rh.`comment`,rh.`evidences`,rac.`name`,rh.`date_added`,cus.`email`,cus.`fullname` FROM " . get_tabname('return_history') . " rh LEFT JOIN " . get_tabname('return_status') . " rs ON (rh.return_status_id = rs.return_status_id) LEFT JOIN " . get_tabname('return_action') . " rac ON (rac.return_action_id = rh.proposal) LEFT JOIN " . get_tabname('customer') . " cus ON (cus.customer_id = rh.customer_id) WHERE rh.return_id = '" . (int)$return_id . "' AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "' AND rac.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY rh.return_history_id DESC LIMIT " . (int)$start . "," . (int)$limit);
+		$query = $this->db->query("SELECT rh.`return_history_id`,rh.`return_status_id`,rh.`comment`,rh.`evidences`,rh.`date_added`,rh.`customer_id`,cus.`email`,cus.`fullname` FROM " . get_tabname('return_history') . " rh LEFT JOIN " . get_tabname('return_status') . " rs ON (rh.return_status_id = rs.return_status_id) LEFT JOIN " . get_tabname('customer') . " cus ON (cus.customer_id = rh.customer_id) WHERE rh.return_id = '" . (int)$return_id . "' AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "' AND rac.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY rh.return_history_id DESC LIMIT " . (int)$start . "," . (int)$limit);
 
 		return $query->rows;
 	}
