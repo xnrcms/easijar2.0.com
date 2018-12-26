@@ -355,6 +355,7 @@ class ControllerApiDispute extends Controller {
     public function return_history()
     {
         $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('account/return');
 
         $allowKey       = ['api_token','return_id'];
         $req_data       = $this->dataFilter($allowKey);
@@ -396,14 +397,26 @@ class ControllerApiDispute extends Controller {
         $return_info                    = [];
         $return_info['return_id']       = $rinfo['return_id'];
         $return_info['seller_id']       = $rinfo['seller_id'];
+        $return_info['is_receive']      = $rinfo['is_receive'];
 
         foreach ($return_history as $key => $value) {
             $return_history[$key]['avatar']     = $this->model_tool_image->resize($this->customer->getAvatar($value['customer_id']), 100, 100);
+
+            $evidences_img              = !empty($value['evidences']) ? explode(',', $value['evidences']) : [];
+            $evidences                  = [];
+            foreach ($evidences_img as $evidences_val) {
+                if (!empty($evidences_val)) {
+                    $evidences[] = $this->model_tool_image->resize($evidences_val, 100, 100);
+                }
+            }
+
+            $return_history[$key]['evidences']      = $evidences;
+            $return_history[$key]['receive_text']   =  in_array((int)$rinfo['is_receive'], [1,2]) ? t('text_return_receive'.(int)$rinfo['is_receive']) : '';
         }
 
         $json['return_info']            = $return_info;
         $json['return_history']         = $return_history;
-        
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 

@@ -21,6 +21,8 @@ $_['text_history']       = 'Return History';
 $_['text_no_results']    = 'You have not made any previous returns!';
 $_['text_agree']         = 'I have read and agree to the <a href="%s" class="agree"><b>%s</b></a>';
 $_['text_return_comment'] = "Seller didn't ship the items, full refund.";
+$_['text_return_receive1'] 	= 'Only Refunds';
+$_['text_return_receive2'] 	= ' Return goods & Refund';
 
 // Column
 $_['column_return_id']   = 'Return ID';

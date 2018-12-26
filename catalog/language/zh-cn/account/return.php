@@ -29,6 +29,8 @@ $_['text_history']       = '退换记录';
 $_['text_no_results']    = '您还没有退换记录！';
 $_['text_agree']         = '我已经阅读并同意 <a href="%s" class="agree"><b>%s</b></a>';
 $_['text_return_comment'] = '超时未发货，自动退款';
+$_['text_return_receive1'] 	= '仅退款';
+$_['text_return_receive2'] 	= '退货退款';
 
 // Column
 $_['column_return_id']   = '退货 ID';

@@ -174,8 +174,8 @@ class ControllerCrontabHandle extends Controller {
         if ($this->string_type($str) == 'allen') return '';
 
         //开始翻译
-        $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['inputStr'=>$str]);
-
+        $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['d'=>'en','q'=>$str,'s'=>'zh-cn']);
+        
     }
 
     private function handle_product_info($product_id,$product,$product_desc,$category)

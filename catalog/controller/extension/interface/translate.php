@@ -10,7 +10,7 @@ class ControllerExtensionInterfaceTranslate extends Controller {
 		$apiurl 			= "https://trans.xiaohuaerai.com/trans";
 
 	    $headers 			= [];
-	    $appcode 			= "5585fe873958491eb7de4b4f6c90d427";
+	    $appcode 			= "c8fab8ba97dc49b896c2daf7ca91ae3e";
 	    array_push($headers, "Authorization:APPCODE " . $appcode);
 
 	    //根据API的要求，定义相对应的Content-Type
@@ -22,7 +22,7 @@ class ControllerExtensionInterfaceTranslate extends Controller {
 	    $parame['s'] 		= $data['s'];
 
 		$data 				= curl_http($apiurl,$parame,'POST',$headers);
-		
+		wr($data);
 		return $data;
 	}
 
