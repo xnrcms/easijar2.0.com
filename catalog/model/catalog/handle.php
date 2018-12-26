@@ -63,9 +63,9 @@ class ModelCatalogHandle extends Model {
       	return $query->row['total'];
     }
 
-    public function get_variant_description_list($language_id = 1)
+    public function get_variant_description_list($data)
     {
-    	$sql 	= "SELECT variant_id,name FROM " . DB_PREFIX . "variant_description WHERE language_id = '" . (int)$language_id . "'";
+    	$sql 	= "SELECT variant_id,name FROM " . DB_PREFIX . "variant_description WHERE language_id = '" . (int)$data['language_id'] . "'";
 
     	if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -102,6 +102,13 @@ class ModelCatalogHandle extends Model {
         }
 
         return $variant_id;
+    }
+
+    public function update_variant_description_name($variant_id = 0,$language_id = 0,$name = '')
+    {
+    	if ((int)$variant_id <= 0 || $language_id <= 0 || empty($name))  return;
+
+    	$this->db->query("UPDATE `" . DB_PREFIX . "variant_description` SET name = '" . $this->db->escape($name) . "' WHERE variant_id = '" . (int)$variant_id . "' AND language_id = '" . (int)$language_id . "'");
     }
 
     public function get_option_value_description_list($data)
@@ -171,13 +178,6 @@ class ModelCatalogHandle extends Model {
     {
     	$query = $this->db->query("SELECT category_id FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
     	return $query->rows;
-    }
-
-    public function update_product($product_id)
-    {
-    	if ((int)$product_id <= 0)  return;
-
-    	$this->db->query("UPDATE `" . DB_PREFIX . "product` SET sku = '" . $this->get_sku((int)$product_id) . "' WHERE product_id = '" . (int)$product_id . "'");
     }
 
     public function get_sku($product_id)

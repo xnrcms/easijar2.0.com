@@ -122,15 +122,20 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 3) {//处理属性翻译
+            $language_id                    = 1;
+            $filter_data['language_id']     = $language_id;
             $variant_info                   = $this->model_catalog_handle->get_variant_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['vtotals'] - $limit * $page);
             $remainder1                     = $this->session->data['handle_data']['vtotals'] - $remainder;
-            $option_id                      = $variant_info['variant_id'];
+            $variant_id                     = $variant_info['variant_id'];
 
             if ($remainder > 0) {
 
                 if (!empty($variant_info)) {
-                   $this->handle_translate($variant_info['name']);
+                   $name = $this->handle_translate($variant_info['name']);
+                   if (!empty($name)) {
+                        $this->model_catalog_handle->update_variant_description_name($variant_id,$language_id,$name);
+                   }
                 }
 
                 $page ++;
@@ -139,7 +144,19 @@ class ControllerCrontabHandle extends Controller {
             }
 
             $this->echo_log([
-                'handle_name'=>'商品选项属性转换',
+                'handle_name'=>'商品属性中文翻译',
+                'handle_num1'=>$this->session->data['handle_data']['vtotals'],
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'属性名称：'.$variant_info['name'] . '(属性ID：' . $variant_info['variant_id'] . ')',
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        }else if ($step == 4) {
+            echo "处理完成";exit();
+            $this->echo_log([
+                'handle_name'=>'商品信息中文翻译',
                 'handle_num1'=>$this->session->data['handle_data']['ototals'],
                 'handle_num2'=>$remainder1,
                 'handle_num3'=>$remainder,
@@ -147,35 +164,37 @@ class ControllerCrontabHandle extends Controller {
                 'handle_time'=>(time()-$ini_time) . '秒',
             ]);
 
-            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+            //$this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        }else if ($step == 5) {
+            echo "处理完成";exit();
         }
-
-        echo "处理完成";exit();
     }
 
+    //1:纯英文;2:纯中文;3:中英文混合
     private function string_type($str)
     {
-        $allen = preg_match("/^[^/x80-/xff]+$/", $str);   //判断是否是英文
-        $allcn = preg_match("/^[".chr(0xa1)."-".chr(0xff)."]+$/",$str);  //判断是否是中文
-        if($allen){ 
-              return 'allen'; 
-        }else{ 
-              if($allcn){ 
-                   return 'allcn'; 
-              }else{ 
-                   return 'encn'; 
-              } 
-        }
+        $m      = mb_strlen($str,'utf-8');
+        $s      = strlen($str);
+
+        if(trim($str)=='') return 0;
+        if($s==$m) return 1;
+        if ($s%$m==0&&$s%3==0) return 2;
+
+        return 3;
     }
 
     private function handle_translate($str)
     {
         if (empty($str) || strlen($str) <= 0)  return '';
-        if ($this->string_type($str) == 'allen') return '';
-
+        if ($this->string_type($str) === 1){
+            wr(['en'=>$str]);
+            return '';
+        }
+        wr(['zh'=>$str]);
         //开始翻译
         $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['d'=>'en','q'=>$str,'s'=>'zh-cn']);
-        
+
+        return !empty($outputStr) ? ucfirst($outputStr) : $str;
     }
 
     private function handle_product_info($product_id,$product,$product_desc,$category)

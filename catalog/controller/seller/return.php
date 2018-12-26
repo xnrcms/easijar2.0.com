@@ -734,6 +734,7 @@ class ControllerSellerReturn extends Controller {
 			if (!isset($json['error']) || empty($json['error'])) {
 				
 				if ($is_platform == 1) {
+        			$this->model_multiseller_return->editReturnIsPlatform($return_id, 1);
                 	$this->model_multiseller_return->addReturnHistoryForMs($return_id, 9,'','', '平台介入处理','',$this->customer->getId());
 				}
 

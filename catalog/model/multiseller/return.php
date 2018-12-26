@@ -29,6 +29,10 @@ class ModelMultisellerReturn extends Model {
 		return $query->row;
 	}
 
+	public function editReturnIsPlatform( $return_id = 0,$is_platform = 0 ){
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `is_platform` = '" . (int)$is_platform . "' WHERE return_id = '" . (int)$return_id . "'");
+	}
+	
 	public function editReturnOvertime( $return_id = 0,$overtime = 0 ){
 		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `overtime` = '" . (int)$overtime . "' WHERE return_id = '" . (int)$return_id . "'");
 	}
