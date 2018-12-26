@@ -57,10 +57,38 @@ class ModelCatalogHandle extends Model {
     	return $query->row;
     }
 
-    public function get_variant_descriptions($name)
+    public function get_variant_description_total($language_id = 1)
     {
-    	$query = $this->db->query("SELECT variant_id,name FROM " . DB_PREFIX . "variant_description WHERE language_id = 2 AND name = '" . $name . "'");
-    	return $query->rows;
+    	$query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "variant_description WHERE language_id = '" . (int)$language_id . "'");
+      	return $query->row['total'];
+    }
+
+    public function get_variant_description_list($language_id = 1)
+    {
+    	$sql 	= "SELECT variant_id,name FROM " . DB_PREFIX . "variant_description WHERE language_id = '" . (int)$language_id . "'";
+
+    	if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
+    	$query = $this->db->query($sql);
+
+      	return $query->row;
+    }
+
+    public function update_product($product_id)
+    {
+    	if ((int)$product_id <= 0)  return;
+
+    	$this->db->query("UPDATE `" . DB_PREFIX . "product` SET sku = '" . $this->get_sku((int)$product_id) . "' WHERE product_id = '" . (int)$product_id . "'");
     }
 
     public function add_variant($data)

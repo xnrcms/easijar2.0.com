@@ -335,7 +335,7 @@ class ControllerApiDispute extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info')]));
         }
 
-        if ($return_info['return_status_id'] != 1) {
+        if ($return_info['return_status_id'] != 1 && $return_info['return_status_id'] != 4) {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_return_info_status')]));
         }
 

@@ -638,6 +638,7 @@ class ControllerSellerReturn extends Controller {
 			$return_id 				= isset($this->request->get['return_id']) ? (int)$this->request->get['return_id'] : 0;
 			$return_status_id 		= isset($this->request->post['return_status_id']) ? (int)$this->request->post['return_status_id'] : 0;
 			$return_info 			= $this->model_multiseller_return->getReturn($return_id);
+			$is_platform 			= 0;
 
 			if (empty($return_info)) {
 				$json['error'] = $this->language->get('error_return_exists');
@@ -684,7 +685,8 @@ class ControllerSellerReturn extends Controller {
 						$this->load->model('account/return');
 						$refuse_nums    = $this->model_account_return->getReturnHistoryForRefuseNums($return_id);
 						if (($refuse_nums + 1) >= 2) {
-							$return_status_id 	= 9;//置为平台处理状态
+							$is_platform 	= 1;//置为平台处理状态
+							$overtime 		= 0;
 						}
 						break;
 					case 6://已收到退货，退款
@@ -730,8 +732,14 @@ class ControllerSellerReturn extends Controller {
 			}
 			
 			if (!isset($json['error']) || empty($json['error'])) {
+				
         		$this->model_multiseller_return->editReturnOvertime($return_id, ($overtime > 0 ? (time() + 86400*$overtime) : 0));
                 $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',$this->customer->getId());
+
+                if ($is_platform == 1) {
+                	$this->model_multiseller_return->addReturnHistoryForMs($return_id, 9,'','', '平台介入处理','',$this->customer->getId());
+				}
+
 				$json['success'] = $this->language->get('text_success');
 			}
 		}

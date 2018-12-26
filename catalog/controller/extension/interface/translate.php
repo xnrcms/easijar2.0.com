@@ -22,6 +22,7 @@ class ControllerExtensionInterfaceTranslate extends Controller {
 	    $parame['s'] 		= $data['s'];
 
 		$data 				= curl_http($apiurl,$parame,'POST',$headers);
+		
 		return $data;
 	}
 
