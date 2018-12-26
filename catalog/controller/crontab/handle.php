@@ -28,6 +28,10 @@ class ControllerCrontabHandle extends Controller {
             $this->session->data['handle_data']['ototals']   = $ototals;
             $this->session->data['handle_data']['data']      = ['ok'=>0];
             
+            $this->echo_log([
+                'handle_name'=>'处理数据准备中'
+            ]);
+
             $this->jumpurl($this->url->link('crontab/handle','step=1'));
         }else if ($step == 2) {//处理商品
             
@@ -37,9 +41,6 @@ class ControllerCrontabHandle extends Controller {
             $remainder1                     = $this->session->data['handle_data']['ptotals'] - $remainder;
             $is_save                        = $remainder > 0 ? true : false;
             $ok                             = $remainder > 0 ? 0 : 1;
-
-            $log      = ['premainder1'=>$remainder1,'premainder'=>$remainder,'product_info'=>$product_info['product_id'] . '(' . $product_info['total'] . ')','ok'=>$ok];
-            $this->echo_log(array_merge($log,$this->session->data['handle_data']['data']),$is_save);
 
             if ($remainder > 0) {
 
@@ -65,8 +66,22 @@ class ControllerCrontabHandle extends Controller {
                 }
 
                 $this->handle_product_info($product_info['product_id'],$save_data1,$save_data2,$save_data3);
-                $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . ($page + 1)));
+
+                $page ++;
+            }else{
+                $step ++;
             }
+
+            $this->echo_log([
+                'handle_name'=>'商品子商品添加',
+                'handle_num1'=>$this->session->data['handle_data']['ptotals'],
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'主商品ID：'.$product_info['product_id'] . '(子产品数：' . $product_info['total'] . ')',
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 1) {//处理属性
             $option_info                    = $this->model_catalog_handle->get_options_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['ototals'] - $limit * $page);
@@ -90,24 +105,23 @@ class ControllerCrontabHandle extends Controller {
                 }
 
                 $page ++;
-                $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . ($page + 1)));
             }else{
                 $step ++;
-                $this->jumpurl($this->url->link('crontab/handle','step=' . ($step+1) . '&page=1'));
             }
 
             $this->echo_log([
                 'handle_name'=>'商品选项属性转换',
                 'handle_num1'=>$this->session->data['handle_data']['ototals'],
                 'handle_num2'=>$remainder1,
-                'handle_num2'=>$remainder,
-                'handle_info'=>$option_info['name'] . '(' . $option_info['option_id'] . ')',
-                'handle_time'=>$remainder,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'属性名称：'.$option_info['name'] . '(属性ID：' . $option_info['option_id'] . ')',
+                'handle_time'=>(time()-$ini_time) . '秒',
             ]);
 
-            $this->jumpurl($this->url->link('crontab/handle','step=' . ($step+1) . '&page=1'));
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 3) {//处理翻译
-            # code...
+            //先处理属性翻译
+            
         }
 
         echo "处理完成";exit();
@@ -192,10 +206,6 @@ class ControllerCrontabHandle extends Controller {
 
         if (isset($data['ok']) && $data['ok'] == 1) {
             $this->model_catalog_handle->clear_table();
-        }
-
-        if (!$is_save) {
-            $this->session->data['handle_data']['data']     = $data; return;
         }
 
         echo "      处理内容：" . (isset($data['handle_name']) ? $data['handle_name'] : '') . '<br>';

@@ -57,6 +57,12 @@ class ModelCatalogHandle extends Model {
     	return $query->row;
     }
 
+    public function get_variant_descriptions($name)
+    {
+    	$query = $this->db->query("SELECT variant_id,name FROM " . DB_PREFIX . "variant_description WHERE language_id = 2 AND name = '" . $name . "'");
+    	return $query->rows;
+    }
+
     public function add_variant($data)
     {
         $this->db->query("INSERT INTO `" . DB_PREFIX . "variant` SET allow_rename = '0', sort_order = '1'");
