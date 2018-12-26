@@ -30,6 +30,10 @@ class ModelSaleReturn extends Model {
 			$implode[] = "r.return_id = '" . (int)$data['filter_return_id'] . "'";
 		}
 
+		if (!empty($data['filter_is_platform'])) {
+			$implode[] = "r.is_platform = '" . (int)$data['filter_is_platform'] . "'";
+		}
+
 		if (!empty($data['filter_order_id'])) {
 			$implode[] = "r.order_id = '" . (int)$data['filter_order_id'] . "'";
 		}
@@ -109,6 +113,10 @@ class ModelSaleReturn extends Model {
 
 		if (!empty($data['filter_return_id'])) {
 			$implode[] = "r.return_id = '" . (int)$data['filter_return_id'] . "'";
+		}
+
+		if (!empty($data['filter_is_platform'])) {
+			$implode[] = "r.is_platform = '" . (int)$data['filter_is_platform'] . "'";
 		}
 
 		if (!empty($data['filter_customer'])) {

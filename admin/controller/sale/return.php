@@ -345,6 +345,7 @@ class ControllerSaleReturn extends Controller {
 			'filter_return_status_id' => $filter_return_status_id,
 			'filter_date_added'       => $filter_date_added,
 			'filter_date_modified'    => $filter_date_modified,
+			'filter_is_platform'      => 1,
 			'sort'                    => $sort,
 			'order'                   => $order,
 			'start'                   => ($page - 1) * $this->config->get('config_limit_admin'),
