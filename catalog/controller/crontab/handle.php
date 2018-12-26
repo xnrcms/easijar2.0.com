@@ -10,7 +10,8 @@ class ControllerCrontabHandle extends Controller {
         $step               = (isset($req_data['step']) && (int)$req_data['step'] > 0) ? (int)$req_data['step'] : 0;
         $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
         $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 1;
-        
+        $ini_time           = time();
+
         $filter_data        = [
             'start'    => ($page - 1) * $limit,
             'limit'    => $limit
@@ -27,8 +28,6 @@ class ControllerCrontabHandle extends Controller {
             $this->session->data['handle_data']['ototals']   = $ototals;
             $this->session->data['handle_data']['data']      = ['ok'=>0];
             
-            $this->echo_log();
-
             $this->jumpurl($this->url->link('crontab/handle','step=1'));
         }else if ($step == 2) {//处理商品
             
@@ -75,9 +74,6 @@ class ControllerCrontabHandle extends Controller {
             $is_save                        = $remainder > 0 ? true : false;
             $option_id                      = $option_info['option_id'];
 
-            $log    = ['oremainder1'=>$remainder1,'oremainder'=>$remainder,'option_info'=>$option_info['name'] . '(' . $option_info['option_id'] . ')'];
-            $this->echo_log(array_merge($log,$this->session->data['handle_data']['data']),$is_save);
-
             if ($remainder > 0) {
 
                 if (!empty($option_info)) {
@@ -93,10 +89,23 @@ class ControllerCrontabHandle extends Controller {
                     $this->handle_variant($variant_id,$option_id,true);
                 }
 
+                $page ++;
                 $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . ($page + 1)));
             }else{
+                $step ++;
                 $this->jumpurl($this->url->link('crontab/handle','step=' . ($step+1) . '&page=1'));
             }
+
+            $this->echo_log([
+                'handle_name'=>'商品选项属性转换',
+                'handle_num1'=>$this->session->data['handle_data']['ototals'],
+                'handle_num2'=>$remainder1,
+                'handle_num2'=>$remainder,
+                'handle_info'=>$option_info['name'] . '(' . $option_info['option_id'] . ')',
+                'handle_time'=>$remainder,
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . ($step+1) . '&page=1'));
         }else if ($step == 3) {//处理翻译
             # code...
         }
@@ -189,15 +198,12 @@ class ControllerCrontabHandle extends Controller {
             $this->session->data['handle_data']['data']     = $data; return;
         }
 
-        echo "        处理进度：" . (isset($data['ok']) && $data['ok'] == 1 ? '已完成' : '处理中') . '<br>';
-        echo "      需整理产品：" . $this->session->data['handle_data']['ptotals'] . '<br>';
-        echo "      已处理产品：" . (isset($data['premainder1']) ? $data['premainder1'] : 0) . '<br>';
-        echo "      未处理产品：" . (isset($data['premainder']) ? (int)$data['premainder'] : $this->session->data['handle_data']['ptotals']) . '<br>';
-        echo "    当前处理产品：" . (isset($data['product_info']) ? $data['product_info'] : 0) . '<br>';
-        echo "      需整理属性：" . $this->session->data['handle_data']['ototals'] . '<br>';
-        echo "      已处理属性：" . (isset($data['oremainder1']) ? (int)$data['oremainder1'] : 0) . '<br>';
-        echo "      未处理属性：" . (isset($data['oremainder']) ? $data['oremainder'] : $this->session->data['handle_data']['ototals']) . '<br>';
-        echo "    当前处理属性：" . (isset($data['option_info']) ? $data['option_info'] : '') . '<br>';
+        echo "      处理内容：" . (isset($data['handle_name']) ? $data['handle_name'] : '') . '<br>';
+        echo "      处理总数：" . (isset($data['handle_num1']) ? $data['handle_num1'] : 0) . '<br>';
+        echo "      已处理输：" . (isset($data['handle_num2']) ? $data['handle_num2'] : 0) . '<br>';
+        echo "      未处理数：" . (isset($data['handle_num3']) ? $data['handle_num3'] : 0) . '<br>';
+        echo "      当前处理：" . (isset($data['handle_info']) ? $data['handle_info'] : '') . '<br>';
+        echo "      处理耗时：" . (isset($data['handle_time']) ? $data['handle_time'] : '');
     }
 
     private function jumpurl($url)

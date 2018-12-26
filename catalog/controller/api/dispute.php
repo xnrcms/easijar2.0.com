@@ -291,7 +291,6 @@ class ControllerApiDispute extends Controller {
         unset($return_info['email']);
         unset($return_info['fullname']);
         unset($return_info['order_id']);
-        unset($return_info['order_status_id']);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$return_info]));
     }
