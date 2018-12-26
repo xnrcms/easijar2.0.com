@@ -280,14 +280,6 @@ class ControllerCatalogVariant extends Controller {
 			$data['variant_description'] = array();
 		}
 
-		if (isset($this->request->post['allow_rename'])) {
-			$data['allow_rename'] = $this->request->post['allow_rename'];
-		} elseif (!empty($variant_info)) {
-			$data['allow_rename'] = $variant_info['allow_rename'];
-		} else {
-			$data['allow_rename'] = '';
-		}
-
 		if (isset($this->request->post['sort_order'])) {
 			$data['sort_order'] = $this->request->post['sort_order'];
 		} elseif (!empty($variant_info)) {

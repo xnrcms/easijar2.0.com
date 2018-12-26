@@ -1397,7 +1397,8 @@ class ControllerCatalogProduct extends Controller {
 
         if (!$this->error) {
             foreach ($this->request->post['selected'] as $product_id) {
-                if (\Models\Product::find($product_id)->isMaster()) {
+                $product = \Models\Product::find($product_id);
+                if ($product->isMaster() && count($product->getChildrenIds()) > 1) {
                     $this->error['warning'] = $this->language->get('error_master_cannot_delete');
                 }
             }
@@ -2020,7 +2021,6 @@ class ControllerCatalogProduct extends Controller {
         $data = $this->loadVariantData();
         $data['json'] = array(
             'variants' => array_get($data, 'variants', []),
-            'custom_variants' => array_get($data, 'custom_variants', []),
             'variant_groups' => array_get($data, 'variant_groups', []),
             'selected_variants' => array_get($data, 'selected_variants', []),
             'products' => array_get($data, 'products', [])

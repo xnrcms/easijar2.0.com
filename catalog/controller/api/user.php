@@ -354,10 +354,10 @@ class ControllerApiUser extends Controller {
 			return ['msg'=>$this->language->get('error_confirm')];
 		}
 
-        $keys 										= md5('smscode-' . $req_data['email'] . '-1');
+        /*$keys 										= md5('smscode-' . $req_data['email'] . '-1');
 		if ((utf8_strlen(html_entity_decode($req_data['verification_code'], ENT_QUOTES, 'UTF-8')) != 6) || !isset($this->session->data['smscode'][$keys]) || $req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] ||  $this->session->data['smscode'][$keys]['expiry_time'] < time()){
 			return ['msg'=>$this->language->get('error_smscode')];
-		}
+		}*/
 
 		if (array_get($req_data, 'email') && ((utf8_strlen($req_data['email']) > 96) || !filter_var($req_data['email'], FILTER_VALIDATE_EMAIL))) {
 			return ['msg'=>$this->language->get('error_email')];

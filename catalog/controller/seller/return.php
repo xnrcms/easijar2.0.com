@@ -678,6 +678,7 @@ class ControllerSellerReturn extends Controller {
 						break;
 					case 3: //已退款
 						$overtime 		= 0;
+						break;
 					case 4: //拒绝
 						//判断拒绝次数 次数到达2次 需要上升平台仲裁
 						$this->load->model('account/return');
@@ -685,6 +686,7 @@ class ControllerSellerReturn extends Controller {
 						if (($refuse_nums + 1) >= 2) {
 							$return_status_id 	= 9;//置为平台处理状态
 						}
+						break;
 					case 6://已收到退货，退款
 						$return_status_id 	= 10;
 					case 10://退款中
@@ -728,7 +730,7 @@ class ControllerSellerReturn extends Controller {
 			}
 			
 			if (!isset($json['error']) || empty($json['error'])) {
-        		$this->model_multiseller_return->editReturnOvertime($return_id, ($overday > 0 ? (time() + 86400*$overday) : 0));
+        		$this->model_multiseller_return->editReturnOvertime($return_id, ($overtime > 0 ? (time() + 86400*$overtime) : 0));
                 $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',$this->customer->getId());
 				$json['success'] = $this->language->get('text_success');
 			}

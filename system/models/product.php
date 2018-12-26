@@ -43,24 +43,11 @@ class Product extends Base
         $childProductIds = $this->children()->pluck('product_id')->toArray();
         $childProductIds[] = $this->product_id;
         $requestProducts = array_get($data, 'products');
-        $customVariants = array_get($data, 'custom_variants');
 
         if (empty($requestProducts)) {
             $removeProductIds = $childProductIds;
         } else {
             foreach ($data['products'] as $item) {
-                foreach ($item['variants'] as $variant_id => $variant_value_id) {
-                    $newValue = array();
-                    foreach ($customVariants as $customVariant){
-                        foreach ($customVariant['values'] as $customVariantValue){
-                            if($variant_id == $customVariant['variantId'] && $variant_value_id == $customVariantValue['variant_value_id']) {
-                                $newValue = $customVariantValue;
-                            }
-                        }
-                    }
-                    $item['variants'][$variant_id] = $newValue;
-                }
-
                 $productId = $item['product_id'];
                 if ($productId && in_array($productId, $childProductIds)) {
                     $requestProductIds[] = $productId;
@@ -85,18 +72,13 @@ class Product extends Base
             return;
         }
         $this->variants()->delete();
-        foreach ($variants as $variantId => $value) {
-            $variantValueId = $value['variant_value_id'];
-            $variantValueName = $value['name'];
-            $variantValueImage = $value['image'];
+        foreach ($variants as $variantId => $variantValueId) {
             if (!$variantId || !$variantValueId) {
                 continue;
             }
             $this->variants()->create(array(
                 'variant_id' => $variantId,
-                'variant_value_id' => $variantValueId,
-                'value_name' => $variantValueName,
-                'value_image' => $variantValueImage
+                'variant_value_id' => $variantValueId
             ));
         }
     }
@@ -134,19 +116,13 @@ class Product extends Base
         if (empty($variants)) {
             return;
         }
-        foreach ($variants as $variantId => $variantValue) {
-            if (!$variantId || !$variantValue) {
+        foreach ($variants as $variantId => $variantValueId) {
+            if (!$variantId || !$variantValueId) {
                 continue;
             }
-            $variantValueId = $variantValue['variant_value_id'];
-            $variantValueName = $variantValue['name'];
-            $variantValueImage = $variantValue['image'];
-
             $newProduct->variants()->create(array(
                 'variant_id' => $variantId,
-                'variant_value_id' => $variantValueId,
-                'value_name' => $variantValueName,
-                'value_image' => $variantValueImage
+                'variant_value_id' => $variantValueId
             ));
         }
     }
@@ -175,7 +151,6 @@ class Product extends Base
             $item = array(
                 'id' => $variant->variant_id,
                 'name' => $variant->name,
-                'allow_rename' => $variant->allow_rename,
                 'values' => $variant->getValueData()
             );
             $variants[] = $item;
@@ -186,7 +161,6 @@ class Product extends Base
             return (int)$item;
         })->toArray();
         $data['products'] = $masterProduct->getChildrenProducts();
-        $data['custom_variants'] = $masterProduct->getChildrenProductsVariants();
         $data['variant_groups'] = Group::getAllGroups();
         return $data;
     }
@@ -239,18 +213,6 @@ class Product extends Base
         return $products;
     }
 
-    private function getChildrenProductsVariants()
-    {
-        $custom_variants = array();
-
-        $variants = $this->getProductVariantsDetail(false);
-
-        foreach ($variants['variants'] as $variant_id => $variant) {
-            $custom_variants[$variant_id] = $variant['values'];
-        }
-
-        return $custom_variants;
-    }
     private function getProductVariants()
     {
         $variants = $this->variants()
@@ -270,7 +232,6 @@ class Product extends Base
         foreach ($this->variants as $productVariant) {
             $variantName = $productVariant->variantName();
             $variantValueName = $productVariant->variantValueName();
-            $variantValueName = $productVariant->value_name ?: $variantValueName;
             if (empty($variantValueName)) {
                 continue;
             }
@@ -301,7 +262,7 @@ class Product extends Base
         return array_merge($productIds->toArray(), [$masterProduct->product_id]);
     }
 
-    public function getProductVariantsDetail($resize = true)
+    public function getProductVariantsDetail()
     {
         $productVariants = $this->variants;
         $currentKey = "|";
@@ -311,14 +272,14 @@ class Product extends Base
             $currentVariantValuesMap[$productVariant->variant_id] = $productVariant->variant_value_id;
         }
 
-        $data['variants'] = $this->formatVariants($resize);
+        $data['variants'] = $this->formatVariants();
         $data['product_variants'] = $currentVariantValuesMap;
         $data['keys'] = $currentKey;
         $data['skus'] = $this->getRelatedSKUs();
         return $data;
     }
 
-    public function formatVariants($resize = true)
+    public function formatVariants()
     {
         $variants = [];
         $childrenIds = $this->getChildrenIds();
@@ -335,7 +296,7 @@ class Product extends Base
             if (self::USE_ALL_VARIANT_VALUES) {
                 $values[$variantId] = $productVariant->variant->getValueData();
             } else {
-                $values[$variantId][] = $productVariant->formatValue($resize);
+                $values[$variantId][] = $productVariant->formatValue();
             }
             $variants[$variantId] = array(
                 'variant_id' => $variantId,

@@ -13,6 +13,9 @@
  */
 
 namespace Seller;
+use Models\Product;
+
+require_once DIR_SYSTEM . 'models/product.php';
 
 class MsProduct
 {
@@ -151,7 +154,11 @@ class MsProduct
 
     public function getCategories($data = array()) {
         $sql = "SELECT c1.status, cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.sort_order FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) 
-                WHERE cp.category_id IN (" . implode(',', $this->config->get('module_multiseller_seller_categories')) . ") AND cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+                WHERE 1=1";
+        if ($this->config->get('module_multiseller_seller_categories')) {
+            $sql .= " AND cp.category_id IN (" . implode(',', $this->config->get('module_multiseller_seller_categories')) . ")";
+        }
+        $sql .= " AND cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
         if (!empty($data['filter_name'])) {
             $sql .= " AND cd2.name LIKE '%" . $this->db->escape((string)$data['filter_name']) . "%'";
@@ -604,6 +611,10 @@ class MsProduct
                 $this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE product_id = '" . (int)$related_id . "' AND related_id = '" . (int)$product_id . "'");
                 $this->db->query("INSERT INTO " . DB_PREFIX . "product_related SET product_id = '" . (int)$related_id . "', related_id = '" . (int)$product_id . "'");
             }
+        }
+
+        if (array_get($data, 'save_variant')) {
+            Product::find((int)$product_id)->saveVariantDescriptions($data['product_description']);
         }
 
         $this->cache->delete('product');

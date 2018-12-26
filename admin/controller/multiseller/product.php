@@ -505,7 +505,8 @@ class ControllerMultisellerProduct extends Controller {
 
         if (!$this->error) {
             foreach ($this->request->post['selected'] as $product_id) {
-                if (\Models\Product::find($product_id)->isMaster()) {
+                $product = \Models\Product::find($product_id);
+                if ($product->isMaster() && count($product->getChildrenIds()) > 1) {
                     $this->error['warning'] = $this->language->get('error_master_cannot_delete');
                 }
             }

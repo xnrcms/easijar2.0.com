@@ -400,7 +400,7 @@ class ControllerApiMyorder extends Controller {
         	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
         }else{
 
-        	$this->load->model('localisation/order_status');wr($order_info);
+        	$this->load->model('localisation/order_status');
         	$order_status = $this->model_localisation_order_status->getOrderStatus($order_info['order_status_id']);
 
         	if (!empty($order_status) && isset($order_status['name']) && !empty($order_status['name'])) {

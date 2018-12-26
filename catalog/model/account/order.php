@@ -487,7 +487,7 @@ class ModelAccountOrder extends Model {
             $status_where       = "AND mssu.order_status_id > '0' ";
         }elseif ($order_type == 1) {
             $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_unpaid_status_id') . "' AND mssu.is_return <= 1 ";
-        }elseif ($order_type == 2) {
+        }elseif ($order_type == 3) {
 
             $unshipped_status = $this->config->get('config_paid_status');
 
@@ -496,7 +496,7 @@ class ModelAccountOrder extends Model {
             }
 
             $status_where   = "AND mssu.order_status_id IN ('" . implode("','",$unshipped_status) . "') AND mssu.is_return <= 1 ";
-        }elseif ($order_type == 3) {
+        }elseif ($order_type == 2) {
             $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' AND mssu.is_return <= 1 ";
         }elseif($order_type == 4){
             $order_statuses = $this->config->get('config_complete_status');

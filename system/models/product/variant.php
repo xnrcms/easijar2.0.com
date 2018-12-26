@@ -17,7 +17,7 @@ class Variant extends Base
 {
     protected $table = 'product_variant';
     protected $primaryKey = 'product_variant_id';
-    protected $fillable = ['product_id', 'variant_id', 'variant_value_id', 'value_name', 'value_image'];
+    protected $fillable = ['product_id', 'variant_id', 'variant_value_id'];
 
     public function variant()
     {
@@ -36,7 +36,8 @@ class Variant extends Base
             ->join('variant_value_description as vvd', 'vvd.variant_value_id', '=', 'vv.variant_value_id')
             ->where('vvd.language_id', '=', current_language_id())
             ->orderBy('v.sort_order')
-            ->orderBy('vv.sort_order');
+            ->orderBy('vv.sort_order')
+            ->orderBy('product_variant.product_variant_id');
         if ($productIds) {
             $query->whereIn('product_id', $productIds);
         }
@@ -59,13 +60,12 @@ class Variant extends Base
         return $query->where('variant_id', $variantId);
     }
 
-    public function formatValue($resize = true)
+    public function formatValue()
     {
-        $image = $this->value_image ? $this->value_image : $this->image;
         return array(
             'variant_value_id' => $this->variant_value_id,
-            'name' => $this->value_name ? $this->value_name : $this->name,
-            'image' => $image ? ($resize ? image_resize($image) : $image) : ''
+            'name' => $this->name,
+            'image' => $this->image ? image_resize($this->image) : ''
         );
     }
 }
