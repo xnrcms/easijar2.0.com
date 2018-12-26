@@ -785,7 +785,18 @@ class ControllerSaleReturn extends Controller {
 
 		$this->load->model('localisation/return_status');
 
-		$data['return_statuses'] = $this->model_localisation_return_status->getReturnStatuses();
+		$notAllow 					= [1,3,5,6,7,8,9];
+		$text_status 				= [4=>'拒绝'];
+		$return_statuses 			= $this->model_localisation_return_status->getReturnStatuses();
+		foreach ($return_statuses as $key => $value) {
+        	if (in_array($value['return_status_id'], $notAllow) || $data['return_status_id'] <= 0) {
+        		unset($return_statuses[$key]);
+        	}else{
+        		$return_statuses[$key]['name'] = isset($text_status[$value['return_status_id']]) ? $text_status[$value['return_status_id']] : $value['name'];
+        	}
+        }
+        
+		$data['return_statuses'] = $return_statuses;
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
