@@ -89,11 +89,15 @@ class ControllerApiPay extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
         
-        $payid                  = '8ac7a49f679c6d210167a175cdeb2992';
+        /*$payid                  = '8ac7a49f679c6d210167a175cdeb2992';
         $amount                 = '1.00';
         $currency               = 'USD';
         $payment                = $this->load->controller('extension/payment/' . $req_data['payment_code'] . '/returnPay',$payid,$amount,$currency);
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$payment]));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$payment]));*/
+
+        
+        /*$payment                = $this->load->controller('extension/payment/' . $req_data['payment_code'] . '/returnPay',[]);
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$payment]));*/
 
         //验证支付订单
         $this->load->model('account/order');
@@ -143,7 +147,7 @@ class ControllerApiPay extends Controller {
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
-
+        wr($req_data);
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }

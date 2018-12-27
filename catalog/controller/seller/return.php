@@ -527,7 +527,8 @@ class ControllerSellerReturn extends Controller {
             }
 
             $return_status_id 			= isset($return_info['return_status_id']) ? (int)$return_info['return_status_id'] : 0;
-            $return_statuses 			= $this->getReturnStatuses($return_status_id);
+            $is_platform 				= isset($return_info['is_platform']) ? (int)$return_info['is_platform'] : 0;
+            $return_statuses 			= $this->getReturnStatuses($return_status_id,-1,$is_platform);
 
 
 			$data['back'] 				= $this->url->link('seller/return');
@@ -545,7 +546,7 @@ class ControllerSellerReturn extends Controller {
         }
 	}
 
-	private function getReturnStatuses($return_status_id = 0,$update_status_id = -1)
+	private function getReturnStatuses($return_status_id = 0,$update_status_id = -1,$is_platform = 0)
 	{
 		if($return_status_id <= 0 || $update_status_id == 0) return [];
 
@@ -554,8 +555,17 @@ class ControllerSellerReturn extends Controller {
         	case 1: $notAllow 		= array_merge($notAllow,[1,3]);break;
         	case 2: $notAllow 		= array_merge($notAllow,[1,2,4]);break;
         	case 6: $notAllow 		= array_merge($notAllow,[1,2,4,6,10]);break;
-        	case 10: $notAllow 		= array_merge($notAllow,[1,2,4,6,10]);break;
+        	case 10: $notAllow 		= array_merge($notAllow,[1,2,3,4,6,10]);break;
         	default:$return_status_id = 0;break;
+        }
+
+        //平台处理后的选项显示
+        if ($is_platform == 1 ) {
+        	if ($return_status_id == 2) {
+        		$notAllow 		= array_merge($notAllow,[1,2,3,4,10]);
+        	}else{
+        		$notAllow 		= array_merge($notAllow,[1,2,3,4,6,10]);
+        	}
         }
 
         $return_statuses 			= $this->model_multiseller_return->getReturnStatuses();
@@ -638,13 +648,13 @@ class ControllerSellerReturn extends Controller {
 			$return_id 				= isset($this->request->get['return_id']) ? (int)$this->request->get['return_id'] : 0;
 			$return_status_id 		= isset($this->request->post['return_status_id']) ? (int)$this->request->post['return_status_id'] : 0;
 			$return_info 			= $this->model_multiseller_return->getReturn($return_id);
-			$is_platform 			= 0;
+            $is_platform 			= isset($return_info['is_platform']) ? (int)$return_info['is_platform'] : 0;
 
 			if (empty($return_info)) {
 				$json['error'] = $this->language->get('error_return_exists');
 			}
 
-			if (!$this->getReturnStatuses($return_info['return_status_id'],$return_status_id)) {
+			if (!$this->getReturnStatuses($return_info['return_status_id'],$return_status_id,$is_platform)) {
 				$json['error'] = $this->language->get('error_return_status');
 			}
 

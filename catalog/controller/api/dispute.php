@@ -11,7 +11,7 @@ class ControllerApiDispute extends Controller {
         $allowKey       = ['api_token','order_sn','order_product_id','refund_money','is_receive','is_service','reason_id','evidences','quantity','comment'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
-
+        
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
@@ -202,6 +202,7 @@ class ControllerApiDispute extends Controller {
                         $status2            = 3;
                     }
                 }
+                
                 if ($return_info['return_status_id'] == 4) {//拒绝
                     if ($responsibility == 1) {//发货时效3内 - 卖家拒绝
                         $overtime       = 0;
@@ -214,6 +215,7 @@ class ControllerApiDispute extends Controller {
                         $status2        = 3;
                     }
                 }
+
                 break;
             case 2://待收货
                 if ((int)$return_info['is_service'] == 2) {//退货退款
@@ -232,19 +234,6 @@ class ControllerApiDispute extends Controller {
                         $overtime       = 0;
                         $status2        = 1;//两天内打款
                     }
-
-                    if ($return_info['return_status_id'] == 4) {//拒绝
-                        //平台仲裁拒绝
-                        if($refuse_nums >= 3){
-                            if ($responsibility == 1) {
-                                $overtime       = (int)$return_info['overtime'];
-                                $status2        = 2;
-                            }else{
-                                $overtime       = (int)$return_info['overtime'];
-                                $status2        = 3;
-                            }
-                        }
-                    }
                 }else{//仅仅退款
                     if ($return_info['return_status_id'] == 10) {//退款中
                         //平台仲裁同意
@@ -257,6 +246,20 @@ class ControllerApiDispute extends Controller {
                         }
                     }
                 }
+
+                if ($return_info['return_status_id'] == 4) {//拒绝
+                    //平台仲裁拒绝
+                    if($refuse_nums >= 3){
+                        if ($responsibility == 1) {
+                            $overtime       = (int)$return_info['overtime'];
+                            $status2        = 2;
+                        }else{
+                            $overtime       = (int)$return_info['overtime'];
+                            $status2        = 3;
+                        }
+                    }
+                }
+
                 break;
             default:  break;
         }

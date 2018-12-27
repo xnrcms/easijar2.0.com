@@ -8,7 +8,8 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "secure-http": false
     },
     "require": {
         "php": ">=5.4.0",
@@ -30,6 +31,7 @@
         "predis/predis": "^1.1",
         "psy/psysh": "^0.8.17",
         "rinvex/country": "^3.1",
+        "riverslei/payment": "*",
         "stripe/stripe-php": "^6.10",
         "swiftmailer/swiftmailer": "^5.4",
         "symfony/console": "3.4.*",

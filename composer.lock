@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "569782a1257e57373d409357b6a2c810",
+    "content-hash": "817f0a952d83964c6dba1df3213176dc",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -2176,12 +2176,12 @@
             "version": "v3.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/rinvex/country.git",
+                "url": "https://github.com/rinvex/renamed-country.git",
                 "reference": "e32228ef43f26d3b02296be9454f842c52d492f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rinvex/country/zipball/e32228ef43f26d3b02296be9454f842c52d492f3",
+                "url": "https://api.github.com/repos/rinvex/renamed-country/zipball/e32228ef43f26d3b02296be9454f842c52d492f3",
                 "reference": "e32228ef43f26d3b02296be9454f842c52d492f3",
                 "shasum": "",
                 "mirrors": [
@@ -2249,7 +2249,68 @@
                 "rinvex",
                 "svg"
             ],
+            "abandoned": "rinvex/countries",
             "time": "2017-03-07T18:40:20+00:00"
+        },
+        {
+            "name": "riverslei/payment",
+            "version": "v4.1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/helei112g/payment.git",
+                "reference": "94ecb0306288e3d8f60bbcc1a3a5e045c5bfa588"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/helei112g/payment/zipball/94ecb0306288e3d8f60bbcc1a3a5e045c5bfa588",
+                "reference": "94ecb0306288e3d8f60bbcc1a3a5e045c5bfa588",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ext-bcmath": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/guzzle": "~6.0",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "codeception/codeception": "*",
+                "endroid/qrcode": "~1.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Payment\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "helei",
+                    "email": "dayugog@gmail.com",
+                    "homepage": "https://helei112g.github.io/categories/payment-3/"
+                }
+            ],
+            "description": "支付宝支付、微信支付、招商一网通支付php SDK。方便快速接入，最完整的开源支付 php sdk",
+            "homepage": "https://helei112g.github.io/categories/payment-3/",
+            "keywords": [
+                "alipay",
+                "weixin",
+                "一网通",
+                "微信支付",
+                "招商一网通",
+                "支付宝支付",
+                "集成支付接口SDK"
+            ],
+            "time": "2018-05-23T12:01:20+00:00"
         },
         {
             "name": "stripe/stripe-php",

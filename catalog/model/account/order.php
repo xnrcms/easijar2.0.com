@@ -497,7 +497,7 @@ class ModelAccountOrder extends Model {
 
             $status_where   = "AND mssu.order_status_id IN ('" . implode("','",$unshipped_status) . "') AND mssu.is_return <= 1 ";
         }elseif ($order_type == 2) {
-            $status_where   = "AND mssu.order_status_id = '" . $this->config->get('config_shipped_status_id') . "' AND mssu.is_return <= 1 ";
+            $status_where   = "AND mssu.order_status_id = '15' AND mssu.is_return <= 1 ";
         }elseif($order_type == 4){
             $order_statuses = $this->config->get('config_complete_status');
             foreach ($order_statuses as $order_status_id) {

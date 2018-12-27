@@ -73,6 +73,11 @@ class ModelExtensionPaymentAlipay extends Model {
 		}
 	}
 
+	public function returnPay($config)
+	{
+		$this->setParams($config);
+	}
+
 	function pagePay($builder,$config) {
 		$this->setParams($config);
 		$biz_content=null;

@@ -1,4 +1,9 @@
 <?php
+
+use Payment\Common\PayException;
+use Payment\Client\Refund;
+use Payment\Config;
+
 class ControllerExtensionPaymentAlipay extends Controller {
     private $logger;
     public function __construct($registry)
@@ -26,7 +31,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
 			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",
 			'alipay_public_key'    => $this->config->get('payment_alipay_alipay_public_key'),
 		);
-		$out_trade_no = trim($order_info['order_id']) . '-' . time();
+		$out_trade_no = trim($order_info['order_sn']) . '-' . time();
 
 		$this->load->model('account/order');
 		$products = $this->model_account_order->getOrderProducts($order_info['order_id']);
@@ -90,7 +95,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
 			'alipay_public_key'    => $this->config->get('payment_alipay_alipay_public_key'),
 		);
 		$this->load->model('extension/payment/alipay');
-		$this->logger->write('POST' . var_export($_POST,true));
+		//$this->logger->write('POST' . var_export($_POST,true));
 		$result = $this->model_extension_payment_alipay->check($arr, $config);
 
 		if($result) {//check successed
@@ -102,9 +107,11 @@ class ControllerExtensionPaymentAlipay extends Controller {
 
 				$order_sn = isset($_POST['out_trade_no']) ? explode('-', $_POST['out_trade_no']) : [];
 				$order_sn = isset($order_sn[0]) ? $order_sn[0] : '';
+				$trade_no = isset($_POST['trade_no']) ? $_POST['trade_no'] : '';
 
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
+				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $trade_no);
 			}
 			echo "success";	//Do not modified or deleted
 		}else {
@@ -181,5 +188,35 @@ class ControllerExtensionPaymentAlipay extends Controller {
 		$data['pay_url'] 		= $this->url->link('extension/payment/alipay/pay');
 
 		return $data;
+    }
+
+    public function returnPay($data)
+    {
+    	$config = array (
+			'app_id'               => $this->config->get('payment_alipay_app_id'),
+			'rsa_private_key' 	   => $this->config->get('payment_alipay_merchant_private_key'),
+			'ali_public_key' 	   => $this->config->get('payment_alipay_alipay_public_key'),
+			'notify_url'           => HTTP_SERVER . "payment_callback/alipay",
+			'return_url'           => $this->url->link('checkout/success'),
+			'charset'              => "UTF-8",
+			'sign_type'            => "RSA2",
+			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",
+		);
+
+		$refund_no 					= date('YmdHis',time()) . random_string(11);
+
+		$data = [
+		    'out_trade_no' => '',
+		    'trade_no' => '2018122722001400650532537314',// 支付宝交易号， 与 out_trade_no 必须二选一
+		    'refund_fee' => '0.2',
+		    'reason' => '我要退款',
+		    'refund_no' => $refund_no,
+		];
+
+		try {
+		    return Refund::run(Config::ALI_REFUND, $config, $data);
+		} catch (PayException $e) {
+		    return $e->errorMessage();
+		}
     }
 }
