@@ -29,6 +29,7 @@ $_['entry_telephone']              = '手机号码';
 $_['entry_password']               = '密码';
 
 // Error
+$_['error_account']                = '警告：登录账不存在。';
 $_['error_login']                  = '警告：邮箱地址/电话号码或密码不匹配。';
 $_['error_attempts']               = '警告：您的账户已经超过最大尝试登录次数，请在一小时后再试。';
 $_['error_approved']               = '提醒：您的帐户正在审核中，审核通过后才能使用。';

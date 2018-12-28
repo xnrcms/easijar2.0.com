@@ -70,6 +70,10 @@ class ControllerApiSystem extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sys_updata is error']));
         }
         
+        if ($req_data['sys_field'] == 'country_code') {
+            $this->session->data['is_set_country']  = 1;
+        }
+
         $this->session->data[$req_data['sys_field']]      = $req_data['sys_updata'];
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'system info set success']));
@@ -99,6 +103,9 @@ class ControllerApiSystem extends Controller {
 
         $json['version']            = '1.0.0';
         $json['is_update']          = 0;
+        $json['country_code']       = isset($this->session->data['country_code']) ? $this->session->data['country_code'] : '65';
+        $json['languages_code']     = isset($this->session->data['language']) ? $this->session->data['language'] : 'en-gb';
+        $json['is_set_country']     = isset($this->session->data['is_set_country']) ? (int)$this->session->data['is_set_country'] : 0;
 
         //语言列表
         $this->load->model('localisation/language');
@@ -135,8 +142,6 @@ class ControllerApiSystem extends Controller {
         //国家列表
         $json['country']            = [];
         $results                    = get_calling_codes();
-
-        $this->session->data['country_code']    = isset($this->session->data['country_code']) ? $this->session->data['country_code'] : '65';
 
         foreach ($results as $result) {
             $name       = explode('(',$result['name']);

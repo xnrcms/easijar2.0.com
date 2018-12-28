@@ -67,3 +67,4 @@ $_['error_images']        		= 'Picture upload is incomplete!';
 $_['error_telephone']           = 'Wrong phone number, please enter the correct phone number!';
 $_['error_password1']           = 'Error: The password must be a 6-32-length string of letters, numbers or underscores!';
 $_['error_password2']           = 'Error: A password must contain at least one special symbol:[~!@#$%^&*()\-_=+{};:<,.>?]';
+$_['error_smscode']        		= 'The verification code error!';

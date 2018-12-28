@@ -337,22 +337,24 @@ class ControllerExtensionModuleMultiFilter extends Controller
             self::$brands = $this->model_catalog_product_pro->getProductTotalGroupBrand($filterData);
         }
         $this->data['brands'] = self::$brands;*/
-        $this->data['brands'] = [];
+        $this->data['brands']       = [];
+        $this->data['options']      = [];
+        $this->data['attributes']   = [];
 
         if (!self::$stock) {
             self::$stock = $this->model_catalog_product_pro->getProductTotalGroupStockStatus($filterData);
         }
         $this->data['stock'] = self::$stock;
-
-        if (!self::$attributes) {
+        
+        /*if (!self::$attributes) {
             self::$attributes = $this->model_catalog_product_pro->getProductTotalGroupAttrValues($filterData);
         }
-        $this->data['attributes'] = self::$attributes;
+        $this->data['attributes'] = self::$attributes;*/
 
-        if (!self::$options) {
+        /*if (!self::$options) {
             self::$options = $this->model_catalog_product_pro->getProductTotalGroupOptionValues($filterData);
         }
-        $this->data['options'] = self::$options;
+        $this->data['options'] = self::$options;*/
 
         if (!self::$variants) {
             self::$variants = $this->model_catalog_product_pro->getProductTotalGroupVariantValues($filterData);

@@ -103,7 +103,7 @@ class ControllerApiFollowSeller extends Controller {
         $this->load->model('account/customer_follow_seller');
         $this->model_account_customer_follow_seller->deleteSellerFollows($seller_ids);
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'product delete success']));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'seller delete success']));
     }
 
     public function setting()

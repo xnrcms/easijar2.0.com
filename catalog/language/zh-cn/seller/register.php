@@ -43,7 +43,6 @@ $_['error_exists_email']        = '错误：该邮箱地址已被注册、请换
 $_['error_exists_telephone']    = '错误：该手机号码已被注册、请换一个手机号码！';
 $_['error_fullname']           	= '名字必须在 1 到 32 字符之间！';
 $_['error_email']               = '无效的邮箱地址！';
-$_['error_telephone']           = '电话号码必须为 3 到 32 个字符之间！';
 $_['error_custom_field']        = '%s 必填！';
 $_['error_password']            = '密码必须在 6 到 32 个字符之间！';
 $_['error_confirm']             = '两次密码输入不一致！';
@@ -58,7 +57,6 @@ $_['error_county']              = '请选择区县！';
 
 
 $_['error_true_name']           = '真实姓名必须在 2 到 10 字符之间！';
-$_['error_address']           	= '详细地址必须在 2 到 40 字符之间！';
 $_['error_experience']          = '店铺经验必须在 1 到 40 字符之间！';
 $_['error_company_type']        = '公司类型选择错误！';
 $_['error_license']        		= '营业执照必须在 15 到 20 字符之间！';
@@ -69,3 +67,4 @@ $_['error_telephone']           = '手机号码错误，请输入正确电话号
 $_['error_address']           	= '详细地址必须在 2 到 10 字符之间！';
 $_['error_password1']           = '错误：密码必须是以字母数字或下划线组成的6-32长度的字符串!';
 $_['error_password2']           = '错误：密码必须包含至少一个特殊符号：[~!@#$%^&*()\-_=+{};:<,.>?]';
+$_['error_smscode']             = '错误：验证码输入错误！';

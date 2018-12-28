@@ -980,7 +980,7 @@ class ControllerSellerProduct extends Controller
         if (isset($this->request->post['date_available'])) {
             $data['date_available'] = $this->request->post['date_available'];
         } elseif (!empty($product_info)) {
-            $data['date_available'] = $product_info['date_available'];
+            $data['date_available'] = (int)strtotime($product_info['date_available']) > 0 ? $product_info['date_available'] : '';
         } else {
             $data['date_available'] = '';
         }
@@ -988,7 +988,7 @@ class ControllerSellerProduct extends Controller
         if (isset($this->request->post['date_until'])) {
             $data['date_until'] = $this->request->post['date_until'];
         } elseif (!empty($product_info)) {
-            $data['date_until'] = $product_info['date_until'];
+            $data['date_until'] = (int)strtotime($product_info['date_until']) > 0 ? $product_info['date_until'] : '';
         } else {
             $data['date_until'] = '';
         }

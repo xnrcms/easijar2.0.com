@@ -28,7 +28,6 @@ class ControllerApiProduct extends Controller {
 		$this->load->model('catalog/product_pro');
 		$this->load->model('tool/image');
 
-
 		//0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
 		$sortsArr 			= ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
@@ -217,6 +216,8 @@ class ControllerApiProduct extends Controller {
 			$ppid 								= $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
 			$product_ids 						= $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
 
+			$this->load->model('tool/image');
+
 			//商品评论
 			$this->load->model('account/oreview');
 			$review['total'] 					= $this->model_account_oreview->getTotalOreviewsByProductIds($product_ids);
@@ -262,7 +263,7 @@ class ControllerApiProduct extends Controller {
 	        $seller_info 			= [];
 	        if (!empty($seller)) {
 	        	$seller_info['seller_id'] 		= $seller['seller_id'];
-	        	$seller_info['avatar'] 			= $seller['avatar'];
+	        	$seller_info['avatar'] 			= $this->model_tool_image->resize($seller['avatar'], 100, 100);
 	        	$seller_info['store_name'] 		= $seller['store_name'];
 	        	$seller_info['product_total'] 	= $seller['total'];
 	        	$seller_info['rating'] 			= sprintf("%.1f", $seller['rating']);
@@ -273,8 +274,6 @@ class ControllerApiProduct extends Controller {
 			$product_image 			= $this->model_catalog_product->getProductImages($product_info['product_id'],5);
 			$images 				= [];
 			if (!empty($product_image)) {
-
-				$this->load->model('tool/image');
 
 				foreach ($product_image as $result) {
 					$images[] = [
@@ -342,6 +341,8 @@ class ControllerApiProduct extends Controller {
 			$this->load->controller('api/browse_records/addProductBrowseRecords',(int)$product_info['product_id']);
 			
 			$json 								= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
+		}else{
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
 		}
 
 		return $this->response->setOutput($json);

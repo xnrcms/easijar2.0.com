@@ -119,6 +119,8 @@ class ControllerApiUser extends Controller {
 				$this->model_account_customer->addLogin($this->customer->getId(), $this->request->server['REMOTE_ADDR']);
 
 	            $data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>'login success']);
+	        }else{
+	        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_account')]));
 	        }
 		}else{
 			$data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>'already login']);
@@ -289,7 +291,7 @@ class ControllerApiUser extends Controller {
 		if (!(isset($req_data['verification_code']) && !empty($req_data['verification_code']) && strlen($req_data['verification_code']) == 6)) {
     		return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
 		}
-
+		
 		$keys 										= md5('smscode-' . $req_data['account'] . '-2');
 		if ($req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
 			return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
@@ -434,7 +436,7 @@ class ControllerApiUser extends Controller {
 	        //生成校验码
 	        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
 
-			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'telephone smscode get success']));
+			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Code send successfully']));
         } else {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail: '.$ret]));
         }
@@ -512,6 +514,6 @@ class ControllerApiUser extends Controller {
 		$mail->setHtml($this->load->view('mail/email_code', $data));
 		$mail->send();
 
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'email code get success']));
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Code send successfully']));
 	}
 }
