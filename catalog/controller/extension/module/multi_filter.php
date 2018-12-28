@@ -402,18 +402,18 @@ class ControllerExtensionModuleMultiFilter extends Controller
         }
 
         if (!self::$firstModule) {
-            self::$firstModule = true;
-            $url = $this->url->getQueriesOnly(['path', 'sort', 'limit', 'order', 'search']);
-            $this->data['filter']['href'] = html_entity_decode($this->url->link(current_route(), $url));
-            $this->data['filter']['selected_in_stock'] = (isset($selectedInStock) && $selectedInStock) ? 1 : 0;
-            $this->data['filter']['selected_brands'] = array_map('intval', $selectedBrandIds);
-            $this->data['filter']['selected_variants'] = array_map('intval', $selectedVariantValueIds);
-            $this->data['filter']['selected_options'] = array_map('intval', $selectedOptionValueIds);
-            $this->data['filter']['selected_statuses'] = array_map('intval', $selectedStockStatusIds);
-            $this->data['filter']['selected_attributes'] = (object)$selectedAttributes;
-            $this->data['filter']['selected_keyword'] = $keyword;
-            $this->data['filter']['selected_price_range'] = array_get($this->data, 'selected_price_range', []);
-            $this->data['filter']['mobile'] = config('is_mobile');
+            self::$firstModule                              = true;
+            $url                                            = $this->url->getQueriesOnly(['path', 'sort', 'limit', 'order', 'search']);
+            $this->data['filter']['href']                   = html_entity_decode($this->url->link(current_route(), $url));
+            $this->data['filter']['selected_in_stock']      = (isset($selectedInStock) && $selectedInStock) ? 1 : 0;
+            $this->data['filter']['selected_brands']        = array_map('intval', $selectedBrandIds);
+            $this->data['filter']['selected_variants']      = array_map('intval', $selectedVariantValueIds);
+            $this->data['filter']['selected_options']       = array_map('intval', $selectedOptionValueIds);
+            $this->data['filter']['selected_statuses']      = array_map('intval', $selectedStockStatusIds);
+            $this->data['filter']['selected_attributes']    = (object)$selectedAttributes;
+            $this->data['filter']['selected_keyword']       = $keyword;
+            $this->data['filter']['selected_price_range']   = array_get($this->data, 'selected_price_range', []);
+            $this->data['filter']['mobile']                 = config('is_mobile');
         }
 
         return $this->data;

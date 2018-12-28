@@ -51,7 +51,7 @@ class ControllerApiLogistics extends Controller
 
         $remainder                  = intval($totals - $limit * $page);
         $data                       = [];
-        $data['totals']             = $totals;
+        $data['totals']             = (int)$totals;
         $data['total_page']         = ceil($totals/$limit);
         $data['remainder']          = $remainder >= 0 ? $remainder : 0;
         $data['lists']              = $logistics;
