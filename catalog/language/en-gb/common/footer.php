@@ -16,6 +16,7 @@ $_['text_account']      = 'My Account';
 $_['text_order']        = 'Order History';
 $_['text_wishlist']     = 'Wish List';
 $_['text_newsletter']   = 'Newsletter';
+$_['text_faq']          = 'FAQ';
 $_['text_powered']      = '%s &copy; %s';
 $_['text_layer_popup_title']      = 'Success';
 $_['button_continue_shopping']    = 'Continue Shopping';
