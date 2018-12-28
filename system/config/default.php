@@ -14,7 +14,7 @@ $_['language_directory']   = 'en-gb';
 $_['language_autoload']    = array('en-gb');
 
 // Date
-$_['date_timezone']        = 'PRO';
+$_['date_timezone']        = 'PRC';
 
 // Database
 $_['db_engine']            = 'mysqli'; // mpdo, mssql, mysql, mysqli or postgre
