@@ -397,7 +397,7 @@ class ControllerApiMyorder extends Controller {
 
         	$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $complete_status[0],t('text_customer_confirm'),false,true);
 
-        	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order cancel success']));
+        	return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'order confirm success']));
         }else{
 
         	$this->load->model('localisation/order_status');

@@ -659,4 +659,11 @@ class ModelCatalogProduct extends Model {
 
         return $ids;
     }
+
+    public function isSellerProduct($product_id = 0)
+    {
+    	$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "ms_product_seller WHERE product_id = '" . (int)$product_id . "'");
+
+		return isset($query->row['total']) ? (int)$query->row['total'] : 0;
+    }
 }

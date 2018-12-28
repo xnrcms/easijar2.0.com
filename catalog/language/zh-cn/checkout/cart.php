@@ -57,3 +57,4 @@ $_['error_product']                           = '此商品不存在！';
 
 // Warning
 $_['warning_login']                  		  = '您还没有登录，登录后才能继续哦!';
+$_['error_seller_info'] 					  = '商家不存在';

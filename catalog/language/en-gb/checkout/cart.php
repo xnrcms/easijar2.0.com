@@ -48,3 +48,4 @@ $_['error_product']            = 'Product not found!';
 
 // Warning
 $_['warning_login']            = 'You have not logged in, you can continue after login!';
+$_['error_seller_info'] 	   = 'Business does not exist';

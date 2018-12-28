@@ -137,6 +137,13 @@ class ControllerApiCart extends Controller {
         $product_id = isset($req_data['product_id']) ? $req_data['product_id'] : 0;
     	$buy_type 	= isset($req_data['buy_type']) ? (int)$req_data['buy_type'] : 0;
 
+        $this->load->model('catalog/product');
+
+        //检测商品是否隶属于店铺下
+        if ($this->model_catalog_product->isSellerProduct($product_id) <= 0 ) {
+            return $this->response->setOutput($this->returnData(['msg'=>t('error_seller_info')]));
+        }
+
         if (!$this->customer->isLogged() && $buy_type == 1){
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
@@ -149,10 +156,7 @@ class ControllerApiCart extends Controller {
         }
 
         $this->session->data['buy_type']        = $buy_type;
-
-    	$this->load->model('catalog/product');
-
-    	$product_info = $this->model_catalog_product->getProduct($product_id);
+    	$product_info                           = $this->model_catalog_product->getProduct($product_id);
 
     	if ($product_info) {
     		$quantity = (isset($req_data['quantity']) && (int)$req_data['quantity'] > 0) ? (int)$req_data['quantity'] : 1;
