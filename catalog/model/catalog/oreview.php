@@ -34,11 +34,11 @@ class ModelCatalogOreview extends Model
             WHERE 1=1 AND mop.seller_id = ' . $this->customer->getId();
 
         if (!empty($data['filter_product'])) {
-            $sql .= " AND op.name LIKE '".$this->db->escape($data['filter_product'])."%'";
+            $sql .= " AND op.name LIKE '%".$this->db->escape($data['filter_product'])."%'";
         }
 
         if (!empty($data['filter_customer'])) {
-            $sql .= " AND c.fullname LIKE '".$this->db->escape($data['filter_customer'])."%'";
+            $sql .= " AND c.fullname LIKE '%".$this->db->escape($data['filter_customer'])."%'";
         }
 
         if (isset($data['filter_status']) && !is_null($data['filter_status'])) {

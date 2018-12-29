@@ -149,7 +149,7 @@ class ControllerSellerOreview extends Controller
             $data['reviews'][] = array(
                 'order_product_review_id' => $result['order_product_review_id'],
                 'name' => $result['name'],
-                'author' => $customer_info ? '(#' . $result['customer_id'] . ')' . $customer_info['fullname'] : "NULL",
+                'author' => (isset($customer_info['fullname']) && !empty($customer_info['fullname'])) ? $customer_info['fullname'] : (isset($customer_info['customer_id']) ? '#' . $result['customer_id'] : 'NULL'),
                 'rating' => $result['rating'],
                 'status' => ($result['status']) ? $this->language->get('text_enabled') : $this->language->get('text_disabled'),
                 'date_added' => date($this->language->get('date_format_short'), strtotime($result['date_added'])),

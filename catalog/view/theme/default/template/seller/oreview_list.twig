@@ -19,7 +19,7 @@
                   <label class="control-label" for="input-product">{{ entry_product }}</label> <input type="text" name="filter_product" value="{{ filter_product }}" placeholder="{{ entry_product }}" id="input-product" class="form-control"/>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for="input-author">{{ entry_author }}</label> <input type="text" name="filter_author" value="{{ filter_author }}" placeholder="{{ entry_author }}" id="input-author" class="form-control"/>
+                  <label class="control-label" for="input-author">{{ entry_author }}</label> <input type="text" name="filter_customer" value="{{ filter_customer }}" placeholder="{{ entry_author }}" id="input-author" class="form-control"/>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for="input-status">{{ entry_status }}</label> <select name="filter_status" id="input-status" class="form-control">
@@ -131,10 +131,10 @@ $('#button-filter').on('click', function() {
     url += '&filter_product=' + encodeURIComponent(filter_product);
   }
 
-	var filter_author = $('input[name=\'filter_author\']').val();
+	var filter_customer = $('input[name=\'filter_customer\']').val();
 
-	if (filter_author) {
-		url += '&filter_author=' + encodeURIComponent(filter_author);
+	if (filter_customer) {
+		url += '&filter_customer=' + encodeURIComponent(filter_customer);
   }
 
   var filter_status = $('select[name=\'filter_status\']').val();
