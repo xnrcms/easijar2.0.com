@@ -124,6 +124,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 				return $data;
 			}else{
+				$logger 				= new Log('pingpong.log');
 				$logger->write(date('Y-m-d H:i:s') . 'pingpong pay error:'.json_encode($pay));
 				return 'pay fail';
 			}

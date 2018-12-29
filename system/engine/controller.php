@@ -22,9 +22,11 @@
  */
 abstract class Controller {
 	protected $registry;
+	protected $apiLogs;
 
 	public function __construct($registry) {
 		$this->registry = $registry;
+		$this->apiLogs 	= false;
 	}
 
 	public function __get($key) {
@@ -74,8 +76,6 @@ abstract class Controller {
 
 	        //按字母排序
 	        ksort($data);
-
-	        wr($data,'sign.txt',false);
 	        
 	        //签名串 key value拼接
 	        $signStr    = "";
@@ -86,7 +86,7 @@ abstract class Controller {
 	        $signStr  .= (!empty($signKey) ? $signKey : time().mt_rand(1000,10000));
 	        
 	        wr([
-	        	'apiUrl'=>isset($this->request->get['route']) ? $this->request->get['route'] : '',
+	        	'apiUrl'=>current_route(),
 	        	'hash'=>$hash,
 	        	'signStr'=>$signStr,
 	        	'hash2'=>md5($signStr),
@@ -101,6 +101,19 @@ abstract class Controller {
     }
 
     public function returnData($data = []){
-    	return json_encode(array_merge(['code'=>'202','msg'=>'fail:system error','time'=>date('Y-m-d H:i:s',time()),'data'=>''],$data));
+    	$data 	= array_merge(['code'=>'202','msg'=>'fail:system error','time'=>date('Y-m-d H:i:s',time()),'data'=>''],$data);
+    	
+    	if ($this->apiLogs) {
+	    	wr("\n\n");
+	    	wr(['api_url'=>current_route(),'returndata'=>$data],'returndata.txt');
+	    	wr("\n\n");
+    	}
+    	
+    	return json_encode($data);
+    }
+
+    public function set_apilog()
+    {
+    	$this->apiLogs 	= true;
     }
 }
