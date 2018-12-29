@@ -31,7 +31,7 @@ class ModelMultisellerCheckout extends Model {
 
             $order_sn   = date('YmdHis',time()) . '2' . random_string(10);
 
-            $this->db->query("INSERT INTO " . DB_PREFIX . "ms_suborder SET order_id = '" . (int)$order_id . "', seller_id = '" . (int)$seller['seller_id'] . "', total = '" . (float)$total . "', order_status_id = '0',order_sn = '" . $order_sn . "'");
+            $this->db->query("INSERT INTO " . DB_PREFIX . "ms_suborder SET order_id = '" . (int)$order_id . "', seller_id = '" . (int)$seller['seller_id'] . "', total = '" . (float)$total . "', order_status_id = '0',order_sn = '" . $order_sn . "',date_added = NOW(),date_modified = NOW()");
         }
     }
 

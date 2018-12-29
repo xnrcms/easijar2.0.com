@@ -66,7 +66,7 @@ class ControllerSellerTransaction extends Controller {
 		$pagination->total = $transaction_total;
 		$pagination->page = $page;
 		$pagination->limit = 10;
-		$pagination->url = $this->url->link('multiseller/transaction', 'page={page}');
+		$pagination->url = $this->url->link('seller/transaction', 'page={page}');
 
 		$data['pagination'] = $pagination->render();
 

@@ -129,8 +129,8 @@ class ControllerApiPay extends Controller {
 
         $json                   = [];
         $json['payment']        = $req_data['payment_code'];
-        $json['payinfo']        = !empty($payment) ? $payment : '';
-        $json['path']           = 'extension/payment/' . $req_data['payment_code'] . '/payFormForSm';
+        $json['payment_view']   = !empty($payment) ? $payment : '';
+        //$json['path']           = 'extension/payment/' . $req_data['payment_code'] . '/payFormForSm';
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 

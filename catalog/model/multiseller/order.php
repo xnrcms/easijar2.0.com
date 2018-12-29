@@ -218,7 +218,7 @@ class ModelMultisellerOrder extends Model {
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
-
+		
 		$query = $this->db->query($sql);
 
 		return $query->rows;
@@ -255,11 +255,11 @@ class ModelMultisellerOrder extends Model {
 		}
 
 		if (!empty($data['filter_date_added'])) {
-			$sql .= " AND DATE(date_added) >= DATE('" . $this->db->escape((string)$data['filter_date_added']) . "')";
+			$sql .= " AND DATE(o.date_added) >= DATE('" . $this->db->escape((string)$data['filter_date_added']) . "')";
 		}
 
 		if (!empty($data['filter_date_modified'])) {
-			$sql .= " AND DATE(date_modified) <= DATE('" . $this->db->escape((string)$data['filter_date_modified']) . "')";
+			$sql .= " AND DATE(o.date_added) <= DATE('" . $this->db->escape((string)$data['filter_date_modified']) . "')";
 		}
 
         if (!empty($data['filter_total'])) {

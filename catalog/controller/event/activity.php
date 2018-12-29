@@ -4,10 +4,10 @@ class ControllerEventActivity extends Controller {
 	public function addCustomer(&$route, &$args, &$output) {
 		if ($this->config->get('config_customer_activity')) {
 			$this->load->model('account/activity');
-
+			$fullname 		= isset($args[0]['fullname']) ? $args[0]['fullname'] : (isset($args[0]['email']) ? $args[0]['email'] : $args[0]['telephone']);
 			$activity_data = array(
 				'customer_id' => $output,
-				'name'        => $args[0]['fullname']
+				'name'        => $fullname
 			);
 
 			$this->model_account_activity->addActivity('register', $activity_data);
