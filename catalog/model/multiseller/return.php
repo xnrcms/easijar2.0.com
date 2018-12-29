@@ -55,15 +55,15 @@ class ModelMultisellerReturn extends Model {
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "r.fullname LIKE '" . $this->db->escape((string)$data['filter_customer']) . "%'";
+			$implode[] = "r.fullname LIKE '%" . $this->db->escape((string)$data['filter_customer']) . "%'";
 		}
 
 		if (!empty($data['filter_product'])) {
-			$implode[] = "r.product = '" . $this->db->escape((string)$data['filter_product']) . "'";
+			$implode[] = "r.product LIKE '%" . $this->db->escape((string)$data['filter_product']) . "%'";
 		}
 
 		if (!empty($data['filter_model'])) {
-			$implode[] = "r.model = '" . $this->db->escape((string)$data['filter_model']) . "'";
+			$implode[] = "r.model LIKE '%" . $this->db->escape((string)$data['filter_model']) . "%'";
 		}
 
 		if (!empty($data['filter_return_status_id'])) {
@@ -134,7 +134,7 @@ class ModelMultisellerReturn extends Model {
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "r.fullname LIKE '" . $this->db->escape((string)$data['filter_customer']) . "%'";
+			$implode[] = "r.fullname LIKE '%" . $this->db->escape((string)$data['filter_customer']) . "%'";
 		}
 
 		if (!empty($data['filter_order_id'])) {
