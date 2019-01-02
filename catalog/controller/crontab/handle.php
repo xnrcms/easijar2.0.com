@@ -24,17 +24,19 @@ class ControllerCrontabHandle extends Controller {
             $ptotals   = $this->model_catalog_handle->get_product_option_value_total();
             $ototals   = $this->model_catalog_handle->get_options_description_total();
             $vtotals   = $this->model_catalog_handle->get_variant_description_total(1);
+            $pdtotals  = $this->model_catalog_handle->get_product_description_totals();
 
             $this->session->data['handle_data']['ptotals']   = $ptotals;
             $this->session->data['handle_data']['ototals']   = $ototals;
             $this->session->data['handle_data']['vtotals']   = $vtotals;
+            $this->session->data['handle_data']['pdtotals']  = $pdtotals;
             $this->session->data['handle_data']['data']      = ['ok'=>0];
             
             $this->echo_log([
                 'handle_name'=>'处理数据准备中'
             ]);
 
-            $this->jumpurl($this->url->link('crontab/handle','step=3'));
+            $this->jumpurl($this->url->link('crontab/handle','step=5'));
         }else if ($step == 2) {//处理商品
             
             //需要处理的商品列表
@@ -166,7 +168,59 @@ class ControllerCrontabHandle extends Controller {
 
             //$this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 5) {
-            echo "处理完成";exit();
+
+            //处理文章详情里面的URL链接
+            $info                           = $this->model_catalog_handle->get_product_description_list($filter_data);
+            $remainder                      = intval($this->session->data['handle_data']['pdtotals'] - $limit * $page);
+            $remainder1                     = $this->session->data['handle_data']['pdtotals'] - $remainder;
+            $is_save                        = $remainder > 0 ? true : false;
+            $option_id                      = $info['product_id'];
+
+            if ($remainder > 0) {
+
+                if (!empty($info)) {
+                    $updata                         = [];
+                    $updata['language_id']          = 2;
+                    $updata['product_id']           = $info['product_id'];
+                    $updata['name']                 = isset($info['name']) ? $this->filter_keywords($info['name']) : '';
+                    $updata['tag']                  = isset($info['tag']) ? $this->filter_keywords($info['tag']) : '';
+                    $updata['meta_title']           = isset($info['meta_title']) ? $this->filter_keywords($info['meta_title']) : '';
+                    $updata['meta_description']     = isset($info['meta_description']) ? $this->filter_keywords($info['meta_description']) : '';
+                    $updata['meta_keyword']         = isset($info['meta_keyword']) ? $this->filter_keywords($info['meta_keyword']) : '';
+                    $description                    = isset($info['description']) ? $this->filter_keywords($info['description']) : '';
+                    $updata['description']          = str_replace(['http://v2.easijar.com','https://v2.easijar.com','http://10.5.151.185','https://10.5.151.185'],['..','..','..','..'], $description);
+
+                    //$this->model_catalog_handle->update_product_description($updata);
+                    print_r($updata);
+
+                    //翻译入库
+                    $updata['language_id']          = 1;
+                    $updata['name']                 = $this->handle_translate($updata['name']);
+                    $updata['tag']                  = $this->handle_translate($updata['tag']);
+                    $updata['meta_title']           = $this->handle_translate($updata['meta_title']);
+                    $updata['meta_description']     = $this->handle_translate($updata['meta_description']);
+                    $updata['meta_keyword']         = $this->handle_translate($updata['meta_keyword']);
+                    print_r($updata);exit();
+                    $this->model_catalog_handle->update_product_description($updata);
+                }
+
+                $page ++;
+            }else{
+                $step ++;
+            }
+
+            $this->echo_log([
+                'handle_name'=>'商品详情信息过滤',
+                'handle_num1'=>$this->session->data['handle_data']['pdtotals'],
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'详情名称：'.$info['name'] . '(详情ID：' . $info['product_id'] . ')',
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        }else if ($step == 6) {
+            echo "ok";exit();
         }
     }
 
@@ -186,14 +240,10 @@ class ControllerCrontabHandle extends Controller {
     private function handle_translate($str)
     {
         if (empty($str) || strlen($str) <= 0)  return '';
-        if ($this->string_type($str) === 1){
-            wr(['en'=>$str]);
-            return '';
-        }
-        wr(['zh'=>$str]);
+        if ($this->string_type($str) === 1) return '';
+
         //开始翻译
         $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['d'=>'en','q'=>$str,'s'=>'zh-cn']);
-
         return !empty($outputStr) ? ucfirst($outputStr) : $str;
     }
 
@@ -432,5 +482,23 @@ class ControllerCrontabHandle extends Controller {
         }
         
         return [$CN,$C];
+    }
+
+
+    private function filter_keywords($content = '')
+    {
+        if ($content) {
+            $filter         = ['亚马逊','速卖通','跨境','批发','直销','欧美','欧洲站','【起念】','起念','一件','代发','wish','EBAY','外贸','2015','2016','2017','2018','热销款','热卖','厂家','包邮','直邮','网红','彩月','原宿','奈珠','青岛'];
+            $filter_empty   = [];
+            $filter_count   = count($filter);
+
+            for ($i=0; $i < $filter_count; $i++) {
+                $filter_empty[] = '';
+            }
+
+            $content    = str_replace($filter, $filter_empty, $content);
+        }
+
+        return $content;
     }
 }

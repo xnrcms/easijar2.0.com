@@ -1,5 +1,54 @@
 <?php
 class ModelCatalogHandle extends Model {
+    public function get_product_description_totals()
+    {
+        $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_description WHERE language_id = 1");
+        return $query->row['total'];
+    }
+    public function get_product_description_list($data){
+        $sql    = "SELECT * FROM " . DB_PREFIX . "product_description WHERE language_id = 1";
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+
+            $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->row;
+    }
+
+    public function update_product_description($updata = [])
+    {
+        if (empty($updata))  return;
+
+        $product_id             = isset($updata['product_id']) ? (int)$updata['product_id'] : 0;
+        $language_id            = isset($updata['language_id']) ? (int)$updata['language_id'] : 0;
+
+        $setSql                 = '';
+
+        foreach ($updata as $key => $value) {
+            if (!in_array($key, ['product_id','language_id'])) {
+                $setSql     .= "`" . $key . "` = '" . $this->db->escape($value) . "',";
+            }
+        }
+
+        $setSql                = trim($setSql,',');
+
+        if (!empty($setSql)) {
+            $sql = "UPDATE `" . DB_PREFIX . "product_description` SET " . $setSql . " WHERE language_id = '" . $language_id . "' AND product_id = '" . $product_id . "'";
+            $this->db->query($sql);
+        }
+
+    }
+
     public function get_product_option_value_total()
     {
     	$query = $this->db->query("SELECT COUNT(total) AS total FROM (SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_option_value WHERE 1 GROUP BY product_id) AS tt WHERE 1");

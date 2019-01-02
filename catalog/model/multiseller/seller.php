@@ -279,7 +279,7 @@ class ModelMultisellerSeller extends Model {
 			);
 		}
 
-		$query = $this->db->query("SELECT COUNT(*) AS total, date_added 
+		$query = $this->db->query("SELECT COUNT(*) AS total, o.date_added 
                                     FROM `" . DB_PREFIX . "ms_suborder` so
                                     LEFT JOIN `" . DB_PREFIX . "order` o ON o.order_id = so.order_id
                                     WHERE so.seller_id = '" . $seller_id . "' AND so.order_status_id IN (" . implode(",", $implode) . ") AND DATE(o.date_added) >= '" . $this->db->escape(date('Y') . '-' . date('m') . '-1') . "' GROUP BY DATE(o.date_added)");
@@ -288,7 +288,7 @@ class ModelMultisellerSeller extends Model {
 			$order_data[date('j', strtotime($result['date_added']))]['count'] = $result['total'];
 		}
 
-		$query = $this->db->query("SELECT SUM(op.seller_amount) AS amount, date_added 
+		$query = $this->db->query("SELECT SUM(op.seller_amount) AS amount, o.date_added 
                                     FROM `" . DB_PREFIX . "ms_order_product` op
                                     LEFT JOIN `" . DB_PREFIX . "ms_suborder` so ON so.order_id = op.order_id
                                     LEFT JOIN `" . DB_PREFIX . "order` o ON o.order_id = op.order_id
