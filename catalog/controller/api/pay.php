@@ -147,7 +147,7 @@ class ControllerApiPay extends Controller {
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
-        wr($req_data);
+
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }

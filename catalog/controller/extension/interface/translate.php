@@ -22,14 +22,9 @@ class ControllerExtensionInterfaceTranslate extends Controller {
 	    $parame['s'] 		= $data['s'];
 
 		$data 				= curl_http($apiurl,$parame,'POST',$headers);
-			wr($data);exit();
 		$data 				= !empty($data) ? json_decode($data,true) : [];
 		
-		if (isset($data['status']) && $data['status'] === 200) {
-			return $data['msg'];
-		}else{
-			return '';
-		}
+		return (isset($data['status']) && $data['status'] === 200) ? $data['msg'] : '';
 	}
 
 	public function support_language()
