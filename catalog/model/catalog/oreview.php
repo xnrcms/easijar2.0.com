@@ -125,7 +125,7 @@ class ModelCatalogOreview extends Model
     }
 
     public function addReviewReply($review_id, $data) {
-        $this->db->query('INSERT INTO '.DB_PREFIX."review_reply SET order_product_review_id = '".(int) $review_id."', content = '".$this->db->escape(strip_tags($data['content']))."', seller_id = '" . $this->customer->getId() . "', date_added = NOW(), date_modified = NOW()");
+        $this->db->query('INSERT INTO '.DB_PREFIX."review_reply SET order_product_review_id = '".(int) $review_id."', content = '".$this->db->escape(strip_tags($data['content']))."', user_id = '" . $this->customer->getId() . "', date_added = NOW(), date_modified = NOW()");
 
         $reply_id = $this->db->getLastId();
 

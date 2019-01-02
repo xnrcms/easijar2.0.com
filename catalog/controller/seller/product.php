@@ -854,6 +854,11 @@ class ControllerSellerProduct extends Controller
 
         }
 
+        //价格合法
+        if (!isset($this->request->post['price']) || $this->request->post['price'] <= 0 || $this->request->post['price'] >= 1000000 ) {
+            //$this->error['price'] = $this->language->get('error_price');
+        }
+
         if ((utf8_strlen($this->request->post['sku']) < 3) || (utf8_strlen($this->request->post['sku']) > 64)) {
             $this->error['sku'] = $this->language->get('error_sku');
         }

@@ -83,7 +83,7 @@ class ControllerApiCoupon extends Controller {
 
 	public function lists()
 	{
-		$allowKey       = ['api_token','seller_id','page'];
+		$allowKey       = ['api_token','seller_id','page'/*,'limit'*/];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
         $data 			= [];
@@ -100,7 +100,8 @@ class ControllerApiCoupon extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
-        $page 				= ( !isset($req_data['page']) || (int)$req_data['page'] <= 0 ) ? 1 : (int)$req_data['page'];
+        $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
+        $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
         $data['platform']	= [];
         $data['business']	= [];
@@ -111,8 +112,8 @@ class ControllerApiCoupon extends Controller {
 		$filter_data 	= [
 			'sort'  => 'discount',
 			'order' => 'DESC',
-			'start' => ($page - 1) * 5,
-			'limit' => 5,
+			'start' => ($page - 1) * $limit,
+			'limit' => $limit,
 			'date' => 1
 		];
 

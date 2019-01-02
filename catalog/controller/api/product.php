@@ -267,7 +267,7 @@ class ControllerApiProduct extends Controller {
 	        	$seller_info['store_name'] 		= $seller['store_name'];
 	        	$seller_info['product_total'] 	= $this->model_multiseller_seller->getTotalSellerProducts($seller['seller_id']);
 	        	$seller_info['rating'] 			= sprintf("%.1f", $seller['rating']);
-	        	$seller_info['chats'] 			= '80%';
+	        	$seller_info['chats'] 			= '98.5%';
 	        }
 
 			//商品图片

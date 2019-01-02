@@ -185,7 +185,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$url 									= $url . http_build_query($payData);
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
-
+		
 		if (isset($pay['result']['code']) && !empty($pay['result']['code']))
 		{
 			if (preg_match('/000\\.000\\.|000\\.100\\.1|000\\.[36]/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code']))

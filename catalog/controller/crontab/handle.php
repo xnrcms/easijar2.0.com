@@ -183,23 +183,23 @@ class ControllerCrontabHandle extends Controller {
                     $updata['language_id']          = 2;
                     $updata['product_id']           = $info['product_id'];
                     $updata['name']                 = isset($info['name']) ? $this->filter_keywords($info['name']) : '';
-                    $updata['tag']                  = isset($info['tag']) ? $this->filter_keywords($info['tag']) : '';
-                    $updata['meta_title']           = isset($info['meta_title']) ? $this->filter_keywords($info['meta_title']) : '';
-                    $updata['meta_description']     = isset($info['meta_description']) ? $this->filter_keywords($info['meta_description']) : '';
-                    $updata['meta_keyword']         = isset($info['meta_keyword']) ? $this->filter_keywords($info['meta_keyword']) : '';
+                    $updata['tag']                  = $updata['name'];
+                    $updata['meta_title']           = $updata['name'];
+                    $updata['meta_description']     = $updata['name'];
+                    $updata['meta_keyword']         = $updata['name'];
                     $description                    = isset($info['description']) ? $this->filter_keywords($info['description']) : '';
                     $updata['description']          = str_replace(['http://v2.easijar.com','https://v2.easijar.com','http://10.5.151.185','https://10.5.151.185'],['..','..','..','..'], $description);
 
-                    //$this->model_catalog_handle->update_product_description($updata);
+                    $this->model_catalog_handle->update_product_description($updata);
                     print_r($updata);
 
                     //翻译入库
                     $updata['language_id']          = 1;
                     $updata['name']                 = $this->handle_translate($updata['name']);
-                    $updata['tag']                  = $this->handle_translate($updata['tag']);
-                    $updata['meta_title']           = $this->handle_translate($updata['meta_title']);
-                    $updata['meta_description']     = $this->handle_translate($updata['meta_description']);
-                    $updata['meta_keyword']         = $this->handle_translate($updata['meta_keyword']);
+                    $updata['tag']                  = $updata['name'];
+                    $updata['meta_title']           = $updata['name'];
+                    $updata['meta_description']     = $updata['name'];
+                    $updata['meta_keyword']         = $updata['name'];
                     print_r($updata);exit();
                     $this->model_catalog_handle->update_product_description($updata);
                 }
