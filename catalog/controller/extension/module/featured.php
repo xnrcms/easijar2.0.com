@@ -32,7 +32,8 @@ class ControllerExtensionModuleFeatured extends Controller {
 		if (!$products) return [];
 
 		//$products 			= array_slice($products, 0, (int)$setting['limit']);
-		$data['products'] 	= [];
+		$data['products'] 		= [];
+		$data['product_total'] 	= $product_total;
 		
 		foreach ($products as $product) {
 			$data['products'][] = $this->model_catalog_product->handleSingleProduct($product, $setting['width'], $setting['height']);

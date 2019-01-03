@@ -512,21 +512,21 @@ class ControllerApiProduct extends Controller {
         }
 
         $page 						= (isset($req_data['page']) && (int)$req_data['page'] > 0) ? (int)$req_data['page'] : 1;
-		$limit 						= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 1;
+		$limit 						= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 		$start 						= $limit * ($page-1);
 
 	    $this->load->model('setting/module');
 	    $this->load->model('tool/image');
 
 		//推荐商品
-		$module_id 					= 39;
+		$module_id 					= 37;
 	    $setting_info 				= $this->model_setting_module->getModule($module_id);
 		$setting_info['module_id'] 	= $module_id;
 		$setting_info['position'] 	= 'content_top';
 		$setting_info['api'] 		= true;
 		$setting_info['limit'] 		= $limit;
 		$setting_info['start'] 		= $start;
-	    $results 					= $this->load->controller('extension/module/latest', $setting_info,true);
+	    $results 					= $this->load->controller('extension/module/featured', $setting_info,true);
 
 	    $product_total 				= isset($results['product_total']) ? (int)$results['product_total'] : 0;
 	    $remainder 					= intval($product_total - $limit * $page);
