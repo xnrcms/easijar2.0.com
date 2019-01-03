@@ -27,6 +27,8 @@ class ControllerSellerProduct extends Controller
         if (!$this->customer->isLogged()) {
             $this->session->data['redirect'] = $this->url->link('seller/product');
             $this->response->redirect($this->url->link('account/login'));
+        }else if (!$this->customer->isSeller()) {
+            $this->response->redirect($this->url->link('seller/add'));
         }
 
         $this->ms_seller = \Seller\MsSeller::getInstance($registry);

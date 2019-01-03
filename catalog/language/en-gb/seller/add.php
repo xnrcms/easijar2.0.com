@@ -56,3 +56,4 @@ $_['error_zone']                = 'Please select a zone';
 $_['error_city']                = 'Please select a city';
 $_['error_county']              = 'Please select a county';
 $_['error_exists_disable']      = 'Your seller account have be disabled or not approved yet. Please contact the administrator for help!';
+$_['error_not_pass']      		= 'Your account has not been audited yet, please wait patiently!';

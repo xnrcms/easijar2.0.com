@@ -8,6 +8,7 @@ $_['text_reward']              = 'Reward Points:';
 $_['text_points']              = 'Price in reward points:';
 $_['text_logistics_mode']      = 'type of shippi:';
 $_['logistics_name']           = 'International Logistics';
+$_['text_freight'] 			   = 'Free Shipping';
 $_['text_stock']               = 'Availability:';
 $_['text_instock']             = 'In Stock';
 $_['text_tax']                 = 'Ex Tax:';

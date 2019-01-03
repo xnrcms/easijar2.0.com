@@ -7,7 +7,7 @@ class ControllerSellerLogin extends Controller {
 		    if ($this->customer->isSeller()) {
 			    $this->response->redirect($this->url->link('seller/account'));
             } else {
-			    $this->response->redirect($this->url->link('seller/account/add'));
+            	$this->response->redirect($this->url->link('seller/add'));
             }
 		}
 

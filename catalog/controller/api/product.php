@@ -141,6 +141,7 @@ class ControllerApiProduct extends Controller {
 	public function detail()
 	{
 		$this->response->addHeader('Content-Type: application/json');
+		$this->load->language('product/product');
 
 		$allowKey		= ['api_token','product_id'];
         $req_data       = $this->dataFilter($allowKey);
@@ -319,13 +320,8 @@ class ControllerApiProduct extends Controller {
 
 			$address 							= [];
 	        $address['country_id']          	= isset($this->session->data['country_code']) ? get_country_code($this->session->data['country_code']) : 0;
-	        $address['weight']              	= isset($product_info['weight']) ? $product_info['weight'] : 0;
-	        $address['weight_class_id']     	= isset($product_info['weight_class_id']) ? $product_info['weight_class_id'] : 0;
-	        $address['length']              	= isset($product_info['length']) ? $product_info['length'] : 0;
-	        $address['width']               	= isset($product_info['width']) ? $product_info['width'] : 0;
-	        $address['height']              	= isset($product_info['height']) ? $product_info['height'] : 0;
-	        $address['length_class_id']     	= isset($product_info['length_class_id']) ? $product_info['length_class_id'] : 0;
-			$cost 								= $this->model_extension_total_multiseller_shipping->getShippingCostByAddress($seller_id,$address);
+	        $address['zone_id']          		= 0;
+			$cost 								= $this->model_extension_total_multiseller_shipping->getProductsCost($seller_id,$address);
 			$pinfo['freight'] 					= !empty($cost) ? $this->currency->format($cost, $this->session->data['currency']) : '包邮';
 
 			$data['images'] 					= $images;
@@ -546,7 +542,7 @@ class ControllerApiProduct extends Controller {
 	    }
 
 	    $data 					= [];
-		$data['total_page'] 	= ceil($product_total/$limit);
+		$data['total_page'] 	= (int)(ceil($product_total/$limit));
 		$data['remainder'] 		= $remainder >= 0 ? $remainder : 0;
 		$data['lists'] 			= $recommend;
 

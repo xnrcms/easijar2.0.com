@@ -184,7 +184,7 @@ class ControllerApiUser extends Controller {
 
 		unset($this->session->data['guest']);
 
-		$req_data['fullname'] 		= '';
+		$req_data['fullname'] 		= 'EasiJAR shopper';
 		$req_data['custom_field'] 	= '';
 		$req_data['newsletter'] 	= 0;
 		$req_data['safe'] 			= 0;

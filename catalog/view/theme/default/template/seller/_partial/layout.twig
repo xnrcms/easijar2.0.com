@@ -33,7 +33,7 @@
       </a></li><li><a {{ route == 'seller/banner' ? 'class="active"' }} href="{{ helper.url.link('seller/banner') }}">
         <i class="iconfont left">&#xe647;</i>{{ text_banner }}<i class="iconfont right">&#xe6a7;</i>
       </a></li>
-      <li><a {{ route == 'account/password' ? 'class="active"' }} href="{{ helper.url.link('account/password','ptype=1') }}">
+      <li><a {{ route == 'account/password' ? 'class="active"' }} href="{{ helper.url.link('seller/account/update_pass') }}">
         <i class="iconfont left">&#xe65f;</i>{{ text_password }}<i class="iconfont right">&#xe6a7;</i>
       </a></li>
       <li><a {{ route == 'seller/product' or route == 'seller/product/edit' or route == 'seller/product/add' ? 'class="active"' }} href="{{ helper.url.link('seller/product') }}">

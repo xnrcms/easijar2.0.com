@@ -3,7 +3,6 @@ class ControllerSellerAccount extends Controller {
     public function index() {
         if (!$this->customer->isLogged()) {
             $this->session->data['redirect'] = $this->url->link('seller/account');
-
             $this->response->redirect($this->url->link('seller/login'));
         } else if (!$this->customer->isSeller()) {
             $this->response->redirect($this->url->link('seller/add'));
@@ -81,5 +80,14 @@ class ControllerSellerAccount extends Controller {
 		}
 
         $this->response->setOutput($this->load->view('seller/account', $data));
+    }
+
+    public function update_pass()
+    {
+        if ($this->customer->isSeller()) {
+            $this->response->redirect($this->url->link('account/password','ptype=1'));
+        } else {
+            $this->response->redirect($this->url->link('seller/add'));
+        }
     }
 }

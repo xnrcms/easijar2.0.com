@@ -34,7 +34,7 @@ class ModelExtensionTotalMultisellerShipping extends Model {
             $title = $this->language->get('multiseller')->get('text_multiseller_shipping');
 		    $first = true;
             foreach ($seller_price as $key => $value) {
-		        $shipping_cost = $this->getShippingCost($key);
+		        $shipping_cost = $this->getShippingCost($key,$this->session->data['shipping_address']);
 		        $cost += $shipping_cost;
 
                 $total['totals'][] = array(
@@ -111,8 +111,12 @@ class ModelExtensionTotalMultisellerShipping extends Model {
         return $cost;
     }
 
-	private function getShippingCost($seller_id) {
-	    $address = $this->session->data['shipping_address'];
+    public function getProductsCost($seller_id,$address){
+        if ($seller_id <= 0 || !isset($address['zone_id']) || !isset($address['country_id']) )  return 0;
+        return $this->getShippingCost($seller_id,$address);
+    }
+
+	private function getShippingCost($seller_id,$address) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "ms_shipping_cost sc
 		                           LEFT JOIN " . DB_PREFIX . "zone_to_geo_zone gz ON sc.geo_zone_id = gz.geo_zone_id
 		                           WHERE seller_id = '" . (int)$seller_id . "' AND (gz.zone_id = '" . $address['zone_id'] . "' OR gz.zone_id = '0') AND gz.country_id = '" . $address['country_id'] . "'

@@ -2,15 +2,30 @@
 class ControllerSellerAdd extends Controller {
 	private $error = array();
 
-    public function index() {
+    public function index()
+    {
+		$this->load->language('seller/add');
+        $this->load->language('seller/layout');
+    	$this->load->model('multiseller/seller');
+
+    	$data['show_add'] = 1;
+
 		if (!$this->customer->isLogged()) {
 			$this->response->redirect($this->url->link('seller/register'));
 		} else if ($this->customer->isSeller()) {
 			$this->response->redirect($this->url->link('seller/account'));
+        }else{
+        	$seller_info = $this->model_multiseller_seller->getSeller($this->customer->getId());
+
+			if (!empty($seller_info) && $seller_info['status'] == '0') {
+				$data['show_add'] = 0;
+			    $this->error['warning'] = $this->language->get('error_not_pass');
+			}else if (!empty($seller_info) && $seller_info['status'] == '1') {
+				
+				$this->response->redirect($this->url->link('seller/account'));
+			}
         }
 
-		$this->load->language('seller/add');
-        $this->load->language('seller/layout');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -154,7 +169,7 @@ class ControllerSellerAdd extends Controller {
 		} else {
 			$data['agree'] = false;
 		}
-
+		
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');
 		$data['content_top'] = $this->load->controller('common/content_top');

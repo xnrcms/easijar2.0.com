@@ -16,6 +16,7 @@ $_['text_reward']                             = '奖励积分：';
 $_['text_points']                             = '积分兑换：';
 $_['text_logistics_mode']                     = '运输方式：';
 $_['logistics_name']                          = '国际物流';
+$_['text_freight'] 							  = '包邮';
 $_['text_stock']                              = '商品库存：';
 $_['text_instock']                            = '有现货';
 $_['text_tax']                                = '税前';
