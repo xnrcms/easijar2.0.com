@@ -113,14 +113,14 @@ class ControllerApiHome extends Controller {
 		$limit 						= 10;
 		$start 						= $limit * ($page-1);
 
-		$module_id 					= 39;
+		$module_id 					= 37;
 	    $setting_info 				= $this->model_setting_module->getModule($module_id);
 		$setting_info['module_id'] 	= $module_id;
 		$setting_info['position'] 	= 'content_top';
 		$setting_info['api'] 		= true;
 		$setting_info['limit'] 		= $limit;
 		$setting_info['start'] 		= $start;
-	    $results 					= $this->load->controller('extension/module/latest', $setting_info,true);
+	    $results 					= $this->load->controller('extension/module/featured', $setting_info,true);
 
 	    $recommend 					= [];
 	    if (isset($results['products']) && !empty($results['products'])) {

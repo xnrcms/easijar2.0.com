@@ -465,24 +465,27 @@ class ModelCatalogProductPro extends ModelCatalogProduct
         return $productList;
     }
 
-    public function getProductsByIds($productIds)
-    {
-        if (empty($productIds)) {
-            return array();
-        }
-        $cacheKey = 'product.ids_' . $this->getCacheKey($productIds);
-        if ($result = $this->getCacheData($cacheKey)) {
+    public function getProductsByIds($data)
+    {   
+        $productIds     = (isset($data['product']) && !empty($data['product'])) ? $data['product'] : [];
+        if (empty($productIds))  return [];
+
+        $cacheKey       = 'product.ids_' . $this->getCacheKey($data);
+        if ($result     = $this->getCacheData($cacheKey)) {
             return $result;
         }
 
-        $sql = $this->getProductSql($productIds);
-        $query = $this->db->query($sql);
-        $products = array();
+        $sql            = $this->getProductSql($productIds);
+        $query          = $this->db->query($sql);
+        $products       = [];
+
         if ($query->num_rows) {
             $detailArray = $this->switchKey($query->rows, 'product_id');
             foreach ($productIds as $productId) {
                 $product = array_get($detailArray, $productId);
-                $products[$product['product_id']] = $this->handleProduct($product);
+                if (!empty($product)) {
+                    $products[$product['product_id']] = $this->handleProduct($product);
+                }
             }
         }
 
