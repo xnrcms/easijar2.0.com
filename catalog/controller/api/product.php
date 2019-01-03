@@ -322,7 +322,7 @@ class ControllerApiProduct extends Controller {
 	        $address['country_id']          	= isset($this->session->data['country_code']) ? get_country_code($this->session->data['country_code']) : 0;
 	        $address['zone_id']          		= 0;
 			$cost 								= $this->model_extension_total_multiseller_shipping->getProductsCost($seller_id,$address);
-			$pinfo['freight'] 					= !empty($cost) ? $this->currency->format($cost, $this->session->data['currency']) : '包邮';
+			$pinfo['freight'] 					= !empty($cost) ? $this->currency->format($cost, $this->session->data['currency']) : t('text_freight');
 
 			$data['images'] 					= $images;
 			$data['pinfo'] 						= $pinfo;//购物车数量

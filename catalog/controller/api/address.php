@@ -283,7 +283,7 @@ class ControllerApiAddress extends Controller {
         $allowKey       = ['api_token','order_sn'];
         $req_data       = $this->dataFilter($allowKey);
         $json           = [];
-        wr("======================================================");
+        
         if (!$this->checkSign($req_data)) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
         }
@@ -296,7 +296,6 @@ class ControllerApiAddress extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
-        wr($this->session->data);
         if (!$this->customer->isLogged()){
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
