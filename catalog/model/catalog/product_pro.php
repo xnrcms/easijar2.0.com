@@ -367,7 +367,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
     {
         $cacheKey = 'product.products_' . $this->getCacheKey($data);
         if ($result = $this->getCacheData($cacheKey)) {
-            //return $result;
+            return $result;
         }
 
         $sql = "SELECT p.product_id";
@@ -386,6 +386,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
         if (array_get($data, 'sort') == 'pdis.date_start') {
             $sql .= " LEFT JOIN " . DB_PREFIX . "product_discount pdis ON (pdis.product_id = p.product_id AND pdis.customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' AND ((pdis.date_start = '0000-00-00' OR pdis.date_start < NOW()) AND (pdis.date_end = '0000-00-00' OR pdis.date_end > NOW())))";
         }
+        
         $sql = $this->buildFilterWhereSql($sql, $data);
         $sql .= " GROUP BY p.product_id";
 
