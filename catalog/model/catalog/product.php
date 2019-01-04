@@ -611,11 +611,11 @@ class ModelCatalogProduct extends Model {
 			$tax = false;
 		}
 
-		if ($this->config->get('config_review_status')) {
+		/*if ($this->config->get('config_review_status')) {
 			$rating = (int)$product['rating'];
 		} else {
 			$rating = false;
-		}
+		}*/
 
 		$discount 		= ($price_c > 0 && $price_c >= $special_c) ? round(($price_c - $special_c) / $price_c)*100 : 0;
 
@@ -629,10 +629,10 @@ class ModelCatalogProduct extends Model {
             'flash'       => $flash_price,
             'tax'         => $tax,
             'minimum'     => $product['minimum'] ?: 1,
-            'rating'      => $rating,
             'sales'       => (int)$product['sales'],
 			'quantity'    => $product['quantity'],
 			'discount'    => $discount,
+			'rating'  	  => (int)$product['rating'],
 			'reviews'  	  => (int)$product['reviews'],
             'href'        => $href ?: $this->url->link('product/product', 'product_id=' . $product['product_id'])
         );

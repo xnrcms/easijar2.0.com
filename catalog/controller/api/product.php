@@ -346,6 +346,7 @@ class ControllerApiProduct extends Controller {
 
 	public function search()
 	{
+		$time 	= time();
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/search');
 
@@ -360,7 +361,7 @@ class ControllerApiProduct extends Controller {
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
         }
-
+        
 		$this->load->model('catalog/category');
 		$this->load->model('catalog/product');
 		$this->load->model('catalog/product_pro');
@@ -398,7 +399,6 @@ class ControllerApiProduct extends Controller {
 		$page 				= (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
 		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
-
 		unset($this->request->post['in_stock']);
 			
 		$this->load->model('catalog/category');
@@ -431,6 +431,7 @@ class ControllerApiProduct extends Controller {
 
 			$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
 			$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
+			wr($results);
 
 			foreach ($results as $result) {
 				$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
@@ -442,15 +443,15 @@ class ControllerApiProduct extends Controller {
 					'special'	=> !empty($product['special']) ? $product['special'] : '',
 					'discount' 	=> $product['discount'],
 					'image'	 	=> $product['thumb'],
-					'rating' 	=> 5,
-					'rating_num'=> 10,
+					'rating' 	=> $product['rating'],
+					'rating_num'=> $product['reviews'],
 				];
 			}
 		}
 
 		$remainder 					= intval($product_total - $limit * $page);
-		$data['sorts'] 				= $this->get_sorts();
-		$data['filter'] 			= $this->get_filter();
+		$data['sorts'] 				= $this->get_sorts();wr("\nRuntime8:".date('Y-m-d H:i:s') . "\n");
+		$data['filter'] 			= $this->get_filter();wr("\nRuntime9:".date('Y-m-d H:i:s') . "\n");
 		$data['total_page'] 		= ceil($product_total/$limit);
 		$data['remainder'] 			= $remainder >= 0 ? $remainder : 0;
 		$data['products'] 			= $products;

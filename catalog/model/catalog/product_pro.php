@@ -123,7 +123,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
     {
         $languageId = (int)$this->config->get('config_language_id');
         if (!empty($data['filter_name'])) {
-            $sql .= ", pa.text";
+            //$sql .= ", pa.text";
         }
 
         if (!empty($data['filter_category_id'])) {
@@ -143,18 +143,18 @@ class ModelCatalogProductPro extends ModelCatalogProduct
         }
 
         if (!empty($data['filter_name']) || !empty($data['filter_attributes'])) {
-            $sql .= " LEFT JOIN " . DB_PREFIX . "product_attribute pa ON (pa.product_id = p.product_id)";
+            //$sql .= " LEFT JOIN " . DB_PREFIX . "product_attribute pa ON (pa.product_id = p.product_id)";
         }
 
         if (!empty($data['filter_attributes'])) {
-            $sql .= " LEFT JOIN " . DB_PREFIX . "attribute attr ON (attr.attribute_id = pa.attribute_id)";
-            $sql .= " LEFT JOIN " . DB_PREFIX . "attribute_description attrd ON (attrd.attribute_id = attr.attribute_id AND attrd.language_id = '" . $languageId . "')";
+            //$sql .= " LEFT JOIN " . DB_PREFIX . "attribute attr ON (attr.attribute_id = pa.attribute_id)";
+            //$sql .= " LEFT JOIN " . DB_PREFIX . "attribute_description attrd ON (attrd.attribute_id = attr.attribute_id AND attrd.language_id = '" . $languageId . "')";
         }
 
         if (!empty($data['filter_option_value_ids'])) {
-            $sql .= " LEFT JOIN " . DB_PREFIX . "product_option_value pov ON (pov.product_id = p.product_id)";
-            $sql .= " LEFT JOIN " . DB_PREFIX . "option_description od ON (od.option_id = pov.option_id AND od.language_id = '" . $languageId . "')";
-            $sql .= " LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (ovd.option_value_id = pov.option_value_id AND ovd.language_id = '" . $languageId . "')";
+            //$sql .= " LEFT JOIN " . DB_PREFIX . "product_option_value pov ON (pov.product_id = p.product_id)";
+            //$sql .= " LEFT JOIN " . DB_PREFIX . "option_description od ON (od.option_id = pov.option_id AND od.language_id = '" . $languageId . "')";
+            //$sql .= " LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (ovd.option_value_id = pov.option_value_id AND ovd.language_id = '" . $languageId . "')";
         }
 
         if (!empty($data['filter_variant_value_ids'])) {
@@ -221,7 +221,8 @@ class ModelCatalogProductPro extends ModelCatalogProduct
                 $words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_name'])));
 
                 foreach ($words as $word) {
-                    $implode[] = "(pd.name LIKE '%" . $this->db->escape($word) . "%' OR pa.text LIKE '%" . $this->db->escape($word) . "%')";
+                    $implode[] = "pd.name LIKE '%" . $this->db->escape($word) . "%'";
+                    //$implode[] = "(pd.name LIKE '%" . $this->db->escape($word) . "%' OR pa.text LIKE '%" . $this->db->escape($word) . "%')";
                 }
 
                 if ($implode) {
@@ -252,13 +253,13 @@ class ModelCatalogProductPro extends ModelCatalogProduct
             }
 
             if (!empty($data['filter_name'])) {
-                $sql .= " OR LCASE(p.model) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                /*$sql .= " OR LCASE(p.model) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.sku) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.upc) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.ean) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.jan) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.isbn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
-                $sql .= " OR LCASE(p.mpn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
+                $sql .= " OR LCASE(p.mpn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";*/
             }
 
             $sql .= ")";
@@ -366,7 +367,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
     {
         $cacheKey = 'product.products_' . $this->getCacheKey($data);
         if ($result = $this->getCacheData($cacheKey)) {
-            return $result;
+            //return $result;
         }
 
         $sql = "SELECT p.product_id";
@@ -456,11 +457,11 @@ class ModelCatalogProductPro extends ModelCatalogProduct
             $productIds[] = $result['product_id'];
         }
 
-        $productData = $this->getProductsByIds($productIds);
+        $productData = $this->getProductsByIds(['product'=>$productIds]);
         foreach ($productIds as $productId) {
             $productList[] = array_get($productData, $productId);
         }
-
+        
         $this->setCacheData($cacheKey, $productList);
         return $productList;
     }
@@ -498,7 +499,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
         $cacheKey = 'product.total_' . $this->getCacheKey($data);
         $total = $this->getCacheData($cacheKey);
         if ($total || $total === 0) {
-            return $total;
+            //return $total;
         }
 
         $filterCategoryId = array_get($data, 'filter_category_id');
@@ -520,7 +521,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
                 $sql .= " GROUP BY p2c.category_id";
             }
         }
-
+        wr("\n" . $sql . "\n");
         $query = $this->db->query($sql);
         if (is_array($filterCategoryId)) {
             $total = $query->rows;
