@@ -347,6 +347,7 @@ class ControllerApiCheckout extends Controller
     // Validate and submit order
     public function confirm()
     {
+        wr("\n\n\n\n\n\n\nRuntime0:" . date('Y-m-d H:i:s') . "\n");
         $this->response->addHeader('Content-Type: application/json');
 
         $allowKey       = ['api_token','shipping_address_id','payment_method','shipping_method','comment'];
@@ -485,7 +486,7 @@ class ControllerApiCheckout extends Controller
             $this->session->data['comment'] = $order_data['comment'];
 
             $order_id = $this->model_checkout_checkout->createOrder();
-            
+
             $this->cart->clear();
 
             // Change order status to Unpaid
@@ -493,13 +494,17 @@ class ControllerApiCheckout extends Controller
 
                 $this->session->data['order_sn'] = $this->model_checkout_checkout->getOrderSnByOrderId($order_id);
 
+                wr("\nRuntime1:" . date('Y-m-d H:i:s') . "\n");
                 $payment_view          = $this->load->controller("extension/payment/" . $order_data['payment_method'] . '/payFormForSm');
+                
+                wr("\nRuntime2:" . date('Y-m-d H:i:s') . "\n");
                 $this->model_checkout_order->addOrderHistory($order_id, config('config_unpaid_status_id'));
+                wr("\nRuntime3:" . date('Y-m-d H:i:s') . "\n");
             } else { // cod order does not need unpaid status
                 $payment_view          = '';
                 $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('payment_cod_order_status_id'));
             }
-
+            wr("\nRuntime4:" . date('Y-m-d H:i:s') . "\n");
             $ret                            = [];
             $ret['payment_method']          = $order_data['payment_method'];
             $ret['payment_view']            = $payment_view;

@@ -115,13 +115,13 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
 		if (isset($pay['result']['code']) && !empty($pay['result']['code'])) {
 
-			if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code'])) {
-				
+			if (preg_match('/000\\.200|800\\.400\\.5|100\\.400\\.500/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code']))
+			{
 				$sign 					= md5($order_info['order_sn'] . $order_info['customer_id'] . $pay['id'] . $this->paySingKey);
 				$data 					= [];
 				$data['callback'] 		= $this->callback . 'orderFinish?paycode=oppcw_creditcard&checkoutId=' . $pay['id'] . '&paysign='. $sign . '&';
 				$data['jsurl'] 			= $this->payUrl . '/v1/paymentWidgets.js?checkoutId=' . $pay['id'];
-				wr($data);
+
 				return $data;
 			}else{
 				$logger 				= new Log('pingpong.log');

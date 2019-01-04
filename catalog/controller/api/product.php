@@ -431,7 +431,6 @@ class ControllerApiProduct extends Controller {
 
 			$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
 			$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
-			wr($results);
 
 			foreach ($results as $result) {
 				$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
