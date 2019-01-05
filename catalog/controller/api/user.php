@@ -303,12 +303,8 @@ class ControllerApiUser extends Controller {
 
 		//校验密码复杂程度
 		$password 				= html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8');
-		if (preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password)){
+		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password))){
 			return ['msg'=>$this->language->get('error_password2')];
-		}
-
-		if (preg_match_all("/^[a-zA-Z\d_~!@#$%^&*()\-_=+{};:<,.>?\/]{6,32}$/",$password) < 1){
-        	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password1')]));
 		}
 		
 		if (!(isset($req_data['new_password']) && !empty($req_data['new_password']))) {
@@ -336,7 +332,7 @@ class ControllerApiUser extends Controller {
 	{
 		//校验密码复杂程度
 		$password 				= html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8');
-		if (preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password)){
+		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password))){
 			return ['msg'=>$this->language->get('error_password2')];
 		}
 
