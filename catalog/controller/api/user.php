@@ -293,7 +293,8 @@ class ControllerApiUser extends Controller {
 		}
 		
 		$keys 										= md5('smscode-' . $req_data['account'] . '-2');
-		if ($req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
+		if ($req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time())
+		{
 			return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
 		}
 
@@ -303,8 +304,9 @@ class ControllerApiUser extends Controller {
 
 		//校验密码复杂程度
 		$password 				= html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8');
-		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password))){
-			return ['msg'=>$this->language->get('error_password2')];
+		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password)))
+		{
+			return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password2')]));
 		}
 		
 		if (!(isset($req_data['new_password']) && !empty($req_data['new_password']))) {

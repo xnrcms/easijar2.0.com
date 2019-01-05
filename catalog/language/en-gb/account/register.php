@@ -49,4 +49,4 @@ $_['error_not_email']      		= 'Error: the mailbox address is not registered, pl
 $_['error_not_telephone']      	= 'Error: the phone number has not been registered, please change a mobile phone number';
 $_['error_address']           	= 'Error: the detailed address must be between 2 and 10 characters.';
 $_['error_password1']           = 'Error: The password must be a 6-32-length string of letters, numbers or underscores!';
-$_['error_password2']           = 'Error: A password must contain at least one special symbol:[~!@#$%^&*()\-_=+{};:<,.>?]';
+$_['error_password2']           = 'Error: Password must be 8-20 characters long,and contain one uppercase and one lowercase character';
