@@ -126,9 +126,9 @@
         </div>
       </div>
     </div>
-      <div class="buttons clearfix  mb-1">
+      {# <div class="buttons clearfix  mb-1">
         <div class="pull-left"><a href="{{ back }}" class="btn btn-default">{{ button_back }}</a></div>
-      </div>
+      </div> #}
     </div>
   </div>
 {% endblock %}
@@ -186,67 +186,6 @@
 	  }
 
 	  location = url;
-  });
-  //--></script>
-  <script type="text/javascript"><!--
-  $('input[name=\'filter_customer\']').autocomplete({
-	  'source': function(request, response) {
-		  $.ajax({
-			  url: 'index.php?route=customer/customer/autocomplete&filter_name=' + encodeURIComponent(request),
-			  dataType: 'json',
-			  success: function(json) {
-				  response($.map(json, function(item) {
-					  return {
-						  label: item['name'],
-						  value: item['customer_id']
-					  }
-				  }));
-			  }
-		  });
-	  },
-	  'select': function(item) {
-		  $('input[name=\'filter_customer\']').val(item['label']);
-	  }
-  });
-
-  $('input[name=\'filter_product\']').autocomplete({
-	  'source': function(request, response) {
-		  $.ajax({
-			  url: 'index.php?route=catalog/product/autocomplete&filter_name=' + encodeURIComponent(request),
-			  dataType: 'json',
-			  success: function(json) {
-				  response($.map(json, function(item) {
-					  return {
-						  label: item['name'],
-						  value: item['product_id']
-					  }
-				  }));
-			  }
-		  });
-	  },
-	  'select': function(item) {
-		  $('input[name=\'filter_product\']').val(item['label']);
-	  }
-  });
-
-  $('input[name=\'filter_model\']').autocomplete({
-	  'source': function(request, response) {
-		  $.ajax({
-			  url: 'index.php?route=catalog/product/autocomplete&filter_model=' + encodeURIComponent(request),
-			  dataType: 'json',
-			  success: function(json) {
-				  response($.map(json, function(item) {
-					  return {
-						  label: item['model'],
-						  value: item['product_id']
-					  }
-				  }));
-			  }
-		  });
-	  },
-	  'select': function(item) {
-		  $('input[name=\'filter_model\']').val(item['label']);
-	  }
   });
   //--></script>
   <script type="text/javascript"><!--

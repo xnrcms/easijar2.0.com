@@ -20,7 +20,7 @@ class ControllerCrontabHandle extends Controller {
         if ($step == 0) {
             $this->session->data['handle_data']     = [];
 
-            //统计需要处理的商品数量
+            //统计需要处理的数据
             $ptotals   = $this->model_catalog_handle->get_product_option_value_total();
             $ototals   = $this->model_catalog_handle->get_options_description_total();
             $vtotals   = $this->model_catalog_handle->get_variant_description_total(1);
@@ -242,6 +242,7 @@ class ControllerCrontabHandle extends Controller {
         if (empty($str) || strlen($str) <= 0)  return '';
         if ($this->string_type($str) === 1) return '';
 
+        return 'en-'.$str;
         //开始翻译
         $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['d'=>'en','q'=>$str,'s'=>'zh-cn']);
         return !empty($outputStr) ? ucfirst($outputStr) : $str;

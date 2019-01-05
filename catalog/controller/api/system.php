@@ -72,6 +72,15 @@ class ControllerApiSystem extends Controller {
         
         if ($req_data['sys_field'] == 'country_code') {
             $this->session->data['is_set_country']  = 1;
+
+            //是否第一次设置
+            $is_first        = isset($this->session->data['is_first_setting']) ? (int)$this->session->data['is_first_setting'] : 0;
+            if ($is_first == 0) {
+                $def_currency                               = [86=>'CNY',60=>'MYR',65=>'SGD'];
+                $this->session->data['language']            = 'en-gb';
+                $this->session->data['currency']            = isset($def_currency[(int)$req_data['sys_updata']]) ? $def_currency[(int)$req_data['sys_updata']] : 'USD';
+                $this->session->data['is_first_setting']    = 1;
+            }
         }
 
         $this->session->data[$req_data['sys_field']]      = $req_data['sys_updata'];

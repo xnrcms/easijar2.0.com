@@ -29,7 +29,7 @@ class ControllerApiProduct extends Controller {
 		$this->load->model('tool/image');
 
 		//0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
-		$sortsArr 			= ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
+		$sortsArr 			= ['p.sort_order-DESC','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
 		$filter 			= isset($req_data['filter']) ? (string)$req_data['filter'] : '';
 		$filter 			= urlencode(html_entity_decode($filter, ENT_QUOTES, 'UTF-8'));
@@ -41,10 +41,11 @@ class ControllerApiProduct extends Controller {
 		$variant 			= isset($req_data['variant']) ? parse_filters($req_data['variant']) : '';
 		$filterPrices 		= isset($req_data['price']) ? parse_filters($req_data['price']) : '';
 
-		$sort 				= isset($req_data['sort']) ? (int)$req_data['sort'] : 0;
-		$sort 				= isset($sortsArr[$sort]) ? $sortsArr[$sort] : $sortsArr[0];
-
-		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
+		$sorts 				= isset($req_data['sorts']) ? (int)$req_data['sorts'] : 0;
+		$sorts 				= isset($sortsArr[$sorts]) ? $sortsArr[$sorts] : $sortsArr[0];
+		$sorts 				= explode('-', $sorts);
+		$sort 				= $sorts[0];
+		$order 				= $sorts[1];
 
         $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
 		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
@@ -368,10 +369,11 @@ class ControllerApiProduct extends Controller {
 		$this->load->model('tool/image');
 
 		//0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
-		$sortsArr 			= ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
+		$sortsArr 			= ['p.sort_order-DESC','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
 		$search 			= isset($req_data['search']) ? (string)$req_data['search'] : '';
 		$search 			= urlencode(html_entity_decode($search, ENT_QUOTES, 'UTF-8'));
+		$variant 			= isset($req_data['variant']) ? parse_filters($req_data['variant']) : '';
 
 		$tag 				= isset($req_data['tag']) ? (string)$req_data['tag'] : (isset($req_data['search']) ? (string)$req_data['search'] : '');
 		$tag 				= urlencode(html_entity_decode($tag, ENT_QUOTES, 'UTF-8'));
@@ -391,10 +393,11 @@ class ControllerApiProduct extends Controller {
 		$stockStatusIds 	= isset($req_data['status']) ? parse_filters($req_data['status']) : '';
 		$filterPrices 		= isset($req_data['price']) ? parse_filters($req_data['price']) : '';
 
-		$sort 				= isset($req_data['sort']) ? (int)$req_data['sort'] : 0;
-		$sort 				= isset($sortsArr[$sort]) ? $sortsArr[$sort] : $sortsArr[0];
-
-		$order 				= isset($req_data['order']) ? (string)$req_data['order'] : 'ASC';
+		$sorts 				= isset($req_data['sorts']) ? (int)$req_data['sorts'] : 0;
+		$sorts 				= isset($sortsArr[$sorts]) ? $sortsArr[$sorts] : $sortsArr[0];
+		$sorts 				= explode('-', $sorts);
+		$sort 				= $sorts[0];
+		$order 				= $sorts[1];
 
 		$page 				= (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
 		$limit 				= (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
@@ -420,8 +423,8 @@ class ControllerApiProduct extends Controller {
                 'filter_brand_ids'    		=> $brandIds,
 				'filter_attributes'   		=> $attr,
 				'parent_id'   				=> 0,
-				'filter_option_value_ids'  	=> $options,
 				'filter_stock_status_ids'  	=> $stockStatusIds,
+				'filter_variant_value_ids' 	=> $variant,
 				'filter_price'        		=> $filterPrices,
 				'sort'                		=> $sort,
 				'order'               		=> $order,

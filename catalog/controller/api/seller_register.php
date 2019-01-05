@@ -73,17 +73,9 @@ class ControllerApiSellerRegister extends Controller
         }
 
         //校验密码复杂程度
-        $password               = html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8');
-        if (empty($password) || utf8_strlen($password) < 6 || utf8_strlen($password) > 32 ) {
-            return ['msg'=>$this->language->get('error_password')];
-        }
-
-        if (preg_match_all("/[`~!@#$%^&*()\-_=+{};:<,.>?\/]/",$password) < 1){
+        $password       = html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8');
+        if (preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password)){
             return ['msg'=>$this->language->get('error_password2')];
-        }
-
-        if (preg_match_all("/^[a-zA-Z\d_~!@#$%^&*()\-_=+{};:<,.>?\/]{6,32}$/",$password) < 1){
-            return ['msg'=>$this->language->get('error_password1')];
         }
 
         if ($req_data['confirm'] !== $req_data['password']) {
