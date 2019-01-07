@@ -17,7 +17,7 @@ $_['text_success']           = '恭喜，您的订单已提交成功！';
 $_['text_note']              = '还差一步，请尽快完成支付。';
 
 // Column
-$_['column_order_id']        = '订单编号：';
+$_['column_order_id']        = '订单ID：';
 $_['column_total']           = '订单金额：';
 $_['column_shipping_method'] = '配送方式：';
 $_['column_payment_method']  = '支付方式：';

@@ -42,7 +42,7 @@ $_['entry_good']              = '好评';
 $_['entry_bad']               = '差评';
 
 // Column
-$_['column_order_id']         = '订单号';
+$_['column_order_id']         = '订单ID';
 $_['column_product']          = '商品';
 $_['column_rating']           = '评分';
 $_['column_date_added']       = '订单日期';

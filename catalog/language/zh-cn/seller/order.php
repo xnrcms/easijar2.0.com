@@ -77,7 +77,7 @@ $_['text_success']                     = '添加成功！';
 $_['text_aftership_info']              = '物流信息';
 
 // Column
-$_['column_order_id']                  = '订单号';
+$_['column_order_id']                  = '订单ID';
 $_['column_customer']                  = '客户名称';
 $_['column_status']                    = '状态';
 $_['column_date_added']                = '生成日期';
