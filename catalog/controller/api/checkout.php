@@ -347,7 +347,6 @@ class ControllerApiCheckout extends Controller
     // Validate and submit order
     public function confirm()
     {
-        wr("\n\n\n\n\n\n\nRuntime0:" . date('Y-m-d H:i:s') . "\n");
         $this->response->addHeader('Content-Type: application/json');
 
         $allowKey       = ['api_token','shipping_address_id','payment_method','shipping_method','comment'];

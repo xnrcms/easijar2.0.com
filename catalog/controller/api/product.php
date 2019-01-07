@@ -32,10 +32,7 @@ class ControllerApiProduct extends Controller {
 		$sortsArr 			= ['p.sort_order-DESC','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
 		$filter 			= isset($req_data['filter']) ? (string)$req_data['filter'] : '';
-		$filter 			= urlencode(html_entity_decode($filter, ENT_QUOTES, 'UTF-8'));
-
 		$attr 				= isset($req_data['attr']) ? (string)$req_data['attr'] : '';
-		$attr 				= urlencode(html_entity_decode($attr, ENT_QUOTES, 'UTF-8'));
 
 		$options 			= isset($req_data['option']) ? parse_filters($req_data['option']) : '';
 		$variant 			= isset($req_data['variant']) ? parse_filters($req_data['variant']) : '';
@@ -119,8 +116,8 @@ class ControllerApiProduct extends Controller {
 					'special'	=> !empty($product['special']) ? $product['special'] : '',
 					'discount' 	=> $product['discount'],
 					'image'	 	=> $product['thumb'],
-					'rating' 	=> 5,
-					'rating_num'=> 10,
+					'rating' 	=> $product['rating'],
+					'rating_num'=> $product['reviews'],
 				];
 			}
 
@@ -372,11 +369,8 @@ class ControllerApiProduct extends Controller {
 		$sortsArr 			= ['p.sort_order-DESC','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
 		$search 			= isset($req_data['search']) ? (string)$req_data['search'] : '';
-		$search 			= urlencode(html_entity_decode($search, ENT_QUOTES, 'UTF-8'));
 		$variant 			= isset($req_data['variant']) ? parse_filters($req_data['variant']) : '';
-
-		$tag 				= isset($req_data['tag']) ? (string)$req_data['tag'] : (isset($req_data['search']) ? (string)$req_data['search'] : '');
-		$tag 				= urlencode(html_entity_decode($tag, ENT_QUOTES, 'UTF-8'));
+		$tag 				= isset($req_data['tag']) ? (string)$req_data['tag'] : '';
 
 		$description 		= isset($req_data['description']) ? (string)$req_data['description'] : '';
 		$description 		= urlencode(html_entity_decode($description, ENT_QUOTES, 'UTF-8'));

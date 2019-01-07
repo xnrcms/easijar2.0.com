@@ -362,8 +362,11 @@
     {% endif %}
   });
 // --></script>
+{{ include(helper.template('common/chat_button')) }}
+{# 
 <script type="text/javascript">
     var hubtalk_opencart_v = "3.2.0.0";
 </script>
 <script type="text/javascript" src="//www.hubtalk.com/widgets/a/{{ chat_key }}/chat.js" charset='utf-8'></script>
+ #}
 {{ footer }}

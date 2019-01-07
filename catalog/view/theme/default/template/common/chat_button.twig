@@ -1,0 +1,36 @@
+<div style="position: fixed;bottom: 27px;right: 166px;z-index: 9999;width: 150px;height: 42px;display: flex;justify-content: center;align-items: center;background-color: #fff;border-radius: 3px;box-shadow: 0px 0px 10px 1px #FE5888;cursor:pointer;" id="mes_box">
+    <img src="image/catalog/chat/img/ic-chat-selected .png" alt="">
+    <span style="color: #FE5888;font-size: 18px;margin-left: 5px;">Messages</span>
+</div>
+<div style="background-color: #fff;display: none;width: 376px;box-shadow: 0px 0px 10px 1px #E5E5E5;position: fixed;bottom: 27px;right: 166px;z-index: 9999;" id="mes_box_main">
+    <div style="height: 30px;width: 100%;display: flex;align-items: center;justify-content: space-between;color: #666666;border-bottom: 1px solid #E5E5E5;">
+        <span style="margin-left: 23px;">Message</span>
+        <span style="display: inline-block;width: 30px;height: 30px;line-height: 30px;text-align: center;font-size: 26px;margin-right: 5px;cursor:pointer;" id="mes_close">&times;</span>
+    </div>
+    <div style="height: 238px;width: 100%;">
+        <p style="color: #FE5888;font-size: 14px;text-align: center;padding: 10px 0;">Please use the APP for a better chat experience.</p>
+        <div style="display: flex;justify-content: center;align-items: center;margin-top: 26px;">
+            <div>
+                <img style="width:115px;height:115px" src="image/catalog/chat/img/pic-qrcode.png" alt="">
+                <p style="display: flex;align-items: center;justify-content: center;margin: 0;">
+                  <img src="image/catalog/chat/img/ic-android.png" alt=""><span style="margin-left:12px;font-size: 14px;color: #666666">Android</span></p>
+            </div>
+            <div style="height: 54px;width: 1px;background-color: #E5E5E5;margin: 0 37px;"></div>
+            <div>
+                <img style="width:115px;height:115px" src="image/catalog/chat/img/pic-qrcode.png" alt="">
+                <p style="display: flex;align-items: center;justify-content: center;margin: 0;">
+                  <img src="image/catalog/chat/img/ic-appstore.png" alt=""><span style="margin-left:12px;font-size: 14px;color: #666666">AppStore</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#mes_box').click(function(){
+        $('#mes_box_main').show();
+        $('#mes_box').hide();
+    })
+    $('#mes_close').click(function(){
+        $('#mes_box_main').hide();
+        $('#mes_box').show();
+    })
+</script>
