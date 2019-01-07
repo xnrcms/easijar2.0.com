@@ -252,11 +252,12 @@ class ControllerApiAddress extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_delete')]));
         }
 
-        if ($this->customer->getAddressId() == $address_id) {
-            return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_default')]));
-        }
+        $is_default = $this->customer->getAddressId() == $address_id ? true : false;
+        /*if ($this->customer->getAddressId() == $address_id) {
+            //return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_default')]));
+        }*/
 
-        $this->model_account_address->deleteAddress($address_id);
+        $this->model_account_address->deleteAddress($address_id,$is_default);
 
         // Default Shipping Address
         if (isset($this->session->data['shipping_address']['address_id']) && ($address_id == $this->session->data['shipping_address']['address_id'])) {

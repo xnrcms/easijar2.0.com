@@ -28,9 +28,9 @@ class ControllerApiCart extends Controller {
 
     	if ($this->cart->hasCartProducts() || !empty($this->session->data['vouchers']) || !empty($this->session->data['recharges'])) 
         {
-            if (!$this->cart->hasStock() && (!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning'))) {
+            /*if (!$this->cart->hasStock() && (!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning'))) {
             	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_stock')]));
-            }
+            }*/
 
             if ($this->config->get('config_customer_price') && !$this->customer->isLogged()) {
                 return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('text_login')]));

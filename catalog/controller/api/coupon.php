@@ -38,7 +38,6 @@ class ControllerApiCoupon extends Controller {
             'limit' 		=> $limit,
         ];
 
-
         $this->load->model('customercoupon/coupon');
         $this->load->model('tool/image');
 

@@ -15,4 +15,4 @@ $_['text_latest']            = 'New product';
 // Button
 $_['button_all']            	= 'All goods';
 $_['company_name']            	= 'Company name';
-$_['seller_info_error']         = 'businesses do not exist';
+$_['seller_info_error']         = 'Businesses does not exist';

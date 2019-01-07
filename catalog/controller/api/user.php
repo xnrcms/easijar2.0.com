@@ -304,19 +304,16 @@ class ControllerApiUser extends Controller {
 
 		//校验密码复杂程度
 		$password 				= html_entity_decode($req_data['new_password'], ENT_QUOTES, 'UTF-8');
+		
+		if (empty($password)) {
+			return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password1')]));
+		}
+
 		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password)))
 		{
 			return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_password2')]));
 		}
 		
-		if (!(isset($req_data['new_password']) && !empty($req_data['new_password']))) {
-        	return $this->response->setOutput($this->returnData(['msg'=>'fail:new_password is empty']));
-		}
-
-		if (!(isset($req_data['confirm_password']) && !empty($req_data['confirm_password']))) {
-        	return $this->response->setOutput($this->returnData(['msg'=>'fail:confirm_password is empty']));
-		}
-
  		if (!( md5($req_data['new_password']) === md5($req_data['confirm_password']))) {
         	return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_confirm')]));
  		}
@@ -334,6 +331,11 @@ class ControllerApiUser extends Controller {
 	{
 		//校验密码复杂程度
 		$password 				= html_entity_decode($req_data['password'], ENT_QUOTES, 'UTF-8');
+		
+		if (empty($password)) {
+			return ['msg'=>$this->language->get('error_password1')];
+		}
+
 		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$password) && preg_match("/[a-z]{1,}/",$password) && preg_match("/[A-Z]{1,}/",$password))){
 			return ['msg'=>$this->language->get('error_password2')];
 		}
@@ -420,7 +422,7 @@ class ControllerApiUser extends Controller {
         if ($ret === true) {
 
 	        //生成校验码
-	        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
+	        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*1), 'expiry_time'  => time()+(60*30)];
 
 			return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Code send successfully']));
         } else {
@@ -478,7 +480,7 @@ class ControllerApiUser extends Controller {
         if (isset($this->session->data['smscode']))  unset($this->session->data['smscode']);
 
         $code 										= mt_rand(100000, 999999); //生成校验码
-        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*2), 'expiry_time'  => time()+(60*10)];
+        $this->session->data['smscode'][$tags] 		= ['code' => $code, 'send_time' => time()+(60*1), 'expiry_time'  => time()+(60*30)];
 
         $this->load->language('mail/email_code');
 

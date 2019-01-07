@@ -351,7 +351,7 @@ class ControllerApiProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/search');
 
-		$allowKey		= ['api_token','page','limit','search','sorts','variant','price','in_stock'];
+		$allowKey		= ['api_token','page','limit','search','path','sorts','variant','price','in_stock'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
@@ -381,8 +381,15 @@ class ControllerApiProduct extends Controller {
 		$description 		= isset($req_data['description']) ? (string)$req_data['description'] : '';
 		$description 		= urlencode(html_entity_decode($description, ENT_QUOTES, 'UTF-8'));
 
-		$category_id 		= isset($req_data['category_id']) ? (int)$req_data['category_id'] : 0;
-		$sub_category 		= isset($req_data['sub_category']) ? (int)$req_data['sub_category'] : 0;
+		$category_id 		= 0;
+		$sub_category 		= false;
+
+		if (isset($req_data['path']) && !empty($req_data['path'])) {
+			$parts 				= explode('_', (string)$req_data['path']);
+			$category_id 		= (int)array_pop($parts);
+			$category_info 		= $this->model_catalog_category->getCategory($category_id);
+			$sub_category 		= $this->config->get('config_product_category') ? true : false;
+		}
 
 		$brandIds 			= isset($req_data['brand']) ? parse_filters($req_data['brand']) : '';
 
@@ -412,43 +419,40 @@ class ControllerApiProduct extends Controller {
 		$products 				= [];
 		$product_total 			= 0;
 
-		if (isset($req_data['search']) || isset($req_data['tag']))
-		{
-			$filter_data = array(
-				'filter_name'         		=> $search,
-				'filter_tag'          		=> $tag,
-				'filter_description'  		=> $description,
-				'filter_category_id'  		=> $category_id,
-				'filter_sub_category' 		=> $sub_category,
-                'filter_brand_ids'    		=> $brandIds,
-				'filter_attributes'   		=> $attr,
-				'parent_id'   				=> 0,
-				'filter_stock_status_ids'  	=> $stockStatusIds,
-				'filter_variant_value_ids' 	=> $variant,
-				'filter_price'        		=> $filterPrices,
-				'sort'                		=> $sort,
-				'order'               		=> $order,
-				'start'               		=> ($page - 1) * $limit,
-				'limit'               		=> $limit
-			);
+		$filter_data = array(
+			'filter_name'         		=> $search,
+			'filter_tag'          		=> $tag,
+			'filter_description'  		=> $description,
+			'filter_category_id'  		=> $category_id,
+			'filter_sub_category' 		=> $sub_category,
+            'filter_brand_ids'    		=> $brandIds,
+			'filter_attributes'   		=> $attr,
+			'parent_id'   				=> 0,
+			'filter_stock_status_ids'  	=> $stockStatusIds,
+			'filter_variant_value_ids' 	=> $variant,
+			'filter_price'        		=> $filterPrices,
+			'sort'                		=> $sort,
+			'order'               		=> $order,
+			'start'               		=> ($page - 1) * $limit,
+			'limit'               		=> $limit
+		);
 
-			$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
-			$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
+		$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
+		$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
 
-			foreach ($results as $result) {
-				$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
+		foreach ($results as $result) {
+			$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
 
-				$products[] 		= [
-					'product_id'=> $product['product_id'],
-					'name'		=> $product['name'],
-					'price'		=> $product['price'],
-					'special'	=> !empty($product['special']) ? $product['special'] : '',
-					'discount' 	=> $product['discount'],
-					'image'	 	=> $product['thumb'],
-					'rating' 	=> $product['rating'],
-					'rating_num'=> $product['reviews'],
-				];
-			}
+			$products[] 		= [
+				'product_id'=> $product['product_id'],
+				'name'		=> $product['name'],
+				'price'		=> $product['price'],
+				'special'	=> !empty($product['special']) ? $product['special'] : '',
+				'discount' 	=> $product['discount'],
+				'image'	 	=> $product['thumb'],
+				'rating' 	=> $product['rating'],
+				'rating_num'=> $product['reviews'],
+			];
 		}
 
 		$remainder 					= intval($product_total - $limit * $page);
