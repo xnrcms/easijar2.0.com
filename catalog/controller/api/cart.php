@@ -40,7 +40,7 @@ class ControllerApiCart extends Controller {
             $this->load->model('tool/upload');
 
             $data['cart_nums'] 		= $this->cart->countProducts();
-            $data['currency'] 		= trim($this->currency->format(1, $this->session->data['currency']),'1.00');
+            $data['currency'] 		= preg_replace('|[0-9\.]+|','',$this->currency->format(100, $this->session->data['currency']));
             $data['products'] 		= [];
 
             $products 				= $this->cart->getCartProducts();
@@ -67,7 +67,7 @@ class ControllerApiCart extends Controller {
                     $price 	= $this->currency->format($unit_price, $this->session->data['currency']);
                     $oprice = $this->currency->format($this->tax->calculate($product['oprice'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
                     $total 	= $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
-                    $nprice = $unit_price * $product['quantity'];
+                    $nprice = str_replace($data['currency'], '', $total);
                 } else {
                     $price 		= false;
                     $oprice 	= false;

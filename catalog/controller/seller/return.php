@@ -719,8 +719,14 @@ class ControllerSellerReturn extends Controller {
 							$json['error'] = $this->language->get('error_pay_currency');
 						}
 
-						if ( !isset($json['error']) || empty($json['error'])) {
-							$res 		= $this->load->controller('extension/payment/' . $payment_code . '/returnPay',$pay_code,$amount,$currency);
+						if ( !isset($json['error']) || empty($json['error']))
+						{
+							$rdata 				= [];
+							$rdata['pay_code'] 	= $pay_code;
+							$rdata['amount'] 	= $amount;
+							$rdata['currency'] 	= $currency;
+							wr(['$rdata'=>$rdata,$payment_code]);
+							$res 		= $this->load->controller('extension/payment/' . $payment_code . '/returnPay',$rdata);
 							if (empty($res) || $res == 'fail') {
 								$json['error'] = $this->language->get('error_return_api');
 							}else if ($res == 'success') {

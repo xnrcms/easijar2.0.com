@@ -495,12 +495,21 @@ class ControllerCheckoutCart extends Controller {
     public function get_totals_html() {
         list($total, $totals) = $this->getTotalsValue();
         $data['totals'] = [];
+
         foreach ($totals as $total) {
+            $title          = $total['title'];
+            if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
+                $titles     = explode('&', $title);
+                $title      = $titles[0] . $titles[2];
+            }
+            if ($total['code'] == 'shipping') continue;
+
             $data['totals'][] = array(
-                'title' => $total['title'],
+                'title' => $title,
                 'text'  => $this->currency->format($total['value'], $this->session->data['currency'])
             );
         }
+
         return $this->load->view('checkout/cart/_total', $data);
     }
 

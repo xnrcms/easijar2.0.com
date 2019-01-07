@@ -218,11 +218,14 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		return 'pay fail';
 	}
 
-	public function returnPay($payid,$amount,$currency)
+	public function returnPay($data)
 	{
+		$payid 				= isset($data['pay_code']) ? $data['pay_code'] : '';
+		$amount 			= isset($data['amount']) ? sprintf("%.2f",substr(sprintf("%.3f", $data['amount']), 0, -2)) : 0;
+		$currency 			= isset($data['currency']) ? $data['currency'] : '';
+		
 		if (empty($payid) || $amount <= 0 || empty($currency)) return 'fail';
 
-		$id 									= '8ac7a49f679c6d210167a175cdeb2992';
 		$entity_id 								= $this->config->get('module_oppcw_global_entity_id');
 		$user_id 								= $this->config->get('module_oppcw_user_id');
 		$user_password 							= $this->config->get('module_oppcw_user_password');
