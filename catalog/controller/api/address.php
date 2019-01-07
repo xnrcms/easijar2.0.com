@@ -248,9 +248,9 @@ class ControllerApiAddress extends Controller {
 
         $this->load->model('account/address');
 
-        if ($this->model_account_address->getTotalAddresses() == 1) {
+        /*if ($this->model_account_address->getTotalAddresses() == 1) {
             return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_delete')]));
-        }
+        }*/
 
         $is_default = $this->customer->getAddressId() == $address_id ? true : false;
         /*if ($this->customer->getAddressId() == $address_id) {

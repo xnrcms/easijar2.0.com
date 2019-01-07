@@ -329,7 +329,6 @@ class ModelCheckoutOrder extends Model {
 
 	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false)
 	{
-		wr("\nRuntime00:" . date('Y-m-d H:i:s') . "\n");
 		$order_info = $this->getOrder($order_id);
 
 		if ($order_info)
@@ -401,9 +400,7 @@ class ModelCheckoutOrder extends Model {
 			}
 
 			$this->cache->delete('product');
-			wr("\nRuntime01:" . date('Y-m-d H:i:s') . "\n");
 		}
-		wr("\nRuntime02:" . date('Y-m-d H:i:s') . "\n");
 	}
 
 	//获取定单信息用来生成地址信息

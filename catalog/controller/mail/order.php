@@ -207,7 +207,7 @@ class ControllerMailOrder extends Controller {
 		    return;
         }
 		$mail = new Mail($this->config->get('config_mail_engine'));
-
+wr(['=====2'=>$order_info]);
 		$mail->setTo($order_info['email']);
 		$mail->setFrom($from);
 		$mail->setSender(html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'));
@@ -265,7 +265,7 @@ class ControllerMailOrder extends Controller {
 		    return;
         }
 		$mail = new Mail($this->config->get('config_mail_engine'));
-
+wr(['=====3'=>$order_info]);
 		$mail->setTo($order_info['email']);
 		$mail->setFrom($from);
 		$mail->setSender(html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'));
@@ -301,7 +301,7 @@ class ControllerMailOrder extends Controller {
 		}
 
 		$order_info = $this->model_checkout_order->getOrder($order_id);
-
+		wr(['=====1'=>$order_info]);
 		if ($order_info && !$order_info['order_status_id'] && $order_status_id && in_array('order', (array)$this->config->get('config_mail_alert'))) {
 			$this->load->language('mail/order_alert');
 

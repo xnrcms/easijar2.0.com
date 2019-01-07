@@ -51,14 +51,15 @@ class ModelExtensionModuleAftership extends Model
 
     public function getOrderLogisticsTotals()
     {
-        $logistics_query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('aftership') . " af LEFT JOIN " . get_tabname('order') . " o ON o.order_id = af.order_id LEFT JOIN " . get_tabname('order_product') . " op ON op.order_product_id = (SELECT `order_product_id` FROM " . get_tabname('ms_order_product') . " msop WHERE af.order_id = msop.order_id AND af.seller_id = msop.seller_id LIMIT 1) WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND op.name IS NOT NULL");
+        $logistics_query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('aftership') . " af LEFT JOIN " . get_tabname('ms_suborder') . " mssu ON (mssu.seller_id = af.seller_id AND mssu.order_id = af.order_id) LEFT JOIN " . get_tabname('ms_order_product') . " msop ON (msop.seller_id = af.seller_id AND msop.order_id = af.order_id) LEFT JOIN " . get_tabname('order') . " o ON o.order_id = af.order_id LEFT JOIN " . get_tabname('order_product') . " op ON op.order_product_id = msop.order_product_id WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND op.name IS NOT NULL");
 
         return $logistics_query->row['total'];
     }
 
     public function getOrderLogistics($data = [])
     {
-        $sql    = "SELECT af.tracking_name,af.tracking_code,af.order_id,af.seller_id,af.tracking_number,af.tracking_name,af.date_added,op.name,op.image FROM " . get_tabname('aftership') . " af LEFT JOIN " . get_tabname('order') . " o ON o.order_id = af.order_id LEFT JOIN " . get_tabname('order_product') . " op ON op.order_product_id = (SELECT `order_product_id` FROM " . get_tabname('ms_order_product') . " msop WHERE af.order_id = msop.order_id AND af.seller_id = msop.seller_id LIMIT 1) WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND op.name IS NOT NULL";
+        $field  = 'af.tracking_name,af.tracking_code,af.order_id,af.seller_id,af.tracking_number,af.tracking_name,af.date_added,op.name,op.image,mssu.order_sn';
+        $sql    = "SELECT " . $field . " FROM " . get_tabname('aftership') . " af LEFT JOIN " . get_tabname('ms_suborder') . " mssu ON (mssu.seller_id = af.seller_id AND mssu.order_id = af.order_id) LEFT JOIN " . get_tabname('ms_order_product') . " msop ON (msop.seller_id = af.seller_id AND msop.order_id = af.order_id) LEFT JOIN " . get_tabname('order') . " o ON o.order_id = af.order_id LEFT JOIN " . get_tabname('order_product') . " op ON op.order_product_id = msop.order_product_id WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND op.name IS NOT NULL";
 
         if (isset($data['start']) || isset($data['limit'])) {
             if ($data['start'] < 0) {

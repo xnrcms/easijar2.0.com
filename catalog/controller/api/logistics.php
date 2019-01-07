@@ -42,6 +42,7 @@ class ControllerApiLogistics extends Controller
             $logistics[]       =[
                 'image'           => $this->model_tool_image->resize($value['image'], 100, 100),
                 'name'            => $value['name'],
+                'order_sn'        => $value['order_sn'],
                 'tracking_number' => $value['tracking_number'],
                 'date_added'      => $value['date_added'],
                 'tracking_name'   => $value['tracking_name'],

@@ -39,8 +39,8 @@ class ControllerApiAccount extends Controller {
 
         $json['account_info'] 				= $account_info;
         $json['pay_nums']                   = $this->model_account_order->getTotalOrdersForMs(1);
-        $json['ship_nums']                  = $this->model_account_order->getTotalOrdersForMs(3);
-        $json['receive_nums']               = $this->model_account_order->getTotalOrdersForMs(2);
+        $json['ship_nums']                  = $this->model_account_order->getTotalOrdersForMs(2);
+        $json['receive_nums']               = $this->model_account_order->getTotalOrdersForMs(3);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
