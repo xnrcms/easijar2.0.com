@@ -189,12 +189,14 @@ class ControllerApiProduct extends Controller {
 				$product_variants 				= isset($variants['product_variants']) &&!empty($variants['product_variants']) ? $variants['product_variants'] : [];
 				
 				$skus 							= isset($variants['skus']) ? $variants['skus'] : [];
-				$skusString 					= '';
+				$skusArr 						= [];
 				foreach ($skus as $skey => $svalue) {
-					$skusString .= $skey;
+					$skusArr[$skey] 	= $skey; 
 				}
 
-				$skusString 	= str_replace('||', '|', $skusString);
+				sort($skusArr);
+
+				$skusString 	= !empty($skusArr) ? str_replace('|||', '|', implode('|', $skusArr)) : '';
 
 				if (isset($variants['variants']) &&!empty($variants['variants'])) {
 					foreach ($variants['variants'] as $kvar=>$vari) {
@@ -216,6 +218,7 @@ class ControllerApiProduct extends Controller {
 				}
 
 				$pinfo['sku'] 					= $productModel->getVariantKeys();
+				$pinfo['skus'] 					= $skusArr;
 				
 				/*$opt['variants'] 				= $variants['variants'];
 				$opt['sku'] 					= $productModel->getVariantKeys();*/
@@ -342,6 +345,7 @@ class ControllerApiProduct extends Controller {
 	        $data['is_wish'] 					= (int)$wish_total;
 	        $data['coupons'] 					= $coupons;
 			
+			wr($data);
 			//添加商品详情浏览记录
 			$this->load->controller('api/browse_records/addProductBrowseRecords',(int)$product_info['product_id']);
 			

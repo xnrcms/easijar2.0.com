@@ -88,6 +88,7 @@ class ControllerApiDispute extends Controller {
         $comment                        = $returnData['comment'];
         $return_reason_id               = (int)$returnData['return_reason_id'];
         $proposal                       = $returnData['is_service'] == 1 ? 6 : 7;
+        $overtime                       = 0;
 
         $this->load->model('multiseller/return');
         $this->model_multiseller_return->addReturnHistoryForMs($return_id, 1,$proposal,$return_reason_id, $comment, $evidences,$this->customer->getId());
@@ -107,13 +108,19 @@ class ControllerApiDispute extends Controller {
                 $this->model_multiseller_return->editReturnResponsibility($return_id,2);
             }else{
                 
-                //买家承担手续费 1
+                $overtime = (time() + 86400*1);
+
+                //买家承担手续费
                 $this->model_multiseller_return->editReturnResponsibility($return_id,1);
             }
         }
 
-        //用户提交申请需要商家24H处理 超时自动处理 
-        $this->model_multiseller_return->editReturnOvertime($return_id,(time() + 86400*3));
+        if ($order_status_id === 2) {
+            $overtime = (time() + 86400*3);
+        }
+
+        //用户提交申请需要超时自动处理 
+        $this->model_multiseller_return->editReturnOvertime($return_id,$overtime);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['return_id'=> $return_id]]));
     }

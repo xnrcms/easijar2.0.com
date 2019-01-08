@@ -214,6 +214,7 @@ class ControllerApiMyorder extends Controller {
             $product_info[$pkey]['image']       = $this->model_tool_image->resize($pval['image'], 100, 100);
             $product_info[$pkey]['oreview']     = ($is_reviewed || !$complated) ? 0 : 1;
             $product_info[$pkey]['return_id']   = $this->model_account_return->getReturnIdByOrderProductId($order_info['order_id'],$pval['order_product_id']);
+            $product_info[$pkey]['order_product_id']     = $pval['order_product_id'];
         }
 
         //获取订单修改时间
@@ -245,7 +246,7 @@ class ControllerApiMyorder extends Controller {
         unset($order_info['currency_value']);
         unset($order_info['date_modified']);
 
-        wr($order_info);
+        wr($product_info);
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
