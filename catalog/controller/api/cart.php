@@ -75,6 +75,16 @@ class ControllerApiCart extends Controller {
                     $nprice 	= false;
                 }
 
+                //处理属性
+                $variants       = '';
+                if (isset($product['option']) && $product['option']) {
+                    foreach ($product['option'] as $okey => $ovalue) {
+                        $variants .= $ovalue['name'] . ':' . $ovalue['value'] . ',';
+                    }
+
+                    $variants   = trim($variants,',');
+                }
+
                 $data['products'][] = array(
                     'product_id'    => (int)$product['product_id'],
                     'cart_id'       => $product['cart_id'],
@@ -86,6 +96,7 @@ class ControllerApiCart extends Controller {
                     'price'         => $price,
                     'nprice'        => $nprice,
                     'oprice'        => $oprice,
+                    'variants'      => $variants
                 );
             }
 

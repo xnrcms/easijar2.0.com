@@ -173,6 +173,12 @@ class ModelSaleReturn extends Model {
 
 		return $query->row['total'];
 	}
+
+	public function getTotalReturnsByProductIds($product_ids) {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return` WHERE return_status_id = '10' AND product_id IN (" . implode(',', $product_ids) . ")");
+
+		return $query->row['total'];
+	}
 	
 	public function addReturnHistory($return_id, $return_status_id, $comment, $notify) {
 		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$return_status_id . "', date_modified = NOW() WHERE return_id = '" . (int)$return_id . "'");

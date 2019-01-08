@@ -235,7 +235,7 @@ class ModelMultisellerSeller extends Model {
                 LEFT JOIN " . DB_PREFIX . "product p ON (p.product_id = ps.product_id) 
                 LEFT JOIN " . DB_PREFIX . "product_description pd ON (pd.product_id = ps.product_id) 
                 LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (ps.product_id = p2s.product_id) 
-                WHERE ps.seller_id = '" . $seller_id . "' AND (ps.date_until >= NOW() OR ps.date_until = '0000-00-00') AND status = '1' AND p.date_available <= NOW()" . $search_sql ." AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'";
+                WHERE ps.seller_id = '" . $seller_id . "' AND (ps.date_until >= NOW() OR ps.date_until = '0000-00-00') AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND status = '1' AND p.date_available <= NOW()" . $search_sql ." AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "'";
 
 		$query = $this->db->query($sql);
 

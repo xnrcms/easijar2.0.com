@@ -901,9 +901,26 @@ class ControllerSaleReturn extends Controller {
 			$json['error'] = $this->language->get('error_permission');
 		} else {
 			$this->load->model('sale/return');
+        	$this->load->model('multiseller/order');
+
+			$return_info = $this->model_sale_return->getReturn($this->request->get['return_id']);
+			$product_ids = $this->model_multiseller_order->getOrderProductIdsForMs((int)$return_info['order_id'], (int)$return_info['seller_id']);
+			$pids 		 = [];
+			
+			foreach ($product_ids as $key => $value) {
+				$pids[$value['order_product_id']] 	= $value['order_product_id'];
+			}
+
+			$pcount 	= count($pids);
+			$rcount 	= $this->model_sale_return->getTotalReturnsByProductIds($pids);
 
 			$this->model_sale_return->addReturnHistory($this->request->get['return_id'], $this->request->post['return_status_id'], $this->request->post['comment'], $this->request->post['notify']);
 
+			//如果订单下商品全部退款成功 修改订单状态为已完成
+			if ($pcount === $rcount) {
+				$this->model_multiseller_order->addOrderHistoryByReturn($return_info['order_id'], $return_info['seller_id'],5,'Return');
+			}
+			
 			$json['success'] = $this->language->get('text_success');
 		}
 

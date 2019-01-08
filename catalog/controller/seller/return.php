@@ -725,7 +725,7 @@ class ControllerSellerReturn extends Controller {
 							$rdata['pay_code'] 	= $pay_code;
 							$rdata['amount'] 	= $amount;
 							$rdata['currency'] 	= $currency;
-							wr(['$rdata'=>$rdata,$payment_code]);
+
 							$res 		= $this->load->controller('extension/payment/' . $payment_code . '/returnPay',$rdata);
 							if (empty($res) || $res == 'fail') {
 								$json['error'] = $this->language->get('error_return_api');
@@ -753,14 +753,15 @@ class ControllerSellerReturn extends Controller {
 			
 			if (!isset($json['error']) || empty($json['error'])) {
 				
-				if ($is_platform == 1) {
-        			$this->model_multiseller_return->editReturnIsPlatform($return_id, 1);
-                	$this->model_multiseller_return->addReturnHistoryForMs($return_id, 9,'','', '平台介入处理','',$this->customer->getId());
-				}
-
         		$this->model_multiseller_return->editReturnOvertime($return_id, ($overtime > 0 ? (time() + 86400*$overtime) : 0));
                 $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',$this->customer->getId());
                 
+                if ($is_platform == 1) {
+                	sleep(2);
+        			$this->model_multiseller_return->editReturnIsPlatform($return_id, 1);
+                	$this->model_multiseller_return->addReturnHistoryForMs($return_id, 9,'','', '平台介入处理','',0);
+				}
+
 				$json['success'] = $this->language->get('text_success');
 			}
 		}

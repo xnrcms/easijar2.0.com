@@ -188,15 +188,27 @@ class ControllerApiProduct extends Controller {
 				$variants_list 					= [];
 				$product_variants 				= isset($variants['product_variants']) &&!empty($variants['product_variants']) ? $variants['product_variants'] : [];
 				
+				$skus 							= isset($variants['skus']) ? $variants['skus'] : [];
+				$skusString 					= '';
+				foreach ($skus as $skey => $svalue) {
+					$skusString .= $skey;
+				}
+
+				$skusString 	= str_replace('||', '|', $skusString);
+
 				if (isset($variants['variants']) &&!empty($variants['variants'])) {
 					foreach ($variants['variants'] as $kvar=>$vari) {
 						if (isset($vari['values']) &&!empty($vari['values'])) {
 							foreach ($vari['values'] as $kv => $vv) {
 								if (isset($product_variants[$kvar]) && (int)$product_variants[$kvar] === (int)$vv['variant_value_id'] ) {
-									$vari['values'][$kv]['selected'] 	= 1;
+									$vari['values'][$kv]['selected'] 	= 0;//前端处理 修改为了0
 								}else{
 									$vari['values'][$kv]['selected'] 	= 0;
 								}
+
+								//对应的sku是否已经下架
+								$ssk 									= '|' . (int)$vari['variant_id'] . ':' . (int)$vv['variant_value_id'] . '|';
+								$vari['values'][$kv]['sku_status'] 		= strpos($skusString, $ssk) === false ? 0 : 1;
 							}
 						}
 						$opt[] 		= $vari;
@@ -207,8 +219,7 @@ class ControllerApiProduct extends Controller {
 				
 				/*$opt['variants'] 				= $variants['variants'];
 				$opt['sku'] 					= $productModel->getVariantKeys();*/
-				/*$opt['product_variants'] 		= $variants['product_variants'];
-				$opt['skus'] 					= $variants['skus'];*/
+				/*$opt['product_variants'] 		= $variants['product_variants'];*/
 			}
 
 			//所有商品ID 子产品和和主产品

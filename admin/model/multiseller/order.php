@@ -11,4 +11,18 @@ class ModelMultisellerOrder extends Model {
 
 		return $query->rows;
     }
+
+    public function getOrderProductIdsForMs($order_id, $seller_id)
+    {
+    	$query = $this->db->query("SELECT `order_product_id` FROM `" . DB_PREFIX . "ms_order_product` WHERE order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$seller_id . "'");
+
+		return $query->rows;
+    }
+
+    public function addOrderHistoryByReturn($order_id, $seller_id = 0, $order_status_id, $comment = '')
+    {
+        $this->db->query("UPDATE `" . DB_PREFIX . "ms_suborder` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "' AND seller_id = '" . (int)$seller_id . "'");
+
+        $this->db->query("INSERT INTO " . DB_PREFIX . "ms_suborder_history SET order_id = '" . (int)$order_id . "', seller_id = '" . (int)$seller_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '0', comment = '" . $this->db->escape($comment) . "', date_added = NOW()");
+    }
 }

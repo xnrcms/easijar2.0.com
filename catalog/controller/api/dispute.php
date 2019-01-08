@@ -113,7 +113,7 @@ class ControllerApiDispute extends Controller {
         }
 
         //用户提交申请需要商家24H处理 超时自动处理 
-        $this->model_multiseller_return->editReturnOvertime($return_id,(time() + 86400*1));
+        $this->model_multiseller_return->editReturnOvertime($return_id,(time() + 86400*3));
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>['return_id'=> $return_id]]));
     }
@@ -402,8 +402,10 @@ class ControllerApiDispute extends Controller {
         $return_info['seller_id']       = $rinfo['seller_id'];
         $return_info['is_receive']      = $rinfo['is_receive'];
 
-        foreach ($return_history as $key => $value) {
-            $return_history[$key]['avatar']     = $this->model_tool_image->resize($this->customer->getAvatar($value['customer_id']), 100, 100);
+        foreach ($return_history as $key => $value)
+        {
+            $avatar                             = (int)$value['customer_id'] > 0 ? $this->customer->getAvatar($value['customer_id']) : "avatar/0.jpg";
+            $return_history[$key]['avatar']     = $this->model_tool_image->resize($avatar, 100, 100);
 
             $evidences_img              = !empty($value['evidences']) ? explode(',', $value['evidences']) : [];
             $evidences                  = [];
@@ -413,6 +415,7 @@ class ControllerApiDispute extends Controller {
                 }
             }
 
+            $return_history[$key]['fullname']       = (int)$value['customer_id'] > 0 ? $value['fullname'] : 'EasiJAR';
             $return_history[$key]['evidences']      = $evidences;
             $return_history[$key]['receive_text']   =  in_array((int)$rinfo['is_receive'], [1,2]) ? t('text_return_receive'.(int)$rinfo['is_receive']) : '';
         }

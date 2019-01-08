@@ -216,6 +216,20 @@ class ControllerApiMyorder extends Controller {
             $product_info[$pkey]['return_id']   = $this->model_account_return->getReturnIdByOrderProductId($order_info['order_id'],$pval['order_product_id']);
         }
 
+        //获取订单修改时间
+        $done_time      = (isset($order_info['date_modified']) && !empty($order_info['date_modified'])) ? strtotime($order_info['date_modified']) : 0;
+
+        if ($order_info['order_status_id'] == 1) {
+            $done_time  = $done_time + (86400 * 2);
+        }else if ($order_info['order_status_id'] == 2) {
+            $done_time  = $done_time + (86400 * 60);
+
+        }else{
+            $done_time     = 0;
+        }
+
+        $order_info['done_time']        = $done_time;
+
         unset($order_info['avatar']);
         unset($order_info['store_name']);
         unset($order_info['shipping_address_format']);
@@ -229,7 +243,9 @@ class ControllerApiMyorder extends Controller {
         unset($order_info['fullname']);
         unset($order_info['telephone']);
         unset($order_info['currency_value']);
+        unset($order_info['date_modified']);
 
+        wr($order_info);
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
