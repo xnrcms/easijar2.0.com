@@ -217,7 +217,7 @@ class ControllerApiProduct extends Controller {
 					}
 				}
 
-				$pinfo['sku'] 					= $productModel->getVariantKeys();
+				$pinfo['sku'] 					= '';//$productModel->getVariantKeys();
 				$pinfo['skus'] 					= $skusArr;
 				
 				/*$opt['variants'] 				= $variants['variants'];

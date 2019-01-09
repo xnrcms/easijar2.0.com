@@ -81,8 +81,9 @@ class ControllerApiCheckout extends Controller
         } else {
             return $this->response->setOutput($this->returnData(['msg'=>'cart select error']));
         }
-
+        
         if (!$this->isValidCart()){
+            
             return $this->response->setOutput($this->returnData(['msg'=>'fail:ValidCart is error']));
         }
 
@@ -244,8 +245,6 @@ class ControllerApiCheckout extends Controller
         $products['products']                   = $cart_products;
 
         $json['cart_section']                   = $products;
-
-
 
         //$json['comment_section']                = $this->renderCommentSection();
         //$json['agree_section']                  = $this->renderAgreeSection();
