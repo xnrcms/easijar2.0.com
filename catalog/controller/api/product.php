@@ -345,7 +345,6 @@ class ControllerApiProduct extends Controller {
 	        $data['is_wish'] 					= (int)$wish_total;
 	        $data['coupons'] 					= $coupons;
 			
-			wr($data);
 			//添加商品详情浏览记录
 			$this->load->controller('api/browse_records/addProductBrowseRecords',(int)$product_info['product_id']);
 			

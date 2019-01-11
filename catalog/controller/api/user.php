@@ -501,7 +501,7 @@ class ControllerApiUser extends Controller {
 		$mail->setSubject(sprintf($this->language->get('text_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8')));
 		$mail->setHtml($this->load->view('mail/email_code', $data));
 		$mail->send();
-		wr(['===============1'=>$data]);
+		
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Code send successfully']));
 	}
 }
