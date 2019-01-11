@@ -94,8 +94,9 @@ class ControllerApiMultiseller extends Controller {
 		$filter_data              = [
 			'sort'                => 'p.date_added',
 			'order'               => 'DESC',
+            'parent_id'           => 0,
 			'start'               => 0,
-			'limit'               => 6
+			'limit'               => 20
 		];
 
         $results                  = $this->model_multiseller_seller->getSellerProducts($seller_id, $filter_data);
@@ -105,7 +106,7 @@ class ControllerApiMultiseller extends Controller {
 
             $json['seller_product'][] = [
                 'product_id'    => $result['product_id'],
-                'image'         => $this->model_tool_image->resize($image, 100, 100),
+                'image'         => $this->model_tool_image->resize($image, 200, 200),
                 'name'          => $result['name'],
                 'price'         => !empty($result['price']) ? $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
                 'special'       => !empty($result['special']) ? $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
@@ -154,6 +155,7 @@ class ControllerApiMultiseller extends Controller {
         $filter_data              = [
             'sort'                => 'p.date_added',
             'order'               => 'DESC',
+            'parent_id'           => 0,
             'start'               => $page * $limit,
             'limit'               => $limit
         ];
@@ -187,7 +189,7 @@ class ControllerApiMultiseller extends Controller {
 
             $products[] = [
                 'product_id'    => $result['product_id'],
-                'image'         => $this->model_tool_image->resize($image, 100, 100),
+                'image'         => $this->model_tool_image->resize($image, 200, 200),
                 'name'          => $result['name'],
                 'price'         => !empty($result['price']) ? $result['price'] : '',
                 'special'       => !empty($result['special']) ? $result['special'] : '',

@@ -15,7 +15,8 @@ class ModelAccountCustomerFollowSeller extends Model {
 	}
 
 	public function getSellerFollow() {
-        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer_follow_seller WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer_follow_seller WHERE customer_id = '" . 
+        	(int)$this->customer->getId() . "' ORDER BY date_added DESC");
 
 		return $query->rows;
 	}

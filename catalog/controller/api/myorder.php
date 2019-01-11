@@ -246,7 +246,6 @@ class ControllerApiMyorder extends Controller {
         unset($order_info['currency_value']);
         unset($order_info['date_modified']);
 
-        wr($product_info);
         $json['order_info'] 			= $order_info;
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;

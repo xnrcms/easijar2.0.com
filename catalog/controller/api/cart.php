@@ -175,15 +175,20 @@ class ControllerApiCart extends Controller {
     		//确定产品SKU 获取真是产品ID
     		$productModel 						= \Models\Product::find($product_id);
 			$variants 							= $productModel->getProductVariantsDetail();
-
 			$skus 								= isset($variants['skus']) ? $variants['skus'] : [];
+            $sku                                = !empty($req_data['sku']) ? trim($req_data['sku']) : '';
 
-			if ( !array_key_exists(trim($req_data['sku']), $skus) ) {
+            $is_sku                             = $this->is_sku($sku,$skus);
+			if ( empty($sku) || !$is_sku ) {
 				return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_product')]));
 			}
 
-			$sku 								= $skus[trim($req_data['sku'])];
-			$product_id 						= substr($sku, (strpos($sku, '&product_id=')+12 - strlen($sku) ) );
+            if (strpos($is_sku, '&product_id=') === false) {
+                $purl                           = explode('-', $is_sku);
+                $product_id                     = count($purl) > 0 ? (int)($purl[count($purl) - 1]) : 0;
+            }else{
+                $product_id                     = (int)substr($is_sku, (strpos($is_sku, '&product_id=')+12 - strlen($is_sku) ) );
+            }
 
             $option 							= isset($req_data['option']) ? array_filter($req_data['option']) : [];
 
@@ -230,6 +235,26 @@ class ControllerApiCart extends Controller {
 
         return $this->response->setOutput($data);
 	}
+
+    private function is_sku($sku,$skus)
+    {
+        if (empty($sku) || empty($skus)) return false;
+
+        $sku    = explode('|', trim($sku,'|'));
+        
+        sort($sku);
+
+        foreach ($skus as $key => $value)
+        {
+            $psku   = !empty($key) ? explode('|', trim($key,'|')) : [];
+            
+            sort($psku);
+
+            if (!empty($psku) && $sku === $psku) return $value;
+        }
+
+        return false;
+    }
 
 	public function update_quantity()
 	{

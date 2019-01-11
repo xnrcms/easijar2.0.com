@@ -173,7 +173,7 @@ class ControllerApiProduct extends Controller {
 			$pinfo['oprice'] 		= $this->currency->format($this->tax->calculate($oprice, $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
 			$pinfo['stock'] 		= isset($product_info['quantity']) ? (int)$product_info['quantity'] : 0;
-			$pinfo['description'] 	= htmlspecialchars_decode($product_info['description']);
+			$pinfo['description'] 	= str_replace('../image/catalog/', trim(base_url(),'/') . '/image/catalog/', htmlspecialchars_decode($product_info['description']));
 			$pinfo['sku'] 			= '';
 
 			//折扣率计算
@@ -282,7 +282,7 @@ class ControllerApiProduct extends Controller {
 	        	$seller_info['rating'] 			= sprintf("%.1f", $seller['rating']);
 	        	$seller_info['chats'] 			= '98.5%';
 	        }
-
+	        
 			//商品图片
 			$product_image 			= $this->model_catalog_product->getProductImages($product_info['product_id'],5);
 			$images 				= [];

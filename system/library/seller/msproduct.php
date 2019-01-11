@@ -69,6 +69,10 @@ class MsProduct
             $sql .= " AND p.model LIKE '%" . $this->db->escape((string)$filter['filter_model']) . "%'";
         }
 
+        if (isset($filter['filter_status']) && $filter['filter_status'] !== '') {
+            $sql .= " AND p.status = '" . (int)$filter['filter_status'] . "'";
+        }
+        
         if (!empty($filter['filter_stock_quantity'])) {
             $stockQuantity = explode('-', $filter['filter_stock_quantity']);
             if (count($stockQuantity) == 2) {
@@ -81,7 +85,7 @@ class MsProduct
         }
 
         $query = $this->db->query($sql);
-
+        wr($sql);
         return $query->row['total'];
     }
 

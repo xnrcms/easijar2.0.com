@@ -5,6 +5,47 @@ class ModelCatalogHandle extends Model {
         $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_description WHERE language_id = 1");
         return $query->row['total'];
     }
+
+    public function get_product_status0()
+    {
+        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '0' OR product_id < 1927");
+        return $query->rows;
+    }
+
+    public function get_product_status1()
+    {
+        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product_description WHERE description LIKE '%data:image/jpeg;base64%'");
+        return $query->rows;
+    }
+
+    public function get_product_description22()
+    {
+        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product_description WHERE description LIKE '%data:image/jpeg;base64%'");
+        return $query->rows;
+    }
+
+    public function del_product_status0($product_ids)
+    {
+        $delsql               = [];
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_description WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_discount WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_image WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_option WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_option_value WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_questions WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_special WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_to_layout WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+
+        foreach ($delsql as $key => $value) {
+            $this->db->query($value);
+        }
+    }
+
     public function get_product_description_list($data){
         $sql    = "SELECT * FROM " . DB_PREFIX . "product_description WHERE language_id = 1";
 
@@ -17,7 +58,7 @@ class ModelCatalogHandle extends Model {
                 $data['limit'] = 20;
             }
 
-            $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+            $sql .= " ORDER BY product_id ASC LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
         }
 
         $query = $this->db->query($sql);
@@ -223,10 +264,42 @@ class ModelCatalogHandle extends Model {
     	return $query->row;
     }
 
+    public function add_product_to_category2($product_id,$cats)
+    {
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
+        $this->add_product_to_category($product_id,$cats);
+    }
+
     public function get_product_to_category($product_id)
     {
     	$query = $this->db->query("SELECT category_id FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
     	return $query->rows;
+    }
+
+    public function get_category_path_level($category_id,$level = 0)
+    {
+        $query = $this->db->query("SELECT `category_id`,`path_id` FROM " . DB_PREFIX . "category_path WHERE level = '" . (int)$level . "' AND category_id = '" . (int)$category_id . "'");
+        return $query->row;
+    }
+
+    public function get_category_path($category_ids)
+    {
+        $query = $this->db->query("SELECT `category_id`,`path_id` FROM " . DB_PREFIX . "category_path WHERE category_id IN ('" . implode("','",$category_ids) . "')");
+        return $query->rows;
+    }
+
+    private function add_product_to_category($product_id,$category)
+    {
+        if (!empty($category) && (int)$product_id > 0)
+        {
+            $insql  = "INSERT INTO " . DB_PREFIX . "product_to_category (product_id,category_id) VALUES ";
+            foreach ($category as $value) {
+                $insql .= "('" . (int)$product_id . "','" . (int)$value . "'),";
+            }
+
+            $insql      = trim($insql,',');
+            $this->db->query($insql);
+        }
     }
 
     public function get_sku($product_id)
@@ -256,19 +329,22 @@ class ModelCatalogHandle extends Model {
     	return $query->rows;
     }
 
-    public function add_product($product_count,$product_id,$product,$product_desc,$category)
+    public function add_product($product_count,$product_id,$product,$product_desc,$category,$seo_url = [])
     {
     	if ((int)$product_count <= 1 || (int)$product_id <= 0 || empty($product) || empty($product_desc))  return;
 
     	$product['parent_id'] 		= $product_id;
 
+        $seller_id          = $product['seller_id'];
+
+        unset($product['seller_id']);
     	for ($i=1; $i < $product_count; $i++)
     	{
     		$insql 		= "INSERT INTO " . DB_PREFIX . "product SET ";
 
     		foreach ($product as $key => $value)
     		{
-    			$insql 	.= $key . " = '" . $value . "',";
+    			$insql 	.= $key . " = '" . $this->db->escape($value) . "',";
     		}
 
     		$insql 		 = trim($insql,',');
@@ -279,6 +355,8 @@ class ModelCatalogHandle extends Model {
 
     		$this->update_product($child_pro_id);
     		$this->add_product_to_category($child_pro_id,$category);
+            $this->add_ms_product_seller($child_pro_id,$seller_id);
+            $this->add_seo_url($child_pro_id,$seo_url);
 
     		$product_desc['product_id'] 		= $child_pro_id;
 
@@ -289,7 +367,7 @@ class ModelCatalogHandle extends Model {
 
     			foreach ($product_desc as $key => $value)
     			{
-	    			$insql 	.= $key . " = '" . $value . "',";
+	    			$insql 	.= $key . " = '" . $this->db->escape($value) . "',";
 	    		}
 
                 $insql 	= trim($insql,',');
@@ -299,19 +377,9 @@ class ModelCatalogHandle extends Model {
     	}
     }
 
-    private function add_product_to_category($product_id,$category)
-    {
-    	if (!empty($category) && (int)$product_id > 0)
-    	{
-    		$insql 	= "INSERT INTO " . DB_PREFIX . "product_to_category (product_id,category_id) VALUES ";
-			foreach ($category as $value) {
-				$insql .= "('" . (int)$product_id . "','" . (int)$value . "'),";
-			}
-
-			$insql 		= trim($insql,',');
-
-			$this->db->query($insql);
-    	}
+    public function add_ms_product_seller($product_id,$seller_id){
+        $this->db->query("DELETE FROM `" . DB_PREFIX . "ms_product_seller` WHERE product_id = '" . (int)$product_id . "'");
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "ms_product_seller` SET product_id = '" . (int)$product_id . "', seller_id = '" . (int)$seller_id . "', number_sold = '0', approved = '0'");
     }
 
     public function add_product_to_store($products)
@@ -348,6 +416,30 @@ class ModelCatalogHandle extends Model {
 
 			$this->db->query($insql);
     	}
+    }
+
+    public function get_seo_url($product_id)
+    {
+        $query = $this->db->query("SELECT `store_id`,`language_id`,`query`,`keyword` FROM " . DB_PREFIX . "seo_url WHERE query = 'product_id=" . (int)$product_id . "'");
+        return $query->rows;
+    }
+
+    private function add_seo_url($product_id,$seo_url = [])
+    {
+        if ($product_id > 0 && !empty($seo_url)) {
+            $this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'product_id=" . (int)$product_id . "'");
+            $insql  = "INSERT INTO " . DB_PREFIX . "seo_url (store_id,language_id,query,keyword) VALUES ";
+            foreach ($seo_url as $key => $value) {
+                $url        = explode('=', $value['query']);
+                $query      = 'product_id=' . (int)$product_id;
+                $keyword    = str_replace('-' . $url[1], '-' . (int)$product_id, $value['keyword']);
+                $insql      .= "('" . (int)$value['store_id'] . "','" . (int)$value['language_id'] . "','" . $query . "','" . $keyword . "'),";
+            }
+
+            $insql      = trim($insql,',');
+
+            $this->db->query($insql);
+        }
     }
 
     public function clear_table()

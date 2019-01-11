@@ -172,7 +172,7 @@ class ControllerApiAddress extends Controller {
 
         $this->load->model('account/address');
 
-        $address_id     = (int)array_get($req_data, 'address_id',0);
+        $address_id     = isset($req_data['address_id']) ? (int)$req_data['address_id'] : 0;
         $save_type      = (int)$req_data['save_type'] == 2 ? 2 : 1;
 
         $req_data['city_id']    = 0;

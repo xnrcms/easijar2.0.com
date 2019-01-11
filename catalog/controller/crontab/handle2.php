@@ -1,11 +1,10 @@
 <?php
-class ControllerCrontabHandle extends Controller {
+class ControllerCrontabHandle2 extends Controller {
 
 	//定时任务
 	public function index() 
 	{
-        set_time_limit(0);
-        $this->load->model('catalog/handle');
+        $this->load->model('catalog/handle2');
         
         $req_data           = array_merge($this->request->get,$this->request->post);
         $step               = (isset($req_data['step']) && (int)$req_data['step'] > 0) ? (int)$req_data['step'] : 0;
@@ -19,25 +18,26 @@ class ControllerCrontabHandle extends Controller {
         ];
 
         if ($step == 0) {
-            $this->session->data['handle_data']     = [];
+            $total          = 3898;
+            $product_info   = $this->model_catalog_handle2->get_product_description2($filter_data);
+            $remainder      = intval($total - $limit * $page);
 
-            //统计需要处理的数据
-            $ptotals   = $this->model_catalog_handle->get_product_option_value_total();
-            $ototals   = $this->model_catalog_handle->get_options_description_total();
-            $vtotals   = $this->model_catalog_handle->get_variant_description_total(1);
-            $pdtotals  = $this->model_catalog_handle->get_product_description_totals();
+            if ($remainder > 0) {
+                $description      = isset($product_info['pdc_desc']) ? $product_info['pdc_desc'] : '';
+                $description      = str_replace(['http://v2.easijar.com','https://v2.easijar.com','http://10.5.151.185','https://10.5.151.185'],['..','..','..','..'], $description);
 
-            $this->session->data['handle_data']['ptotals']   = $ptotals;
-            $this->session->data['handle_data']['ototals']   = $ototals;
-            $this->session->data['handle_data']['vtotals']   = $vtotals;
-            $this->session->data['handle_data']['pdtotals']  = $pdtotals;
-            $this->session->data['handle_data']['data']      = ['ok'=>0];
-            
-            $this->echo_log([
-                'handle_name'=>'处理数据准备中'
-            ]);
-            //print_r($this->session->data['handle_data']);exit();
-            $this->jumpurl($this->url->link('crontab/handle','step=7'));
+                $this->model_catalog_handle2->update_desc($description,$product_info['product_id']);
+
+                $page ++;
+
+                echo $remainder . '<br>';
+                echo $product_info['product_id'] . '<br>';
+                $this->jumpurl($this->url->link('crontab/handle2','step=' . $step . '&page=' . $page));
+            }else{
+                echo "ok";exit();
+            }
+
+            $this->jumpurl($this->url->link('crontab/handle','step=5'));
         }else if ($step == 2) {//处理商品
             
             //需要处理的商品列表
@@ -46,8 +46,6 @@ class ControllerCrontabHandle extends Controller {
             $remainder1                     = $this->session->data['handle_data']['ptotals'] - $remainder;
             $is_save                        = $remainder > 0 ? true : false;
             $ok                             = $remainder > 0 ? 0 : 1;
-
-            $shop   = [108=>1,110=>2,130=>3,112=>4,113=>5,114=>6,153=>7,184=>8];
 
             if ($remainder > 0) {
 
@@ -64,25 +62,18 @@ class ControllerCrontabHandle extends Controller {
                 unset($save_data2['language_id']);
                 unset($save_data2['product_id']);
 
-                $seller_id                  = 0;
                 if (!empty($category)) {
                     foreach ($category as $key => $value) {
                         $save_data3[$value['category_id']]   = $value['category_id'];
-                        if (isset($shop[$value['category_id']])) {
-                            $seller_id  = $shop[$value['category_id']];
-                        }
                     }
 
                     sort($save_data3);
                 }
 
-                $save_data1['seller_id']  = $seller_id;
-                
                 $this->handle_product_info($product_info['product_id'],$save_data1,$save_data2,$save_data3);
 
                 $page ++;
             }else{
-                $page = 0;
                 $step ++;
             }
 
@@ -94,7 +85,6 @@ class ControllerCrontabHandle extends Controller {
                 'handle_info'=>'主商品ID：'.$product_info['product_id'] . '(子产品数：' . $product_info['total'] . ')',
                 'handle_time'=>(time()-$ini_time) . '秒',
             ]);
-            //exit();
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 1) {//处理属性
@@ -121,7 +111,6 @@ class ControllerCrontabHandle extends Controller {
 
                 $page ++;
             }else{
-                $page = 0;
                 $step ++;
             }
 
@@ -154,7 +143,6 @@ class ControllerCrontabHandle extends Controller {
 
                 $page ++;
             }else{
-                $page = 0;
                 $step ++;
             }
 
@@ -169,10 +157,15 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 4) {
-
-            $this->model_catalog_handle->clear_table();
-
             echo "处理完成";exit();
+            $this->echo_log([
+                'handle_name'=>'商品信息中文翻译',
+                'handle_num1'=>$this->session->data['handle_data']['ototals'],
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'属性名称：'.$option_info['name'] . '(属性ID：' . $option_info['option_id'] . ')',
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
 
             //$this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 5) {
@@ -214,7 +207,6 @@ class ControllerCrontabHandle extends Controller {
 
                 $page ++;
             }else{
-                $page = 0;
                 $step ++;
             }
 
@@ -247,63 +239,8 @@ class ControllerCrontabHandle extends Controller {
             $this->model_catalog_handle->del_product_status0($ids);*/
             echo 'del ok';exit();
         }
-        else if ($step == 7) {//处理分类以及店铺绑定
-            //分类在处理
-            $info                           = $this->model_catalog_handle->get_product_description_list($filter_data);
-            $remainder                      = intval($this->session->data['handle_data']['pdtotals'] - $limit * $page);
-            $remainder1                     = $this->session->data['handle_data']['pdtotals'] - $remainder;
-
-            if ($remainder > 0) {
-                $categorys                      = $this->model_catalog_handle->get_product_to_category($info['product_id']);
-                if (!empty($categorys)) {
-                    $cat_ids                     = [];
-                    foreach ($categorys as $key => $value) {
-                        $category_levels        = $this->model_catalog_handle->get_category_path_level($value['category_id'],1);
-                        if (!empty($category_levels)) {
-                            $cat_ids[]   = (int)$category_levels['category_id'];
-                            $cat_ids[]   = (int)$category_levels['path_id'];
-                        }else{
-                            $cat_ids[]   = (int)$value['category_id'];
-                        }
-                    }
-
-                    $cat_ids[]           = 0;
-
-                    $cats                = $this->model_catalog_handle->get_category_path($cat_ids);
-
-                    $shop                = [108=>1,110=>2,130=>3,112=>4,113=>5,114=>6,153=>7,184=>8];
-                    $seller_id           = 0;
-                    $product_cats        = [];
-                    foreach ($cats as $key => $value) {
-                        $product_cats[$value['path_id']]  = $value['path_id'];
-                        if (isset($shop[$value['path_id']])) {
-                            $seller_id   = $shop[$value['path_id']];
-                        }
-                    }
-
-                    //添加商品到分类
-                    $this->model_catalog_handle->add_product_to_category2($info['product_id'],$product_cats);
-                    $this->model_catalog_handle->add_ms_product_seller($info['product_id'],$seller_id);
-                }else{
-                    wr([$info['product_id']]);
-                }
-
-                $page ++;
-            }else{
-                $page = 0;
-                $step = 6;
-            }
-
-            $this->echo_log([
-                'handle_name'=>'商品分类和店铺归类',
-                'handle_num1'=>$this->session->data['handle_data']['pdtotals'],
-                'handle_num2'=>$remainder1,
-                'handle_num3'=>$remainder,
-                'handle_info'=>'商品ID：'.$info['product_id'],
-                'handle_time'=>(time()-$ini_time) . '秒',
-            ]);
-
-            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        else if ($step == 7) {
+            echo "ok";exit();
         }
     }
 
@@ -337,10 +274,6 @@ class ControllerCrontabHandle extends Controller {
 
         //修改主产品
         $this->model_catalog_handle->update_product($product_id);
-        $this->model_catalog_handle->add_ms_product_seller($product_id,$product['seller_id']);
-
-        //获取seo地址
-        $seo_url    = $this->model_catalog_handle->get_seo_url($product_id);
 
         //获取需要处理的选项产品
         $product_option_value_lists     = $this->model_catalog_handle->get_product_option_value_lists(['product_id'=>$product_id]);
@@ -381,7 +314,7 @@ class ControllerCrontabHandle extends Controller {
         $combination          = $this->variant_combination($variant_id);
 
         if (isset($combination[0]) && $combination[0] > 0) {
-            $this->model_catalog_handle->add_product($combination[0],$product_id,$product,$product_desc,$category,$seo_url);
+            $this->model_catalog_handle->add_product($combination[0],$product_id,$product,$product_desc,$category);
         }
 
         if (isset($combination[1]) && !empty($combination[1]))
@@ -412,9 +345,9 @@ class ControllerCrontabHandle extends Controller {
     private function echo_log($data = [],$is_save = false)
     {
 
-        /*if (isset($data['ok']) && $data['ok'] == 1) {
+        if (isset($data['ok']) && $data['ok'] == 1) {
             $this->model_catalog_handle->clear_table();
-        }*/
+        }
 
         echo "      处理内容：" . (isset($data['handle_name']) ? $data['handle_name'] : '') . '<br>';
         echo "      处理总数：" . (isset($data['handle_num1']) ? $data['handle_num1'] : 0) . '<br>';

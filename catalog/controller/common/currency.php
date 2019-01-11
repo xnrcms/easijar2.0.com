@@ -14,7 +14,7 @@ class ControllerCommonCurrency extends Controller {
 		$results = $this->model_localisation_currency->getCurrencies();
 
 		foreach ($results as $result) {
-			if ($result['status']) {
+			if ($result['status'] && $result['code'] != 'CNY') {
 				$data['currencies'][] = array(
 					'title'        => $result['title'],
 					'code'         => $result['code'],

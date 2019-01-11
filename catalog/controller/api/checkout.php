@@ -315,7 +315,7 @@ class ControllerApiCheckout extends Controller
                         }
                     }
 
-                    return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'shipping_address_id set success']));
+                    return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'update success']));
                 }
             }
 
@@ -337,7 +337,7 @@ class ControllerApiCheckout extends Controller
                 return $this->response->setOutput($this->returnData(['msg'=>t('error_payment_unavailable')]));
             }
 
-            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'payment_method set success']));
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'update success']));
         }
 
         return $this->response->setOutput($this->returnData());

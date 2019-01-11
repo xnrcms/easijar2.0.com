@@ -56,7 +56,7 @@ class ControllerApiLogistics extends Controller
         $data['total_page']         = ceil($totals/$limit);
         $data['remainder']          = $remainder >= 0 ? $remainder : 0;
         $data['lists']              = $logistics;
-        wr($data);
+
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=> $data ]));
     }
 }

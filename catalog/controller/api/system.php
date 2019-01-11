@@ -139,9 +139,9 @@ class ControllerApiSystem extends Controller {
         $results                    = $this->model_localisation_currency->getCurrencies();
 
         foreach ($results as $result) {
-            if ($result['status']) {
+            if ($result['status'] && $result['code'] != 'CNY') {
                 $json['currencies'][] = array(
-                    'name'      => $result['symbol_left'] . $result['title'] . $result['symbol_right'],
+                    'name'      => $result['title'],
                     'code'      => $result['code'],
                     'selected'  =>(isset($this->session->data['currency']) && $this->session->data['currency'] == $result['code']) ? 1 : 0,
                 );
@@ -150,12 +150,15 @@ class ControllerApiSystem extends Controller {
 
         //国家列表
         $json['country']            = [];
-        $results                    = get_calling_codes();
+        //$results                    = get_calling_codes();
+        $results                    = [
+            ['name'=>'Malaysia','code'=>'60'],
+            ['name'=>'Singapore','code'=>'65'],
+        ];
 
         foreach ($results as $result) {
-            $name       = explode('(',$result['name']);
             $json['country'][] = array(
-                'name'      => isset($name[0]) ? $name[0] : '',
+                'name'      => $result['name'],
                 'code'      => $result['code'],
                 'selected'  =>(isset($this->session->data['country_code']) && $this->session->data['country_code'] == $result['code']) ? 1 : 0,
             );
