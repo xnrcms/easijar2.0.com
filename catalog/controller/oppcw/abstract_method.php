@@ -105,11 +105,20 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$payData['authentication.userId'] 		= $user_id;
 		$payData['authentication.password'] 	= $user_password;
 		$payData['authentication.entityId'] 	= $entity_id;
-		$payData['amount'] 						= round($order_info['total'],2);
+		$payData['amount'] 						= sprintf("%1.2f",$order_info['total']);
 		$payData['currency'] 					= $order_info['currency_code'];
 		$payData['paymentType'] 				= 'DB';
 		$payData['merchantTransactionId'] 		= $order_info['order_sn'];
 
+		$this->load->model('extension/payment/oppcw_creditcard');
+        $registration_ids = $this->model_extension_payment_oppcw_creditcard->getRegistrationId($order_info['customer_id']);
+        $registrations 	  = [];
+        if (!empty($registration_ids)) {
+        	foreach ($registration_ids as $key => $value) {
+        		$payData['registrations[' . $key . '].id'] 	=  $value['registrations'] ;
+        	}
+        }
+        
 		$pay  									= curl_http($url,$payData,'POST');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
 

@@ -3,6 +3,8 @@ class ModelMultisellerSeller extends Model {
 	public function addSeller($seller_id, $data) {
 		$this->db->query("INSERT INTO " . DB_PREFIX . "ms_seller SET `seller_id` = '" . (int)$seller_id . "', `store_name` = '" . $this->db->escape((string)$data['store_name']) . "', `company` = '" . $this->db->escape((string)$data['company']) . "', `seller_group_id` = '" . (int)$this->config->get('module_multiseller_seller_group') . "', `alipay` = '" . $this->db->escape((string)$data['alipay']) . "', product_validation = '" . (int)!$this->config->get('module_multiseller_product_validation') . "', country_id = '" . (int)$data['country_id'] . "', zone_id = '" . (int)$data['zone_id'] . "', city_id = '" . (int)$data['city_id'] . "', county_id = '" . (int)$data['county_id'] . "', `status` = '" . (int)!$this->config->get('module_multiseller_seller_approval') . "', date_added = NOW(), date_modified = NOW()");
 
+		$this->saveSellerReturnAddress($seller_id, $data);
+
 		if ($this->config->get('module_multiseller_seller_approval')) {
 			$this->db->query("INSERT INTO `" . DB_PREFIX . "customer_approval` SET customer_id = '" . (int)$seller_id . "', type = 'seller', date_added = NOW()");
 		}
@@ -10,6 +12,56 @@ class ModelMultisellerSeller extends Model {
 
 	public function editSeller($seller_id, $data) {
 		$this->db->query("UPDATE " . DB_PREFIX . "ms_seller SET store_name = '" . $this->db->escape((string)$data['store_name']) . "', company = '" . $this->db->escape((string)$data['company']) . "', description = '" . $this->db->escape((string)$data['description']) . "', country_id = '" . (int)$data['country_id'] . "', zone_id = '" . (int)$data['zone_id'] . "', city_id = '" . (int)$data['city_id'] . "', county_id = '" . (int)$data['county_id'] . "', avatar = '" . $this->db->escape((string)$data['avatar']) . "', banner = '" . $this->db->escape((string)$data['banner']) . "', alipay = '" . $this->db->escape((string)$data['alipay']) . "', date_modified = NOW() WHERE `seller_id` = '" . (int)$seller_id . "'");
+
+		$this->saveSellerReturnAddress($seller_id, $data);
+	}
+
+	public function  getSellerReturnAddress($seller_id){
+		$query 		= $this->db->query("SELECT * FROM " . get_tabname('ms_seller_return_address') . " WHERE `seller_id` = '" . (int)$seller_id . "'");
+		if (isset($query->row['seller_id']) && $query->row['seller_id'] > 0)
+		{
+			return $query->row;
+		}else{
+			return [
+				'return_shipping_name'=>'',
+				'return_shipping_mobile'=>'',
+				'return_shipping_address1'=>'',
+				'return_shipping_address2'=>'',
+				'return_shipping_zip_code'=>'',
+			];
+		}
+	}
+
+	public function saveSellerReturnAddress($seller_id, $data)
+	{
+		$query 		= $this->db->query("SELECT `seller_id` FROM " . get_tabname('ms_seller_return_address') . " WHERE `seller_id` = '" . (int)$seller_id . "'");
+		$sql 		= '';
+
+		if (isset($query->row['seller_id']) && $query->row['seller_id'] > 0)
+		{
+			$seller_id 		= $query->row['seller_id'];
+			
+			$sql .= isset($data['return_shipping_name'])?",`return_shipping_name` = '".$this->db->escape((string)$data['return_shipping_name'])."'" :'';
+			$sql .= isset($data['return_shipping_mobile'])? ",`return_shipping_mobile` = '".$this->db->escape((string)$data['return_shipping_mobile'])."'":'';
+			$sql .= isset($data['return_shipping_address1'])? ",`return_shipping_address1` = '".$this->db->escape((string)$data['return_shipping_address1'])."'":'';
+			$sql .= isset($data['return_shipping_address2'])? ",`return_shipping_address2` = '".$this->db->escape((string)$data['return_shipping_address2'])."'":'';
+			$sql .= isset($data['return_shipping_zip_code'])? ",`return_shipping_zip_code` = '".$this->db->escape((string)$data['return_shipping_zip_code'])."'":'';
+			if (!empty($sql)) {
+				$sql 			.= ",`date_modified` = NOW() WHERE `seller_id` = '" . (int)$seller_id . "'";
+				$sql 			= trim($sql,',');
+				$this->db->query("UPDATE " . get_tabname('ms_seller_return_address') . " SET " . $sql);
+			}
+		}else{
+			$sql = "INSERT INTO " . get_tabname('ms_seller_return_address') . " SET `seller_id` = '" . (int)$seller_id . "'";
+			$sql .= isset($data['return_shipping_name'])?",`return_shipping_name` = '".$this->db->escape((string)$data['return_shipping_name'])."'" :'';
+			$sql .= isset($data['return_shipping_mobile'])? ",`return_shipping_mobile` = '".$this->db->escape((string)$data['return_shipping_mobile'])."'":'';
+			$sql .= isset($data['return_shipping_address1'])? ",`return_shipping_address1` = '".$this->db->escape((string)$data['return_shipping_address1'])."'":'';
+			$sql .= isset($data['return_shipping_address2'])? ",`return_shipping_address2` = '".$this->db->escape((string)$data['return_shipping_address2'])."'":'';
+			$sql .= isset($data['return_shipping_zip_code'])? ",`return_shipping_zip_code` = '".$this->db->escape((string)$data['return_shipping_zip_code'])."'":'';
+			$sql 			.= ",`date_added` = NOW(), date_modified = NOW()";
+
+			$this->db->query($sql);
+		}
 	}
 
 	public function saveSeller($seller_id, $data)

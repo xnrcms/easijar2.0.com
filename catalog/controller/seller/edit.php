@@ -115,10 +115,39 @@ class ControllerSellerEdit extends Controller {
 			$data['error_county'] = '';
 		}
 
+		if (isset($this->error['return_shipping_name'])) {
+			$data['error_return_shipping_name'] = $this->error['return_shipping_name'];
+		} else {
+			$data['error_return_shipping_name'] = '';
+		}
+		if (isset($this->error['return_shipping_mobile'])) {
+			$data['error_return_shipping_mobile'] = $this->error['return_shipping_mobile'];
+		} else {
+			$data['error_return_shipping_mobile'] = '';
+		}
+		if (isset($this->error['return_shipping_address1'])) {
+			$data['error_return_shipping_address1'] = $this->error['return_shipping_address1'];
+		} else {
+			$data['error_return_shipping_address1'] = '';
+		}
+		if (isset($this->error['return_shipping_address2'])) {
+			$data['error_return_shipping_address2'] = $this->error['return_shipping_address2'];
+		} else {
+			$data['error_return_shipping_address2'] = '';
+		}
+		if (isset($this->error['return_shipping_zip_code'])) {
+			$data['error_return_shipping_zip_code'] = $this->error['return_shipping_zip_code'];
+		} else {
+			$data['error_return_shipping_zip_code'] = '';
+		}
+
 		$data['action'] = $this->url->link('seller/edit');
 
 		$this->load->model('multiseller/seller');
 		$seller_info = $this->model_multiseller_seller->getSeller($this->customer->getId());
+		$return_info = $this->model_multiseller_seller->getSellerReturnAddress($this->customer->getId());
+
+		$seller_info = array_merge($seller_info,$return_info);
 
 		if (isset($this->request->post['store_name'])) {
             $data['store_name'] = $this->request->post['store_name'];
@@ -185,6 +214,46 @@ class ControllerSellerEdit extends Controller {
 			$data['alipay'] = $seller_info['alipay'];
 		} else {
 			$data['alipay'] = '';
+		}
+
+		if (isset($this->request->post['return_shipping_name'])) {
+			$data['return_shipping_name'] = $this->request->post['return_shipping_name'];
+        } else if (!empty($seller_info)) {
+			$data['return_shipping_name'] = $seller_info['return_shipping_name'];
+		} else {
+			$data['return_shipping_name'] = '';
+		}
+
+		if (isset($this->request->post['return_shipping_mobile'])) {
+			$data['return_shipping_mobile'] = $this->request->post['return_shipping_mobile'];
+        } else if (!empty($seller_info)) {
+			$data['return_shipping_mobile'] = $seller_info['return_shipping_mobile'];
+		} else {
+			$data['return_shipping_mobile'] = '';
+		}
+
+		if (isset($this->request->post['return_shipping_address1'])) {
+			$data['return_shipping_address1'] = $this->request->post['return_shipping_address1'];
+        } else if (!empty($seller_info)) {
+			$data['return_shipping_address1'] = $seller_info['return_shipping_address1'];
+		} else {
+			$data['return_shipping_address1'] = '';
+		}
+
+		if (isset($this->request->post['return_shipping_address2'])) {
+			$data['return_shipping_address2'] = $this->request->post['return_shipping_address2'];
+        } else if (!empty($seller_info)) {
+			$data['return_shipping_address2'] = $seller_info['return_shipping_address2'];
+		} else {
+			$data['return_shipping_address2'] = '';
+		}
+
+		if (isset($this->request->post['return_shipping_zip_code'])) {
+			$data['return_shipping_zip_code'] = $this->request->post['return_shipping_zip_code'];
+        } else if (!empty($seller_info)) {
+			$data['return_shipping_zip_code'] = $seller_info['return_shipping_zip_code'];
+		} else {
+			$data['return_shipping_zip_code'] = '';
 		}
 
 		$this->load->model('localisation/country');
@@ -264,6 +333,22 @@ class ControllerSellerEdit extends Controller {
 
 		if (!isset($this->request->post['county_id']) || $this->request->post['county_id'] == '' || !is_numeric($this->request->post['county_id'])) {
 			$this->error['county'] = $this->language->get('error_county');
+		}
+
+		if ((utf8_strlen($this->request->post['return_shipping_name']) < 2) || (utf8_strlen($this->request->post['return_shipping_name']) > 10)) {
+			$this->error['return_shipping_name'] = $this->language->get('error_return_shipping_name');
+		}
+		if ((utf8_strlen($this->request->post['return_shipping_mobile']) < 10) || (utf8_strlen($this->request->post['return_shipping_mobile']) > 20)) {
+			$this->error['return_shipping_mobile'] = $this->language->get('error_return_shipping_mobile');
+		}
+		if ((utf8_strlen($this->request->post['return_shipping_address1']) < 5) || (utf8_strlen($this->request->post['return_shipping_address1']) > 100)) {
+			$this->error['return_shipping_address1'] = $this->language->get('error_return_shipping_address1');
+		}
+		if ((utf8_strlen($this->request->post['return_shipping_address2']) < 5) || (utf8_strlen($this->request->post['return_shipping_address2']) > 100)) {
+			$this->error['return_shipping_address2'] = $this->language->get('error_return_shipping_address2');
+		}
+		if ((utf8_strlen($this->request->post['return_shipping_zip_code']) < 5) || (utf8_strlen($this->request->post['return_shipping_zip_code']) > 10)) {
+			$this->error['return_shipping_zip_code'] = $this->language->get('error_return_shipping_zip_code');
 		}
 
 		$seller_info = $this->model_multiseller_seller->getSeller($this->customer->getId());

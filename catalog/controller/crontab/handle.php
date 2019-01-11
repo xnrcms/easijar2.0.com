@@ -304,6 +304,8 @@ class ControllerCrontabHandle extends Controller {
             ]);
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        }else if( $step == 8){//修正语言
+            
         }
     }
 

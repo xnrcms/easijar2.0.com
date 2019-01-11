@@ -114,6 +114,57 @@
             {% endif %}
           </div>
         </div>
+
+        <div class="form-group required">
+          <label class="col-sm-12">{{ entry_return_shipping_name }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="return_shipping_name" value="{{ return_shipping_name }}" placeholder="{{ entry_return_shipping_name }}" id="input-alipay" class="form-control" />
+            {% if error_return_shipping_name %}
+            <div class="text-danger">{{ error_return_shipping_name }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label class="col-sm-12">{{ entry_return_shipping_mobile }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="return_shipping_mobile" value="{{ return_shipping_mobile }}" placeholder="{{ entry_return_shipping_mobile }}" id="input-alipay" class="form-control" />
+            {% if error_return_shipping_mobile %}
+            <div class="text-danger">{{ error_return_shipping_mobile }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label class="col-sm-12">{{ entry_return_shipping_address1 }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="return_shipping_address1" value="{{ return_shipping_address1 }}" placeholder="{{ entry_return_shipping_address1 }}" id="input-alipay" class="form-control" />
+            {% if error_return_shipping_address1 %}
+            <div class="text-danger">{{ error_return_shipping_address1 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label class="col-sm-12">{{ entry_return_shipping_address2 }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="return_shipping_address2" value="{{ return_shipping_address2 }}" placeholder="{{ entry_return_shipping_address2 }}" id="input-alipay" class="form-control" />
+            {% if error_return_shipping_address2 %}
+            <div class="text-danger">{{ error_return_shipping_address2 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label class="col-sm-12">{{ entry_return_shipping_zip_code }}</label>
+          <div class="col-sm-12">
+            <input type="text" name="return_shipping_zip_code" value="{{ return_shipping_zip_code }}" placeholder="{{ entry_return_shipping_zip_code }}" id="input-alipay" class="form-control" />
+            {% if error_return_shipping_zip_code %}
+            <div class="text-danger">{{ error_return_shipping_zip_code }}</div>
+            {% endif %}
+          </div>
+        </div>
+
         <div class="buttons clearfix">
           <div class="pull-right">
             <input type="submit" value="{{ button_continue }}" class="btn btn-primary" />

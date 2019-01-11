@@ -34,6 +34,12 @@ $_['entry_postcode']            = '邮政编码';
 $_['entry_country']             = '国家';
 $_['entry_zone']                = '省份';
 
+$_['entry_return_shipping_name']              = '收货人姓名';
+$_['entry_return_shipping_mobile']            = '收货人电话';
+$_['entry_return_shipping_address1']          = '收货人详细地址-英文';
+$_['entry_return_shipping_address2']          = '收货人详细地址-中文';
+$_['entry_return_shipping_zip_code']          = '邮政编码';
+
 
 // Error
 $_['error_exists']              = '错误：该邮箱地址已被注册、请换一个电子邮箱！';
@@ -52,3 +58,9 @@ $_['error_zone']                = '请选择区域！';
 $_['error_city']                = '请选择城市！';
 $_['error_county']              = '请选择区县！';
 $_['error_exists_disable']      = '您的商户账号已被禁用，您不能重新注册商户账号，请联系管理员！';
+
+$_['error_return_shipping_name']              = '收货人姓名必须在 2 至 10 字符之间！';
+$_['error_return_shipping_mobile']            = '收货人电话必须在 10 至 20 字符之间！';
+$_['error_return_shipping_address1']          = '收货人详细地址-英文必须在 5 至 100 字符之间！';
+$_['error_return_shipping_address2']          = '收货人详细地址-中文必须在 5 至 100 字符之间！';
+$_['error_return_shipping_zip_code']          = '邮政编码必须在 5 至 10 字符之间！';
