@@ -497,6 +497,14 @@ class ControllerApiProduct extends Controller {
 
 		if (!empty($variants)) {
 			foreach ($variants as $key => $value) {
+				if ((int)$value['variant_id'] == 1 && isset($value['variants']) && !empty($value['variants'])) {
+					foreach ($value['variants'] as $kk => $vv) {
+						if ($kk >= 100){
+							unset($value['variants'][$kk]);continue;
+						}
+					}
+				}
+
 				$filter['variants'][] 	= $value;
 			}
 		}

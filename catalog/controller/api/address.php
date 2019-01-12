@@ -315,7 +315,7 @@ class ControllerApiAddress extends Controller {
         $address['city']               = $order_info['shipping_city'];
         $address['postcode']           = $order_info['shipping_postcode'];
         $address['country_id']         = $order_info['shipping_country_id'];
-        $address['zone_id']            = $order_info['shipping_country_id'];
+        $address['zone_id']            = $order_info['shipping_zone_id'];
 
         $this->load->model('localisation/country');
         $results                                = $this->model_localisation_country->getCountries();

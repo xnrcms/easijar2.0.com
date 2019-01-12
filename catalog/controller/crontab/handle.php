@@ -20,7 +20,7 @@ class ControllerCrontabHandle extends Controller {
 
         if ($step == 0) {
             $this->session->data['handle_data']     = [];
-
+            
             //统计需要处理的数据
             $ptotals   = $this->model_catalog_handle->get_product_option_value_total();
             $ototals   = $this->model_catalog_handle->get_options_description_total();
@@ -39,7 +39,7 @@ class ControllerCrontabHandle extends Controller {
             //print_r($this->session->data['handle_data']);exit();
             $this->jumpurl($this->url->link('crontab/handle','step=7'));
         }else if ($step == 2) {//处理商品
-            
+            echo "ok";exit();
             //需要处理的商品列表
             $product_info                   = $this->model_catalog_handle->get_product_option_value_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['ptotals'] - $limit * $page);
@@ -98,6 +98,7 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 1) {//处理属性
+            echo "ok";exit();
             $option_info                    = $this->model_catalog_handle->get_options_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['ototals'] - $limit * $page);
             $remainder1                     = $this->session->data['handle_data']['ototals'] - $remainder;
@@ -136,6 +137,7 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 3) {//处理属性翻译
+            echo "ok";exit();
             $language_id                    = 1;
             $filter_data['language_id']     = $language_id;
             $variant_info                   = $this->model_catalog_handle->get_variant_description_list($filter_data);
@@ -169,14 +171,14 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 4) {
-
+            echo "ok";exit();
             $this->model_catalog_handle->clear_table();
 
             echo "处理完成";exit();
 
             //$this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 5) {
-
+            echo "ok";exit();
             //处理文章详情里面的URL链接
             $info                           = $this->model_catalog_handle->get_product_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['pdtotals'] - $limit * $page);
@@ -229,8 +231,9 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 6) {
+            echo "ok";exit();
             //刪除下架数据
-            /*$plist      = $this->model_catalog_handle->get_product_status0();
+            $plist      = $this->model_catalog_handle->get_product_status0();
             $plist1     = $this->model_catalog_handle->get_product_status1();
             $ids        = [];
 
@@ -243,11 +246,12 @@ class ControllerCrontabHandle extends Controller {
             }
 
             $ids = array_flip(array_flip($ids));
-            
-            $this->model_catalog_handle->del_product_status0($ids);*/
+            //print_r($ids);exit();
+            $this->model_catalog_handle->del_product_status0($ids);
             echo 'del ok';exit();
         }
         else if ($step == 7) {//处理分类以及店铺绑定
+            echo "ok";exit();
             //分类在处理
             $info                           = $this->model_catalog_handle->get_product_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['pdtotals'] - $limit * $page);
@@ -305,7 +309,194 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if( $step == 8){//修正语言
+echo "ok";exit();
+            $limit              = 1000;
+            $filter_data        = [
+                'start'    => ($page - 1) * $limit,
+                'limit'    => $limit
+            ];
             
+            $total                          = $this->model_catalog_handle->get_product_count();
+            $list                           = $this->model_catalog_handle->get_product_list($filter_data);
+            $remainder                      = intval($total - $limit * $page);
+            $remainder1                     = $total - $remainder;
+            $product_ids                    = [];
+            $error                          = [];
+            $no_vars                        = [];
+
+            if (!empty($list)) {
+                foreach ($list as $key => $value) {
+                    $product_id         = $value['product_id'];
+                    $pdinfo1            = $this->model_catalog_handle->get_product_description_for_product_id($product_id,1);
+                    $pdinfo2            = $this->model_catalog_handle->get_product_description_for_product_id($product_id,2);
+
+                    $product_ids[]      = $product_id;
+
+                    if (empty($pdinfo1)) {
+                        $error['pdinfo1'][] = $product_id;
+                    }
+
+                    if (empty($pdinfo2)) {
+                        $error['pdinfo2'][] = $product_id;
+                    }
+
+                    if (!empty($pdinfo1) && !empty($pdinfo2)) {
+                        $total2  = $this->model_catalog_handle->get_product_count($product_id);
+                        $list2   = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000],$product_id);
+                        if (!empty($list2)) {
+                            $pids = [];
+                            foreach ($list2 as $key => $value) {
+                                $pids[] = $value['product_id'];
+                            }
+
+                            $pids[] = 0;
+
+                            $updata                         = [];
+                            $updata['product_ids']          = $pids;
+                            $updata['language_id']          = 2;
+                            $updata['name']                 = $pdinfo2['name'];
+                            $updata['tag']                  = $pdinfo2['name'];
+                            $updata['meta_title']           = $pdinfo2['name'];
+                            $updata['meta_description']     = $pdinfo2['name'];
+                            $updata['meta_keyword']         = $pdinfo2['name'];
+
+                            //$this->model_catalog_handle->update_product_descriptions($updata);
+
+                        }else{
+                            $no_vars[] = $product_id;
+                        }
+                    }
+                }
+
+                if (!empty($no_vars))
+                {
+                    $this->model_catalog_handle->del_product_variant($no_vars);
+                
+                    $variants = [];
+                    foreach ($no_vars as $key => $value) {
+                        $variants[]     = ['product_id'=>$value,'variant_id'=>10,'variant_value_id'=>11078];
+                    }
+
+                    $this->model_catalog_handle->add_product_variant($variants);
+                }
+
+                $page ++;
+            }else{
+                $page = 0;
+                $step = 1000;
+            }
+
+            if (!empty($error)) {
+                wr($error);
+            }
+
+            $remainder                      = intval($total - $limit * $page);
+
+            $this->echo_log([
+                'handle_name'=>'商品修正语言',
+                'handle_num1'=>$total,
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'页数：'.$page,
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+
+        }else if($step == 1000){
+            echo "ok";exit();
+        }else if ($step == 9) {//修正英文名称含有中文问题
+            $path = '111.xlsx';echo "ok";exit();
+            include 'Classes/PHPExcel.php';            
+            include 'Classes/PHPExcel/IOFactory.php';
+
+            $type       = 'Excel2007';//设置为Excel5代表支持2003或以下版本， Excel2007代表2007版
+            $xlsReader  = \PHPExcel_IOFactory::createReader($type);  
+            $xlsReader->setReadDataOnly(true);
+            $xlsReader->setLoadSheetsOnly(true);
+            $Sheets     = $xlsReader->load($path);
+            //开始读取上传到服务器中的Excel文件，返回一个 二维数组
+            $dataArray = $Sheets->getSheet(0)->toArray();
+
+            unset($dataArray[0]);
+
+            /*print_r($dataArray);exit();
+            $dataArray      = [];
+            $dataArray[0] = [15635,'',"Xia Xin's short-sleeved cotton T-shirt, stool and chair printed decals"];
+            $dataArray[1] = [19185,'',"Pearl Chiffon wrinkled Muslim women's headscarves wholesale 2018 Hui clothing wrinkled hot selling headscarves"];*/
+
+            foreach ($dataArray as $key => $value) {
+                $pinfo  = $this->model_catalog_handle->get_product($value[0]);
+                if (!empty($pinfo)) {
+                    $product_ids        = [];
+                    if ($pinfo['parent_id'] == 0) {
+                        $product_id     = $value[0];
+                    }else{
+                        $product_id     = $pinfo['parent_id'];
+                    }
+
+                    $product_ids[]  = $product_id;
+
+                    $list   = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000],$product_id);
+
+                    foreach ($list as $k => $v) {
+                        $product_ids[]  = $v['product_id'];
+                    }
+
+                    $updata                         = [];
+                    $updata['product_ids']          = $product_ids;
+                    $updata['language_id']          = 1;
+                    $updata['name']                 = $value[2];
+                    $updata['tag']                  = $updata['name'];
+                    $updata['meta_title']           = $updata['name'];
+                    $updata['meta_description']     = $updata['name'];
+                    $updata['meta_keyword']         = $updata['name'];
+
+                    $this->model_catalog_handle->update_product_descriptions($updata);
+                }else{
+                    wr($value);
+                }
+            }
+            echo "ok";exit();
+        }else if ($step == 10) {echo "ok";exit();
+            $list = $this->model_catalog_handle->get_product_description2();
+
+            foreach ($list as $key => $value) {
+
+                $product_ids        = [];
+                if ($value['parent_id'] == 0) {
+                    $product_id     = $value['product_id'];
+                }else{
+                    $product_id     = $value['parent_id'];
+                }
+
+                $product_ids[]  = $product_id;
+
+                $list2   = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000],$product_id);
+
+                foreach ($list2 as $k => $v) {
+                    $product_ids[]  = $v['product_id'];
+                }
+
+                $updata                         = [];
+                $updata['product_ids']          = $product_ids;
+                $updata['language_id']          = $value['language_id'];
+                /*$updata['name']                 = $value['name'];*/
+                $name = $value['language_id'] == 1 ? str_replace([' s925 ',' S925 ',' 925 ','S925','s925','925'], [' ',' ',' ',' ',' ',' '], $value['name']):str_replace([' s925 ',' S925 ',' 925 ','S925','s925','925'], ['','','','','',''], $value['name']);;
+                $updata['name']                 = $name;
+                $updata['tag']                  = $updata['name'];
+                $updata['meta_title']           = $updata['name'];
+                $updata['meta_description']     = $updata['name'];
+                $updata['meta_keyword']         = $updata['name'];
+                
+                $this->model_catalog_handle->update_product_descriptions($updata);
+                /*if ($key == 51) {
+                    print_r($updata);exit();
+                }*/
+                //$list2   = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000],$value['product_id']);
+                //print_r($product_ids);exit();
+            }
+            echo "ok";exit();
         }
     }
 

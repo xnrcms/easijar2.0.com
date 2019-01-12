@@ -6,9 +6,43 @@ class ModelCatalogHandle extends Model {
         return $query->row['total'];
     }
 
+    public function get_product_count($parent_id = 0)
+    {
+        $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "product WHERE status = '1' AND parent_id = '" .$parent_id. "'");
+        return $query->row['total'];
+    }
+
+    public function get_product_description_for_product_id($product_id,$language_id){
+        $query = $this->db->query("SELECT name FROM ".DB_PREFIX . "product_description WHERE language_id = '".$language_id."' AND product_id = '".$product_id."'");
+        return $query->row;
+    }
+
+    public function get_product_list($data,$parent_id = 0)
+    {
+        $sql    = "SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '1' AND parent_id = '" .$parent_id. "'";
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+
+            $sql .= " ORDER BY product_id ASC LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
+    }
+
     public function get_product_status0()
     {
-        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '0' OR product_id < 1927");
+
+        $product_ids = ['3201','3880','3296','4014','4351','4442','4443','5161','5179','5308','5329','5706','13220','13300','14016','14017','14018'];
+        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '0' OR product_id < 1927 OR product_id IN ('" . implode("','",$product_ids) . "')");
         return $query->rows;
     }
 
@@ -40,6 +74,7 @@ class ModelCatalogHandle extends Model {
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id IN ('" . implode("','",$product_ids) . "')";
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')";
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "ms_product_seller WHERE product_id IN ('" . implode("','",$product_ids) . "')";
 
         foreach ($delsql as $key => $value) {
             $this->db->query($value);
@@ -64,6 +99,30 @@ class ModelCatalogHandle extends Model {
         $query = $this->db->query($sql);
 
         return $query->row;
+    }
+
+    public function update_product_descriptions($updata = [])
+    {
+        if (empty($updata))  return;
+
+        $product_ids            = $updata['product_ids'];
+        $language_id            = isset($updata['language_id']) ? (int)$updata['language_id'] : 0;
+
+        $setSql                 = '';
+
+        foreach ($updata as $key => $value) {
+            if (!in_array($key, ['product_ids','language_id'])) {
+                $setSql     .= "`" . $key . "` = '" . $this->db->escape($value) . "',";
+            }
+        }
+
+        $setSql                = trim($setSql,',');
+
+        if (!empty($setSql)) {
+            $sql = "UPDATE `" . DB_PREFIX . "product_description` SET " . $setSql . " WHERE language_id = '" . $language_id . "' AND product_id IN ('" . implode("','",$product_ids) . "')";
+            $this->db->query($sql);
+        }
+
     }
 
     public function update_product_description($updata = [])
@@ -192,6 +251,13 @@ class ModelCatalogHandle extends Model {
         }
 
         return $variant_id;
+    }
+
+    public function get_product_description2()
+    {
+        $sql = "SELECT p.product_id,p.parent_id,pd.`name`,pd.language_id FROM `oc_product` p LEFT JOIN `oc_product_description` pd ON p.product_id = pd.product_id WHERE pd.`name` LIKE '%925%' AND p.parent_id = 0";
+        $query = $this->db->query($sql);
+        return $query->rows;
     }
 
     public function update_variant_description_name($variant_id = 0,$language_id = 0,$name = '')
@@ -416,6 +482,24 @@ class ModelCatalogHandle extends Model {
 
 			$this->db->query($insql);
     	}
+    }
+
+    public function del_product_variant($product_ids)
+    {
+        $sql    = "DELETE FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')";
+        $this->db->query($sql);
+    }
+
+    public function get_product_variant_total1($product_ids)
+    {
+        $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')");
+        return $query->row['total'];
+    }
+
+    public function get_product_variants1($product_ids)
+    {
+        $query = $this->db->query("SELECT product_id FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')");
+        return $query->rows;
     }
 
     public function get_seo_url($product_id)

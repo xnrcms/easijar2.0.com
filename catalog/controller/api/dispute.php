@@ -75,6 +75,7 @@ class ControllerApiDispute extends Controller {
         $returnData['seller_id']        = $order_info['seller_id'];
         $returnData['image']            = $product_info['image'];
         $returnData['return_money']     = $refund_money;
+        $returnData['order_status_id']  = $order_status_id;
 
         $return_id                      = $this->model_account_return->addReturn($returnData);
         $evidences                      = (isset($req_data['evidences']) && !empty($req_data['evidences'])) ? $req_data['evidences'] : '';
@@ -167,6 +168,13 @@ class ControllerApiDispute extends Controller {
         $seller_id              = isset($return_info['seller_id']) ? (int)$return_info['seller_id'] : 0;
         $order_info             = $this->model_account_return->getSuborderInfo($order_id,$seller_id);
         
+        $this->load->model('multiseller/seller');
+        $seller_shipping        = $this->model_multiseller_seller->getSellerReturnAddress($seller_id);
+
+        $seller_shipping['return_shipping_address']    = $seller_shipping['return_shipping_address'.(int)$this->config->get('config_language_id')];
+        unset($seller_shipping['return_shipping_address1']);
+        unset($seller_shipping['return_shipping_address2']);
+
         //根据订单状态分发信息
         $overtime               = 0;
         $status2                = 0;
@@ -291,7 +299,8 @@ class ControllerApiDispute extends Controller {
 
         $return_info['return_money']    = $this->currency->format($return_money, $currency_code, $currency_value, $this->session->data['currency']);
         
-        $return_info                    = array_merge($return_info,$order_info);
+        $return_info                    = array_merge($return_info,$order_info,$seller_shipping);
+
 
         unset($return_info['date_added']);
         unset($return_info['date_modified']);
@@ -357,7 +366,23 @@ class ControllerApiDispute extends Controller {
         $returnData['comment']              = $req_data['comment'];
         $returnData['evidences']            = (isset($req_data['evidences']) && !empty($req_data['evidences'])) ? $req_data['evidences'] : '';;
 
-        $return_id                      = $this->model_account_return->addReturnHistoryForCs($returnData);
+        $this->model_account_return->addReturnHistoryForCs($returnData);
+        
+        $order_status_id                    = isset($return_info['order_status_id']) ? (int)$return_info['order_status_id'] : 0;
+        $overtime                           = 0;
+
+        if ($order_status_id === 15) {
+            $overtime = (time() + 86400*1);
+        }
+
+        if ($order_status_id === 2) {
+            $overtime = (time() + 86400*3);
+        }
+
+        $this->load->model('multiseller/return');
+        
+        //用户提交申请需要超时自动处理 
+        $this->model_multiseller_return->editReturnOvertime($return_id,$overtime);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'update Success']));
     }

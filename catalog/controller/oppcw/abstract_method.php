@@ -29,7 +29,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 {
 	private $paySingKey = '~~!!@#@#1';
 	private $payUrl 	= 'https://test.oppwa.com';
-	private $callback 	= 'http://10.5.151.185:8081/#/';
+	private $callback 	= 'https://h5.easijar.com/#/';
 
 	public function index()
 	{
@@ -92,7 +92,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 	public function payFormForSm()
     {
 		$this->load->model('checkout/order');
-
+		wr('===========1');
 		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($this->session->data['order_sn'],get_order_type($this->session->data['order_sn']));
 		if (!$order_info)  return '';
 
@@ -109,7 +109,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$payData['currency'] 					= $order_info['currency_code'];
 		$payData['paymentType'] 				= 'DB';
 		$payData['merchantTransactionId'] 		= $order_info['order_sn'];
-
+		wr(['===========2'=>$payData]);
 		$this->load->model('extension/payment/oppcw_creditcard');
         $registration_ids = $this->model_extension_payment_oppcw_creditcard->getRegistrationId($order_info['customer_id']);
         $registrations 	  = [];
@@ -162,7 +162,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 
     public function callback() 
     {
-		$res 		= $this->get_callback();wr(['$res'=>$res]);
+		$res 		= $this->get_callback();
 		if (isset($this->session->data['api_id']) && $this->session->data['api_id'] > 0) return $res;
 		if ( isset($res[0]) && $res[0] == 'success') {
 			$this->response->redirect($this->url->link('checkout/success'));
@@ -178,9 +178,9 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$checkoutId 				= isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
 		$sign 						= isset($req_data['paysign']) ? $req_data['paysign'] : '';
 		$id 						= isset($req_data['id']) ? $req_data['id'] : '';
-		wr(['sss1']);
+
 		if (empty($id) || empty($checkoutId) || empty($sign)) return 'pay callback parameter error';
-		wr(['sss2']);
+
 		$entity_id 					= $this->config->get('module_oppcw_global_entity_id');
 		$user_id 					= $this->config->get('module_oppcw_user_id');
 		$user_password 				= $this->config->get('module_oppcw_user_password');
@@ -194,7 +194,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$url 									= $url . http_build_query($payData);
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
-		wr(['$res'=>$payData]);
+
 		if (isset($pay['result']['code']) && !empty($pay['result']['code']))
 		{
 			if (preg_match('/000\\.000\\.|000\\.100\\.1|000\\.[36]/', $pay['result']['code']) || preg_match('/000\\.400\\.0[^3]|000\\.400\\.100/', $pay['result']['code']))
@@ -214,7 +214,6 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 				$this->load->model('extension/payment/oppcw_creditcard');
 		        $method = $this->model_extension_payment_oppcw_creditcard->setRegistrationId($order_info['customer_id'], $registrationId);
 
-		        wr([$order_sn, $this->config->get('payment_alipay_order_status_id'),$payid]);
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
 				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $payid);

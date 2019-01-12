@@ -72,7 +72,6 @@ class ControllerApiMultiseller extends Controller {
         $banner_info        = $this->model_multiseller_seller_banner->getSellerBanner($seller_id);
         if (!empty($banner_info)) {
             $banner_images      = $this->model_multiseller_seller_banner->getSellerBannerImages($seller_id,$this->config->get('config_language_id'));
-
             foreach ($banner_images as $key => $value) {
                 foreach ($value as $banner_image) {
                     if (is_file(DIR_IMAGE . $banner_image['image'])) {
@@ -84,7 +83,7 @@ class ControllerApiMultiseller extends Controller {
                     $json['seller_banner'][] = array(
                         'title'      => $banner_image['title'],
                         'link'       => $banner_image['link'],
-                        'image'      => $this->model_tool_image->resize($thumb, 100, 100)
+                        'image'      => $this->model_tool_image->resize($thumb, 375, 185)
                     );
                 }
             }
