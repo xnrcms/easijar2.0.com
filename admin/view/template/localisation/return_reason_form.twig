@@ -55,6 +55,15 @@
                   {{ text_type3 }}
                 {% endif %}
               </label>
+              <label class="radio-inline">
+                {% if reason_type == '3' %}
+                  <input type="radio" name="reason_type" value="3" checked="checked"/>
+                  {{ text_type4 }}
+                {% else %}
+                  <input type="radio" name="reason_type" value="3"/>
+                  {{ text_type4 }}
+                {% endif %}
+              </label>
             </div>
           </div>
           <div class="form-group required">

@@ -18,6 +18,7 @@ $_['text_edit']        = '编辑退货原因';
 $_['text_type1']       = '订单取消';
 $_['text_type2']       = '已收到货';
 $_['text_type3']       = '未收到货';
+$_['text_type4']       = '待发货';
 
 // Column
 $_['column_name']      = '退货原因名称';

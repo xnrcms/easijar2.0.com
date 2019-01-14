@@ -10,6 +10,7 @@ $_['text_edit']        = 'Edit Return Reason';
 $_['text_type1']       = 'Order Cancellation';
 $_['text_type2']       = 'Received Goods';
 $_['text_type3']       = 'No Goods Received';
+$_['text_type4']       = 'To Be Shipped';
 
 // Column
 $_['column_name']      = 'Return Reason Name';
