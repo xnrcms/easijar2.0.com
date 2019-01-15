@@ -262,7 +262,12 @@ class ControllerProductProduct extends Controller {
 			$data['reward'] = $product_info['reward'];
 			$data['points'] = $product_info['points'];
 			$data['sales'] = $product_info['sales'];
-			$data['description'] = html_entity_decode($product_info['description'], ENT_QUOTES, 'UTF-8');
+
+			$shuoming = '<p><br><img style="display: block; margin-left: auto; margin-right: auto;" src="../image/catalog/shuoming.png" alt="undefined" data-mce-src="../image/catalog/shuoming.png" data-mce-style="display: block; margin-left: auto; margin-right: auto;" data-mce-selected="1"></p>';
+
+			$data['description'] = html_entity_decode($product_info['description'] . $shuoming, ENT_QUOTES, 'UTF-8');
+
+
 
 			if ($product_info['quantity'] <= 0) {
 				$data['stock'] = $product_info['stock_status'];

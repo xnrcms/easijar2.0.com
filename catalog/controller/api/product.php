@@ -173,7 +173,14 @@ class ControllerApiProduct extends Controller {
 			$pinfo['oprice'] 		= $this->currency->format($this->tax->calculate($oprice, $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
 			$pinfo['stock'] 		= isset($product_info['quantity']) ? (int)$product_info['quantity'] : 0;
-			$pinfo['description'] 	= str_replace('../image/catalog/', trim(base_url(),'/') . '/image/catalog/', htmlspecialchars_decode($product_info['description']));
+
+			$shuoming = '<p><br><img style="display: block; margin-left: auto; margin-right: auto;" src="../image/catalog/shuoming.png" alt="undefined" data-mce-src="../image/catalog/shuoming.png" data-mce-style="display: block; margin-left: auto; margin-right: auto;" data-mce-selected="1"></p>';
+			
+			$searchStr 				= ['../image/catalog/','http://10.5.151.185/'];
+			$replaceStr 			= [trim(base_url(),'/') . '/image/catalog/',trim(base_url(),'/')];
+			$subjectStr 			= htmlspecialchars_decode($product_info['description'] . $shuoming);
+
+			$pinfo['description'] 	= str_replace($searchStr, $replaceStr,$subjectStr);
 			$pinfo['sku'] 			= '';
 
 			//折扣率计算
