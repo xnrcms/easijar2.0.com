@@ -717,7 +717,7 @@ class ModelAccountOrder extends Model {
                 }
 
                 if (!empty($order_product_id)) {
-                    $query_return  = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "return WHERE order_id = '" . $order_id . "' AND product_id IN (" . implode(',', $order_product_id) . ")");
+                    $query_return  = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "return WHERE order_id = '" . $order_id . "' AND product_id IN (" . implode(',', $order_product_id) . ") AND return_status_id <> 8 ");
 
                     if (isset($query_return->row['total']) && $query_return->row['total'] > 0) {
                         $isReturn   = true;

@@ -48,6 +48,7 @@ class ControllerApiCoupon extends Controller {
         	foreach ($results as $key => $value) {
         		$avatar                 		= !empty($value['avatar']) ? $value['avatar'] : 'no_image.png';
 		        $value['avatar']        		= $this->model_tool_image->resize($avatar, 100, 100);
+                $value['discount']              = sprintf("%.2f", $value['discount']);
 
 		        $overdue 						= $value['over_time'] > 0 ? 1 : 0;
 
@@ -130,6 +131,15 @@ class ControllerApiCoupon extends Controller {
         //商家优惠券列表
 		$results = $this->model_marketing_coupon->getCoupons($filter_data,$req_data['seller_id']);
 		foreach ($results as $result) {
+
+            $result['discount']              = sprintf("%.2f", $result['discount']);
+
+            if ($result['type'] == 'F') {
+                $result['discount']          = $this->currency->format($result['discount'], $this->session->data['currency']);
+            } else {
+                $result['discount']          = round($result['discount']).'%';
+            }
+
 			$data['business'][] = array(
 				'coupon_id'  => $result['coupon_id'],
 				'name'       => $result['name'],

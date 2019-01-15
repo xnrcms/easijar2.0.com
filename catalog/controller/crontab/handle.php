@@ -497,6 +497,70 @@ echo "ok";exit();
                 //print_r($product_ids);exit();
             }
             echo "ok";exit();
+        }else if ($step == 11) {
+            $limit              = 12000;
+            $filter_data        = [
+                'start'    => ($page - 1) * $limit,
+                'limit'    => $limit
+            ];
+            
+            $total                          = $this->model_catalog_handle->get_variant_value_count();
+            $list                           = $this->model_catalog_handle->get_variant_value_list($filter_data);
+
+            if (!empty($list))
+            {
+                foreach ($list as $key => $value) {
+                    $plist  = $this->model_catalog_handle->get_product_variant_list1($value['variant_id'],$value['variant_value_id']);
+
+                    $pids   = [];
+                    foreach ($plist as $k => $v) {
+                        $pids[$v['product_id']] = $v['product_id'];
+                    }
+
+                    sort($pids);
+
+                    $plist2     = $this->model_catalog_handle->get_product_status3($pids);
+
+                    $dels_pid   = array_flip($pids);
+
+                    foreach ($plist2 as $kk => $vv) {
+                        if (isset($dels_pid[(int)$vv['product_id']])) {
+                            unset($dels_pid[(int)$vv['product_id']]);
+                        }
+                    }
+
+                    $dels_pid   = array_flip($dels_pid);
+                    wr(['dels_pid'=>$dels_pid]);
+
+                    $this->model_catalog_handle->del_product_variant($dels_pid);
+
+                    $plist2  = $this->model_catalog_handle->get_product_variant_list1($value['variant_id'],$value['variant_value_id']);
+
+                    if (empty($plist2)) {
+                        wr(['del_variant_value'=>[$value['variant_id'],$value['variant_value_id']]]);
+                        $this->model_catalog_handle->del_variant_value($value['variant_id'],$value['variant_value_id']);
+                    }
+                }
+
+                $page ++;
+            }else{
+                //$page = 0;
+                $step = 1000;
+            }
+                        
+            $remainder                      = intval($total - $limit * $page);
+            $remainder1                     = $total - $remainder;
+
+            $this->echo_log([
+                'handle_name'=>'商品属性剔除',
+                'handle_num1'=>$total,
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'页数：'.$page,
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }
     }
 

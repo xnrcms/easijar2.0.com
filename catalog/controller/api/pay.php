@@ -173,6 +173,6 @@ class ControllerApiPay extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$res[1]]));
         }
 
-        return $this->response->setOutput($this->returnData(['code'=>'206','msg'=>$res]));
+        return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>$res]));
     }
 }

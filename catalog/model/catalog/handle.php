@@ -52,6 +52,12 @@ class ModelCatalogHandle extends Model {
         return $query->rows;
     }
 
+    public function get_product_status3($product_ids)
+    {
+        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE product_id IN ('" . implode("','",$product_ids) . "')");
+        return $query->rows;
+    }
+
     public function get_product_description22()
     {
         $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product_description WHERE description LIKE '%data:image/jpeg;base64%'");
@@ -294,6 +300,39 @@ class ModelCatalogHandle extends Model {
         }
     }
 
+    public function get_variant_value_count()
+    {
+        $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "variant_value WHERE 1");
+        return $query->row['total'];
+    }
+
+    public function del_variant_value($variant_id,$variant_value_id)
+    {
+        $this->db->query("DELETE FROM " . DB_PREFIX . "variant_value WHERE variant_id = '".(int)$variant_id."' AND variant_value_id = '".(int)$variant_value_id."'");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "variant_value_description WHERE variant_id = '".(int)$variant_id."' AND variant_value_id = '".(int)$variant_value_id."'");
+    }
+
+    public function get_variant_value_list($data)
+    {
+        $sql    = "SELECT `variant_value_id`,`variant_id` FROM " . DB_PREFIX . "variant_value WHERE 1";
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+
+            $sql .= " ORDER BY variant_id ASC LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
+    }
+
     public function add_variant_option_id($data)
     {
     	if (!empty($data)) {
@@ -494,6 +533,12 @@ class ModelCatalogHandle extends Model {
     {
         $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')");
         return $query->row['total'];
+    }
+
+    public function get_product_variant_list1($variant_id,$variant_value_id)
+    {
+        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product_variant WHERE variant_id = '" . (int)$variant_id . "' AND variant_value_id = '" . (int)$variant_value_id . "'");
+        return $query->rows;
     }
 
     public function get_product_variants1($product_ids)

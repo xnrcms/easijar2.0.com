@@ -28,8 +28,8 @@ require_once 'OPPCw/AbstractController.php';
 abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController implements OPPCw_IPaymentMethodDefinition
 {
 	private $paySingKey = '~~!!@#@#1';
-	private $payUrl 	= 'https://test.oppwa.com';
-	private $callback 	= 'https://h5.easijar.com/#/';
+	private $payUrl 	= OPPCW_PAYURL;
+	private $callback 	= OPPCW_CALLBACK;
 
 	public function index()
 	{

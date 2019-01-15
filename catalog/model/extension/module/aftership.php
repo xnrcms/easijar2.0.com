@@ -56,6 +56,19 @@ class ModelExtensionModuleAftership extends Model
         return $logistics_query->row['total'];
     }
 
+    public function getOrderLogisticsTotalsForRead()
+    {
+        $logistics_query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('aftership') . " af LEFT JOIN " . get_tabname('ms_suborder') . " mssu ON (mssu.seller_id = af.seller_id AND mssu.order_id = af.order_id) LEFT JOIN " . get_tabname('ms_order_product') . " msop ON (msop.seller_id = af.seller_id AND msop.order_id = af.order_id) LEFT JOIN " . get_tabname('order') . " o ON o.order_id = af.order_id LEFT JOIN " . get_tabname('order_product') . " op ON op.order_product_id = msop.order_product_id WHERE o.customer_id = '" . (int)$this->customer->getId() . "' AND is_read = '0' AND op.name IS NOT NULL");
+
+        return $logistics_query->row['total'];
+    }
+
+    public function updateOrderLogisticsReadStatus($aftership_ids)
+    {
+        $aftership_ids  = is_array($aftership_ids) ? $aftership_ids : [$aftership_ids];
+        $this->db->query("UPDATE " . get_tabname('aftership') . " SET is_read = '1' WHERE id IN ('" . implode("','",$aftership_ids) . "')");
+    }
+
     public function getOrderLogistics($data = [])
     {
         $field  = 'af.tracking_name,af.tracking_code,af.order_id,af.seller_id,af.tracking_number,af.tracking_name,af.date_added,op.name,op.image,mssu.order_sn';

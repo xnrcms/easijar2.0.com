@@ -35,6 +35,7 @@ class ControllerApiLogistics extends Controller
         );
 
         $totals                = $this->model_extension_module_aftership->getOrderLogisticsTotals();
+        $read_totals           = $this->model_extension_module_aftership->getOrderLogisticsTotalsForRead();
         $order_logistics       = $this->model_extension_module_aftership->getOrderLogistics($filter_data);
 
         $logistics             = [];
@@ -53,6 +54,7 @@ class ControllerApiLogistics extends Controller
         $remainder                  = intval($totals - $limit * $page);
         $data                       = [];
         $data['totals']             = (int)$totals;
+        $data['read_totals']        = (int)$read_totals;
         $data['total_page']         = ceil($totals/$limit);
         $data['remainder']          = $remainder >= 0 ? $remainder : 0;
         $data['lists']              = $logistics;

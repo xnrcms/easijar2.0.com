@@ -67,7 +67,7 @@ class ControllerApiInformation extends Controller {
 
         $dtype              = (int)$req_data['dtype'];
 
-        if (!in_array($dtype, [0,1,2,3])) {
+        if (!in_array($dtype, [0,1,2,3,4])) {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:dtype is error']));
         }
 
@@ -77,7 +77,7 @@ class ControllerApiInformation extends Controller {
         $dataFilter['start']    = 0;
         $dataFilter['limit']    = 100;
         
-        if ($dtype != 3) {
+        if ($dtype != 4) {
             $dataFilter['type']     = $dtype;
         }
 
