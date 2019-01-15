@@ -50,7 +50,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 			$payData['authentication.userId'] 		= $user_id;
 			$payData['authentication.password'] 	= $user_password;
 			$payData['authentication.entityId'] 	= $entity_id;
-			$payData['amount'] 						= round($order_info['total'],2);
+			$payData['amount'] 						= sprintf("%1.2f",$order_info['total']);
 			$payData['currency'] 					= $order_info['currency_code'];
 			$payData['paymentType'] 				= 'DB';
 			$payData['merchantTransactionId'] 		= $order_info['order_sn'];
@@ -92,7 +92,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 	public function payFormForSm()
     {
 		$this->load->model('checkout/order');
-		wr('===========1');
+
 		$order_info = $this->model_checkout_order->getOrderByOrderSnUsePayInfoForMs($this->session->data['order_sn'],get_order_type($this->session->data['order_sn']));
 		if (!$order_info)  return '';
 
@@ -109,7 +109,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$payData['currency'] 					= $order_info['currency_code'];
 		$payData['paymentType'] 				= 'DB';
 		$payData['merchantTransactionId'] 		= $order_info['order_sn'];
-		wr(['===========2'=>$payData]);
+
 		$this->load->model('extension/payment/oppcw_creditcard');
         $registration_ids = $this->model_extension_payment_oppcw_creditcard->getRegistrationId($order_info['customer_id']);
         $registrations 	  = [];
@@ -144,7 +144,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
     {
     	$req_data 			= array_merge($this->request->get,$this->request->post);
     	$body 				= file_get_contents('php://input');
-
+    	wr(['$req_data'=>$req_data]);
     	$key_from_configuration 	= "A33C82C19CC1F6B63B37E4B3F0BACBFEBD2BB3E3B6E7292023786AF97F771BAC";
 		$iv_from_http_header 		= isset($this->request->server['HTTP_X_INITIALIZATION_VECTOR']) ? $this->request->server['HTTP_X_INITIALIZATION_VECTOR'] : '';
 		$auth_tag_from_http_header 	= isset($this->request->server['HTTP_X_AUTHENTICATION_TAG']) ? $this->request->server['HTTP_X_AUTHENTICATION_TAG'] : '';
@@ -154,9 +154,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$cipher_text 				= hex2bin($http_body . $auth_tag_from_http_header);
 		$result 					= sodium_crypto_aead_aes256gcm_decrypt($cipher_text, NULL, $iv, $key);
 		$result 					= !empty($result) ? json_decode($result,true) : [];
-    	wr("==========1");
-    	wr([$result]);
-    	wr("==========2");
+		wr(['$result'=>$result]);
     	return $req_data;
     }
 
