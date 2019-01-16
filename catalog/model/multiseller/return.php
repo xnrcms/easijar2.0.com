@@ -195,13 +195,22 @@ class ModelMultisellerReturn extends Model {
 		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$return_id . "', return_status_id = '" . (int)$return_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape(strip_tags($comment)) . "', date_added = NOW()");
 	}
 
-	public function addReturnHistoryForMs($return_id, $return_status_id, $proposal = 0,$return_reason_id = 0,$comment = '',$evidences = '',$customer_id = 0) {
+	public function addReturnHistoryForMs($data)
+	{
+		$return_id 					= isset($data['return_id']) ? (int)$data['return_id'] : 0;
+		$return_status_id 			= isset($data['return_status_id']) ? (int)$data['return_status_id'] : 0;
+		$proposal 					= isset($data['proposal']) ? (int)$data['proposal'] : 0;
+		$return_reason_id 			= isset($data['return_reason_id']) ? (int)$data['return_reason_id'] : 0;
+		$comment 					= isset($data['comment']) ? (string)$data['comment'] : '';
+		$evidences 					= isset($data['evidences']) ? (string)$data['evidences'] : '';
+		$customer_id 				= isset($data['customer_id']) ? (int)$data['customer_id'] : 0;
+		$utype 						= isset($data['utype']) ? (int)$data['utype'] : 0;
 
 		if ($return_status_id != 9) {
-			$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$return_status_id . "', date_modified = NOW() WHERE return_id = '" . (int)$return_id . "'");
+			$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . $return_status_id . "', date_modified = NOW() WHERE return_id = '" . (int)$return_id . "'");
 		}
 
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$return_id . "', return_status_id = '" . (int)$return_status_id . "', proposal = '" . (int)$proposal . "', comment = '" . $this->db->escape(strip_tags($comment)) . "',customer_id = '" . (int)$customer_id . "',evidences = '" . $evidences . "',return_reason_id = '" . (int)$return_reason_id . "', date_added = NOW()");
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . $return_id . "', return_status_id = '" . $return_status_id . "', proposal = '" . $proposal . "', comment = '" . $this->db->escape(strip_tags($comment)) . "',customer_id = '" . $customer_id . "',evidences = '" . $evidences . "',return_reason_id = '" . $return_reason_id . "',utype = '" . $utype . "', date_added = NOW()");
 	}
 
 	public function getReturnHistories($return_id, $start = 0, $limit = 10) {

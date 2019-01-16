@@ -754,12 +754,28 @@ class ControllerSellerReturn extends Controller {
 			if (!isset($json['error']) || empty($json['error'])) {
 				
         		$this->model_multiseller_return->editReturnOvertime($return_id, ($overtime > 0 ? (time() + 86400*$overtime) : 0));
-                $this->model_multiseller_return->addReturnHistoryForMs($return_id, $return_status_id,'','', $this->request->post['comment'],'',$this->customer->getId());
+
+        		$history_data                           = [];
+		        $history_data['return_id']              = $return_id;
+		        $history_data['return_status_id']       = $return_status_id;
+		        $history_data['comment']                = $this->request->post['comment'];
+		        $history_data['customer_id']            = $this->customer->getId();
+		        $history_data['utype']                  = 2;
+
+                $this->model_multiseller_return->addReturnHistoryForMs($history_data);
                 
                 if ($is_platform == 1) {
                 	sleep(2);
         			$this->model_multiseller_return->editReturnIsPlatform($return_id, 1);
-                	$this->model_multiseller_return->addReturnHistoryForMs($return_id, 9,'','', '平台介入处理','',0);
+
+        			$history_data                           = [];
+			        $history_data['return_id']              = $return_id;
+			        $history_data['return_status_id']       = 9;
+			        $history_data['comment']                = '平台介入处理';
+			        $history_data['customer_id']            = 0;
+			        $history_data['utype']                  = 3;
+
+                	$this->model_multiseller_return->addReturnHistoryForMs($history_data);
 				}
 
 				$json['success'] = $this->language->get('text_success');
