@@ -198,7 +198,7 @@ class ControllerApiDispute extends Controller {
         $overtime               = 0;
         $status2                = 0;
         $order_status_id        = isset($order_info['order_status_id']) ? (int)$order_info['order_status_id'] : 0;
-        $responsibility         = isset($order_info['responsibility']) ? (int)$order_info['responsibility'] : 0;
+        $responsibility         = isset($return_info['responsibility']) ? (int)$return_info['responsibility'] : 0;
 
         if ($return_info['return_status_id'] == 1) {//待审核
             $overtime           = (int)$return_info['overtime'];
@@ -528,7 +528,7 @@ class ControllerApiDispute extends Controller {
         $history_data['return_reason_id']       = $rinfo['return_reason_id'];
         $history_data['customer_id']            = $this->customer->getId();
         $history_data['utype']                  = 1;
-        
+
         $this->model_multiseller_return->addReturnHistoryForMs($history_data);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'after sale application has been withdrawn']));
