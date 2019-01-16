@@ -23,7 +23,7 @@ $_['text_agree']         = 'I have read and agree to the <a href="%s" class="agr
 $_['text_return_comment'] = "Seller didn't ship the items, full refund.";
 $_['text_return_receive1'] 	= 'Only Refunds';
 $_['text_return_receive2'] 	= ' Return goods & Refund';
-$_['text_return_logistics'] = "Buyer has returned the good\nLogistics Company：%s\nTracking Number:%s\nRefund Explain:%s";
+$_['text_return_logistics'] = "Buyer has returned the good<br />Logistics Company：%s<br />Tracking Number:%s<br />Refund Explain:%s";
 
 // Column
 $_['column_return_id']   = 'Return ID';

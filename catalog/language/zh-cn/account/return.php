@@ -31,7 +31,7 @@ $_['text_agree']         = '我已经阅读并同意 <a href="%s" class="agree">
 $_['text_return_comment'] = '超时未发货，自动退款';
 $_['text_return_receive1'] 	= '仅退款';
 $_['text_return_receive2'] 	= '退货退款';
-$_['text_return_logistics'] = "买方已退回\n物流公司：%s\n物流单号:%s\n退款说明:%s";
+$_['text_return_logistics'] = "买方已退回<br />物流公司：%s<br />物流单号:%s<br />退款说明:%s";
 
 // Column
 $_['column_return_id']   = '退货 ID';
