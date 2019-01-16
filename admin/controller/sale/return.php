@@ -785,7 +785,26 @@ class ControllerSaleReturn extends Controller {
 
 		$this->load->model('localisation/return_status');
 
-		$notAllow 					= [1,3,5,6,7,8,9];
+		$return_statuses 	= [];
+		$is_service 		= isset($return_info['is_service']) ? (int)$return_info['is_service'] : 0;
+
+		//1-仅退款 2-退货退款
+		if (in_array($is_service, [1,2])) {
+			if ($is_service == 1) {
+				$return_statuses 	= [
+					['return_status_id'=>10,'name'=>'同意'],
+					['return_status_id'=>4,'name'=>'拒绝']
+				];
+			}elseif ($is_service == 2) {
+				$return_statuses 	= [
+					['return_status_id'=>202,'name'=>'同意-买家责任'],
+					['return_status_id'=>203,'name'=>'同意-买家责任'],
+					['return_status_id'=>4,'name'=>'拒绝'],
+				];
+			}
+		}
+
+		/*$notAllow 					= [1,3,5,6,7,8,9];
 		$text_status 				= [4=>'拒绝'];
 		$return_statuses 			= $this->model_localisation_return_status->getReturnStatuses();
 		foreach ($return_statuses as $key => $value) {
@@ -794,7 +813,7 @@ class ControllerSaleReturn extends Controller {
         	}else{
         		$return_statuses[$key]['name'] = isset($text_status[$value['return_status_id']]) ? $text_status[$value['return_status_id']] : $value['name'];
         	}
-        }
+        }*/
         
 		$data['return_statuses'] = $return_statuses;
 

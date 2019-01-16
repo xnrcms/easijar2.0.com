@@ -175,6 +175,17 @@ class ControllerApiUser extends Controller {
 
 		unset($req_data['account']);
 
+		$password 			= isset($req_data['password']) ? $req_data['password'] : '';
+		$confirm 			= isset($req_data['confirm']) ? $req_data['confirm'] : '';
+		if (empty($password) || empty($confirm)) {
+			$keys 		= md5('smscode-' . $req_data['email'] . '-1');
+			if ((utf8_strlen(html_entity_decode($req_data['verification_code'], ENT_QUOTES, 'UTF-8')) != 6) || !isset($this->session->data['smscode'][$keys]) || $req_data['verification_code'] != $this->session->data['smscode'][$keys]['code'] ||  $this->session->data['smscode'][$keys]['expiry_time'] < time()){
+				return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode')]));
+			}else{
+				return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'verification_code ok']));
+			}
+		}
+
 		$this->load->model('account/customer');
 
         $validate 		= $this->register_validate($req_data);
