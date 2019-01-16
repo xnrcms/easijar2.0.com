@@ -797,8 +797,8 @@ class ControllerSaleReturn extends Controller {
 				];
 			}elseif ($is_service == 2) {
 				$return_statuses 	= [
-					['return_status_id'=>202,'name'=>'同意-卖家责任'],
-					['return_status_id'=>203,'name'=>'同意-买家责任'],
+					['return_status_id'=>202,'name'=>'同意-买家责任'],
+					['return_status_id'=>203,'name'=>'同意-卖家责任'],
 					['return_status_id'=>4,'name'=>'拒绝'],
 				];
 			}
@@ -933,15 +933,15 @@ class ControllerSaleReturn extends Controller {
 			$pcount 	= count($pids);
 			$rcount 	= $this->model_sale_return->getTotalReturnsByProductIds($pids);
 
-			if ($this->request->post['return_status_id'] == 202) {
+			if ($this->request->post['return_status_id'] == 202) {//同意-买家责任
 				$this->request->post['return_status_id'] 	= 2;
-				$this->request->post['responsibility'] 		= 2;
+				$this->request->post['responsibility'] 		= 1;
 				$this->request->post['overtime'] 			= (time() + 86400*10);
 			}
 
-			if ($this->request->post['return_status_id'] == 203) {
+			if ($this->request->post['return_status_id'] == 203) {//同意-卖家责任
 				$this->request->post['return_status_id'] 	= 2;
-				$this->request->post['responsibility'] 		= 1;
+				$this->request->post['responsibility'] 		= 2;
 				$this->request->post['overtime'] 			= (time() + 86400*10);
 			}
 

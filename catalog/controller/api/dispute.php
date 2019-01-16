@@ -236,8 +236,9 @@ class ControllerApiDispute extends Controller {
                 if ((int)$return_info['is_service'] == 2) {//退货退款
 
                     if ($return_info['return_status_id'] == 2) {//等待寄回商品
-                        $overtime       = (int)$return_info['overtime'];
-                        $status2        = 1;//10天内将货品寄回
+                        $overtime       = (int)$return_info['overtime'];//10天内将货品寄回
+                        $status2        = in_array($responsibility, [1,2]) ? $responsibility + 1 : 1;
+
                     }
 
                     if ($return_info['return_status_id'] == 5) {//等待寄回商品
