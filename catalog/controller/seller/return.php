@@ -771,7 +771,7 @@ class ControllerSellerReturn extends Controller {
         			$history_data                           = [];
 			        $history_data['return_id']              = $return_id;
 			        $history_data['return_status_id']       = 9;
-			        $history_data['comment']                = '平台介入处理';
+			        $history_data['comment']                = 'Platform Intervention Processing';
 			        $history_data['customer_id']            = 0;
 			        $history_data['utype']                  = 3;
 

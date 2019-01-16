@@ -321,7 +321,6 @@ class ControllerApiDispute extends Controller {
         
         $return_info                    = array_merge($return_info,$order_info,$seller_shipping);
 
-
         unset($return_info['date_added']);
         unset($return_info['date_modified']);
         unset($return_info['action']);
@@ -605,7 +604,24 @@ class ControllerApiDispute extends Controller {
         $returnData['shipping_explain']     = $req_data['shipping_explain'];
         $returnData['shipping_image']       = (isset($req_data['shipping_image']) && !empty($req_data['shipping_image'])) ? $req_data['shipping_image'] : '';
 
-        $return_id                      = $this->model_account_return->updateReturnLogistics($returnData);
+        $this->model_account_return->updateReturnLogistics($returnData);
+
+        $this->load->model('multiseller/return');
+
+        $comment    = sprintf(t('text_return_logistics'), $req_data['shipping_company'], $req_data['shipping_number'], $req_data['shipping_explain']);
+
+        $history_data                           = [];
+        $history_data['return_id']              = $req_data['return_id'];
+        $history_data['return_status_id']       = 5;
+        $history_data['comment']                = $comment;
+        $history_data['customer_id']            = $this->customer->getId();
+        $history_data['utype']                  = 1;
+
+        $this->model_multiseller_return->addReturnHistoryForMs($history_data);
+
+        //用户提交申请需要超时自动处理
+        $overtime                   = (time() + 86400*60);
+        $this->model_multiseller_return->editReturnOvertime($req_data['return_id'],$overtime);
 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Save Success']));
     }
