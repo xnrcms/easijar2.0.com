@@ -797,7 +797,7 @@ class ControllerSaleReturn extends Controller {
 				];
 			}elseif ($is_service == 2) {
 				$return_statuses 	= [
-					['return_status_id'=>202,'name'=>'同意-买家责任'],
+					['return_status_id'=>202,'name'=>'同意-卖家责任'],
 					['return_status_id'=>203,'name'=>'同意-买家责任'],
 					['return_status_id'=>4,'name'=>'拒绝'],
 				];
@@ -933,7 +933,22 @@ class ControllerSaleReturn extends Controller {
 			$pcount 	= count($pids);
 			$rcount 	= $this->model_sale_return->getTotalReturnsByProductIds($pids);
 
-			$this->model_sale_return->addReturnHistory($this->request->get['return_id'], $this->request->post['return_status_id'], $this->request->post['comment'], $this->request->post['notify']);
+			if ($this->request->post['return_status_id'] == 202) {
+				$this->request->post['return_status_id'] 	= 2;
+				$this->request->post['responsibility'] 		= 2;
+			}
+
+			if ($this->request->post['return_status_id'] == 203) {
+				$this->request->post['return_status_id'] 	= 2;
+				$this->request->post['responsibility'] 		= 1;
+			}
+
+			$this->request->post['utype'] 					= 3;//平台
+			$this->request->post['comment'] 				= !empty($this->request->post['comment']) ? $this->request->post['comment'] : '平台仲裁';
+
+			$req_data 										= array_merge($this->request->post,$this->request->get);
+
+			$this->model_sale_return->addReturnHistory($req_data);
 
 			//如果订单下商品全部退款成功 修改订单状态为已完成
 			if ($pcount === $rcount) {

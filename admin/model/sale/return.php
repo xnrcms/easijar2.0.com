@@ -180,9 +180,14 @@ class ModelSaleReturn extends Model {
 		return $query->row['total'];
 	}
 	
-	public function addReturnHistory($return_id, $return_status_id, $comment, $notify) {
-		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$return_status_id . "', date_modified = NOW() WHERE return_id = '" . (int)$return_id . "'");
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$return_id . "', return_status_id = '" . (int)$return_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape(strip_tags($comment)) . "', date_added = NOW()");
+	public function addReturnHistory($data) {
+		$comment 			= isset($data['comment']) ? $data['comment'] : '';
+		$responsibility 	= isset($data['responsibility']) ? (int)$data['responsibility'] : 0;
+		$utype 				= isset($data['utype']) ? (int)$data['utype'] : 0;
+
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$data['return_status_id'] . "',`responsibility` = '" . $responsibility . "',`date_modified` = NOW() WHERE return_id = '" . (int)$data['return_id'] . "'");
+
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$data['return_id'] . "', return_status_id = '" . (int)$data['return_status_id'] . "', notify = '', comment = '" . $this->db->escape(strip_tags($comment)) . "',utype = '" . $utype . "', date_added = NOW()");
 	}
 
 	public function getReturnHistories($return_id, $start = 0, $limit = 10) {
