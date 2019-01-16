@@ -936,11 +936,13 @@ class ControllerSaleReturn extends Controller {
 			if ($this->request->post['return_status_id'] == 202) {
 				$this->request->post['return_status_id'] 	= 2;
 				$this->request->post['responsibility'] 		= 2;
+				$this->request->post['overtime'] 			= (time() + 86400*10);
 			}
 
 			if ($this->request->post['return_status_id'] == 203) {
 				$this->request->post['return_status_id'] 	= 2;
 				$this->request->post['responsibility'] 		= 1;
+				$this->request->post['overtime'] 			= (time() + 86400*10);
 			}
 
 			$this->request->post['utype'] 					= 3;//平台

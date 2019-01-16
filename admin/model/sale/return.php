@@ -184,8 +184,9 @@ class ModelSaleReturn extends Model {
 		$comment 			= isset($data['comment']) ? $data['comment'] : '';
 		$responsibility 	= isset($data['responsibility']) ? (int)$data['responsibility'] : 0;
 		$utype 				= isset($data['utype']) ? (int)$data['utype'] : 0;
+		$overtime 			= isset($data['overtime']) ? (int)$data['overtime'] : 0;
 
-		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$data['return_status_id'] . "',`responsibility` = '" . $responsibility . "',`date_modified` = NOW() WHERE return_id = '" . (int)$data['return_id'] . "'");
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$data['return_status_id'] . "',`responsibility` = '" . $responsibility . "',overtime = '" . $overtime . "',`date_modified` = NOW() WHERE return_id = '" . (int)$data['return_id'] . "'");
 
 		$this->db->query("INSERT INTO `" . DB_PREFIX . "return_history` SET `return_id` = '" . (int)$data['return_id'] . "', return_status_id = '" . (int)$data['return_status_id'] . "', notify = '', comment = '" . $this->db->escape(strip_tags($comment)) . "',utype = '" . $utype . "', date_added = NOW()");
 	}
