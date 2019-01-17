@@ -83,7 +83,7 @@ class ControllerApiCoupon extends Controller {
 
 	public function lists()
 	{
-		$allowKey       = ['api_token','seller_id','page'/*,'limit'*/];
+		$allowKey       = ['api_token','seller_id','page','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
         $data 			= [];
@@ -117,6 +117,7 @@ class ControllerApiCoupon extends Controller {
 			'date' => 1
 		];
 
+        $seller_id                  = $req_data['seller_id'];
         //获取用户已经领取的优惠券
         $getCouponList              = [];
         if ($this->customer->isLogged()) {
@@ -128,8 +129,9 @@ class ControllerApiCoupon extends Controller {
             $getCouponList    =  isset($this->session->data['getCouponList']) ? $this->session->data['getCouponList'] : [];
         }
 
+        $totals  = $this->model_marketing_coupon->getCouponsTotals($filter_data,$seller_id);
         //商家优惠券列表
-		$results = $this->model_marketing_coupon->getCoupons($filter_data,$req_data['seller_id']);
+		$results = $this->model_marketing_coupon->getCoupons($filter_data,$seller_id);
 		foreach ($results as $result) {
 
             $result['discount']              = sprintf("%.2f", $result['discount']);
@@ -149,6 +151,10 @@ class ControllerApiCoupon extends Controller {
 				'date_end'   => date($this->language->get('date_format_short'), strtotime($result['date_end'])),
 			);
 		}
+
+        $remainder                  = intval($totals - $limit * $page);
+        $data['total_page']         = ceil($totals/$limit);
+        $data['remainder']          = $remainder >= 0 ? $remainder : 0;
 
 		$json 			= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);
         return $this->response->setOutput($json);

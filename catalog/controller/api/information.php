@@ -85,11 +85,10 @@ class ControllerApiInformation extends Controller {
         
         $json                   = [];
         
-        // 0-订单取消 1-已收到货 2-未收到货
+        // 0-订单取消 1-已收到货 2-未收到货 3-待发货 
         if (!empty($reason)) {
             foreach ($reason as $key => $value) {
-                $type                   = $dtype == 3 ? $value['type'] : '';
-                $json['reason'.$type][] = ['return_reason_id'=>$value['return_reason_id'],'name'=>$value['name']];
+                $json['reason'][] = ['return_reason_id'=>$value['return_reason_id'],'name'=>$value['name']];
             }
         }
 

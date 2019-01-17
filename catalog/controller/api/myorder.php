@@ -47,9 +47,9 @@ class ControllerApiMyorder extends Controller {
 
             foreach ($result as $keys =>$value)
             {
-                $results1[$value['seller_id']]['msid']            = $value['seller_id']; 
-                $results1[$value['seller_id']]['store_name']      = $value['store_name'];
-                $results1[$value['seller_id']]['product_info'][]  = [
+                $results1[$keys]['msid']            = $value['seller_id']; 
+                $results1[$keys]['store_name']      = htmlspecialchars_decode($value['store_name'],ENT_QUOTES);
+                $results1[$keys]['product_info'][]  = [
                     'return_id'     => (int)$value['return_id'],
                     'order_id'      => (int)$value['order_id'],
                     'product_id'    => (int)$value['product_id'],
