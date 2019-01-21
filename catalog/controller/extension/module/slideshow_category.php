@@ -64,12 +64,34 @@ class ControllerExtensionModuleSlideshowCategory extends Controller
         $this->load->model('catalog/product');
 
         $categoriesData = [];
-        foreach ($categoryIds as $categoryId) {
-            if (!$category = $this->model_catalog_category->getCategory($categoryId)) {
+        $categorys      = $this->model_catalog_category->getCategoryByIds($categoryIds);
+        if(!$categorys){
+            return;
+        }
+
+        $parent_ids    = [];
+        foreach ($categorys as $category) {
+            $parent_ids[] = $category['category_id'];
+        }
+
+        if (!$parent_ids) {
+            return;
+        }
+
+        $children_categorys         = $this->model_catalog_category->getCategoriesByParentIds($parent_ids);
+        $child_cate                 = [];
+        foreach ($children_categorys as $key => $value) {
+            $child_cate[$value['parent_id']][] = $value;
+        }
+
+        foreach ($categorys as $category) {
+
+            //$children = $this->model_catalog_category->getCategories($category['category_id']);
+            $children = (isset($child_cate[$category['category_id']]) && !empty($child_cate[$category['category_id']])) ? $child_cate[$category['category_id']] : [];
+            if (!$children) {
                 continue;
             }
 
-            $children = $this->model_catalog_category->getCategories($category['category_id']);
             $childrenData = [];
             foreach($children as $child) {
                 $childrenData[] = array(

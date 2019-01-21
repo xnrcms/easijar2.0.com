@@ -227,10 +227,15 @@ class ControllerApiDispute extends Controller {
 
         switch ($order_status_id) {
             case 15://待发货
+
+                if ($return_info['return_status_id'] == 1 && $responsibility == 1) {
+                    $status2            = 2;
+                }
+
                 if ($return_info['return_status_id'] == 10) {//商家自动退款，退款中
                     if ($responsibility == 1) {//发货时效3内 - 卖家同意
                         $overtime           = (int)$return_info['overtime'];
-                        $status2            = 1;
+                        $status2            = 4;
                     }else{
                         $overtime           = (int)$return_info['overtime'];
                         $status2            = 3;

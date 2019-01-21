@@ -6,6 +6,27 @@ class ModelCatalogCategory extends Model {
         return $query->row;
     }
 
+    public function getCategoryByIds($category_ids) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "category c LEFT JOIN " . DB_PREFIX . "category_description cd ON (c.category_id = cd.category_id) WHERE c.category_id IN (" . implode(',', $category_ids) . ") AND cd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND c.status = '1'");
+
+        return $query->rows;
+    }
+
+    public function getCategoriesByParentIds($parent_ids) {
+        $cacheKey = 'category.categories_by_parent_ids_' . $this->getCacheKey($parent_ids);
+        $result = $this->cache->get($cacheKey);
+        if (is_array($result)) {
+            return $result;
+        }
+
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "category c LEFT JOIN " . DB_PREFIX . "category_description cd ON (c.category_id = cd.category_id) WHERE c.parent_id IN (" . implode(',', $parent_ids) . ") AND cd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND c.status = '1' ORDER BY c.sort_order, LCASE(cd.name)");
+
+        $result = $query->rows;
+        $this->cache->set($cacheKey, $result);
+
+        return $result;
+    }
+
     public function getCategories($parent_id = 0) {
         $cacheKey = 'category.categories_' . $this->getCacheKey($parent_id);
         $result = $this->cache->get($cacheKey);
