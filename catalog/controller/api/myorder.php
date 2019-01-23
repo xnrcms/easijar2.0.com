@@ -12,7 +12,7 @@ class ControllerApiMyorder extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -64,6 +64,8 @@ class ControllerApiMyorder extends Controller {
             foreach ($results1 as $value1) {
                 $results[]  = $value1;
             }
+
+            wr($result);
         }
         elseif ($req_data['order_type'] == 4)
         {
@@ -156,7 +158,7 @@ class ControllerApiMyorder extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -294,7 +296,7 @@ class ControllerApiMyorder extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -373,7 +375,7 @@ class ControllerApiMyorder extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -438,7 +440,7 @@ class ControllerApiMyorder extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -489,7 +491,7 @@ class ControllerApiMyorder extends Controller {
         return $this->response->setOutput($this->returnData(['msg'=>'接口暂时弃用']));
         
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {

@@ -60,7 +60,6 @@ class ControllerAccountPassword extends Controller {
 			$data['error_confirm'] = '';
 		}
 
-		$data['action'] = $this->url->link('account/password');
 
 		if (isset($this->request->post['old_password'])) {
 			$data['old_password'] = $this->request->post['old_password'];
@@ -84,6 +83,7 @@ class ControllerAccountPassword extends Controller {
 		$backlink 		= $ptype == 0 ? $this->url->link('account/account') : $this->url->link('seller/account');
 
 		$data['back'] 	= $backlink;
+		$data['action'] = $this->url->link('account/password&ptype='.$ptype);
 
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');

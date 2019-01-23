@@ -46,6 +46,26 @@ class ModelCatalogHandle extends Model {
         return $query->rows;
     }
 
+    public function add_product_image($data)
+    {
+        if (!empty($data)) {
+            $sql    = "INSERT INTO " . DB_PREFIX . "product_image (product_id,image,sort_order) VALUES ";
+            foreach ($data as $value) {
+                $sql .= "('" . (int)$value['product_id'] . "','" . $value['image'] . "','0'),";
+            }
+
+            $sql        = trim($sql,',');
+
+            $this->db->query($sql);
+        }
+    }
+
+    public function get_product_images($product_id)
+    {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+        return $query->rows;
+    }
+
     public function get_product_status1()
     {
         $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product_description WHERE description LIKE '%data:image/jpeg;base64%'");
@@ -204,6 +224,69 @@ class ModelCatalogHandle extends Model {
 
     	$query = $this->db->query($sql);
       	return $query->row;
+    }
+
+    public function del_variant_data($variant_id,$variant_value_id)
+    {
+        $plist      = $this->get_product_variant_list1($variant_id,$variant_value_id);
+
+        $del_pids   = [];
+        if (!empty($plist)) {
+            foreach ($plist as $key => $value) {
+                $del_pids[] = $value['product_id'];
+            }
+        }
+
+        $delsql               = [];
+        if (!empty($del_pids)) {
+            $this->del_product_status0($del_pids);
+        }
+
+        $delsql               = [];
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "variant_value_description WHERE variant_id = '".(int)$variant_id."' AND variant_value_id = '".(int)$variant_value_id."'";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "variant_value WHERE variant_id = '".(int)$variant_id."' AND variant_value_id = '".(int)$variant_value_id."'";
+
+        foreach ($delsql as $key => $value) {
+            $this->db->query($value);
+        }
+    }
+
+    public function set_variant_value_description($name,$variant_id,$variant_value_id,$language_id)
+    {
+        $query_sql               = [];
+        $query_sql[]             = "DELETE FROM " . DB_PREFIX . "variant_value_description WHERE variant_id = '".(int)$variant_id."' AND variant_value_id = '".(int)$variant_value_id."' AND language_id = '" . (int)$language_id . "'";
+        $query_sql[]             = "INSERT INTO `" . DB_PREFIX . "variant_value_description` SET name = '" . $this->db->escape($name) . "', variant_value_id = '" . (int)$variant_value_id . "', variant_id = '" . (int)$variant_id . "', language_id = '" .(int)$language_id. "'";
+
+        foreach ($query_sql as $key => $value) {
+            $this->db->query($value);
+        }
+    }
+
+    public function move_variant_product($olds,$news)
+    {
+        if (!empty($olds) && !empty($news)) {
+            $query_sql      = [];
+            $query_sql[]    = "UPDATE `" . DB_PREFIX . "product_variant` SET variant_id = '" . (int)$news['variant_id'] . "',variant_value_id = '" . (int)$news['variant_value_id'] . "' WHERE variant_id = '" . (int)$olds['variant_id'] . "' AND variant_value_id = '" . (int)$olds['variant_value_id'] . "'";
+
+            $query_sql[]    = "DELETE FROM " . DB_PREFIX . "variant_value_description WHERE variant_id = '".(int)$olds['variant_id']."' AND variant_value_id = '".(int)$olds['variant_value_id']."'";
+            $query_sql[]    = "DELETE FROM " . DB_PREFIX . "variant_value WHERE variant_id = '".(int)$olds['variant_id']."' AND variant_value_id = '".(int)$olds['variant_value_id']."'";
+
+            foreach ($query_sql as $key => $value) {
+                $this->db->query($value);
+            }
+        }
+    }
+
+    public function get_variant_value_description($name)
+    {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "variant_value_description WHERE language_id = 2 AND name = '" . $name . "'");
+        return $query->rows;
+    }
+
+    public function get_variant_value_description2($name)
+    {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "variant_value_description WHERE language_id = 2 AND name = '" . $name . "'");
+        return $query->row;
     }
 
     public function get_variant_description($name)

@@ -40,7 +40,9 @@
               if (json['error']) {
                   layer.msg(json['error']);
               } else {
-                  layer.msg(json['success']);
+                  layer.msg(json['success'],{},function(){
+                    window.parent.location.reload();
+                  });
               }
           },
           error: function (xhr, errorType, error) {

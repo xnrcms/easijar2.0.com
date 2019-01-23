@@ -135,7 +135,7 @@ class ModelAccountReturn extends Model {
 
 	public function addReturnHistoryForCs($returnData)
 	{
-		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$returnData['return_status_id'] . "', date_modified = NOW() WHERE return_id = '" . (int)$returnData['return_id'] . "'");
+		$this->db->query("UPDATE `" . DB_PREFIX . "return` SET `return_status_id` = '" . (int)$returnData['return_status_id'] . "',return_reason_id = '" . $returnData['return_reason_id'] . "', date_modified = NOW() WHERE return_id = '" . (int)$returnData['return_id'] . "'");
 
 		$this->db->query("INSERT INTO " . get_tabname('return_history') . " SET return_id = '" . (int)$returnData['return_id'] . "', return_status_id = '" . (int)$returnData['return_status_id'] . "', comment = '" . $returnData['comment'] . "',proposal = '" . (int)$returnData['proposal'] . "',return_reason_id = '" . $returnData['return_reason_id'] . "',evidences = '" . $returnData['evidences'] . "', customer_id = '" . (int)$this->customer->getId() . "',date_added = NOW()");
 	}

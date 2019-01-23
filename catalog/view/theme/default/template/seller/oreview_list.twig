@@ -91,13 +91,15 @@
                                   <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
                                     <span class="caret"></span>
                                   </button>
+                                  {% if review.replied <= 0 %}
                                   <ul class="dropdown-menu dropdown-menu-right">
-                                    <li class="{{ review.replied ? 'disabled' : '' }}">
+                                    <li class="">
                                       <a href="javascript:void(0);" class="btn-reply" data-id="{{ review.order_product_review_id }}">
                                         <i class="fa fa-cog"></i> {{ button_reply }}
                                       </a>
                                     </li>
                                   </ul>
+                                  {% endif %}
                                 </div>
                               </td>
                             </tr>

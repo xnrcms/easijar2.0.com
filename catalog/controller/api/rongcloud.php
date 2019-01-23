@@ -12,7 +12,7 @@ class ControllerApiRongcloud extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -96,7 +96,7 @@ class ControllerApiRongcloud extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -154,7 +154,7 @@ class ControllerApiRongcloud extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {

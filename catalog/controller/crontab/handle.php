@@ -543,7 +543,8 @@ echo "ok";exit();
                 }
 
                 $page ++;
-            }else{
+            }
+            else{
                 //$page = 0;
                 $step = 1000;
             }
@@ -561,6 +562,128 @@ echo "ok";exit();
             ]);
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        }else if ($step == 12) {
+            echo "ok=";exit();
+            //$count      = $this->model_catalog_handle->get_product_count(0);
+            $list       = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>10000],0);
+            $add_count  = 0;
+
+            foreach ($list as $key => $value) {
+
+                //通过主产品ID获取相册
+                $product_id         = $value['product_id'];
+                $images             = $this->model_catalog_handle->get_product_images($product_id);
+
+                if (empty($images)) {
+                    wr(['empty($images)'=>$product_id]);
+                    continue;
+                }
+
+                $list2              = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000],$product_id);
+
+                $add_images         = [];
+                foreach ($list2 as $k => $v) {
+                    foreach ($images as $key => $value) {
+                        $add_images[]  = ['product_id'=>$v['product_id'],'image'=>$value['image']];
+                    }
+                }
+
+                if (!empty($add_images)) {
+
+                    $add_count ++;
+
+                    $this->model_catalog_handle->add_product_image($add_images);
+                }else{
+                    wr(['empty($add_images)'=>$product_id]);
+                    continue;
+                }
+            }
+
+            echo "ok=".$add_count;exit();
+        }else if ($step == 13) {
+            $path = 'attr.xlsx';
+            include 'Classes/PHPExcel.php';            
+            include 'Classes/PHPExcel/IOFactory.php';
+
+            $type       = 'Excel2007';//设置为Excel5代表支持2003或以下版本， Excel2007代表2007版
+            $xlsReader  = \PHPExcel_IOFactory::createReader($type);  
+            $xlsReader->setReadDataOnly(true);
+            $xlsReader->setLoadSheetsOnly(true);
+            $Sheets     = $xlsReader->load($path);
+            //开始读取上传到服务器中的Excel文件，返回一个 二维数组
+            $dataArray = $Sheets->getSheet(2)->toArray();
+
+            unset($dataArray[0]);
+
+            foreach ($dataArray as $key => $value) {
+                $variant_value      = (isset($value[1]) && !empty($value[1])) ? trim($value[1]) : '';
+                $variant_zh         = (isset($value[2]) && !empty($value[2])) ? trim($value[2]) : '';
+                $variant_en         = (isset($value[3]) && !empty($value[3])) ? trim($value[3]) : '';
+                $variant_mark       = (isset($value[4]) && !empty($value[4])) ? trim($value[4]) : '';
+                wr($value);
+                if (empty($variant_value) && empty($variant_zh) && empty($variant_en) && empty($variant_mark)) {
+                    continue;
+                }
+
+                if (empty($variant_value)) {
+                    wr($value,'attr1.txt');
+                    continue;
+                }
+
+                //根据属性值获取数据
+                $variant_value_description    = $this->model_catalog_handle->get_variant_value_description($variant_value);
+                if (!$variant_value_description) {
+                    wr($value,'attr2.txt');
+                    continue;
+                }
+
+                //根据备注相应处理
+                if ($variant_mark == '删除' || $variant_mark == '删掉' || strpos( '@'.$variant_mark,'下架EJ') !== false) {
+                    wr($value,'attr3.txt');
+                    foreach ($variant_value_description as $vvk => $vvv)
+                    {
+                        $variant_id          = $vvv['variant_id'];
+                        $variant_value_id    = $vvv['variant_value_id'];
+                        //删掉属性相关数据
+                        $this->model_catalog_handle->del_variant_data($variant_id,$variant_value_id);
+                    }
+
+                    continue;
+                }
+
+                if (empty($variant_zh) || empty($variant_en)) {
+                    wr($value,'attr4.txt');
+                    continue;
+                }
+
+                foreach ($variant_value_description as $vvk => $vvv)
+                {
+                    $variant_id          = $vvv['variant_id'];
+                    $variant_value_id    = $vvv['variant_value_id'];
+
+                    //屬性重置
+                    $this->model_catalog_handle->set_variant_value_description($variant_value,$variant_id,$variant_value_id,1);
+                    $this->model_catalog_handle->set_variant_value_description($variant_value,$variant_id,$variant_value_id,2);
+
+                    //属性值跟修改后的属性值如果一样不需要整理对应的产品
+                    if ( $variant_value === $variant_zh ) {
+                        $this->model_catalog_handle->set_variant_value_description($variant_en,$variant_id,$variant_value_id,1);
+                        $this->model_catalog_handle->set_variant_value_description($variant_zh,$variant_id,$variant_value_id,2);
+                    }else{
+                        //转移属性
+                        $variant_value_description2    = $this->model_catalog_handle->get_variant_value_description2($variant_zh);
+                        if (empty($variant_value_description2)) {
+                            $this->model_catalog_handle->set_variant_value_description($variant_en,$variant_id,$variant_value_id,1);
+                            $this->model_catalog_handle->set_variant_value_description($variant_zh,$variant_id,$variant_value_id,2);
+                        }else{
+
+                            $this->model_catalog_handle->move_variant_product($vvv,$variant_value_description2);
+                        }
+                    }
+                }
+            }
+
+            echo "ok";exit();
         }
     }
 

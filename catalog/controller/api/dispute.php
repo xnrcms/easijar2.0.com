@@ -13,7 +13,7 @@ class ControllerApiDispute extends Controller {
         $data           = $this->returnData();
         
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -156,7 +156,7 @@ class ControllerApiDispute extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -333,7 +333,7 @@ class ControllerApiDispute extends Controller {
         unset($return_info['email']);
         unset($return_info['fullname']);
         unset($return_info['order_id']);
-
+        wr($return_info);
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$return_info]));
     }
 
@@ -349,7 +349,7 @@ class ControllerApiDispute extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -421,7 +421,7 @@ class ControllerApiDispute extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -491,7 +491,7 @@ class ControllerApiDispute extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -550,7 +550,7 @@ class ControllerApiDispute extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
@@ -642,7 +642,7 @@ class ControllerApiDispute extends Controller {
         $json           = [];
 
         if (!$this->checkSign($req_data)) {
-            return $this->response->setOutput($this->returnData(['msg'=>'fail:sign error']));
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
         }
 
         if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
