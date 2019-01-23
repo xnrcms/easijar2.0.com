@@ -46,7 +46,7 @@ class ModelMarketingCoupon extends Model {
 
 	public function getCoupons($data = array(),$seller_id=0) {
 
-		$sql = "SELECT coupon_id, name, code, discount, date_start, date_end, status FROM " . DB_PREFIX . "coupon WHERE seller_id = '" . $seller_id . "'";
+		$sql = "SELECT coupon_id, name, code, discount, date_start, date_end, status,type FROM " . DB_PREFIX . "coupon WHERE seller_id = '" . $seller_id . "'";
 
 		if(isset($data['date']) && $data['date'] == 1){
 			$sql .= " AND date_start <= NOW() AND date_end >= NOW() AND status = 1";
