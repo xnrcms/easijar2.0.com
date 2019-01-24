@@ -500,7 +500,7 @@ class ModelCatalogProductPro extends ModelCatalogProduct
         $cacheKey = 'product.total_' . $this->getCacheKey($data);
         $total = $this->getCacheData($cacheKey);
         if ($total || $total === 0) {
-            //return $total;
+            return $total;
         }
 
         $filterCategoryId = array_get($data, 'filter_category_id');

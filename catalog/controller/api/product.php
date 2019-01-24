@@ -81,6 +81,17 @@ class ControllerApiProduct extends Controller {
 				);
 			}
 
+			if (!empty($filterPrices)) {
+				$minPrice  = isset($filterPrices[0]) ? (float)$filterPrices[0] : 0;
+				$maxPrice  = isset($filterPrices[1]) ? (float)$filterPrices[1] : 1000000;
+				$minPrice  = $this->currency->convert($minPrice,$this->session->data['currency'],'CNY');
+				$maxPrice  = $this->currency->convert($maxPrice,$this->session->data['currency'],'CNY');
+				
+				$filterPrices 			= [$minPrice,$maxPrice];
+
+				sort($filterPrices);
+			}
+		
 			//$data['products'] = array();
 			$filter_data = array(
 				'filter_category_id'  		=> $category_id,
@@ -433,6 +444,17 @@ class ControllerApiProduct extends Controller {
 		
 		$products 				= [];
 		$product_total 			= 0;
+
+		if (!empty($filterPrices)) {
+			$minPrice  = isset($filterPrices[0]) ? (float)$filterPrices[0] : 0;
+			$maxPrice  = isset($filterPrices[1]) ? (float)$filterPrices[1] : 1000000;
+			$minPrice  = $this->currency->convert($minPrice,$this->session->data['currency'],'CNY');
+			$maxPrice  = $this->currency->convert($maxPrice,$this->session->data['currency'],'CNY');
+			
+			$filterPrices 			= [$minPrice,$maxPrice];
+
+			sort($filterPrices);
+		}
 
 		$filter_data = array(
 			'filter_name'         		=> $search,
