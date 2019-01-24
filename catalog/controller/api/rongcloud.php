@@ -32,12 +32,13 @@ class ControllerApiRongcloud extends Controller {
 
         $this->load->model('rongcloud/rongcloud');
         $uinfo                  = $this->model_rongcloud_rongcloud->getUser(['customer_id'=>$customer_id]);
+        $avatar                 = $this->customer->getAvatar($customer['customer_id']);
 
         $data                   = [];
         if (!empty($uinfo)) {
             $data['rongcloud_uid']              = $uinfo['rongcloud_uid'];
             $data['rongcloud_nickname']         = $uinfo['rongcloud_nickname'];
-            $data['rongcloud_avatar']           = $this->customer->getAvatar($uinfo['customer_id']);
+            $data['rongcloud_avatar']           = $this->model_tool_image->resize($avatar, 100, 100);
             $data['rongcloud_token']            = $uinfo['rongcloud_token'];
         }else{
 
@@ -52,7 +53,6 @@ class ControllerApiRongcloud extends Controller {
 
             $fullname                = !empty($customer['fullname']) ? $customer['fullname'] : 'user_'.$customer['customer_id'];
             $rongcloud_uid           = md5($customer['customer_id'] . '~~!!1#@1qaz2wsx');
-            $avatar                  = $this->customer->getAvatar($customer['customer_id']);
 
             $data['rongcloud_uid']              = $rongcloud_uid;
             $data['rongcloud_nickname']         = $fullname;

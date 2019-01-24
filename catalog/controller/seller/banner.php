@@ -65,20 +65,7 @@ class ControllerSellerBanner extends Controller {
 		}
 
 		$url = '';
-
-
-		$data['breadcrumbs'] = array();
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard')
-		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('design/banner', $url)
-		);
-
+		
 		if (!isset($this->request->get['banner_id'])) {
 			$data['action'] = $this->url->link('seller/banner/index', '&banner_id=0');
 		} else {

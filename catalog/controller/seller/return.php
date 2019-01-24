@@ -11,8 +11,9 @@ class ControllerSellerReturn extends Controller {
             $this->response->redirect($this->url->link('seller/add'));
 		}
 
-		$this->load->language('seller/return');
+		$this->load->language('seller/edit');
         $this->load->language('seller/layout');
+		$this->load->language('seller/return');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -139,10 +140,15 @@ class ControllerSellerReturn extends Controller {
 		}
 
 		$data['breadcrumbs'] = array();
-
+		
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard')
+			'href' => $this->url->link('common/home')
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_account'),
+			'href' => $this->url->link('seller/account')
 		);
 
 		$data['breadcrumbs'][] = array(

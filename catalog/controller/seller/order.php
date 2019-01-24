@@ -11,8 +11,9 @@ class ControllerSellerOrder extends Controller {
             $this->response->redirect($this->url->link('seller/add'));
 		}
 
-		$this->load->language('seller/order');
         $this->load->language('seller/layout');
+		$this->load->language('seller/edit');
+		$this->load->language('seller/order');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -126,10 +127,15 @@ class ControllerSellerOrder extends Controller {
 		}
 
 		$data['breadcrumbs'] = array();
-
+		
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard')
+			'href' => $this->url->link('common/home')
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_account'),
+			'href' => $this->url->link('seller/account')
 		);
 
 		$data['breadcrumbs'][] = array(
