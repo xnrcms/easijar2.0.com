@@ -251,17 +251,19 @@ class ControllerSellerEvent extends Controller {
         $this->load->model('checkout/order');
         $this->load->language('seller/common', 'seller');
 
-        $order_products = $this->model_checkout_order->getOrderProducts($this->request->get['order_id']);
-
-        $seller_id = 0;
-        foreach ($order_products as $order_product) {
-            if ($order_product['product_id'] == $this->request->get['product_id']) {
-                $seller_id = $this->model_multiseller_order->getSellerIdByOrderProductId($order_product['order_product_id']) ?: 0;
+        if (isset($this->request->get['order_id']) && isset($this->request->get['product_id']))
+        {
+            $order_products = $this->model_checkout_order->getOrderProducts($this->request->get['order_id']);
+            $seller_id      = 0;
+            foreach ($order_products as $order_product) {
+                if ($order_product['product_id'] == $this->request->get['product_id']) {
+                    $seller_id = $this->model_multiseller_order->getSellerIdByOrderProductId($order_product['order_product_id']) ?: 0;
+                }
             }
-        }
 
-        $data['action'] = ''; // 为空时action自动取url，这是的action会自动携带所有url里的参数，就不会出现product_id参数不存在的问题了
-        $data['seller_id'] = $seller_id;
+            $data['action'] = ''; // 为空时action自动取url，这是的action会自动携带所有url里的参数，就不会出现product_id参数不存在的问题了
+            $data['seller_id'] = $seller_id;
+        }
     }
 
 	public function modelAccountReturnAddReturnAfter(&$route, &$args, &$output) {

@@ -301,7 +301,7 @@ class ControllerAccountReturn extends Controller {
 
 		$this->load->model('account/order');
 
-		if (isset($this->request->get['order_id'])) {
+		/*if (isset($this->request->get['order_id'])) {
 			$order_info = $this->model_account_order->getOrder($this->request->get['order_id']);
 		}
 
@@ -420,7 +420,7 @@ class ControllerAccountReturn extends Controller {
 			$data['agree'] = $this->request->post['agree'];
 		} else {
 			$data['agree'] = false;
-		}
+		}*/
 
 		$data['back'] = $this->url->link('account/account');
 

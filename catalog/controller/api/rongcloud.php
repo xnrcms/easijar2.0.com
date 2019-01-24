@@ -36,8 +36,8 @@ class ControllerApiRongcloud extends Controller {
         $data                   = [];
         if (!empty($uinfo)) {
             $data['rongcloud_uid']              = $uinfo['rongcloud_uid'];
-            $data['rongcloud_nickname']        = $uinfo['rongcloud_nickname'];
-            $data['rongcloud_avatar']           = $uinfo['rongcloud_avatar'];
+            $data['rongcloud_nickname']         = $uinfo['rongcloud_nickname'];
+            $data['rongcloud_avatar']           = $this->customer->getAvatar($uinfo['customer_id']);
             $data['rongcloud_token']            = $uinfo['rongcloud_token'];
         }else{
 

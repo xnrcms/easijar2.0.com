@@ -433,9 +433,10 @@ class ControllerAccountOrder extends Controller {
 				);
 			}
 
-			$seller_id 		 = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
-			$comment 		 = !empty($order_info['comment']) ? json_decode($order_info['comment'],true) : [];
-			$data['comment'] = isset($comment[$seller_id]) ? nl2br($comment[$seller_id]) : '';
+			$seller_id 		 	= isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+			$comment 		 	= !empty($order_info['comment']) ? json_decode($order_info['comment'],true) : [];
+			$data['comment'] 	= isset($comment[$seller_id]) ? nl2br($comment[$seller_id]) : '';
+			$data['order_sn'] 	= $this->request->get['order_id'];
 
             //快递单信息
             $data['kd_tracking_status'] = $this->config->get('module_express_tracking_status');

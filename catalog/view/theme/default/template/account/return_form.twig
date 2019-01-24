@@ -13,7 +13,31 @@
     {% set class = 'col-sm-12' %}
     {% endif %}
     <div id="content" class="{{ class }}"> {{ content_top }}
-      <h1>{{ heading_title }}</h1>
+
+    <div style="background-color: #fff;margin-top:70px;" id="mes_box_main">
+      
+      <div style="height: 238px;width: 100%;">
+          <p style="color: #FE5888;font-size: 14px;text-align: center;padding: 10px 0;">Please use the APP for a better chat experience.</p>
+          <div style="display: flex;justify-content: center;align-items: center;margin-top: 26px;">
+              <div>
+                  <img style="width:105px;height:105px" src="image/catalog/chat/img/android.png" alt="">
+                  <p style="display: flex;align-items: center;justify-content: center;margin: 0;">
+                    <img src="image/catalog/chat/img/ic-android.png" alt=""><span style="margin-left:12px;font-size: 14px;color: #666666">Android</span></p>
+              </div>
+              <div style="height: 54px;width: 1px;background-color: #E5E5E5;margin: 0 37px;"></div>
+              <div>
+                  <img style="width:105px;height:105px" src="image/catalog/chat/img/ios.png" alt="">
+                  <p style="display: flex;align-items: center;justify-content: center;margin: 0;">
+                    <img src="image/catalog/chat/img/ic-appstore.png" alt=""><span style="margin-left:12px;font-size: 14px;color: #666666">AppStore</span></p>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+
+
+      {# <h1>{{ heading_title }}</h1>
       <p>{{ text_description }}</p>
       <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">
         <fieldset>
@@ -154,7 +178,7 @@
             <input type="submit" value="{{ button_submit }}" class="btn btn-primary" />
           </div>
         </div>
-      </form>
+      </form> #}
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>

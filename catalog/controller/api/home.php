@@ -91,7 +91,7 @@ class ControllerApiHome extends Controller {
 		$setting_info['limit'] 		= $limit;
 		$setting_info['start'] 		= $start;
 	    $results 					= $this->load->controller('extension/module/special', $setting_info);
-
+	    wr($results);
 	    $discount 					= [];
 	    if (isset($results['products']) && !empty($results['products'])) {
 	    	foreach ($results['products'] as $rval) {

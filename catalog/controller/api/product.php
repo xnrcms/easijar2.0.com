@@ -284,7 +284,7 @@ class ControllerApiProduct extends Controller {
 	        if (!empty($seller)) {
 	        	$seller_info['seller_id'] 		= $seller['seller_id'];
 	        	$seller_info['avatar'] 			= $this->model_tool_image->resize($seller['avatar'], 100, 100);
-	        	$seller_info['store_name'] 		= $seller['store_name'];
+	        	$seller_info['store_name'] 		= htmlspecialchars_decode($seller['store_name']);
 	        	$seller_info['product_total'] 	= $this->model_multiseller_seller->getTotalSellerProducts($seller['seller_id']);
 	        	$seller_info['rating'] 			= sprintf("%.1f", $seller['rating']);
 	        	$seller_info['chats'] 			= '98.5%';
