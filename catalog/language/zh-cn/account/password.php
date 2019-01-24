@@ -24,3 +24,6 @@ $_['entry_confirm']  		= '确认密码';
 $_['error_old_password'] 	= '原始密码错误！';
 $_['error_password'] 		= '密码必须在 4 至 20 个字符之间！';
 $_['error_confirm']  		= '两次输入密码不一致！';
+$_['error_password1']       = '请输入你的密码!';
+$_['error_password2']       = '密码长度必须为8-20个字符，并包含一个大写和一个小写字符';
+$_['error_password3']       = '原始密码不能与新密码相同';

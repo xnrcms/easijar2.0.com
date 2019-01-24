@@ -96,14 +96,30 @@ class ControllerAccountPassword extends Controller {
 	}
 
 	protected function validate() {
+		if (empty($this->request->post['old_password']))
+		{
+			$this->error['old_password'] = $this->language->get('error_old_password');return !$this->error;
+		}
+
+		if ($this->request->post['old_password'] == $this->request->post['password'])
+		{
+			$this->error['password'] = $this->language->get('error_password3');return !$this->error;
+		}
+
 		//检验原始密码是否正确
 		$this->load->model('account/customer');
 		$customer 		= $this->model_account_customer->getCustomer($this->customer->getId(),$this->request->post['old_password']);
 		$password 		= array_get($customer,'password');
 		$passok 		= (!empty($password) && password_verify($this->request->post['old_password'], $password)) ? true : false;
-		
+
 		if (!$passok) {
 			$this->error['old_password'] = $this->language->get('error_old_password');return !$this->error;
+		}
+
+		if (!(preg_match("/^[a-zA-Z\d\/]{8,20}$/",$this->request->post['password']) && preg_match("/[a-z]{1,}/",$this->request->post['password']) && preg_match("/[A-Z]{1,}/",$this->request->post['password'])))
+		{
+			$this->error['password'] = $this->language->get('error_password2');
+			return !$this->error;
 		}
 
 		if ((utf8_strlen(html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')) > 40)) {
