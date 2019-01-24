@@ -31,6 +31,8 @@ class ControllerApiRongcloud extends Controller {
         $customer_id            = (int)$req_data['seller_id'] > 0 ? (int)$req_data['seller_id'] : $this->customer->getId();
 
         $this->load->model('rongcloud/rongcloud');
+        $this->load->model('tool/image');
+        
         $uinfo                  = $this->model_rongcloud_rongcloud->getUser(['customer_id'=>$customer_id]);
         $avatar                 = $this->customer->getAvatar($customer_id);
 
@@ -43,7 +45,6 @@ class ControllerApiRongcloud extends Controller {
         }else{
 
             $this->load->model('account/customer');
-            $this->load->model('tool/image');
 
             $customer                =  $this->model_account_customer->getCustomer($customer_id);
 
