@@ -47,7 +47,8 @@ class ControllerAccountOrder extends Controller {
 			$page = 1;
 		}
 
-		$data['orders'] = array();
+		$data['orders'] 		= array();
+		$data['error_warning'] 	= isset($this->request->get['notice']) ? $this->request->get['notice'] : '';
 
 		$this->load->model('account/order');
 		$this->load->model('tool/image');
@@ -155,13 +156,13 @@ class ControllerAccountOrder extends Controller {
             }*/
 
             if ($result['status_id'] == $this->config->get('config_unpaid_status_id')) {
-                $href_cancel = $this->url->link('account/order/cancel', 'order_id=' . $result['order_sn']);
+                $href_cancel = $this->url->link('account/order/cancel', 'type='.$data['type'].'&order_id=' . $result['order_sn']);
             } else {
                 $href_cancel = '';
             }
 
             if ($result['status_id'] == $this->config->get('config_shipped_status_id')) {
-                $href_confirm = $this->url->link('account/order/confirm', 'order_id=' . $result['order_sn']);
+                $href_confirm = $this->url->link('account/order/confirm', 'type='.$data['type'].'&order_id=' . $result['order_sn']);
             } else {
                 $href_confirm = '';
             }
@@ -575,19 +576,44 @@ class ControllerAccountOrder extends Controller {
         $this->load->language('account/order');
 
         if (isset($this->request->get['order_id'])) {
-            $order_id = $this->request->get['order_id'];
+            $order_sn = $this->request->get['order_id'];
         } else {
-            $order_id = 0;
+            $order_sn = 0;
         }
 
-        $this->load->model('checkout/order');
+        $reason_id 					= 1;
 
-        $order_info = $this->model_checkout_order->getOrder($order_id);
+        if ( empty($order_sn) ) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:order_sn is error']));
+        }
 
-        if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id'))
-        $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_cancelled_status_id'), t('text_customer_cancel'), true);
+        $this->load->model('account/order');
+        $this->load->model('multiseller/checkout');
+		$this->load->model('localisation/return_reason');
 
-        $this->response->redirect($this->url->link('account/order'));
+        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_sn);
+        if (empty($order_info)) {
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type'].'&notice='.t('error_order_info')));return;
+        }
+
+        $isReturn                       = $this->model_account_order->isReturn($order_sn);
+        if ($isReturn) {
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type'].'&notice='.t('error_is_return')));return;
+        }
+
+        //未付款 直接取消
+        if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_unpaid_status_id')){
+
+        	//取消原因
+        	$reason 			= $this->model_localisation_return_reason->getRsasonNameByType($reason_id,0);
+
+        	$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $this->config->get('config_cancelled_status_id'),isset($reason['name']) ? $reason['name'] : '',false,true);
+
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type']));return;
+        }
+        else{
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type'].'&notice=order_status is error'));return;
+        }
     }
 
     public function confirm()
@@ -595,20 +621,43 @@ class ControllerAccountOrder extends Controller {
         $this->load->language('account/order');
 
         if (isset($this->request->get['order_id'])) {
-            $order_id = $this->request->get['order_id'];
+            $order_sn = $this->request->get['order_id'];
         } else {
-            $order_id = 0;
+            $order_sn = '0';
         }
 
-        $this->load->model('checkout/order');
+        /*$this->load->model('checkout/order');
 
         $order_info = $this->model_checkout_order->getOrder($order_id);
 
         if($order_info['order_status_id'] == $this->config->get('config_shipped_status_id')) {
             $complete_status = $this->config->get('config_complete_status');
             $this->model_checkout_order->addOrderHistory($order_id, $complete_status[0], t('text_customer_confirm'), true);
+        }*/
+
+        $this->load->model('account/order');
+
+        $order_info 					= $this->model_account_order->getOrderStatusForMs($order_sn);
+        if (empty($order_info)) {
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type'].'&notice='.t('error_order_info')));return;
         }
 
-        $this->response->redirect($this->url->link('account/order'));
+        $isReturn                       = $this->model_account_order->isReturn($order_sn);
+        if ($isReturn) {
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type'].'&notice='.t('error_is_return')));return;
+        }
+
+        if( isset($order_info['order_status_id']) && $order_info['order_status_id'] === $this->config->get('config_shipped_status_id')){
+
+        	$this->load->model('multiseller/checkout');
+
+        	$complete_status = $this->config->get('config_complete_status');
+
+        	$this->model_multiseller_checkout->addSubOrderHistory($order_info['order_id'], $order_info['seller_id'], $complete_status[0],t('text_customer_confirm'),false,true);
+
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type']));return;
+        }else{
+        	$this->response->redirect($this->url->link('account/order','type='.$this->request->get['type'].'&notice=order_status is error'));return;
+        }
     }
 }
