@@ -64,8 +64,6 @@ class ControllerApiMyorder extends Controller {
             foreach ($results1 as $value1) {
                 $results[]  = $value1;
             }
-
-            wr($result);
         }
         elseif ($req_data['order_type'] == 4)
         {

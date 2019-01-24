@@ -144,7 +144,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
     {
     	$req_data 			= array_merge($this->request->get,$this->request->post);
     	$body 				= file_get_contents('php://input');
-    	wr(['$req_data'=>$req_data]);
+ 
     	$key_from_configuration 	= "A33C82C19CC1F6B63B37E4B3F0BACBFEBD2BB3E3B6E7292023786AF97F771BAC";
 		$iv_from_http_header 		= isset($this->request->server['HTTP_X_INITIALIZATION_VECTOR']) ? $this->request->server['HTTP_X_INITIALIZATION_VECTOR'] : '';
 		$auth_tag_from_http_header 	= isset($this->request->server['HTTP_X_AUTHENTICATION_TAG']) ? $this->request->server['HTTP_X_AUTHENTICATION_TAG'] : '';
@@ -154,7 +154,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$cipher_text 				= hex2bin($http_body . $auth_tag_from_http_header);
 		$result 					= sodium_crypto_aead_aes256gcm_decrypt($cipher_text, NULL, $iv, $key);
 		$result 					= !empty($result) ? json_decode($result,true) : [];
-		wr(['$result'=>$result]);
+
     	return $req_data;
     }
 
