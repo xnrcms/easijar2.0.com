@@ -315,7 +315,7 @@ class ControllerAccountOrder extends Controller {
                 $data['is_pickup'] = true;
                 $data['pickup_name'] = $pickup_info['name'];
                 $data['pickup_telephone'] = $pickup_info['telephone'];
-                $data['pickup_address'] = $pickup_info['address'];;
+                $data['pickup_address'] = $pickup_info['address'];
                 $data['pickup_open'] = $pickup_info['open'];
                 $data['pickup_comment'] = $pickup_info['comment'];
             }

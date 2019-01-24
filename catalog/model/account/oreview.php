@@ -190,6 +190,7 @@ class ModelAccountOreview extends Model
             $sql .= ' LIMIT '.(int) $data['start'].','.(int) $data['limit'];
         }
 
+        print_r($sql);exit();
         $query = $this->db->query($sql);
 
         return $query->rows;
@@ -248,6 +249,53 @@ class ModelAccountOreview extends Model
         return $query->row['total'];
     }
 
+    public function getTotalOreviewsForMs($data = array())
+    {
+        $order_statuses = $this->config->get('config_complete_status');
+
+        foreach ($order_statuses as $order_status_id) {
+            $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
+        }
+
+        $sql = 'SELECT COUNT(*) AS total FROM ' . get_tabname('order_product') . ' op
+                        LEFT JOIN ' . get_tabname('ms_order_product') .' msop ON (msop.order_product_id = op.order_product_id)
+                        LEFT JOIN ' . get_tabname('ms_suborder') .' mssu ON (mssu.order_id = msop.order_id)
+                        LEFT JOIN ' . get_tabname('ms_seller') . ' ms ON (ms.seller_id = msop.seller_id)
+                        LEFT JOIN ' . get_tabname('order_product_review').' opr ON (opr.order_product_id = msop.order_product_id AND msop.seller_id = ms.seller_id)
+                        LEFT JOIN ' . get_tabname('order') .' o ON (o.order_id = op.order_id)
+                        WHERE (' .implode(' OR ', $implode).') ';
+
+        $implode = array();
+
+        if (isset($data['filter_reviewed'])) {
+            if ($data['filter_reviewed']) {
+                $implode[] = 'opr.order_product_review_id IS NOT NULL';
+            } else {
+                $implode[] = 'opr.order_product_review_id IS NULL';
+            }
+        }
+
+        if (isset($data['filter_customer_id'])) {
+            $implode[] = "o.customer_id = '".(int) $data['filter_customer_id']."'";
+        }
+
+        if (isset($data['filter_order_id'])) {
+            $implode[] = "o.order_id = '".(int) $data['filter_order_id']."'";
+        }
+
+        if (isset($data['filter_date_added'])) {
+            $implode[] = "DATE(o.date_added) = DATE('".$this->db->escape($data['filter_date_added'])."')";
+        }
+
+        if ($implode) {
+            $sql .= ' AND '.implode(' AND ', $implode);
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->row['total'];
+    }
+
     public function getOreviewsForMs($data = array())
     {
         $order_statuses = $this->config->get('config_complete_status');
@@ -256,15 +304,17 @@ class ModelAccountOreview extends Model
             $implode[] = "mssu.order_status_id = '".(int) $order_status_id."'";
         }
 
-        $fields         = format_find_field('order_id,date_added,currency_code,currency_value','o');
+        $fields         = format_find_field('order_id,date_added,currency_code,currency_value,date_added','o');
         $fields         .= ',' . format_find_field('sku,image,name,product_id','op');
         $fields         .= ',' . format_find_field('store_name,seller_id AS msid','ms');
+        $fields         .= ',' . format_find_field('order_product_review_id AS reviewed,text,rating','opr');
         $fields         .= ',' . format_find_field('order_sn','mssu');
 
         $sql = 'SELECT DISTINCT op.*, ' . $fields . ' FROM ' . get_tabname('order_product') . ' op
                         LEFT JOIN ' . get_tabname('ms_order_product') .' msop ON (msop.order_product_id = op.order_product_id)
                         LEFT JOIN ' . get_tabname('ms_suborder') .' mssu ON (mssu.order_id = msop.order_id)
                         LEFT JOIN ' . get_tabname('ms_seller') . ' ms ON (ms.seller_id = msop.seller_id)
+                        LEFT JOIN ' . get_tabname('order_product_review').' opr ON (opr.order_product_id = msop.order_product_id AND msop.seller_id = ms.seller_id)
                         LEFT JOIN ' . get_tabname('order') .' o ON (o.order_id = op.order_id)
                         WHERE (' .implode(' OR ', $implode).') ';
 

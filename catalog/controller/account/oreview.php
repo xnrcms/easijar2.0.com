@@ -58,8 +58,8 @@ class ControllerAccountOreview extends Controller
             'limit' => $limit,
         );
 
-        $oreview_total = $this->model_account_oreview->getTotalOreviews($filter_data);
-        $results = $this->model_account_oreview->getOreviews($filter_data);
+        $oreview_total = $this->model_account_oreview->getTotalOreviewsForMs($filter_data);
+        $results = $this->model_account_oreview->getOreviewsForMs($filter_data);
 
         $data['oreviews'] = array();
         foreach ($results as $result) {
