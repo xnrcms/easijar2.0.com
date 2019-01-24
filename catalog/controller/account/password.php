@@ -101,7 +101,7 @@ class ControllerAccountPassword extends Controller {
 		$customer 		= $this->model_account_customer->getCustomer($this->customer->getId(),$this->request->post['old_password']);
 		$password 		= array_get($customer,'password');
 		$passok 		= (!empty($password) && password_verify($this->request->post['old_password'], $password)) ? true : false;
-
+		
 		if (!$passok) {
 			$this->error['old_password'] = $this->language->get('error_old_password');return !$this->error;
 		}

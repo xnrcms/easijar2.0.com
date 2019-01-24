@@ -32,7 +32,7 @@ class ControllerApiRongcloud extends Controller {
 
         $this->load->model('rongcloud/rongcloud');
         $uinfo                  = $this->model_rongcloud_rongcloud->getUser(['customer_id'=>$customer_id]);
-        $avatar                 = $this->customer->getAvatar($customer['customer_id']);
+        $avatar                 = $this->customer->getAvatar($customer_id);
 
         $data                   = [];
         if (!empty($uinfo)) {
