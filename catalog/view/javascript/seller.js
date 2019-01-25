@@ -32,7 +32,7 @@ $(document).on('click', 'a[data-toggle=\'image\']', function(e) {
 
   $('#button-image').on('click', function() {
     var act = $element.attr('btn-act');
-    CKFinder.popup( {
+    CKFinder.modal( {
       chooseFiles: true,
       width: 800,
       height: 600,
@@ -78,7 +78,6 @@ $(document).on('click', 'a[data-toggle=\'image\']', function(e) {
                     var new_sub_src = sub_img['thumb'];
                     $element.find('img').attr('src', new_sub_src);
                     $element.next('input').val(sub_img['image']);
-                    $element.next('input')[0].dispatchEvent(new Event('input'));
                     for(var i = 1; i < json['result'].length; i++){
                       html  = '<tr id="image-row' + image_row + '">';
                       html += '  <td class="text-left"><a href="" id="thumb-image' + image_row + '"data-toggle="image" class="img-thumbnail product-img"><img src="' + json['result'][i]['thumb'] + '" alt="" title="" data-placeholder="' + placeholder + '" /></a><input type="hidden" name="product_image[' + image_row + '][image]" value="' + json['result'][i]['image'] + '" id="input-image' + image_row + '" /></td>';

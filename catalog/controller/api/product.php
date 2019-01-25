@@ -91,7 +91,7 @@ class ControllerApiProduct extends Controller {
 
 				sort($filterPrices);
 			}
-		
+
 			//$data['products'] = array();
 			$filter_data = array(
 				'filter_category_id'  		=> $category_id,
@@ -169,9 +169,10 @@ class ControllerApiProduct extends Controller {
         }
         
 		$this->load->model('catalog/product');
+		$this->load->model('catalog/product_pro');
 
 		$product_info 			= $this->model_catalog_product->getProduct($req_data['product_id']);
-		
+
 		if (!empty($product_info))
 		{
 			$pinfo 					= [];
@@ -208,13 +209,38 @@ class ControllerApiProduct extends Controller {
 				
 				$skus 							= isset($variants['skus']) ? $variants['skus'] : [];
 				$skusArr 						= [];
-				foreach ($skus as $skey => $svalue) {
-					$skusArr[$skey] 	= $skey; 
+				$skus_prodoct_ids 				= [];
+
+				foreach ($skus as $skey => $svalue)
+				{
+					$skusArr[$skey] 			= $skey;
+
+					if (strpos($svalue, '&product_id=') === false) {
+		                $purl             		= explode('-', $svalue);
+		                $spid             		= count($purl) > 0 ? (int)($purl[count($purl) - 1]) : 0;
+		            }else{
+		                $spid             		= (int)substr($svalue, (strpos($svalue, '&product_id=')+12 - strlen($svalue) ) );
+		            }
+
+					$skus_prodoct_ids[$skey] 	= $spid;
 				}
 
 				sort($skusArr);
 
-				$skusString 	= !empty($skusArr) ? str_replace('|||', '|', implode('|', $skusArr)) : '';
+				$sku_products 					= $this->model_catalog_product_pro->getProductsStockByIds($skus_prodoct_ids);
+				$sku_stocks 					= [];
+				if (!empty($sku_products)) {
+					foreach ($sku_products as $skey => $svlaue) {
+						$sku_stocks[$svlaue['product_id']] 			= $svlaue['quantity'];
+					}
+				}
+
+				$skusProductStock 		= [];
+				foreach ($skus_prodoct_ids as $spkey => $spvalue) {
+					$skusProductStock[] = ['sku'=>$spkey,'stock'=>(isset($sku_stocks[$spvalue])) ? (int)$sku_stocks[$spvalue] : 0];
+				}
+
+				$skusString 					= !empty($skusArr) ? str_replace('|||', '|', implode('|', $skusArr)) : '';
 
 				if (isset($variants['variants']) &&!empty($variants['variants'])) {
 					foreach ($variants['variants'] as $kvar=>$vari) {
@@ -236,7 +262,7 @@ class ControllerApiProduct extends Controller {
 				}
 
 				$pinfo['sku'] 					= '';//$productModel->getVariantKeys();
-				$pinfo['skus'] 					= $skusArr;
+				$pinfo['skus'] 					= $skusProductStock;
 				
 				/*$opt['variants'] 				= $variants['variants'];
 				$opt['sku'] 					= $productModel->getVariantKeys();*/

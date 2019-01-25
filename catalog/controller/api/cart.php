@@ -170,7 +170,11 @@ class ControllerApiCart extends Controller {
     	$product_info                           = $this->model_catalog_product->getProduct($product_id);
 
     	if ($product_info) {
-    		$quantity = (isset($req_data['quantity']) && (int)$req_data['quantity'] > 0) ? (int)$req_data['quantity'] : 1;
+    		$quantity      = (isset($req_data['quantity']) && (int)$req_data['quantity'] > 0) ? (int)$req_data['quantity'] : 1;
+            $stock         = (isset($product_info['quantity']) && (int)$product_info['quantity'] > 0) ? (int)$req_data['quantity'] : 0;
+            if ($stock <= 0 || $quantity > $stock) {
+                return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('text_no_stock')]));
+            }
 
     		//确定产品SKU 获取真是产品ID
     		$productModel 						= \Models\Product::find($product_id);

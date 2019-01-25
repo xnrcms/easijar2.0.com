@@ -247,6 +247,10 @@ class ControllerApiAccount extends Controller {
             }
         }
 
+        $json['rongcloud_uid']               = '';
+        $json['rongcloud_nickname']          = '';
+        $json['rongcloud_avatar']            = '';
+
         //修改融云昵称或者头像
         if ($field == 'fullname' || $field == 'avatar')
         {
@@ -263,13 +267,18 @@ class ControllerApiAccount extends Controller {
                 $data                               = [];
                 $data['rongcloud_uid']              = $rongcloud_uid;
                 $data['rongcloud_nickname']         = $fullname;
-                $data['rongcloud_avatar']           = $this->model_tool_image->resize($avatar, 100, 100);
+                $data['rongcloud_avatar']           = $this->model_tool_image->resize($avatar, 100, 100) . '?t=' . time();
                 $data['customer_id']                = $this->customer->getId();
 
                 $reguser                            = $this->load->controller('extension/interface/rongcloud/reguser',$data);
     
-                if (isset($reguser['code']) && $reguser['code'] == '200') {
+                if (isset($reguser['code']) && $reguser['code'] == '200')
+                {
                     $this->model_rongcloud_rongcloud->updateUser($data);
+
+                    $json['rongcloud_uid']               = $rongcloud_uid;
+                    $json['rongcloud_nickname']          = $fullname;
+                    $json['rongcloud_avatar']            = $data['rongcloud_avatar'];
                 }
             }
         }

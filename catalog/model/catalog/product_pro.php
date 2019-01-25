@@ -467,6 +467,12 @@ class ModelCatalogProductPro extends ModelCatalogProduct
         return $productList;
     }
 
+    public function getProductsStockByIds($productIds)
+    {
+        $query          = $this->db->query($this->getProductSql($productIds));
+        return $query->rows;
+    }
+
     public function getProductsByIds($data)
     {   
         $productIds     = (isset($data['product']) && !empty($data['product'])) ? $data['product'] : [];
