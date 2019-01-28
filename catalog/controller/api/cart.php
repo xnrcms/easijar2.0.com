@@ -292,7 +292,7 @@ class ControllerApiCart extends Controller {
 
         $this->cart->update($req_data['cart_id'], $req_data['quantity']);
 
-        if (!$this->cart->hasStock() && (!config('config_stock_checkout') || config('config_stock_warning'))) {
+        if (!$this->cart->hasStock() /*&& (!config('config_stock_checkout') || config('config_stock_warning'))*/) {
             return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_stock')]));
         }
 
