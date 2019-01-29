@@ -297,11 +297,21 @@ class ModelCheckoutOrder extends Model {
 		}
 	}
 
-	public function getOrderProducts($order_id) {
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
+    public function getOrderProducts($order_id)
+    {
+        $cache_key      = 'order_product_' . (int)$order_id . '.getOrderProducts.by.order_id';
+        $result         = $this->cache->get($cache_key);
 
-		return $query->rows;
-	}
+        if ($result && is_array($result))  return $result;
+
+        $query          = $this->db->query("SELECT op.*, p.image FROM " . DB_PREFIX . "order_product op LEFT JOIN " . DB_PREFIX . "product p ON (op.product_id = p.product_id) WHERE op.order_id = '" . (int)$order_id . "'");
+
+        $result = $query->rows;
+
+        $this->cache->set($cache_key, $result);
+        
+        return $result;
+    }
 
 	public function getOrderOptions($order_id, $order_product_id) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product_id . "'");
@@ -399,7 +409,12 @@ class ModelCheckoutOrder extends Model {
 				}
 			}
 
-			$this->cache->delete('product');
+			$order_products      = $this->getOrderProducts($order_id);
+            if (!empty($order_products)) {
+                foreach ($order_products as $value) {
+                    $this->cache->delete('product.id' . $value['product_id']);
+                }
+            }
 		}
 	}
 
@@ -728,7 +743,12 @@ class ModelCheckoutOrder extends Model {
 				}*/
 			}
 
-			$this->cache->delete('product');
+			$order_products      = $this->getOrderProducts($order_id);
+            if (!empty($order_products)) {
+                foreach ($order_products as $value) {
+                    $this->cache->delete('product.id' . $value['product_id']);
+                }
+            }
 		}
 	}
 

@@ -355,13 +355,22 @@ class ControllerProductProduct extends Controller {
 				);
 			}
 
-			$productModel = \Models\Product::find($product_id);
-			$variants = $productModel->getProductVariantsDetail();
-			if ($variants) {
-				$data['variants'] = $variants['variants'];
-				$data['keys'] = $productModel->getVariantKeys();
-				$data['product_variants'] = $variants['product_variants'];
-				$data['skus'] = $variants['skus'];
+			$cache_key      = 'product_id' . (int)$product_id . '.getProductVariantsDetail.by.product_id';
+        	$variants   	= $this->cache->get($cache_key);
+
+        	if (!$variants) {
+        		$productModel 		= \Models\Product::find($product_id);
+				$variants 			= $productModel->getProductVariantsDetail();
+				$this->cache->set($cache_key, $variants);
+        	}
+
+			if ($variants)
+			{
+				$data['variants'] 			= $variants['variants'];
+				$data['keys'] 				= $variants['keys'];
+				$data['product_variants'] 	= $variants['product_variants'];
+				$data['skus'] 				= $variants['skus'];
+
 				$this->document->addScript('catalog/view/javascript/variant.js');
 			}
 

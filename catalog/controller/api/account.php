@@ -217,23 +217,25 @@ class ControllerApiAccount extends Controller {
             if ($field  == 'telephone') {
                 //手机号设置 
                 $updata         = explode('#', $val);
-                if (count($updata) != 2) {
+                if (count($updata) != 4) {
                     return $this->response->setOutput($this->returnData(['msg'=>'fail:updata is error']));
                 }
-
+                wr($updata);
                 $val            = isset($updata[0]) ? $updata[0] : '';
                 $smscode        = isset($updata[1]) ? $updata[1] : '';
                 $email          = isset($updata[2]) ? $updata[2] : '';
                 $emailcode      = isset($updata[3]) ? $updata[3] : '';
 
-                //邮箱验证码校验
-                $keys           = md5('smscode-' . $email . '-1');
-                if ( empty($emailcode) || !isset($this->session->data['smscode'][$keys]['code']) || $emailcode != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
-                    return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode1')]));
-                }
+                if (!empty($email) && !empty($emailcode)) {
+                    //邮箱验证码校验
+                    $keys           = md5('smscode-' . $email . '-2');
+                    if ( empty($emailcode) || !isset($this->session->data['smscode'][$keys]['code']) || $emailcode != $this->session->data['smscode'][$keys]['code'] || $this->session->data['smscode'][$keys]['expiry_time'] < time()) {
+                        return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_smscode1')]));
+                    }
 
-                if (empty($val) && empty($smscode)) {
-                    return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success']));
+                    if (empty($val) || $val == '-') {
+                        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success']));
+                    }
                 }
 
                 //手机号格式错误

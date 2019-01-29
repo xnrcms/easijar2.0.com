@@ -5,8 +5,6 @@ class ModelCatalogOreview extends Model
     public function editReview($order_product_review_id, $data)
     {
         $this->db->query('UPDATE '.DB_PREFIX."order_product_review SET text = '".$this->db->escape(strip_tags($data['text']))."', rating = '".(int) $data['rating']."', status = '".(int) $data['status']."', date_modified = NOW() WHERE order_product_review_id = '".(int) $order_product_review_id."'");
-
-        $this->cache->delete('product');
     }
 
     public function getReview($order_product_review_id)

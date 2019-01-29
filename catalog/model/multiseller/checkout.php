@@ -41,8 +41,11 @@ class ModelMultisellerCheckout extends Model {
 		return $query->rows;
     }
 
-	public function addSubOrderHistory($order_id, $seller_id, $order_status_id, $comment = '', $notify = false, $not_update_master = false) {
+	public function addSubOrderHistory($order_id, $seller_id, $order_status_id, $comment = '', $notify = false, $not_update_master = false)
+    {
+        $this->load->model('checkout/order');
         $this->load->model('multiseller/order');
+        
 		$order_info = $this->model_multiseller_order->getSuborder($order_id, $seller_id);
 
 		if ($order_info) {
@@ -80,7 +83,12 @@ class ModelMultisellerCheckout extends Model {
             }
         }
 
-        $this->cache->delete('product');
+        $order_products      = $this->model_checkout_order->getOrderProducts($order_id);
+        if (!empty($order_products)) {
+            foreach ($order_products as $value) {
+                $this->cache->delete('product.id' . $value['product_id']);
+            }
+        }
 	}
 
 	public function getSubOrderProducts($order_id, $seller_id) {
