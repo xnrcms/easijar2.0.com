@@ -490,7 +490,7 @@ class ModelAccountOreview extends Model
                                    WHERE p.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' " . $maps . "AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'
                                    ORDER BY r.date_added DESC LIMIT ".(int)$start * $limit .','.(int) $limit;
 
-        $cache_key      = 'oreviews.product_id' . (int)$product_info['product_id'] . '.getOreviewsByProductIds.'.md5($sql);
+        $cache_key      = 'oreviews.product_id' . (int)$product_id . '.getOreviewsByProductIds.'.md5($sql);
         $results        = $this->cache->get($cache_key);
         if ($results)  return $results;
 
@@ -525,7 +525,7 @@ class ModelAccountOreview extends Model
         $sql    = 'SELECT COUNT(*) AS total FROM '.DB_PREFIX.'order_product_review r LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id) LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id) WHERE r.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 " . $maps . "AND pd.language_id = '".(int) $this->config->get('config_language_id')."'";
 
 
-        $cache_key      = 'oreviews.product_id' . (int)$product_info['product_id'] . '.getTotalOreviewsByProductIds.'.md5($sql);
+        $cache_key      = 'oreviews.product_id' . (int)$product_id . '.getTotalOreviewsByProductIds.'.md5($sql);
         $results        = $this->cache->get($cache_key);
         if ($results)  return $results;
 
