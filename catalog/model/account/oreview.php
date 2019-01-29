@@ -102,11 +102,18 @@ class ModelAccountOreview extends Model
 
     public function getOreviewImages($order_product_review_id)
     {
-        $query = $this->db->query('SELECT code AS filename
-                                   FROM '.DB_PREFIX.'order_product_review_image i
-                                   WHERE i.order_product_review_id = '.(int) $order_product_review_id . ';');
+        $sql   = 'SELECT code AS filename FROM '.DB_PREFIX.'order_product_review_image i WHERE i.order_product_review_id = '.(int) $order_product_review_id;
 
-        return $query->rows;
+        $cache_key      = 'oreviews.order_product_review_id' . (int)$order_product_review_id . '.getOreviewImages.'.md5($sql);
+        $results        = $this->cache->get($cache_key);
+        if ($results)  return $results;
+
+        $query          = $this->db->query($sql);
+        $results        = $query->rows;
+
+        $this->cache->set($cache_key, $results);
+        
+        return $results;
     }
 
     public function isReviewed($order_product_id)
@@ -475,15 +482,24 @@ class ModelAccountOreview extends Model
             $maps      .= "AND r.rating = '" . (int)$rating . "' ";//无图
         }
 
-        $query = $this->db->query('SELECT r.order_product_review_id, r.order_product_id,r.customer_id, r.author, r.rating,op.sku, r.text, p.product_id, pd.name, p.price, p.image, r.date_added
+        $sql            = 'SELECT r.order_product_review_id, r.order_product_id,r.customer_id, r.author, r.rating,op.sku, r.text, p.product_id, pd.name, p.price, p.image, r.date_added
                                    FROM '.DB_PREFIX.'order_product_review r
                                    LEFT JOIN '.DB_PREFIX.'order_product op ON (op.order_product_id = r.order_product_id)
                                    LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id)
                                    LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id)
                                    WHERE p.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' " . $maps . "AND r.parent_id = 0 AND pd.language_id = '".(int) $this->config->get('config_language_id')."'
-                                   ORDER BY r.date_added DESC LIMIT ".(int)$start * $limit .','.(int) $limit);
+                                   ORDER BY r.date_added DESC LIMIT ".(int)$start * $limit .','.(int) $limit;
 
-        return $query->rows;
+        $cache_key      = 'oreviews.product_id' . (int)$product_info['product_id'] . '.getOreviewsByProductIds.'.md5($sql);
+        $results        = $this->cache->get($cache_key);
+        if ($results)  return $results;
+
+        $query      = $this->db->query($sql);
+        $results    = $query->rows;
+
+        $this->cache->set($cache_key, $results);
+
+        return $results;
     }
 
     /**
@@ -506,9 +522,19 @@ class ModelAccountOreview extends Model
             $maps      .= "AND r.rating = '" . (int)$rating . "' ";//无图
         }
 
-        $query = $this->db->query('SELECT COUNT(*) AS total FROM '.DB_PREFIX.'order_product_review r LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id) LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id) WHERE r.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 " . $maps . "AND pd.language_id = '".(int) $this->config->get('config_language_id')."'");
+        $sql    = 'SELECT COUNT(*) AS total FROM '.DB_PREFIX.'order_product_review r LEFT JOIN '.DB_PREFIX.'product p ON (r.product_id = p.product_id) LEFT JOIN '.DB_PREFIX."product_description pd ON (p.product_id = pd.product_id) WHERE r.product_id IN (" . implode(',', $product_id) . ") AND r.status = '1' AND r.parent_id = 0 " . $maps . "AND pd.language_id = '".(int) $this->config->get('config_language_id')."'";
 
-        return $query->row['total'];
+
+        $cache_key      = 'oreviews.product_id' . (int)$product_info['product_id'] . '.getTotalOreviewsByProductIds.'.md5($sql);
+        $results        = $this->cache->get($cache_key);
+        if ($results)  return $results;
+
+        $query = $this->db->query($sql);
+        $total = $query->row['total'];
+
+        $this->cache->set($cache_key, $total);
+
+        return $total;
     }
 
     public function getOreviewsTotalForApi($data = [])

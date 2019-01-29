@@ -199,9 +199,15 @@ class ControllerApiProduct extends Controller {
 			$pinfo['discount'] 		= ($price >= $oprice) ? round(($price - $oprice)/$price)*100 : 0;
 
 			//产品属性
-			$opt 								= [];
-			$productModel 						= \Models\Product::find($product_info['product_id']);
-			$variants 							= $productModel->getProductVariantsDetail();
+			$opt 			= [];
+			$cache_key      = 'product_id' . (int)$product_info['product_id'] . '.getProductVariantsDetail.by.product_id';
+        	$variants   	= $this->cache->get($cache_key);
+
+        	if (!$variants) {
+        		$productModel 		= \Models\Product::find($product_info['product_id']);
+				$variants 			= $productModel->getProductVariantsDetail();
+				$this->cache->set($cache_key, $variants);
+        	}
 
 			if ($variants) {
 				$variants_list 					= [];
@@ -261,12 +267,8 @@ class ControllerApiProduct extends Controller {
 					}
 				}
 
-				$pinfo['sku'] 					= '';//$productModel->getVariantKeys();
+				$pinfo['sku'] 					= '';
 				$pinfo['skus'] 					= $skusProductStock;
-				
-				/*$opt['variants'] 				= $variants['variants'];
-				$opt['sku'] 					= $productModel->getVariantKeys();*/
-				/*$opt['product_variants'] 		= $variants['product_variants'];*/
 			}
 
 			//所有商品ID 子产品和和主产品
@@ -294,12 +296,19 @@ class ControllerApiProduct extends Controller {
 	            //购买的商品属性
 	            $option_data 	 = [];
 	            $options 	     = '';
-	            if ($variantData = Models\Order\Product::find((int) $result['order_product_id'])->getVariantLabels()) {
+	            
+	            $cache_key     	= 'oreviews.product_variant' . (int)$result['order_product_id'] . '.getVariantLabels.'.md5($sql);
+		        $options        = $this->cache->get($cache_key);
+		        if (!$options){
+		        	if ($variantData = Models\Order\Product::find((int) $result['order_product_id'])->getVariantLabels()) {
 	                    $option_data = array_merge($option_data, $variantData);
 	                    foreach ($option_data as $key => $value) {
 	                    	$options 	.= $value['name'] . ':' . $value['value'] . ',';
 	                    }
-	            }
+
+	                    $this->cache->set($cache_key, $options);
+		            }
+		        }
 
 	            $customer_info = $this->model_account_customer->getCustomer($result['customer_id']);
 	            $customer_name = $customer_info ? $customer_info['fullname'] : '';

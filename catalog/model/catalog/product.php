@@ -657,6 +657,12 @@ class ModelCatalogProduct extends Model {
     public function getProductAllIdByPidOrProductId($product_id = 0)
     {
     	$sql 	= "SELECT product_id FROM `oc_product` WHERE product_id= " . (int)$product_id . " OR parent_id = " . (int)$product_id;
+
+    	$cache_key      = 'product.id' . (int)$product_id . '.getProductAllIdByPidOrProductId.ByProductId' . md5($sql);
+        $results   		= $this->cache->get($cache_key);
+
+        if (!$results)  return $results;
+
     	$query 	= $this->db->query($sql);
 
     	$ids 	= [];
@@ -665,6 +671,8 @@ class ModelCatalogProduct extends Model {
     	}
 
     	sort($ids);
+
+    	$this->cache->set($cache_key, $ids);
 
         return $ids;
     }
