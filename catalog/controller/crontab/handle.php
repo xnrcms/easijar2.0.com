@@ -620,7 +620,7 @@ echo "ok";exit();
                 $variant_zh         = (isset($value[2]) && !empty($value[2])) ? trim($value[2]) : '';
                 $variant_en         = (isset($value[3]) && !empty($value[3])) ? trim($value[3]) : '';
                 $variant_mark       = (isset($value[4]) && !empty($value[4])) ? trim($value[4]) : '';
-                wr($value);
+
                 if (empty($variant_value) && empty($variant_zh) && empty($variant_en) && empty($variant_mark)) {
                     continue;
                 }

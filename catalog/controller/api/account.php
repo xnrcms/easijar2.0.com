@@ -220,7 +220,7 @@ class ControllerApiAccount extends Controller {
                 if (count($updata) != 4) {
                     return $this->response->setOutput($this->returnData(['msg'=>'fail:updata is error']));
                 }
-                wr($updata);
+                
                 $val            = isset($updata[0]) ? $updata[0] : '';
                 $smscode        = isset($updata[1]) ? $updata[1] : '';
                 $email          = isset($updata[2]) ? $updata[2] : '';
