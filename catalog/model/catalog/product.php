@@ -239,7 +239,8 @@ class ModelCatalogProduct extends Model {
 			'p.date_added',
 			'ps.price',
 			'rating',
-			'p.sort_order'
+			'p.sort_order',
+			'p.date_modified'
 		);
 
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {

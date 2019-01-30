@@ -5,7 +5,7 @@ class ControllerExtensionModuleSpecial extends Controller {
 
 		$filter_data = array(
 			'sort'  => 'p.date_modified',
-			'order' => 'ASC',
+			'order' => 'DESC',
 			'start' => 0,
 			'limit' => $setting['limit'],
 			'start' => isset($setting['start']) ? $setting['start'] : 0
