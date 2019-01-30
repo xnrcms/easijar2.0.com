@@ -4,6 +4,11 @@ class ControllerCommonHeader extends Controller {
         // Analytics
         $this->load->model('setting/extension');
 
+        //如果是手机端直接跳转到H5
+        if (is_mobile()) {
+            $this->response->redirect('https://h5.easijar.com');exit();
+        }
+
         $data['analytics'] = array();
 
         $analytics = $this->model_setting_extension->getExtensions('analytics');

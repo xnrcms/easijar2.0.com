@@ -17,10 +17,13 @@ $_['text_add']            = 'Add Return';
 $_['text_opened']         = 'Product is opened';
 $_['text_unopened']       = 'Product is not opened';
 $_['text_order']          = 'Order Information';
-$_['text_product_info']   = 'Product Information &amp; Reason for Return';
+$_['text_product_info']   = 'Product Information';
 $_['text_history']        = 'Return History';
 $_['text_history_add']    = 'Add History';
 $_['text_filter']         = 'Filter';
+$_['text_return_utype1'] 	= 'Buyer';
+$_['text_return_utype2'] 	= 'Seller';
+$_['text_return_utype3'] 	= 'Platform';
 
 // Column
 $_['column_return_id']     = 'Return ID';
@@ -34,6 +37,13 @@ $_['column_date_modified'] = 'Date Modified';
 $_['column_comment']       = 'Comment';
 $_['column_notify']        = 'Notify';
 $_['column_action']        = 'Action';
+$_['column_return_user']   		= 'User';
+$_['column_order_status']   	= 'Receiving Status';
+$_['column_return_action']   	= 'Application Appeal';
+$_['column_return_reason']   	= 'Refund Reason';
+$_['column_return_comment']   	= 'Refund Instruction';
+$_['column_return_image']   	= 'Proof Picture';
+$_['column_return_stataus']   	= 'Accepting State';
 
 // Entry
 $_['entry_customer']      = 'Customer';

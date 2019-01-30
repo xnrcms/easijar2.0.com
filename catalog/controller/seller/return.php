@@ -540,7 +540,6 @@ class ControllerSellerReturn extends Controller {
             $is_platform 				= isset($return_info['is_platform']) ? (int)$return_info['is_platform'] : 0;
             $return_statuses 			= $this->getReturnStatuses($return_status_id,-1,$is_platform);
 
-
 			$data['back'] 				= $this->url->link('seller/return');
             $data['return_statuses'] 	= $return_statuses;
             $data['column_left'] 		= $this->load->controller('common/column_left');
@@ -605,8 +604,10 @@ class ControllerSellerReturn extends Controller {
 
 	public function history() {
 		$this->load->language('seller/return');
+        $this->load->language('account/return');
 
 		$this->load->model('multiseller/return');
+        $this->load->model('tool/image');
 
 		if (isset($this->request->get['page'])) {
 			$page = $this->request->get['page'];
@@ -619,10 +620,28 @@ class ControllerSellerReturn extends Controller {
 		$results = $this->model_multiseller_return->getReturnHistories($this->request->get['return_id'], ($page - 1) * 10, 10);
 
 		foreach ($results as $result) {
+			$evidences 			= !empty($result['evidences']) ? explode(',', $result['evidences']) : [];
+			$images 			= [];
+			foreach ($evidences as $key => $value) {
+				if (!empty($value)) {
+					$images[] 	= [
+						'id'=>$result['return_id'].'-'.$key,
+						'path'=>$this->model_tool_image->resize($value, 30, 30),
+						'path2'=>$value
+					];
+				}
+			}
+
+			$utype 			= in_array($result['utype'], [1,2,3]) ? '('.t('text_return_utype'.(int)$result['utype']).')' : '11';
+
 			$data['histories'][] = array(
-				'notify'     => $result['notify'] ? $this->language->get('text_yes') : $this->language->get('text_no'),
-				'status'     => $result['status'],
-				'comment'    => nl2br($result['comment']),
+				'fullname'   => $utype . ((int)$result['customer_id'] > 0 ? $result['fullname'] : 'EasiJAR'),
+				'status'     => !empty($result['status']) ? $result['status'] : '/',
+				'ostatus'    => !empty($result['ostatus']) ? $result['ostatus'] : '/',
+				'comment'    => !empty($result['comment']) ? $result['comment'] : '/',
+				'reason'   	 => !empty($result['reason']) ? $result['reason'] : '/',
+				'evidences'  => $images,
+				'is_receive' => in_array((int)$result['is_receive'], [1,2]) ? t('text_return_receive'.(int)$result['is_receive']) : '/',
 				'date_added' => date($this->language->get('datetime_format'), strtotime($result['date_added']))
 			);
 		}

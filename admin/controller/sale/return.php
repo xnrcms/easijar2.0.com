@@ -787,9 +787,10 @@ class ControllerSaleReturn extends Controller {
 
 		$return_statuses 	= [];
 		$is_service 		= isset($return_info['is_service']) ? (int)$return_info['is_service'] : 0;
+		$is_done 			= $this->model_sale_return->getTotalReturnHistoriesUtype($return_info['return_id'],3);
 
 		//1-仅退款 2-退货退款
-		if (in_array($is_service, [1,2])) {
+		if (in_array($is_service, [1,2]) && $is_done <= 1) {
 			if ($is_service == 1) {
 				$return_statuses 	= [
 					['return_status_id'=>10,'name'=>'同意'],
@@ -803,7 +804,7 @@ class ControllerSaleReturn extends Controller {
 				];
 			}
 		}
-
+		
 		/*$notAllow 					= [1,3,5,6,7,8,9];
 		$text_status 				= [4=>'拒绝'];
 		$return_statuses 			= $this->model_localisation_return_status->getReturnStatuses();
@@ -876,6 +877,7 @@ class ControllerSaleReturn extends Controller {
 		$this->load->language('sale/return');
 
 		$this->load->model('sale/return');
+        $this->load->model('tool/image');
 
 		if (isset($this->request->get['page'])) {
 			$page = $this->request->get['page'];
@@ -887,11 +889,30 @@ class ControllerSaleReturn extends Controller {
 
 		$results = $this->model_sale_return->getReturnHistories($this->request->get['return_id'], ($page - 1) * 10, 10);
 
-		foreach ($results as $result) {
+		foreach ($results as $result)
+		{	
+			$evidences 			= !empty($result['evidences']) ? explode(',', $result['evidences']) : [];
+			$images 			= [];
+			foreach ($evidences as $key => $value) {
+				if (!empty($value)) {
+					$images[] 	= [
+						'id'=>$result['return_id'].'-'.$key,
+						'path'=>$this->model_tool_image->resize($value, 30, 30),
+						'path2'=>$value
+					];
+				}
+			}
+
+			$utype 			= in_array($result['utype'], [1,2,3]) ? '('.t('text_return_utype'.(int)$result['utype']).')-' : '';
+
 			$data['histories'][] = array(
-				'notify'     => $result['notify'] ? $this->language->get('text_yes') : $this->language->get('text_no'),
-				'status'     => $result['status'],
-				'comment'    => nl2br($result['comment']),
+				'fullname'   => $utype . ((int)$result['customer_id'] > 0 ? $result['fullname'] : 'EasiJAR'),
+				'status'     => !empty($result['status']) ? $result['status'] : '/',
+				'ostatus'    => !empty($result['ostatus']) ? $result['ostatus'] : '/',
+				'comment'    => !empty($result['comment']) ? $result['comment'] : '/',
+				'reason'   	 => !empty($result['reason']) ? $result['reason'] : '/',
+				'evidences'  => $images,
+				'is_receive' => in_array((int)$result['is_receive'], [1,2]) ? t('text_return_receive'.(int)$result['is_receive']) : '/',
 				'date_added' => date($this->language->get('datetime_format'), strtotime($result['date_added']))
 			);
 		}
@@ -907,7 +928,7 @@ class ControllerSaleReturn extends Controller {
 		$data['pagination'] = $pagination->render();
 
 		$data['results'] = sprintf($this->language->get('text_pagination'), ($history_total) ? (($page - 1) * 10) + 1 : 0, ((($page - 1) * 10) > ($history_total - 10)) ? $history_total : ((($page - 1) * 10) + 10), $history_total, ceil($history_total / 10));
-
+		
 		$this->response->setOutput($this->load->view('sale/return_history', $data));
 	}
 	

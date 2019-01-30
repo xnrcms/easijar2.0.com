@@ -213,6 +213,7 @@
                 <legend>{{ text_history }}</legend>
                 <div id="history"></div>
               </fieldset>
+              {% if return_statuses %}
               <br/>
               <fieldset>
                 <legend>{{ text_history_add }}</legend>
@@ -248,6 +249,7 @@
                   </div>
                 </form>
               </fieldset>
+              {% endif %}
             </div>
           {% endif %}
         </div>

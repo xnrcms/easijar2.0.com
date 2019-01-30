@@ -9,25 +9,43 @@
 <table class="table table-bordered">
   <thead>
     <tr>
+      <td class="text-left">{{ column_return_user }}</td>
+      <td class="text-left">{{ column_order_status }}</td>
+      <td class="text-left">{{ column_return_action }}</td>
+      <td class="text-left">{{ column_return_reason }}</td>
+      <td class="text-left">{{ column_return_comment }}</td>
+      <td class="text-left">{{ column_return_image }}</td>
+      <td class="text-left">{{ column_return_stataus }}</td>
       <td class="text-left">{{ column_date_added }}</td>
-      <td class="text-left">{{ column_comment }}</td>
-      <td class="text-left">{{ column_status }}</td>
-      <td class="text-left">{{ column_notify }}</td>
     </tr>
   </thead>
   <tbody>
     {% if histories %}
     {% for history in histories %}
     <tr>
-      <td class="text-left">{{ history.date_added }}</td>
+      <td class="text-left">{{ history.fullname }}</td>
+      <td class="text-left">{{ history.ostatus }}</td>
+      <td class="text-left">{{ history.is_receive }}</td>
+      <td class="text-left">{{ history.reason }}</td>
       <td class="text-left">{{ history.comment }}</td>
+      <td class="text-left" style="position: relative;">
+        {% if history.evidences %}
+          {% for images in history.evidences %}
+            <a href="../image/{{ images.path2 }}" target="_bank" data-toggle="images2" class="img-thumbnail">
+              <img src="{{ images.path }}"/>
+            </a>
+            <input type="hidden" value="{{ images.path2 }}"/>
+          {% endfor %}
+        {% else %}
+        {{ history.comment }}</td>
+        {% endif %}
       <td class="text-left">{{ history.status }}</td>
-      <td class="text-left">{{ history.notify }}</td>
+      <td class="text-left">{{ history.date_added }}</td>
     </tr>
     {% endfor %}
     {% else %}
     <tr>
-      <td class="text-center" colspan="4">{{ text_no_results }}</td>
+      <td class="text-center" colspan="8">{{ text_no_results }}</td>
     </tr>
     {% endif %}
   </tbody>

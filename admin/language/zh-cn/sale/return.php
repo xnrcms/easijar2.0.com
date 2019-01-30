@@ -21,6 +21,12 @@ $_['text_order']          = '订单信息';
 $_['text_product']        = '商品信息 &amp; 退货原因';
 $_['text_history']        = '添加退货记录';
 $_['text_history_add']     = '添加历史';
+$_['text_return_comment'] = '超时未发货，自动退款';
+$_['text_return_receive1'] 	= '仅退款';
+$_['text_return_receive2'] 	= '退货退款';
+$_['text_return_utype1'] 	= '买家';
+$_['text_return_utype2'] 	= '卖家';
+$_['text_return_utype3'] 	= '平台';
 
 // Column
 $_['column_return_id']     = '退货 ID';
@@ -34,6 +40,13 @@ $_['column_date_modified'] = '修改日期';
 $_['column_comment']       = '附言';
 $_['column_notify']        = '客户通知';
 $_['column_action']        = '管理';
+$_['column_return_user']   		= '用户';
+$_['column_order_status']   	= '收货状态';
+$_['column_return_action']   	= '申请诉求';
+$_['column_return_reason']   	= '退款原因';
+$_['column_return_comment']   	= '退款说明';
+$_['column_return_image']   	= '举证图片';
+$_['column_return_stataus']   	= '受理状态';
 
 // Entry
 $_['entry_customer']      = '客户';

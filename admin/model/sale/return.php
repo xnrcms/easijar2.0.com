@@ -200,7 +200,14 @@ class ModelSaleReturn extends Model {
 			$limit = 10;
 		}
 
-		$query = $this->db->query("SELECT rh.date_added, rs.name AS status, rh.comment, rh.notify FROM " . DB_PREFIX . "return_history rh LEFT JOIN " . DB_PREFIX . "return_status rs ON rh.return_status_id = rs.return_status_id WHERE rh.return_id = '" . (int)$return_id . "' AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY rh.date_added DESC LIMIT " . (int)$start . "," . (int)$limit);
+		$fields 	= 'rh.date_added, rs.name AS status, rh.comment, rh.notify,rh.evidences,rh.return_id,rh.customer_id,rh.utype';
+		$fields 	.= ',cus.fullname,mssu.order_status_id,mssu.order_sn,r.is_receive,r.is_service';
+		$fields 	.= ",(SELECT rr.name FROM " . get_tabname('return_reason') . " rr WHERE rr.return_reason_id = rh.return_reason_id AND rr.language_id = '" . (int)$this->config->get('config_language_id') . "') AS reason";
+		$fields 	.= ",(SELECT ost.name FROM " . get_tabname('order_status') . " ost WHERE ost.order_status_id = mssu.order_status_id AND ost.language_id = '" . (int)$this->config->get('config_language_id') . "') AS ostatus";
+
+		$sql 		= "SELECT ".$fields." FROM " . DB_PREFIX . "return_history rh LEFT JOIN " . DB_PREFIX . "return_status rs ON rh.return_status_id = rs.return_status_id LEFT JOIN " . get_tabname('customer') . "cus ON cus.customer_id = rh.customer_id LEFT JOIN " . get_tabname('return') . "r ON r.return_id = rh.return_id LEFT JOIN " . get_tabname('ms_suborder') . " mssu ON (mssu.seller_id = r.seller_id AND mssu.order_id = r.order_id) WHERE rh.return_id = '" . (int)$return_id . "' AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY rh.return_history_id DESC LIMIT " . (int)$start . "," . (int)$limit;
+
+		$query = $this->db->query($sql);
 
 		return $query->rows;
 	}
@@ -213,6 +220,12 @@ class ModelSaleReturn extends Model {
 
 	public function getTotalReturnHistoriesByReturnStatusId($return_status_id) {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "return_history WHERE return_status_id = '" . (int)$return_status_id . "'");
+
+		return $query->row['total'];
+	}
+
+	public function getTotalReturnHistoriesUtype($return_id,$utype = 0) {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "return_history` WHERE return_id = '" . (int)$return_id . "' AND utype = '" . (int)$utype . "'");
 
 		return $query->row['total'];
 	}
