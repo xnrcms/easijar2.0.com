@@ -110,9 +110,7 @@ class ModelCatalogProduct extends Model {
 			}
 		}
 
-
-		$this->cache->delete('product');
-
+		$this->cache->delete('product.id' . (int)$product_id);
 		return $product_id;
 	}
 
@@ -253,7 +251,7 @@ class ModelCatalogProduct extends Model {
 		    Models\Product::find((int)$product_id)->saveVariantDescriptions($data['product_description']);
         }
 
-		$this->cache->delete('product');
+        $this->cache->delete('product.id' . (int)$product_id);
 	}
 
 	public function copyProduct($product_id) {

@@ -267,8 +267,6 @@ class ControllerProductProduct extends Controller {
 
 			$data['description'] = html_entity_decode($product_info['description'] . $shuoming, ENT_QUOTES, 'UTF-8');
 
-
-
 			if ($product_info['quantity'] <= 0) {
 				$data['stock'] = $product_info['stock_status'];
 			} elseif ($this->config->get('config_stock_display')) {
@@ -355,7 +353,7 @@ class ControllerProductProduct extends Controller {
 				);
 			}
 
-			$cache_key      = 'product_id' . (int)$product_id . '.getProductVariantsDetail.by.product_id';
+			$cache_key   = 'product.id'.(int)$product_id.'.getProductVariantsDetail.ByProduct_id'.(int)$this->config->get('config_language_id');
         	$variants   	= $this->cache->get($cache_key);
 
         	if (!$variants) {

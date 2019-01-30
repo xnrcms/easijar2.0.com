@@ -5,7 +5,7 @@ class ModelCatalogReview extends Model {
 
 		$review_id = $this->db->getLastId();
 
-		$this->cache->delete('product');
+		$this->cache->delete('product.id' . (int)$data['product_id']);
 
 		return $review_id;
 	}
@@ -13,13 +13,16 @@ class ModelCatalogReview extends Model {
 	public function editReview($review_id, $data) {
 		$this->db->query("UPDATE " . DB_PREFIX . "review SET author = '" . $this->db->escape((string)$data['author']) . "', product_id = '" . (int)$data['product_id'] . "', text = '" . $this->db->escape(strip_tags((string)$data['text'])) . "', rating = '" . (int)$data['rating'] . "', status = '" . (int)$data['status'] . "', date_added = '" . $this->db->escape((string)$data['date_added']) . "', date_modified = NOW() WHERE review_id = '" . (int)$review_id . "'");
 
-		$this->cache->delete('product');
+		$this->cache->delete('product.id' . (int)$data['product_id']);
 	}
 
 	public function deleteReview($review_id) {
-		$this->db->query("DELETE FROM " . DB_PREFIX . "review WHERE review_id = '" . (int)$review_id . "'");
+		$review 	= $this->getReview($review_id);
+		if (!empty($review)) {
+			$this->db->query("DELETE FROM " . DB_PREFIX . "review WHERE review_id = '" . (int)$review_id . "'");
+			$this->cache->delete('product.id' . (int)$review['product_id']);
+		}
 
-		$this->cache->delete('product');
 	}
 
 	public function getReview($review_id) {

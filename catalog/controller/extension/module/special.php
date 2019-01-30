@@ -4,7 +4,7 @@ class ControllerExtensionModuleSpecial extends Controller {
 		$this->load->model('catalog/product');
 
 		$filter_data = array(
-			'sort'  => 'pd.name',
+			'sort'  => 'p.date_modified',
 			'order' => 'ASC',
 			'start' => 0,
 			'limit' => $setting['limit'],

@@ -142,9 +142,10 @@ class ModelLocalisationLanguage extends Model {
 
 		foreach ($query->rows as $product) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product['product_id'] . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($product['name']) . "', description = '" . $this->db->escape($product['description']) . "', tag = '" . $this->db->escape($product['tag']) . "', meta_title = '" . $this->db->escape($product['meta_title']) . "', meta_description = '" . $this->db->escape($product['meta_description']) . "', meta_keyword = '" . $this->db->escape($product['meta_keyword']) . "'");
+			
+			$this->cache->delete('product.id' . (int)$product['product_id']);
 		}
 
-		$this->cache->delete('product');
 
 		// Product Attribute
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_attribute WHERE language_id = '" . (int)$this->config->get('config_language_id') . "'");

@@ -11,7 +11,7 @@ class ModelCatalogProductOption extends Model {
 			}
 		}
 
-		$this->cache->delete('product');
+        $this->cache->delete('product.id' . (int)$data['product_id']);
 	}
 
 	public function editProductOption($product_option_id, $data) {
@@ -25,7 +25,7 @@ class ModelCatalogProductOption extends Model {
 			}
 		}
 
-		$this->cache->delete('product');
+		$this->cache->delete('product.id' . (int)$data['product_id']);
 	}
 
 	public function deleteProductOption($product_option_id) {

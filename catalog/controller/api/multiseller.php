@@ -61,7 +61,7 @@ class ControllerApiMultiseller extends Controller {
             $follow_total     = $this->model_account_customer_follow_seller->getSellerFollowByCustomerId($sinfo['seller_id']);
         }
 
-        $sinfo['store_name']    = $seller_info['store_name'];
+        $sinfo['store_name']    = htmlspecialchars_decode($seller_info['store_name']);
         $sinfo['is_follow']     = (int)$follow_total;
         $sinfo['follow_num']    = (int)$this->model_account_customer_follow_seller->getSellerFollowBySellerId($sinfo['seller_id']);
 

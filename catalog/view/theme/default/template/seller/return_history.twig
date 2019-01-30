@@ -28,7 +28,7 @@
       <td class="text-left">{{ history.ostatus }}</td>
       <td class="text-left">{{ history.is_receive }}</td>
       <td class="text-left">{{ history.reason }}</td>
-      <td class="text-left">{{ history.comment }}</td>
+      <td class="text-left" style="word-break: break-all;width:30%;">{{ history.comment }}</td>
       <td class="text-left" style="position: relative;">
         {% if history.evidences %}
           {% for images in history.evidences %}

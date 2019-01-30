@@ -200,7 +200,7 @@ class ControllerApiProduct extends Controller {
 
 			//产品属性
 			$opt 			= [];
-			$cache_key      = 'product_id' . (int)$product_info['product_id'] . '.getProductVariantsDetail.by.product_id';
+			$cache_key   = 'product.id'.(int)$product_info['product_id'].'.getProductVariantsDetail.ByProduct_id'.(int)$this->config->get('config_language_id');
         	$variants   	= $this->cache->get($cache_key);
 
         	if (!$variants) {

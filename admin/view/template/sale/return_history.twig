@@ -28,7 +28,7 @@
       <td class="text-left">{{ history.is_receive }}</td>
       <td class="text-left">{{ history.reason }}</td>
       <td class="text-left">{{ history.comment }}</td>
-      <td class="text-left" style="position: relative;">
+      <td class="text-left" style="word-break: break-all;width:30%;">{{ history.comment }}</td>
         {% if history.evidences %}
           {% for images in history.evidences %}
             <a href="../image/{{ images.path2 }}" target="_bank" data-toggle="images2" class="img-thumbnail">
