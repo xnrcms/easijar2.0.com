@@ -425,7 +425,8 @@ class ModelCatalogProduct extends Model {
 		return $query->rows;
 	}
 
-	public function getProductImages($product_id,$limit = 0) {
+	public function getProductImages($product_id,$limit = 0)
+	{
 		$limit 		= (int)$limit;
 		$sql_limit 	= '';
 
@@ -433,9 +434,19 @@ class ModelCatalogProduct extends Model {
 			$sql_limit 	.= ' LIMIT ' . $limit;
 		}
 
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "' ORDER BY sort_order ASC" . $sql_limit);
+		$sql 			= "SELECT * FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "' ORDER BY sort_order ASC" . $sql_limit;
 
-		return $query->rows;
+		$cache_key      = 'product.id' . (int)$product_id . '.getProductImages.ByProductId' . md5($sql);
+        $results   		= $this->cache->get($cache_key);
+
+        if (!$results)  return $results;
+
+		$query 		= $this->db->query($sql);
+		$results 	= $query->rows;
+
+    	$this->cache->set($cache_key, $results);
+
+		return $results;
 	}
 
 	public function getProductRelated($product_id) {

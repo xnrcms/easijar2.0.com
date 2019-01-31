@@ -374,7 +374,7 @@ class ControllerProductProduct extends Controller {
 
 			$data['options'] = array();
 
-			foreach ($this->model_catalog_product->getProductOptions($this->request->get['product_id']) as $option) {
+			/*foreach ($this->model_catalog_product->getProductOptions($this->request->get['product_id']) as $option) {
 				$product_option_value_data = array();
 
 				foreach ($option['product_option_value'] as $option_value) {
@@ -405,7 +405,7 @@ class ControllerProductProduct extends Controller {
 					'value'                => $option['value'],
 					'required'             => $option['required']
 				);
-			}
+			}*/
 
 			if ($product_info['minimum']) {
 				$data['minimum'] = $product_info['minimum'];
@@ -503,11 +503,11 @@ class ControllerProductProduct extends Controller {
 			$this->load->model('multiseller/seller');
 			$seller_info 	= $this->model_multiseller_seller->getSellerByProductId($product_info['product_id']);
 
-			if (!empty($seller_info) && !empty($seller_info['chat_key'])) {
+			/*if (!empty($seller_info) && !empty($seller_info['chat_key'])) {
 				$data['chat_key'] 		= $seller_info['chat_key'];
 			}else{
 				$data['chat_key'] 		= 'w1321c94de2fa353a5deeb0e63d2a61d2';
-			}
+			}*/
 			
 			$this->response->setOutput($this->load->view('product/product', $data));
 		} else {

@@ -83,7 +83,7 @@ class ControllerApiMultiseller extends Controller {
                     $json['seller_banner'][] = array(
                         'title'      => $banner_image['title'],
                         'link'       => $banner_image['link'],
-                        'image'      => $this->model_tool_image->resize($thumb, 375, 185)
+                        'image'      => $this->model_tool_image->resize($thumb, 750, 340)
                     );
                 }
             }
@@ -91,7 +91,7 @@ class ControllerApiMultiseller extends Controller {
 
         $this->load->model('multiseller/seller');
 		$filter_data              = [
-			'sort'                => 'p.date_added',
+			'sort'                => 'p.date_modified',
 			'order'               => 'DESC',
             'parent_id'           => 0,
 			'start'               => 0,
@@ -152,7 +152,7 @@ class ControllerApiMultiseller extends Controller {
         $limit                    = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
 
         $filter_data              = [
-            'sort'                => 'p.date_added',
+            'sort'                => 'p.date_modified',
             'order'               => 'DESC',
             'parent_id'           => 0,
             'start'               => $page * $limit,
@@ -190,8 +190,8 @@ class ControllerApiMultiseller extends Controller {
                 'product_id'    => $result['product_id'],
                 'image'         => $this->model_tool_image->resize($image, 200, 200),
                 'name'          => $result['name'],
-                'price'         => !empty($result['price']) ? $result['price'] : '',
-                'special'       => !empty($result['special']) ? $result['special'] : '',
+                'price'         => !empty($result['price']) ? $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
+                'special'       => !empty($result['special']) ? $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
                 'discount'      => $discount,
                 'rating'        => 5,
                 'rating_num'    => 10,
