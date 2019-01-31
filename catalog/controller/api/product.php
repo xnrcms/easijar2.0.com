@@ -518,9 +518,9 @@ class ControllerApiProduct extends Controller {
 		if (isset($req_data['seller_id']) && (int)$req_data['seller_id'] > 0)
 		{
 			$this->load->model('multiseller/seller');
-			
-			$product_total          = $this->model_multiseller_seller->getTotalSellerProducts($seller_id, $filter_data);
-        	$results                = $this->model_multiseller_seller->getSellerProducts($seller_id, $filter_data);
+
+			$product_total          = $this->model_multiseller_seller->getTotalSellerProducts($req_data['seller_id'], $filter_data);
+        	$results                = $this->model_multiseller_seller->getSellerProducts($req_data['seller_id'], $filter_data);
 		}else{
 			$this->load->model('catalog/product_pro');
 

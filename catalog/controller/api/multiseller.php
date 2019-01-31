@@ -105,7 +105,7 @@ class ControllerApiMultiseller extends Controller {
 
             $json['seller_product'][] = [
                 'product_id'    => $result['product_id'],
-                'image'         => $this->model_tool_image->resize($image, 200, 200),
+                'image'         => $this->model_tool_image->resize($image, 300, 300),
                 'name'          => $result['name'],
                 'price'         => !empty($result['price']) ? $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
                 'special'       => !empty($result['special']) ? $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
@@ -188,7 +188,7 @@ class ControllerApiMultiseller extends Controller {
 
             $products[] = [
                 'product_id'    => $result['product_id'],
-                'image'         => $this->model_tool_image->resize($image, 200, 200),
+                'image'         => $this->model_tool_image->resize($image, 300, 300),
                 'name'          => $result['name'],
                 'price'         => !empty($result['price']) ? $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
                 'special'       => !empty($result['special']) ? $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']) : '',
