@@ -155,7 +155,7 @@ class ControllerApiMultiseller extends Controller {
             'sort'                => 'p.date_modified',
             'order'               => 'DESC',
             'parent_id'           => 0,
-            'start'               => $page * $limit,
+            'start'               => ($page - 1) * $limit,
             'limit'               => $limit
         ];
 
@@ -248,7 +248,7 @@ class ControllerApiMultiseller extends Controller {
         $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
         
         $filter_data              = [
-            'sort'                => 'p.date_added',
+            'sort'                => 'p.date_modified',
             'order'               => 'DESC',
             'start'               => $page * $limit,
             'limit'               => $limit,
