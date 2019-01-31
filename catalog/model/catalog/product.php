@@ -142,7 +142,7 @@ class ModelCatalogProduct extends Model {
 				$sql .= " OR ";
 			}
 
-			if (!empty($data['filter_tag'])) {
+			/*if (!empty($data['filter_tag'])) {
 				$implode = array();
 
 				$words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_tag'])));
@@ -154,9 +154,9 @@ class ModelCatalogProduct extends Model {
 				if ($implode) {
 					$sql .= " " . implode(" AND ", $implode) . "";
 				}
-			}
+			}*/
 
-			if (!empty($data['filter_name'])) {
+			/*if (!empty($data['filter_name'])) {
 				$sql .= " OR LCASE(p.model) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
 				$sql .= " OR LCASE(p.sku) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
 				$sql .= " OR LCASE(p.upc) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
@@ -164,7 +164,7 @@ class ModelCatalogProduct extends Model {
 				$sql .= " OR LCASE(p.jan) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
 				$sql .= " OR LCASE(p.isbn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
 				$sql .= " OR LCASE(p.mpn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
-			}
+			}*/
 
 			$sql .= ")";
 		}
@@ -439,7 +439,7 @@ class ModelCatalogProduct extends Model {
 		$cache_key      = 'product.id' . (int)$product_id . '.getProductImages.ByProductId' . md5($sql);
         $results   		= $this->cache->get($cache_key);
 
-        if (!$results)  return $results;
+        if ($results)  return $results;
 
 		$query 		= $this->db->query($sql);
 		$results 	= $query->rows;
@@ -674,7 +674,7 @@ class ModelCatalogProduct extends Model {
     	$cache_key      = 'product.id' . (int)$product_id . '.getProductAllIdByPidOrProductId.ByProductId' . md5($sql);
         $results   		= $this->cache->get($cache_key);
 
-        if (!$results)  return $results;
+        if ($results)  return $results;
 
     	$query 	= $this->db->query($sql);
 

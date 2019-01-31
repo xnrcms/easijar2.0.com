@@ -242,15 +242,13 @@ class ControllerApiMultiseller extends Controller {
         $sortsArr           = ['p.sort_order','pd.name-ASC','pd.name-DESC','p.price-ASC','p.price-DESC','rating-ASC','rating-DESC'];
 
         $search             = isset($req_data['search']) ? (string)$req_data['search'] : '';
-        $search             = urlencode(html_entity_decode($search, ENT_QUOTES, 'UTF-8'));
-
         $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
         $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 10;
         
         $filter_data              = [
             'sort'                => 'p.date_modified',
             'order'               => 'DESC',
-            'start'               => $page * $limit,
+            'start'               => ($page - 1) * $limit,
             'limit'               => $limit,
             'filter_name'         => $search
         ];

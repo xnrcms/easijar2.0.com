@@ -153,7 +153,7 @@ class ModelMultisellerSeller extends Model {
                 $implode = array();
 
                 $words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_name'])));
-
+		
                 foreach ($words as $word) {
                     $implode[] = "(pd.name LIKE '%" . $this->db->escape($word) . "%')";
                 }
@@ -171,7 +171,7 @@ class ModelMultisellerSeller extends Model {
                 $sql .= " OR ";
             }
 
-            if (!empty($data['filter_tag'])) {
+            /*if (!empty($data['filter_tag'])) {
                 $implode = array();
 
                 $words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_tag'])));
@@ -183,9 +183,9 @@ class ModelMultisellerSeller extends Model {
                 if ($implode) {
                     $sql .= " " . implode(" AND ", $implode) . "";
                 }
-            }
+            }*/
 
-            if (!empty($data['filter_name'])) {
+            /*if (!empty($data['filter_name'])) {
                 $sql .= " OR LCASE(p.model) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.sku) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.upc) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
@@ -193,7 +193,7 @@ class ModelMultisellerSeller extends Model {
                 $sql .= " OR LCASE(p.jan) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.isbn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
                 $sql .= " OR LCASE(p.mpn) = '" . $this->db->escape(utf8_strtolower($data['filter_name'])) . "'";
-            }
+            }*/
 
             $sql .= ")";
         }
