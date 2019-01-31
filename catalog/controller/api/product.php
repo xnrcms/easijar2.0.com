@@ -422,7 +422,7 @@ class ControllerApiProduct extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->load->language('product/search');
 
-		$allowKey		= ['api_token','page','limit','search','path','sorts','variant','price','in_stock'];
+		$allowKey		= ['api_token','page','limit','search','path','sorts','variant','price','in_stock','seller_id'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
 
@@ -436,7 +436,6 @@ class ControllerApiProduct extends Controller {
 
 		$this->load->model('catalog/category');
 		$this->load->model('catalog/product');
-		$this->load->model('catalog/product_pro');
 		$this->load->model('tool/image');
 
 		//0:默认排序，1：名称 A - Z 2:名称 Z - A 3:价格 低 - 高 4：价格 高 - 低 5：评级 低 - 高 6：评级 高 - 低 7：型号 A - Z 8：型号 Z - A
@@ -516,8 +515,19 @@ class ControllerApiProduct extends Controller {
 			'limit'               		=> $limit
 		);
 
-		$product_total 					= $this->model_catalog_product_pro->getTotalProducts($filter_data);
-		$results 						= $this->model_catalog_product_pro->getProducts($filter_data);
+		if (isset($req_data['seller_id']) && (int)$req_data['seller_id'] > 0)
+		{
+			$this->load->model('multiseller/seller');
+			
+			$product_total          = $this->model_multiseller_seller->getTotalSellerProducts($seller_id, $filter_data);
+        	$results                = $this->model_multiseller_seller->getSellerProducts($seller_id, $filter_data);
+		}else{
+			$this->load->model('catalog/product_pro');
+
+			$product_total 			= $this->model_catalog_product_pro->getTotalProducts($filter_data);
+			$results 				= $this->model_catalog_product_pro->getProducts($filter_data);
+		}
+
 
 		foreach ($results as $result) {
 			$product 	= $this->model_catalog_product->handleSingleProduct($result, $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
