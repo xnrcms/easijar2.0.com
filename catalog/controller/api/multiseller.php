@@ -42,7 +42,7 @@ class ControllerApiMultiseller extends Controller {
         $sinfo                  = [];
         $sinfo['seller_id']     = (int)$seller_info['seller_id'];
         $sinfo['store_name']    = $seller_info['store_name'];
-        $sinfo['description']   = $seller_info['description'];
+        $sinfo['description']   = htmlspecialchars_decode($seller_info['description']);
 
         $avatar                 = !empty($seller_info['avatar']) ? $seller_info['avatar'] : 'no_image.png';
         $banner                 = !empty($seller_info['banner']) ? $seller_info['banner'] : 'no_image.png';
