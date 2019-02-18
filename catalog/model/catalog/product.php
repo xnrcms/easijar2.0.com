@@ -11,7 +11,7 @@ class ModelCatalogProduct extends Model {
 
 	public function getProduct($product_id)
 	{
-		$cache_key 		= 'product.id' . (int)$product_id . '.getProduct.by.product_id';
+		$cache_key 		= 'product.id' . (int)$product_id . '_' . $this->config->get('config_language_id') . '.getProduct.by.product_id';
 		$product_data 	= $this->cache->get($cache_key);
 		
 		if (!$product_data)
@@ -640,7 +640,7 @@ class ModelCatalogProduct extends Model {
 			$rating = false;
 		}*/
 
-		$discount 		= ($special_c > 0 && $price_c >= $special_c) ? sprintf('%.0f',(($price_c - $special_c) / 100)*100) : 0;
+		$discount 		= ($special_c > 0 && $price_c >= $special_c) ? sprintf('%.2f',(($price_c - $special_c) / 100)*100) : 0;
         return array(
             'product_id'  => $product['product_id'],
             'thumb'       => $image,

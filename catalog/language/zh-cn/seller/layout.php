@@ -25,4 +25,4 @@ $_['text_seller_account']         = '商户管理中心';
 $_['text_back_home']              = '返回商城';
 $_['text_oreview']                = '商品评价';
 $_['text_return']                 = '商品退换';
-$_['text_coupon']      			  = '优惠券';
+$_['text_coupon']      			  = '营销券';

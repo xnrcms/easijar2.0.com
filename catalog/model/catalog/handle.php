@@ -40,9 +40,20 @@ class ModelCatalogHandle extends Model {
 
     public function get_product_status0()
     {
+        $model  = file_get_contents('./1.txt');
+        $model  = explode("\n", $model);
+
+        $models = [];
+        foreach ($model as $key => $value) {
+            $models[] = trim($value);
+        }
 
         $product_ids = ['3201','3880','3296','4014','4351','4442','4443','5161','5179','5308','5329','5706','13220','13300','14016','14017','14018'];
-        $query = $this->db->query("SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '0' OR product_id < 1927 OR product_id IN ('" . implode("','",$product_ids) . "')");
+
+        /*$sql = "SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '0' OR product_id < 1927 OR product_id IN ('" . implode("','",$product_ids) . "') OR model IN ('" .implode("','",$models). "')";*/
+
+        $sql = "SELECT `product_id` FROM " . DB_PREFIX . "product WHERE model IN ('" .implode("','",$models). "')";
+        $query = $this->db->query($sql);
         return $query->rows;
     }
 
@@ -85,7 +96,8 @@ class ModelCatalogHandle extends Model {
     }
 
     public function del_product_status0($product_ids)
-    {
+    {   
+        print_r(count($product_ids));echo '<br>';
         $delsql               = [];
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product WHERE product_id IN ('" . implode("','",$product_ids) . "')";
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_description WHERE product_id IN ('" . implode("','",$product_ids) . "')";
@@ -101,9 +113,9 @@ class ModelCatalogHandle extends Model {
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')";
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id IN ('" . implode("','",$product_ids) . "')";
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "ms_product_seller WHERE product_id IN ('" . implode("','",$product_ids) . "')";
-
         foreach ($delsql as $key => $value) {
             $this->db->query($value);
+            //echo($value).'<br>';
         }
     }
 
@@ -665,5 +677,58 @@ class ModelCatalogHandle extends Model {
     	$this->db->query("TRUNCATE `" . DB_PREFIX . "option_value_description`");
     	$this->db->query("TRUNCATE `" . DB_PREFIX . "product_option`");
     	$this->db->query("TRUNCATE `" . DB_PREFIX . "product_option_value`");
+    }
+
+    public function add_image_path($data)
+    {
+        if (!empty($data)) {
+            $sql    = "INSERT INTO " . DB_PREFIX . "image_path (image_path) VALUES ";
+            foreach ($data as $value) {
+                $sql .= "('" .$value. "'),";
+            }
+
+            $sql        = trim($sql,',');
+            $this->db->query($sql);
+        }
+    }
+
+    public function get_product_images_for_image($product_ids)
+    {
+        $query = $this->db->query("SELECT image FROM " . DB_PREFIX . "product_image WHERE product_id IN ('" .implode("','",$product_ids). "')");
+        return $query->rows;
+    }
+
+    public function add_image_path2($data)
+    {
+        if (!empty($data)) {
+            $sql    = "INSERT INTO " . DB_PREFIX . "image_path2 (image_path) VALUES ";
+            foreach ($data as $value) {
+                $sql .= "('" .$value. "'),";
+            }
+
+            $sql        = trim($sql,',');
+            $this->db->query($sql);
+        }
+    }
+
+    public function get_product_list_for_image($data)
+    {
+        $sql    = "SELECT p.product_id,p.image,pd.description FROM oc_product p LEFT JOIN oc_product_description pd ON pd.product_id = p.product_id WHERE p.product_id > 0";
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+
+            $sql .= " ORDER BY p.product_id ASC LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
     }
 }

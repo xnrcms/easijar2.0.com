@@ -20,6 +20,7 @@ $_['text_cron']                     = '定时任务';
 $_['text_category']                 = '商品分类';
 $_['text_country']                  = '国家设置';
 $_['text_coupon']                   = '优惠券';
+$_['text_coupon2']                  = '营销券';
 $_['text_currency']                 = '货币设置';
 $_['text_customer']                 = '客户管理';
 $_['text_customer_group']           = '客户群组';

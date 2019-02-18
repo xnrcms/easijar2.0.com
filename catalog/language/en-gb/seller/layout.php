@@ -25,4 +25,4 @@ $_['text_seller_account']         = 'Seller Account';
 $_['text_back_home']              = 'Home';
 $_['text_oreview']                = 'Reviews';
 $_['text_return']                 = 'Returns';
-$_['text_coupon']      			  = 'Coupon';
+$_['text_coupon']      			  = 'Marketing Voucher';

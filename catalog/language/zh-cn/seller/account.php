@@ -34,11 +34,11 @@ $_['text_order_list']           = '订单列表';
 $_['column_customer']           = '商户';
 $_['column_order_total']        = '订单金额';
 $_['column_order_date']         = '订单时间';
-$_['column_order_status']        = '状态';
+$_['column_order_status']       = '状态';
 
 // 图表
-$_['text_chart_stack']        = '切换为堆叠';
-$_['text_chart_tiled']        = '切换为平铺';
-$_['text_chart_bar']        = '切换为柱状';
-$_['text_chart_save_img']        = '保存为图片';
+$_['text_chart_stack']        	= '切换为堆叠';
+$_['text_chart_tiled']        	= '切换为平铺';
+$_['text_chart_bar']        	= '切换为柱状';
+$_['text_chart_save_img']       = '保存为图片';
 

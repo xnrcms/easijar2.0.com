@@ -1,22 +1,9 @@
 <?php
-class ControllerSellerCoupon extends Controller {
+class ControllerMarketingCoupon2 extends Controller {
 	private $error = array();
-    private $ms_seller = null;
 
-    public function index()
-    {
-		if (!$this->customer->isLogged())
-		{
-			$this->session->data['redirect'] = $this->url->link('seller/edit');
-			$this->response->redirect($this->url->link('seller/login'));
-        } else if (!$this->customer->isSeller()){
-        	
-            $this->response->redirect($this->url->link('seller/add'));
-		}
-
-        $this->load->language('seller/coupon');
-        $this->load->language('seller/account');
-        $this->load->language('seller/layout');
+	public function index() {
+		$this->load->language('marketing/coupon2');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -25,33 +12,19 @@ class ControllerSellerCoupon extends Controller {
 		$this->getList();
 	}
 
-	public function add()
-	{
-		if (!$this->customer->isLogged())
-		{
-			$this->session->data['redirect'] = $this->url->link('seller/edit');
-			$this->response->redirect($this->url->link('seller/login'));
-        } else if (!$this->customer->isSeller()){
-
-            $this->response->redirect($this->url->link('seller/add'));
-		}
-
-		$this->load->language('seller/coupon');
-        $this->load->language('seller/account');
-        $this->load->language('seller/layout');
+	public function add() {
+		$this->load->language('marketing/coupon2');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$this->load->model('marketing/coupon');
 
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-
-			$this->request->post['launch_scene'] 		= 1;
-			$this->request->post['seller_id'] 			= $this->customer->getId();
-
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm())
+		{
+			$this->request->post['seller_id'] = 0;
 			$this->model_marketing_coupon->addCoupon2($this->request->post);
 
-			$this->session->data['success'] 			= $this->language->get('text_success');
+			$this->session->data['success'] = $this->language->get('text_success');
 
 			$url = '';
 
@@ -67,39 +40,25 @@ class ControllerSellerCoupon extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('seller/coupon', $url));
+			$this->response->redirect($this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url));
 		}
 
 		$this->getForm();
 	}
 
-	public function edit()
-	{
-		if (!$this->customer->isLogged())
-		{
-			$this->session->data['redirect'] = $this->url->link('seller/edit');
-			$this->response->redirect($this->url->link('seller/login'));
-        } else if (!$this->customer->isSeller()){
-
-            $this->response->redirect($this->url->link('seller/add'));
-		}
-
-		$this->load->language('seller/coupon');
-        $this->load->language('seller/account');
-        $this->load->language('seller/layout');
+	public function edit() {
+		$this->load->language('marketing/coupon2');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$this->load->model('marketing/coupon');
 
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm())
+		{
+			$this->request->post['seller_id'] = 0;
+			$this->model_marketing_coupon->editCoupon2($this->request->get['coupon_id'], $this->request->post);
 
-			$this->request->post['launch_scene'] 		= 1;
-			$this->request->post['seller_id'] 			= $this->customer->getId();
-			
-			$this->model_marketing_coupon->editCoupon2($this->request->get['coupon_id'],$this->request->post);
-
-			$this->session->data['success'] 			= $this->language->get('text_success');
+			$this->session->data['success'] = $this->language->get('text_success');
 
 			$url = '';
 
@@ -115,30 +74,17 @@ class ControllerSellerCoupon extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('seller/coupon',$url));
+			$this->response->redirect($this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url));
 		}
 
 		$this->getForm();
 	}
 
-	public function delete() 
-	{
-		if (!$this->customer->isLogged())
-		{
-			$this->session->data['redirect'] = $this->url->link('seller/edit');
-			$this->response->redirect($this->url->link('seller/login'));
-        } else if (!$this->customer->isSeller()){
-
-            $this->response->redirect($this->url->link('seller/add'));
-		}
-		
-		$this->load->language('seller/coupon');
-        $this->load->language('seller/account');
-        $this->load->language('seller/layout');
+	public function delete() {
+		$this->load->language('marketing/coupon2');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->language('marketing/coupon');
 		$this->load->model('marketing/coupon');
 
 		if ($this->validateDelete())
@@ -161,7 +107,7 @@ class ControllerSellerCoupon extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('seller/coupon',$url));
+			$this->response->redirect($this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url));
 		}
 
 		$this->getList();
@@ -200,24 +146,20 @@ class ControllerSellerCoupon extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['breadcrumbs'] = [];
+		$data['breadcrumbs'] = array();
+
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/home')
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
 		);
 
 		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_account'),
-			'href' => $this->url->link('seller/account')
+			'text' => $this->language->get('heading_title'),
+			'href' => $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url)
 		);
 
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_coupon'),
-			'href' => $this->url->link('seller/coupon')
-		);
-
-		$data['add'] = $this->url->link('seller/coupon/add',$url);
-		$data['delete'] = $this->url->link('seller/coupon/delete',$url);
+		$data['add'] = $this->url->link('marketing/coupon2/add', 'user_token=' . $this->session->data['user_token'] . $url);
+		$data['delete'] = $this->url->link('marketing/coupon2/delete', 'user_token=' . $this->session->data['user_token'] . $url);
 
 		$data['coupons'] = array();
 
@@ -254,7 +196,7 @@ class ControllerSellerCoupon extends Controller {
 				'date_start' => date($this->language->get('date_format_short'), strtotime($result['date_start'])),
 				'date_end'   => date($this->language->get('date_format_short'), strtotime($result['date_end'])),
 				'status'     => isset($coupon_status[$result['status']]) ? $coupon_status[(int)$result['status']] : '',
-				'edit'       => $this->url->link('seller/coupon/edit', 'coupon_id=' . $result['coupon_id'] . $url)
+				'edit'       => $this->url->link('marketing/coupon2/edit', 'user_token=' . $this->session->data['user_token'] . '&coupon_id=' . $result['coupon_id'] . $url)
 			);
 		}
 
@@ -290,12 +232,14 @@ class ControllerSellerCoupon extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['sort_name'] = $this->url->link('seller/coupon','sort=name' . $url);
-		$data['sort_code'] = $this->url->link('seller/coupon','sort=code' . $url);
-		$data['sort_discount'] = $this->url->link('seller/coupon','sort=discount' . $url);
-		$data['sort_date_start'] = $this->url->link('seller/coupon','sort=date_start' . $url);
-		$data['sort_date_end'] = $this->url->link('seller/coupon','sort=date_end' . $url);
-		$data['sort_status'] = $this->url->link('seller/coupon','sort=status' . $url);
+		$data['sort_name'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url);
+		$data['sort_explain'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=explain' . $url);
+		$data['sort_type'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=type' . $url);
+		$data['sort_order_total'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=order_total' . $url);
+		$data['sort_discount'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=discount' . $url);
+		$data['sort_date_start'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=date_start' . $url);
+		$data['sort_date_end'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=date_end' . $url);
+		$data['sort_status'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . '&sort=status' . $url);
 
 		$url = '';
 
@@ -311,7 +255,7 @@ class ControllerSellerCoupon extends Controller {
 		$pagination->total = $coupon_total;
 		$pagination->page = $page;
 		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('seller/coupon',$url . '&page={page}');
+		$pagination->url = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}');
 
 		$data['pagination'] = $pagination->render();
 
@@ -320,18 +264,17 @@ class ControllerSellerCoupon extends Controller {
 		$data['sort'] = $sort;
 		$data['order'] = $order;
 
-		$data['column_left'] = $this->load->controller('common/column_left');
-		$data['column_right'] = $this->load->controller('common/column_right');
-		$data['content_top'] = $this->load->controller('common/content_top');
-		$data['content_bottom'] = $this->load->controller('common/content_bottom');
-		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('seller/coupon', $data));
+		$this->response->setOutput($this->load->view('marketing/coupon_list2', $data));
 	}
 
-	protected function getForm() {
-		$data['text_form'] = !isset($this->request->get['coupon_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
+	protected function getForm()
+	{
+		$data['text_form'] 	= !isset($this->request->get['coupon_id'])?$this->language->get('text_add'):$this->language->get('text_edit');
+		$data['user_token'] = $this->session->data['user_token'];
 
 		if (isset($this->request->get['coupon_id'])) {
 			$data['coupon_id'] = (int)$this->request->get['coupon_id'];
@@ -375,30 +318,25 @@ class ControllerSellerCoupon extends Controller {
 			$url .= '&order=' . $this->request->get['order'];
 		}
 
-		$data['breadcrumbs'] = [];
+		$data['breadcrumbs'] = array();
+
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/home',$url)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
 		);
 
 		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_account',$url),
-			'href' => $this->url->link('seller/account',$url)
+			'text' => $this->language->get('heading_title'),
+			'href' => $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url)
 		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_coupon'),
-			'href' => $this->url->link('seller/coupon',$url)
-		);
-
 
 		if (!isset($this->request->get['coupon_id'])) {
-			$data['action'] = $this->url->link('seller/coupon/add',$url);
+			$data['action'] = $this->url->link('marketing/coupon2/add', 'user_token=' . $this->session->data['user_token'] . $url);
 		} else {
-			$data['action'] = $this->url->link('seller/coupon/edit','coupon_id=' . $this->request->get['coupon_id'] . $url);
+			$data['action'] = $this->url->link('marketing/coupon2/edit', 'user_token=' . $this->session->data['user_token'] . '&coupon_id=' . $this->request->get['coupon_id'] . $url);
 		}
 
-		$data['cancel'] = $this->url->link('seller/coupon',$url);
+		$data['cancel'] = $this->url->link('marketing/coupon2', 'user_token=' . $this->session->data['user_token'] . $url);
 
 		if (isset($this->request->get['coupon_id']) && (!$this->request->server['REQUEST_METHOD'] != 'POST')) {
 			$coupon_info = $this->model_marketing_coupon->getCoupon2($this->request->get['coupon_id']);
@@ -429,11 +367,12 @@ class ControllerSellerCoupon extends Controller {
 
 		$data['date_start'] = $data['date_start'] != '0000-00-00' ? $data['date_start'] : '';
 		$data['date_end'] 	= $data['date_end'] != '0000-00-00' ? $data['date_end'] : '';
+		
 
 		$coupon_type 			= [
 			1=>$this->language->get('text_coupon_type1'),
 			2=>$this->language->get('text_coupon_type2'),
-			//3=>$this->language->get('text_coupon_type3'),
+			3=>$this->language->get('text_coupon_type3'),
 		];
 
 		$data['coupon_type'] 	= $coupon_type;
@@ -452,18 +391,18 @@ class ControllerSellerCoupon extends Controller {
 		
 		$data['coupon_launch_scene'] 	= $coupon_launch_scene;
 
-		$data['column_left'] = $this->load->controller('common/column_left');
-		$data['column_right'] = $this->load->controller('common/column_right');
-		$data['content_top'] = $this->load->controller('common/content_top');
-		$data['content_bottom'] = $this->load->controller('common/content_bottom');
-		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('seller/coupon_form', $data));
+		$this->response->setOutput($this->load->view('marketing/coupon_form2', $data));
 	}
 
-	protected function validateForm()
-	{
+	protected function validateForm() {
+		if (!$this->user->hasPermission('modify', 'marketing/coupon2')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
 		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 128)) {
 			$this->error['name'] = $this->language->get('error_name');
 		}
@@ -527,6 +466,10 @@ class ControllerSellerCoupon extends Controller {
 
 	protected function validateDelete()
 	{
+		if (!$this->user->hasPermission('modify', 'marketing/coupon')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
 		if (!isset($this->request->post['selected']) || empty($this->request->post['selected'])) {
 			$this->error['warning'] = $this->language->get('error_selected_coupon_id');
 		}else{
@@ -536,7 +479,52 @@ class ControllerSellerCoupon extends Controller {
 				$this->error['warning'] = $this->language->get('error_coupon_status_delete');
 			}
 		}
-
+		
 		return !$this->error;
+	}
+
+	public function history() {
+		$this->load->language('marketing/coupon2');
+
+		if (isset($this->request->get['coupon_id'])) {
+			$coupon_id = $this->request->get['coupon_id'];
+		} else {
+			$coupon_id = 0;
+		}
+
+		if (isset($this->request->get['page'])) {
+			$page = $this->request->get['page'];
+		} else {
+			$page = 1;
+		}
+
+		$this->load->model('marketing/coupon');
+
+		$data['histories'] = array();
+
+		$results = $this->model_marketing_coupon->getCouponHistories($coupon_id, ($page - 1) * 10, 10);
+
+		foreach ($results as $result) {
+			$data['histories'][] = array(
+				'order_id'   => $result['order_id'],
+				'customer'   => $result['customer'],
+				'amount'     => $result['amount'],
+				'date_added' => date($this->language->get('date_format_short'), strtotime($result['date_added']))
+			);
+		}
+
+		$history_total = $this->model_marketing_coupon->getTotalCouponHistories($coupon_id);
+
+		$pagination = new Pagination();
+		$pagination->total = $history_total;
+		$pagination->page = $page;
+		$pagination->limit = 10;
+		$pagination->url = $this->url->link('marketing/coupon2/history', 'user_token=' . $this->session->data['user_token'] . '&coupon_id=' . $coupon_id . '&page={page}');
+
+		$data['pagination'] = $pagination->render();
+
+		$data['results'] = sprintf('Showing %d to %d of %d (%d Pages)', ($history_total) ? (($page - 1) * 10) + 1 : 0, ((($page - 1) * 10) > ($history_total - 10)) ? $history_total : ((($page - 1) * 10) + 10), $history_total, ceil($history_total / 10));
+
+		$this->response->setOutput($this->load->view('marketing/coupon_history', $data));
 	}
 }

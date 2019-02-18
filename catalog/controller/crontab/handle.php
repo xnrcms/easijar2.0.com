@@ -231,7 +231,7 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 6) {
-            echo "ok";exit();
+
             //刪除下架数据
             $plist      = $this->model_catalog_handle->get_product_status0();
             $plist1     = $this->model_catalog_handle->get_product_status1();
@@ -246,7 +246,7 @@ class ControllerCrontabHandle extends Controller {
             }
 
             $ids = array_flip(array_flip($ids));
-            //print_r($ids);exit();
+
             $this->model_catalog_handle->del_product_status0($ids);
             echo 'del ok';exit();
         }
@@ -684,6 +684,109 @@ echo "ok";exit();
             }
 
             echo "ok";exit();
+        }else if($step == 14){
+            echo "ok";exit();
+            $st_time    = date('2018-12-01 00:00:00');
+            $en_time    = date('2019-01-06 00:00:00');
+            $day        = isset($req_data['day']) ? (int)$req_data['day'] : 0;
+            $nums       = isset($req_data['nums']) ? (int)$req_data['nums'] : 0;
+            $now_time   = strtotime($st_time) + 86400 * $day;
+
+            if ($now_time >= strtotime($en_time)) {
+                echo "ok=".$nums;exit();
+            }
+
+            $ymd        = date('Y/m/d',$now_time);
+            $dirs1      = DIR_IMAGE . 'catalog/shopfw/'.$ymd.'/main/*';
+            $files1     = glob($dirs1);
+
+            $dirs2      = DIR_IMAGE . 'catalog/shopfw/'.$ymd.'/description/*';
+            $files2     = glob($dirs2);
+
+            $image_path = [];
+
+            if (!empty($files1)) {
+                foreach ($files1 as $val1) {
+                    $image_path[] = str_replace(DIR_IMAGE,'',$val1);
+                }
+            }
+
+            if (!empty($files2)) {
+                foreach ($files2 as $val2) {
+                    $image_path[] = str_replace(DIR_IMAGE,'',$val2);
+                }
+            }
+
+            $this->model_catalog_handle->add_image_path($image_path);
+
+            $day ++;
+            $nums   = $nums + count($image_path);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&day=' . $day . '&nums='.$nums));
+        }else if ($step == 15) {
+            $limit              = 1000;
+            $filter_data        = [
+                'start'    => ($page - 1) * $limit,
+                'limit'    => $limit
+            ];
+            
+            $total                          = 105922;
+            $list                           = $this->model_catalog_handle->get_product_list_for_image($filter_data);
+
+            if (!empty($list))
+            {
+                $image_path         = [];
+                $product_ids        = [];
+
+                foreach ($list as $key => $value) {
+                    $image_path[$value['image']]        = $value['image'];
+                    $product_ids[$value['product_id']]  = $value['product_id'];
+
+                    $desc   = htmlspecialchars_decode($value['description']);
+                    preg_match_all('/<\s*img\s+[^>]*?src\s*=\s*(\'|\")(.*?)\\1[^>]*?\/?\s*>/i',$desc,$match);
+
+                    if (isset($match[2]) && !empty($match[2])) {
+                        foreach ($match[2] as $k => $v) {
+                            if (strpos($v, 'image/catalog/shopfw') >= 1) {
+                                $img                = str_replace("../image/", '', $v);
+                                $image_path[$img]   = $img;
+                            }
+                        }
+                    }
+                }
+
+                if (!empty($product_ids)) {
+                    $images         = $this->model_catalog_handle->get_product_images_for_image($product_ids);
+                    if (!empty($images)) {
+                        foreach ($images as $kk => $vv) {
+                            if(!empty($vv['image'])){
+                                $image_path[$vv['image']]   = $vv['image'];
+                            }
+                        }
+                    }
+                }
+
+                $this->model_catalog_handle->add_image_path2($image_path);
+
+                $page ++;
+            }
+            else{
+                $step = 1000;
+            }
+
+            $remainder                      = intval($total - $limit * $page);
+            $remainder1                     = $total - $remainder;
+
+            $this->echo_log([
+                'handle_name'=>'商品属性剔除',
+                'handle_num1'=>$total,
+                'handle_num2'=>$remainder1,
+                'handle_num3'=>$remainder,
+                'handle_info'=>'页数：'.$page,
+                'handle_time'=>(time()-$ini_time) . '秒',
+            ]);
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }
     }
 
