@@ -351,4 +351,52 @@ class ModelExtensionTotalCoupon extends Model {
 		
 		return (isset($query->row['code']) && !empty($query->row['code'])) ? $query->row['code'] : '';
 	}
+
+	public function getNewPeopleCouponsTotal()
+	{
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "coupon2` WHERE launch_scene = '2' AND status = '1' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW()))");	
+		
+		return $query->row['total'];
+	}
+
+	public function getNewPeopleCoupons()
+	{
+		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "coupon2` WHERE launch_scene = '2' AND status = '1' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW())) ORDER BY discount ASC");
+		return $query->rows;
+	}
+
+	public function isGetNewPeopleCouponTotal()
+	{
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "coupon_customer2` WHERE launch_scene = '2' AND customer_id = '" . (int)$this->customer->getId() . "'");
+		
+		return $query->row['total'];
+	}
+
+	public function addNewPeopleCoupons($coupons)
+	{
+		if (!empty($coupons)) {
+            $sql    = "INSERT INTO " . DB_PREFIX . "coupon_customer2 (coupon_id,customer_id,`name`,`explain`,`type`,order_total,discount,coupon_total,date_start,date_end,`status`,seller_id,get_limit,uses_limit,launch_scene,date_added,date_modified) VALUES ";
+            foreach ($coupons as $value) {
+                $sql .= "('"
+                . (int)$value['coupon_id'] . "','"
+                . (int)$this->customer->getId() . "','"
+                . $this->db->escape($value['name']) . "','"
+                . $this->db->escape($value['explain']) . "','"
+                . (int)$value['type'] . "','"
+                . (int)$value['order_total'] . "','"
+                . (float)$value['discount'] . "','"
+                . (int)$value['coupon_total'] . "','"
+                . $this->db->escape($value['date_start']) . "','"
+                . $this->db->escape($value['date_end']) . "','0','"
+                . (int)$value['seller_id'] . "','"
+                . (int)$value['get_limit'] . "','"
+                . (int)$value['uses_limit'] . "','"
+                . (int)$value['launch_scene'] . "',NOW(),NOW()),";
+            }
+
+            $sql        = trim($sql,',');
+            wr($sql);
+            $this->db->query($sql);
+        }
+	}
 }

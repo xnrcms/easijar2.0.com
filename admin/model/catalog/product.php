@@ -765,4 +765,13 @@ class ModelCatalogProduct extends Model {
         $sql = "UPDATE " . DB_PREFIX . "product SET status = 0 WHERE product_id IN (" . substr($data, 0, strlen($data) - 1) . ")";
         $this->db->query($sql);
     }
+
+    public function setThematicActivitiesByProductId($thematic_activities_id,$product_ids)
+    {
+    	$this->db->query("UPDATE " . DB_PREFIX . "product SET thematic_activities_id = '0' WHERE thematic_activities_id = '" . (int)$thematic_activities_id . "'");
+
+    	if(!empty($product_ids)){
+    		$this->db->query("UPDATE " . DB_PREFIX . "product SET thematic_activities_id = '" . (int)$thematic_activities_id . "' WHERE product_id IN ('" .implode("','",$product_ids). "')");
+    	}
+    }
 }

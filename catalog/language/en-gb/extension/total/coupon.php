@@ -14,3 +14,5 @@ $_['entry_select_coupon']  = 'Please select the coupon you want to used.';
 // Error
 $_['error_coupon']  = 'Warning: Coupon is either invalid, expired or reached its usage limit!';
 $_['error_empty']   = 'Warning: Please enter a coupon code!';
+$_['error_coupon_user']   	= 'Error: You are not a new user at the moment!';
+$_['error_coupon_get']   	= 'Error: The coupon has been collected!';

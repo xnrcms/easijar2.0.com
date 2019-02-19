@@ -751,4 +751,10 @@ class ModelAccountOrder extends Model {
 
         return $isReturn;
     }
+
+    public function getCustomerTotalOrders() {
+        $query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "order` o WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+
+        return $query->row['total'];
+    }
 }

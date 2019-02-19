@@ -102,4 +102,14 @@ class ControllerExtensionTotalCoupon extends Controller {
 			return $customer_coupons ? $customer_coupons : array();;
 		}
 	}
+
+	//新人优惠券列表
+	public function getNewPeopleCouponForApi()
+	{
+		$this->load->model('extension/total/coupon');
+
+		$coupons 	= $this->model_extension_total_coupon->getNewPeopleCoupons();
+
+		return $coupons;
+	}
 }
