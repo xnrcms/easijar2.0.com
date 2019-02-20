@@ -33,11 +33,13 @@ class ModelMarketingCoupon extends Model {
 
 	public function getCouponsTotals($data = array(),$seller_id=0)
 	{
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "coupon WHERE seller_id = '" . $seller_id . "'";
+		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "coupon2 WHERE seller_id = '" . $seller_id . "'";
 
 		if(isset($data['date']) && $data['date'] == 1){
-			$sql .= " AND date_start <= NOW() AND date_end >= NOW() AND status = 1";
+			$sql .= " AND date_start <= NOW() AND date_end >= NOW() ";
 		}
+
+		$sql .= "AND status = 1 AND (coupon_total = 0 OR coupon_total > get_total)";
 
 		$query = $this->db->query($sql);
 
@@ -85,7 +87,7 @@ class ModelMarketingCoupon extends Model {
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
-		wr([$sql]);
+
 		$query = $this->db->query($sql);
 
 		return $query->rows;
@@ -141,19 +143,51 @@ class ModelMarketingCoupon extends Model {
 		return $query->row['total'];
 	}
 
-	public function insertCoupon($coupon_id = 0, $customer_id = 0){
-		$this->db->query("INSERT INTO " . DB_PREFIX . "coupon_customer SET coupon_id = '" . (int)$coupon_id . "', customer_id = '" . (int)$customer_id . "'");
-		return $this->db->getLastId();
+	public function insertCoupon($coupon_id = 0, $customer_id = 0)
+	{
+		$coupon 	= $this->getCoupon($coupon_id);
+		$get_id 	= 0;
+
+		if (!empty($coupon)) {
+			
+			$sql    = "INSERT INTO " . DB_PREFIX . "coupon_customer2 (coupon_id,customer_id,`name`,`explain`,`type`,order_total,discount,coupon_total,date_start,date_end,`status`,seller_id,get_limit,uses_limit,launch_scene,date_added,date_modified) VALUES ";
+            
+            $sql .= "('"
+            . (int)$coupon['coupon_id'] . "','"
+            . (int)$this->customer->getId() . "','"
+            . $this->db->escape($coupon['name']) . "','"
+            . $this->db->escape($coupon['explain']) . "','"
+            . (int)$coupon['type'] . "','"
+            . (int)$coupon['order_total'] . "','"
+            . (float)$coupon['discount'] . "','"
+            . (int)$coupon['coupon_total'] . "','"
+            . $this->db->escape($coupon['date_start']) . "','"
+            . $this->db->escape($coupon['date_end']) . "','0','"
+            . (int)$coupon['seller_id'] . "','"
+            . (int)$coupon['get_limit'] . "','"
+            . (int)$coupon['uses_limit'] . "','"
+            . (int)$coupon['launch_scene'] . "',NOW(),NOW()),";
+
+            $sql        = trim($sql,',');
+
+            $this->db->query($sql);
+
+            $get_id 	= $this->db->getLastId();
+
+            $this->db->query("UPDATE " . DB_PREFIX . "coupon2 SET get_total = (get_total + 1) WHERE coupon_id = '" . (int)$coupon['coupon_id'] . "'");
+		}
+
+		return $get_id;
 	}
 
-	public function isGetCoupon($coupon_id = 0, $customer_id = 0){
-		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "coupon_customer` WHERE `coupon_id` = '" . (int)$coupon_id . "' AND customer_id = '" . (int)$customer_id . "'");
+	public function isGetCoupon($coupon_id = 0){
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "coupon_customer2` WHERE `coupon_id` = '" . (int)$coupon_id . "' AND customer_id = '" . (int)$this->customer->getId() . "'");
 		return $query->row['total'];
 	}
 
 	public function getCustomerCoupons()
 	{
-		$query = $this->db->query("SELECT `coupon_id` FROM " . get_tabname('coupon_customer') . " WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+		$query = $this->db->query("SELECT `coupon_id` FROM " . get_tabname('coupon_customer2') . " WHERE customer_id = '" . (int)$this->customer->getId() . "'");
 		return $query->rows;
 	}
 

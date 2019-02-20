@@ -118,7 +118,8 @@ class ControllerApiCoupon extends Controller {
 		];
 
         $seller_id                  = $req_data['seller_id'];
-        //获取用户已经领取的优惠券
+        
+        //获取商家优惠券
         $getCouponList              = [];
         if ($this->customer->isLogged()) {
             $coupons            = $this->model_marketing_coupon->getCustomerCoupons();
@@ -130,6 +131,7 @@ class ControllerApiCoupon extends Controller {
         }
 
         $totals  = $this->model_marketing_coupon->getCouponsTotals($filter_data,$seller_id);
+
         //商家优惠券列表
 		$results = $this->model_marketing_coupon->getCoupons($filter_data,$seller_id);
 		foreach ($results as $result) {
@@ -179,12 +181,17 @@ class ControllerApiCoupon extends Controller {
             return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
         }
 
+        if (!$this->customer->isLogged()){
+            return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
+        }
+
         $coupon_id 		= isset($req_data['coupon_id']) ? (int)$req_data['coupon_id'] : 0;
         
         $this->load->model('marketing/coupon');
 
         //获取优惠券
-        $coupon_info 	= $this->model_marketing_coupon->getCoupon($coupon_id);
+        $coupon_info 	= $this->model_marketing_coupon->getCoupon2($coupon_id);
+        $get_limit      = (int)$coupon_info['get_limit'];
 
         //优惠券失效
         if ( !($coupon_info['date_start'] <= date('Y-m-d', time()) && $coupon_info['date_end'] >= date('Y-m-d', time())) ) {
@@ -195,13 +202,13 @@ class ControllerApiCoupon extends Controller {
         	return $this->response->setOutput($this->returnData(['msg'=>'fail:coupon is unavailable']));
         }
 
-        if ($this->customer->isLogged()) {
-        	if ( $this->model_marketing_coupon->isGetCoupon($coupon_id,$this->customer->getId() ) > 0 ) {
+        //if ($this->customer->isLogged()) {
+        	if ( $get_limit >0 && $this->model_marketing_coupon->isGetCoupon($coupon_id) > $get_limit ) {
 	        	return $this->response->setOutput($this->returnData(['msg'=>'fail:coupon already gets']));
 	        }
 
-	        $this->model_marketing_coupon->insertCoupon($coupon_id,$this->customer->getId());
-        }else{
+	        $this->model_marketing_coupon->insertCoupon($coupon_id);
+        /*}else{
         	if (!isset($this->session->data['getCouponList'])) $this->session->data['getCouponList'] = [];
 
         	if (in_array($coupon_id, $this->session->data['getCouponList'])) {
@@ -209,7 +216,7 @@ class ControllerApiCoupon extends Controller {
         	}
 
         	$this->session->data['getCouponList'][] 	= $coupon_id;
-        }
+        }*/
 
         $json 			= $this->returnData(['code'=>'200','msg'=>'success','data'=>'gets coupon success']);
         return $this->response->setOutput($json);

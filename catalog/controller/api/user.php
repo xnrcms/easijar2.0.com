@@ -96,7 +96,7 @@ class ControllerApiUser extends Controller {
 				}
 				
 				// getCouponList
-				if (isset($this->session->data['getCouponList']) && is_array($this->session->data['getCouponList'])) {
+				/*if (isset($this->session->data['getCouponList']) && is_array($this->session->data['getCouponList'])) {
 					$this->load->model('marketing/coupon');
 
 					foreach ($this->session->data['getCouponList'] as $key => $coupon_id)
@@ -107,7 +107,7 @@ class ControllerApiUser extends Controller {
 
 						unset($this->session->data['getCouponList'][$key]);
 					}
-				}
+				}*/
 
 				//添加用户浏览商品记录
 				if (isset($this->session->data['ProductBrowseRecordsForIds']) && is_array($this->session->data['ProductBrowseRecordsForIds'])) {
