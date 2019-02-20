@@ -203,11 +203,11 @@ class ControllerApiCoupon extends Controller {
         }
 
         //if ($this->customer->isLogged()) {
-        	if ( $get_limit >0 && $this->model_marketing_coupon->isGetCoupon($coupon_id) > $get_limit ) {
+        	if ( $get_limit >0 && $this->model_marketing_coupon->isGetCoupon($coupon_id) >= $get_limit ) {
 	        	return $this->response->setOutput($this->returnData(['msg'=>'fail:coupon already gets']));
 	        }
 
-	        $this->model_marketing_coupon->insertCoupon($coupon_id);
+	        $is_get    = $this->model_marketing_coupon->insertCoupon($coupon_id);
         /*}else{
         	if (!isset($this->session->data['getCouponList'])) $this->session->data['getCouponList'] = [];
 
@@ -218,7 +218,10 @@ class ControllerApiCoupon extends Controller {
         	$this->session->data['getCouponList'][] 	= $coupon_id;
         }*/
 
-        $json 			= $this->returnData(['code'=>'200','msg'=>'success','data'=>'gets coupon success']);
-        return $this->response->setOutput($json);
+        if ($is_get) {
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'gets coupon success']));
+        }else{
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:gets error']));
+        }
 	}
 }

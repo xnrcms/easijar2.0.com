@@ -143,10 +143,9 @@ class ModelMarketingCoupon extends Model {
 		return $query->row['total'];
 	}
 
-	public function insertCoupon($coupon_id = 0, $customer_id = 0)
+	public function insertCoupon($coupon_id = 0)
 	{
-		$coupon 	= $this->getCoupon($coupon_id);
-		$get_id 	= 0;
+		$coupon 	= $this->getCoupon2($coupon_id);
 
 		if (!empty($coupon)) {
 			
@@ -171,13 +170,11 @@ class ModelMarketingCoupon extends Model {
             $sql        = trim($sql,',');
 
             $this->db->query($sql);
-
-            $get_id 	= $this->db->getLastId();
-
             $this->db->query("UPDATE " . DB_PREFIX . "coupon2 SET get_total = (get_total + 1) WHERE coupon_id = '" . (int)$coupon['coupon_id'] . "'");
+            return true;
+		}else{
+			return false;
 		}
-
-		return $get_id;
 	}
 
 	public function isGetCoupon($coupon_id = 0){
