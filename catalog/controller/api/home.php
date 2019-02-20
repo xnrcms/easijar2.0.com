@@ -140,6 +140,11 @@ class ControllerApiHome extends Controller {
 
 		$data['recommend'] 			= $recommend;
 
+        $this->load->model('account/order');
+        
+		$order_total       			= $this->model_account_order->getCustomerTotalOrders();
+		$data['is_new_people'] 		= (int)$order_total > 0 ? 1 : 0;
+
 		//购物车数量
         //$data['cart_nums'] 		= $this->cart->countProducts();
 
