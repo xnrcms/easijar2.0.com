@@ -44,25 +44,29 @@ class ControllerApiCoupon extends Controller {
         $totals             = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
         $results 			= $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);
         $coupon 			= [];
+        $seller_ids         = [];          
+
         if (!empty($results)) {
         	foreach ($results as $key => $value) {
         		$avatar                 		= !empty($value['avatar']) ? $value['avatar'] : 'no_image.png';
 		        $value['avatar']        		= $this->model_tool_image->resize($avatar, 100, 100);
                 $value['discount']              = sprintf("%.2f", $value['discount']);
+                $value['store_name']            = !empty($value['store_name']) ? htmlspecialchars_decode($value['store_name']) : 'EasiJAR';
 
 		        $overdue 						= $value['over_time'] > 0 ? 1 : 0;
 
-		        if ($value['type'] == 'F') {
-                	$value['discount'] 			= $this->currency->format($value['discount'], $this->session->data['currency']);
-	            } else {
-	                $value['discount'] 			= '-'.round($value['discount']).'%';
-	            }
+		        if ($value['type'] == 2) {
+                    $discount = '-'.round($value['discount']).'%';
+                } else {
+                    $discount = $this->currency->format($value['discount'], $this->session->data['currency']);
+                }
 
                 $value['over_time']             = $overdue;
+                $value['discount']              = $discount;
                 
 	            unset($value['type']);
 	            //unset($value['over_time']);
-	            unset($value['total']);
+	            //unset($value['total']);
 
 		        $coupon[$value['seller_id'].'_'.$overdue]['seller_id'] 	= $value['seller_id'];
 		        $coupon[$value['seller_id'].'_'.$overdue]['store_name']	= $value['store_name'];
