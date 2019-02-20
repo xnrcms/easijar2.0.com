@@ -376,7 +376,14 @@ class ModelExtensionTotalCoupon extends Model {
 	{
 		if (!empty($coupons)) {
             $sql    = "INSERT INTO " . DB_PREFIX . "coupon_customer2 (coupon_id,customer_id,`name`,`explain`,`type`,order_total,discount,coupon_total,date_start,date_end,`status`,seller_id,get_limit,uses_limit,launch_scene,date_added,date_modified) VALUES ";
-            foreach ($coupons as $value) {
+            
+            $coupon_id 		= [];
+            $coupon_id[] 	= 0;
+            
+            foreach ($coupons as $value)
+            {
+            	$coupon_id[] 	= (int)$value['coupon_id'];
+
                 $sql .= "('"
                 . (int)$value['coupon_id'] . "','"
                 . (int)$this->customer->getId() . "','"
@@ -395,8 +402,9 @@ class ModelExtensionTotalCoupon extends Model {
             }
 
             $sql        = trim($sql,',');
-            wr($sql);
+
             $this->db->query($sql);
+            $this->db->query("UPDATE " . DB_PREFIX . "coupon2 SET get_total = (get_total + 1) WHERE coupon_id IN ('" .implode("','",$coupon_id). "')");
         }
 	}
 }

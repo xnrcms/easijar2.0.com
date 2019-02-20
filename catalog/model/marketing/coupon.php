@@ -46,15 +46,16 @@ class ModelMarketingCoupon extends Model {
 
 	public function getCoupons($data = array(),$seller_id=0) {
 
-		$sql = "SELECT coupon_id, name, code, discount, date_start, date_end, status,type FROM " . DB_PREFIX . "coupon WHERE seller_id = '" . $seller_id . "'";
+		$sql = "SELECT coupon_id, name, discount, date_start, date_end, status,type FROM " . DB_PREFIX . "coupon2 WHERE seller_id = '" . $seller_id . "'";
 
 		if(isset($data['date']) && $data['date'] == 1){
-			$sql .= " AND date_start <= NOW() AND date_end >= NOW() AND status = 1";
+			$sql .= " AND date_start <= NOW() AND date_end >= NOW() ";
 		}
+
+		$sql .= "AND status = 1 AND (coupon_total = 0 OR coupon_total > get_total)";
 
 		$sort_data = array(
 			'name',
-			'code',
 			'discount',
 			'date_start',
 			'date_end',
@@ -84,7 +85,7 @@ class ModelMarketingCoupon extends Model {
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
-
+		wr([$sql]);
 		$query = $this->db->query($sql);
 
 		return $query->rows;

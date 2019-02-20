@@ -136,10 +136,10 @@ class ControllerApiCoupon extends Controller {
 
             $result['discount']              = sprintf("%.2f", $result['discount']);
 
-            if ($result['type'] == 'F') {
-                $result['discount']          = $this->currency->format($result['discount'], $this->session->data['currency']);
-            } else {
+            if ($result['type'] == 2) {
                 $result['discount']          = round($result['discount']).'%';
+            } else {
+                $result['discount']          = $this->currency->format($result['discount'], $this->session->data['currency']);
             }
 
 			$data['business'][] = array(

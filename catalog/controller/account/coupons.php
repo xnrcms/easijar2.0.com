@@ -42,11 +42,12 @@ class ControllerAccountCoupons extends Controller
         $results = $this->model_customercoupon_coupon->getCouponsByCustomer($this->customer, false,3);
         $data['coupons'] = array();
         foreach ($results as $result) {
-            if ($result['type'] == 'F') {
-                $discount = $this->currency->format($result['discount'], $this->session->data['currency']);
-            } else {
+            if ($result['type'] == 2) {
                 $discount = '-'.round($result['discount']).'%';
+            } else {
+                $discount = $this->currency->format($result['discount'], $this->session->data['currency']);
             }
+            
             $data['coupons'][] = array(
                 'name' => $result['name'],
                 'code' => $result['code'],

@@ -121,11 +121,11 @@ class ControllerApiThematicActivities extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_coupon_get')]));
         }
 
-        //判断是不是新人
+        /*//判断是不是新人
         $order_total       = $this->model_account_order->getCustomerTotalOrders();
         if ((int)$order_total > 0) {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_coupon_user')]));
-        }
+        }*/
 
         //入库优惠券
         $this->load->model('extension/total/coupon');
@@ -135,7 +135,7 @@ class ControllerApiThematicActivities extends Controller {
         }else{
             return $this->response->setOutput($this->returnData(['msg'=>'fail:coupons is empty']));
         }
-
+ 
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success']));
     }
 

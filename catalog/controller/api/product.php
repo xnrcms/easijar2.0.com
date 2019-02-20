@@ -371,8 +371,16 @@ class ControllerApiProduct extends Controller {
 			$results 		= $this->model_marketing_coupon->getCoupons($filter_data,$seller_id);
 
 			foreach ($results as $result) {
+				$result['discount']              = sprintf("%.2f", $result['discount']);
+
+	            if ($result['type'] == 2) {
+	                $result['discount']          = round($result['discount']).'%';
+	            } else {
+	                $result['discount']          = $this->currency->format($result['discount'], $this->session->data['currency']);
+	            }
+
 				$coupons[] 		 = [
-					'discount'   => $this->currency->format($this->tax->calculate($result['discount'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency'])
+					'discount'   => $result['discount']
 				];
 			}
 
