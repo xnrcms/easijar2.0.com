@@ -172,7 +172,7 @@ class ControllerApiProduct extends Controller {
 		$this->load->model('catalog/product_pro');
 
 		$product_info 			= $this->model_catalog_product->getProduct($req_data['product_id']);
-		wr($product_info);
+
 		if (!empty($product_info))
 		{
 			$pinfo 					= [];
@@ -412,6 +412,7 @@ class ControllerApiProduct extends Controller {
 	        $data['variants'] 					= $opt;
 	        $data['is_wish'] 					= (int)$wish_total;
 	        $data['coupons'] 					= $coupons;
+	        $data['is_addcart'] 				= !in_array((int)$product_info['thematic_activities_id'], [57.58]) ? 1 : 0;
 			
 			//添加商品详情浏览记录
 			$this->load->controller('api/browse_records/addProductBrowseRecords',(int)$product_info['product_id']);
