@@ -14,7 +14,13 @@ class ControllerExtensionModuleThematicActivities extends Controller {
 			if (!isset($this->request->get['module_id'])) {
 				$module_id 	= $this->model_setting_module->addModule('thematic_activities', $this->request->post);
 			} else {
-				$module_id 	= $this->request->get['module_id'];
+				$module_id 		= $this->request->get['module_id'];
+				$module_info 	= $this->model_setting_module->getModule($module_id);
+				foreach ($module_info['product'] as $product_id)
+				{
+					$this->cache->delete('product.id' . (int)$product_id);
+				}
+
 				$this->model_setting_module->editModule($module_id, $this->request->post);
 			}
 
