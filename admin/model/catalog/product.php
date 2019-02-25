@@ -772,6 +772,10 @@ class ModelCatalogProduct extends Model {
 
     	if(!empty($product_ids)){
     		$this->db->query("UPDATE " . DB_PREFIX . "product SET thematic_activities_id = '" . (int)$thematic_activities_id . "' WHERE product_id IN ('" .implode("','",$product_ids). "')");
+
+    		foreach ($product_ids as $product_id) {
+				$this->cache->delete('product.id' . (int)$product_id);
+			}
     	}
     }
 }

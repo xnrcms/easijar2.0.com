@@ -172,7 +172,7 @@ class ControllerApiProduct extends Controller {
 		$this->load->model('catalog/product_pro');
 
 		$product_info 			= $this->model_catalog_product->getProduct($req_data['product_id']);
-		
+		wr($product_info);
 		if (!empty($product_info))
 		{
 			$pinfo 					= [];

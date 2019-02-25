@@ -54,12 +54,11 @@ class ControllerApiHome extends Controller {
 
 	    if ($is_new_people == 0) {
 		    //新人推荐商品
-	        $module_id                  = 37;
+	        $module_id                  = 58;
 	        $setting_info               = $this->model_setting_module->getModule($module_id);
 	        $setting_info['module_id']  = $module_id;
 	        $setting_info['api']        = true;
 	        $setting_info['limit']      = 3;
-	        $setting_info['start']      = 0;
 	        $results                    = $this->load->controller('extension/module/thematic_activities', $setting_info,true);
 
 	        $recommend                  = [];

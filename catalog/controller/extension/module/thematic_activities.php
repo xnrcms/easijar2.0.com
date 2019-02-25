@@ -8,10 +8,6 @@ class ControllerExtensionModuleThematicActivities extends Controller {
 		$this->load->model('catalog/product');
 		$this->load->model('catalog/product_pro');
 
-		if (!$setting['limit']) {
-			$setting['limit'] = 4;
-		}
-
 		$product_ids 	= isset($setting['product']) ? $setting['product'] : [];
 		$product_total 	= count($product_ids);
 		$pids 			= [];

@@ -55,17 +55,11 @@ class ControllerApiThematicActivities extends Controller {
         $this->load->model('setting/module');
 
         //推荐商品
-        $page                       = 1;
-        $limit                      = 10;
-        $start                      = $limit * ($page-1);
         $module_id                  = 58;
         $setting_info               = $this->model_setting_module->getModule($module_id);
         $setting_info['module_id']  = $module_id;
         $setting_info['api']        = true;
-        $setting_info['limit']      = $limit;
-        $setting_info['start']      = $start;
-        $setting_info['width']      = 300;
-        $setting_info['height']     = 300;
+
         $results                    = $this->load->controller('extension/module/thematic_activities', $setting_info,true);
 
         $recommend                  = [];
