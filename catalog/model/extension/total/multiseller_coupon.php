@@ -182,7 +182,9 @@ class ModelExtensionTotalMultisellerCoupon extends Model {
                 } else {
 		            $seller_price[$seller_id]['price'] 			= $product['total'];
 		            $seller_price[$seller_id]['product_id'][] 	= $product['product_id'];
-                    $seller_price[$seller_id]['seller_name'] 	= $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
+		            
+		            $store_name 			= $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
+	                $seller_price[$seller_id]['seller_name'] 	= htmlspecialchars_decode($store_name);
                 }
             }
 

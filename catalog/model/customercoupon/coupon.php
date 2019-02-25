@@ -102,7 +102,7 @@ class ModelCustomercouponCoupon extends Model
         $customer_id            = (int)array_get($data, 'customer_id');
         if ($customer_id <= 0)  return [];
 
-        $fields      = format_find_field('coupon_id,name,discount,date_start,date_end,explain,seller_id,type','c');
+        $fields      = format_find_field('coupon_id,name,discount,date_start,date_end,explain,seller_id,type,launch_scene,order_total','c');
         $fields     .= ',' . format_find_field('store_name,avatar','ms');
 
         $sql        = 'SELECT ' . $fields . ',(date_end-CURDATE()) AS over_time FROM `'.DB_PREFIX.'coupon_customer2` AS c LEFT JOIN `'.DB_PREFIX.'ms_seller` AS ms ON (ms.seller_id = c.seller_id) WHERE customer_id='.(int) $customer_id;
@@ -110,9 +110,12 @@ class ModelCustomercouponCoupon extends Model
         $dtype      = isset($data['dtype']) ? (int)$data['dtype'] : 0;
         $seller_id  = isset($data['seller_id']) ? (int)$data['seller_id'] : 0;
 
-        if ($dtype == 1) {
+        if ($dtype == 0) {
+            $sql    .= " AND c.seller_id >= '0'";
+        }elseif ($dtype == 1) {
             $sql    .= " AND c.seller_id = '0'";
-        }elseif ($dtype == 2) {
+        }
+        else {
             if ($seller_id > 0) {
                 $sql    .= " AND c.seller_id = '" . (int)$seller_id . "'";
             }else{
@@ -123,6 +126,7 @@ class ModelCustomercouponCoupon extends Model
         $sort_data  = [
             'c.coupon_id',
             'c.date_added',
+            'c.discount',
             'over_time'
         ];
 

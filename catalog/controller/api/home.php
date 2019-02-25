@@ -26,6 +26,7 @@ class ControllerApiHome extends Controller {
 		//获取幻灯片
 		$this->load->model('design/banner');
 
+        $data['currency']   = $this->currency->getSymbolLeft($this->session->data['currency']);
 	    $data['broadcast'] 	= [];
 	    $setting_info 		= $this->model_setting_module->getModule(35);
 	    $results 			= $this->model_design_banner->getBanner($setting_info['banner_id']);
@@ -42,7 +43,45 @@ class ControllerApiHome extends Controller {
 		    }
 	    }
 
-	    $data['category'] 	= [];
+	    $data['category'] 		= [];
+
+        $this->load->model('account/order');
+
+		$order_total       			= $this->model_account_order->getCustomerTotalOrders();
+	    $is_new_people 				= 0;//(int)$order_total > 0 ? 1 : 0;
+		$data['is_new_people'] 		= $is_new_people;
+	    $data['new_people'] 		= [];
+
+	    if ($is_new_people == 0) {
+		    //新人推荐商品
+	        $module_id                  = 37;
+	        $setting_info               = $this->model_setting_module->getModule($module_id);
+	        $setting_info['module_id']  = $module_id;
+	        $setting_info['api']        = true;
+	        $setting_info['limit']      = 3;
+	        $setting_info['start']      = 0;
+	        $results                    = $this->load->controller('extension/module/thematic_activities', $setting_info,true);
+
+	        $recommend                  = [];
+	        if (isset($results['products']) && !empty($results['products'])) {
+	            foreach ($results['products'] as $rval) {
+	                $recommend[]        = [
+	                    'product_id'    => $rval['product_id'],
+	                    'name'          => $rval['name'],
+	                    'thumb'         => $rval['thumb'],
+	                    'price'         => trim($rval['price'],$data['currency']),
+	                    'rating'        => $rval['rating'],
+	                    'reviews'       => $rval['reviews'],
+	                ];
+	            }
+	        }
+
+	        $amounts 							= [60=>60,65=>20];
+	        $country_code 						= isset($this->session->data['country_code']) ? (int)$this->session->data['country_code'] : 0;
+	        $data['new_people']['currency'] 	= $data['currency'];
+	        $data['new_people']['amount'] 		= isset($amounts[$country_code]) ? $amounts[$country_code] : 0;
+	        $data['new_people']['products'] 	= $recommend;
+	    }
 
 	    //获取分类
 	    $module_id 					= 51;
@@ -139,11 +178,6 @@ class ControllerApiHome extends Controller {
 	    }
 
 		$data['recommend'] 			= $recommend;
-
-        $this->load->model('account/order');
-        
-		$order_total       			= $this->model_account_order->getCustomerTotalOrders();
-		$data['is_new_people'] 		= (int)$order_total > 0 ? 1 : 0;
 
 		//购物车数量
         //$data['cart_nums'] 		= $this->cart->countProducts();

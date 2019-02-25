@@ -151,8 +151,27 @@ class ControllerApiCheckout extends Controller
         //$json['shipping_method_section']        = $this->renderShippingMethodSection();
         //$json['payment_method_section']         = $this->renderPaymentMethodSection();
 
-        $products                               = $this->renderCartSection();
-        $cart_products                          = [];
+        //获取可用优惠券列表
+        /*$filter_data        = [
+            'customer_id'   => $this->customer->getId(),
+            'seller_id'     => 0,
+            'dtype'         => 0,
+            'sort'          => 'over_time',
+            'order'         => 'DESC',
+            'start'         => 0,
+            'limit'         => 200,
+        ];
+
+        $this->load->model('customercoupon/coupon');
+
+        $totals             = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
+        $results            = $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);*/
+
+        $products                    = $this->renderCartSection();
+        $cart_products               = [];
+        $coupon_list                 = isset($products['total_list_data']['coupon']) ? $products['total_list_data']['coupon'] : [];
+
+        unset($products['total_list_data']);
 
         if ( isset($products['products']) && !empty($products['products'])) {
 
@@ -167,11 +186,11 @@ class ControllerApiCheckout extends Controller
             $ship_ototal    = [];
 
             foreach ($totals as $tk => $tv) {
-                if (strpos('&'.$tv['title'], '平台商品运费') >= 1 || strpos('&'.$tv['title'], 'Platform shipping fee') >= 1) {
+                if (strpos('&#'.$tv['title'], '平台商品运费') >= 1 || strpos('&#'.$tv['title'], 'Platform shipping fee') >= 1) {
                     unset($totals[$tk]);continue;
                 }
 
-                $tt                             = explode('&', $tv['title']);
+                $tt                             = explode('&#', $tv['title']);
                 if (count($tt) == 3 && (int)$tt[1] > 0 ) {
                     $seller_ship[$tt[1]]      = $tv['text'];
                     $ship_del[$tt[1]]         = $tk;
@@ -207,6 +226,7 @@ class ControllerApiCheckout extends Controller
 
                 $value['shipping']       = $shipping;
                 $value['coupon']         = !empty($coupon) ? $coupon : '';
+                $value['coupon_list']    = isset($coupon_list[$value['seller_id']]) ? $coupon_list[$value['seller_id']] : [];
                 $value['seller_id']      = $value['seller_id'];
                 $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
                 
@@ -243,6 +263,7 @@ class ControllerApiCheckout extends Controller
 
         $products['totals']                     = $totals;
         $products['products']                   = $cart_products;
+        $products['coupon_list']                = isset($coupon_list[0]) ? $coupon_list[0] : [];
 
         $json['cart_section']                   = $products;
 
@@ -870,11 +891,14 @@ class ControllerApiCheckout extends Controller
         $data['products']   = $this->getProducts();
         //$data['vouchers']   = $this->getVouchers();
         //$data['recharges']  = $this->getRecharges();
-        $data['totals']     = $this->getTotals();
 
+        $total_data         = $this->getTotals();
+
+        $data['totals']                 = $total_data[0];
+        $data['total_list_data']        = $total_data[1];
         $this->load->view('checkout/checkout/_confirm', $data);
 
-        return $this->load->getViewData('products,totals');
+        return $this->load->getViewData('products,totals,total_list_data');
     }
 
     private function renderAgreeSection()
@@ -1001,13 +1025,15 @@ class ControllerApiCheckout extends Controller
             $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
         }
 
+        $total_list_data    = [];
+
         array_multisort($sort_order, SORT_ASC, $results);
         foreach ($results as $result) {
             if ($this->config->get('total_' . $result['code'] . '_status')) {
                 $this->load->model('extension/total/' . $result['code']);
 
                 // We have to put the totals in an array so that they pass by reference.
-                $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
+                $total_list_data[$result['code']]    = $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
             }
         }
 
@@ -1015,6 +1041,7 @@ class ControllerApiCheckout extends Controller
         foreach ($totals as $key => $value) {
             $sort_order[$key] = $value['sort_order'];
         }
+
         array_multisort($sort_order, SORT_ASC, $totals);
 
         $results = array();
@@ -1023,11 +1050,11 @@ class ControllerApiCheckout extends Controller
             $results[] = array(
                 'title'     => $total['title'],
                 'text'      => $this->currency->format($total['value'], $this->session->data['currency']),
-                'ototal'    =>$total['value']
+                'ototal'    => $total['value']
             );
         }
 
-        return $results;
+        return [$results,$total_list_data];
     }
 
     // Address

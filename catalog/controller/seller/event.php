@@ -38,9 +38,10 @@ class ControllerSellerEvent extends Controller {
                         $products[$seller_id]['checked']        = ($products[$seller_id]['checked']) ? true : (bool)(isset($product['checked']) ? $product['checked'] : 0);
                         $products[$seller_id]['products'][]     = $product;
                     } else {
+                        $store_name             = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
-                            'store_name'    => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
+                            'store_name'    => htmlspecialchars_decode($store_name),
                             'shipping'      => 0,
                             'checked'       => (bool)(isset($product['checked']) ? $product['checked'] : 0),
                             'products'      => array($product),
@@ -105,7 +106,7 @@ class ControllerSellerEvent extends Controller {
 				'href'       => $this->url->link('product/product', 'product_id=' . $product['product_id'])
 			);
 			if (!isset($products[$seller_id])) {
-                $coupons                 = $this->load->controller('extension/total/coupon/getCouponForApi',['seller_id'=>$seller_id]);
+                /*$coupons                 = $this->load->controller('extension/total/coupon/getCouponForApi',['seller_id'=>$seller_id]);
                 $coupon                  = [];
 
                 foreach ($coupons as $key => $value) {
@@ -114,12 +115,13 @@ class ControllerSellerEvent extends Controller {
                         'name'      =>$value['name'],
                         'discount'  =>$this->currency->format($this->tax->calculate($value['discount'], $tax_class_id, $this->config->get('config_tax')), $this->session->data['currency']),
                     ];
-                }
+                }*/
 
-			    $products[$seller_id]    = array(
+                $store_name             = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
+			    $products[$seller_id]   = array(
                     'seller_id'         =>$seller_info['seller_id'],
-			        'store_name'        => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
-                    'coupons'           => $coupon,
+			        'store_name'        => htmlspecialchars_decode($store_name),
+                    //'coupons'           => $coupon,
                     'products'          => array($product)
                 );
             } else {
@@ -188,10 +190,10 @@ class ControllerSellerEvent extends Controller {
             $country = $this->model_localisation_country->getCountry($seller_info['country_id']);
             $zone = $this->model_localisation_zone->getZone($seller_info['zone_id']);
 
-            $data['store_name'] = $seller_info['store_name'];
-            $data['store_url'] = $this->url->link('multiseller/home', 'seller_id=' . $seller_info['seller_id']);
-            $data['store_address'] = $country ? $country['name'] : '' . ' ' . $zone ? $zone['name'] : '';
-            $data['store_avatar'] = $this->model_tool_image->resize($seller_info['avatar'], 100, 100);
+            $data['store_name']     = htmlspecialchars_decode($seller_info['store_name']);
+            $data['store_url']      = $this->url->link('multiseller/home', 'seller_id=' . $seller_info['seller_id']);
+            $data['store_address']  = $country ? $country['name'] : '' . ' ' . $zone ? $zone['name'] : '';
+            $data['store_avatar']   = $this->model_tool_image->resize($seller_info['avatar'], 100, 100);
         }
 	}
 
@@ -216,9 +218,10 @@ class ControllerSellerEvent extends Controller {
             } else {
                 $suborder_info = $this->model_multiseller_order->getSuborder((int)$data['order_id'], $seller_id);
 
-                $order_status = $this->model_localisation_order_status->getOrderStatus($suborder_info['order_status_id']);
+                $order_status   = $this->model_localisation_order_status->getOrderStatus($suborder_info['order_status_id']);
+                $store_name     = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
                 $products[$seller_id] = array(
-                    'store_name'   => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name'),
+                    'store_name'   => htmlspecialchars_decode($store_name),
                     'products'     => array($product),
                     'order_stauts' => $order_status['name']
                 );
@@ -232,11 +235,13 @@ class ControllerSellerEvent extends Controller {
             'name'        => $this->language->get('seller')->get('text_whole_order')
         );
 
-        $sellers = $this->model_multiseller_order->getOrderSellers((int)$this->request->get['order_id']);
+        $sellers            = $this->model_multiseller_order->getOrderSellers((int)$this->request->get['order_id']);
+        $store_name         = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
+
         foreach ($sellers as $seller) {
             $data['sellers'][] = array(
             'seller_id'   => $seller['seller_id'] ? (int)$seller['seller_id'] : 0,
-            'name'        => $seller['seller_id'] ? $seller['store_name'] : $this->config->get('config_name')
+            'name'        => htmlspecialchars_decode($store_name)
             );
         }
         $data['entry_seller'] = $this->language->get('seller')->get('entry_seller');

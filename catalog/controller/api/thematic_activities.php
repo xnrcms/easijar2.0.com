@@ -68,12 +68,17 @@ class ControllerApiThematicActivities extends Controller {
 
         $recommend                  = [];
         if (isset($results['products']) && !empty($results['products'])) {
-            foreach ($results['products'] as $rval) {
+            foreach ($results['products'] as $rval)
+            {
+                $price              = trim($rval['price'],$json['currency']);
+                $special            = !empty($rval['special']) ? trim($rval['price'],$json['currency']) : $price;
+
                 $recommend[]        = [
                     'product_id'    => $rval['product_id'],
                     'name'          => $rval['name'],
                     'thumb'         => $rval['thumb'],
-                    'price'         => trim($rval['price'],$json['currency']),
+                    'price'         => $price,
+                    'special'       => $special,
                     'rating'        => $rval['rating'],
                     'reviews'       => $rval['reviews'],
                 ];

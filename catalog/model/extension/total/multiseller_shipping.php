@@ -24,9 +24,10 @@ class ModelExtensionTotalMultisellerShipping extends Model {
 		        if (isset($seller_price[$seller_id])) {
 		            $seller_price[$seller_id]['price'] += $product['price'];
                 } else {
+                    $store_name                   = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
 		            $seller_price[$seller_id] = array(
 		                'price'       => $product['price'],
-                        'seller_name' => $seller_info ? $seller_info['store_name'] : $this->config->get('config_name')
+                        'seller_name' => htmlspecialchars_decode($store_name)
                     );
                 }
             }
@@ -40,7 +41,7 @@ class ModelExtensionTotalMultisellerShipping extends Model {
                 $total['totals'][] = array(
                     'seller_id'  => $key,
                     'code'       => 'multiseller_shipping',
-                    'title'      => $value['seller_name'] . '&'.$key.'multiseller_shipping&' . $title,
+                    'title'      => $value['seller_name'] . '&#'.$key.'multiseller_shipping&#' . $title,
                     'value'      => $shipping_cost,
                     'sort_order' => $this->config->get('total_multiseller_shipping_sort_order')
                 );

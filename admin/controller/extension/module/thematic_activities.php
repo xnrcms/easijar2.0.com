@@ -12,14 +12,15 @@ class ControllerExtensionModuleThematicActivities extends Controller {
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 
 			if (!isset($this->request->get['module_id'])) {
-				$this->model_setting_module->addModule('thematic_activities', $this->request->post);
+				$module_id 	= $this->model_setting_module->addModule('thematic_activities', $this->request->post);
 			} else {
-				$this->model_setting_module->editModule($this->request->get['module_id'], $this->request->post);
+				$module_id 	= $this->request->get['module_id'];
+				$this->model_setting_module->editModule($module_id, $this->request->post);
 			}
 
 			//设置商品为专题商品
 			$this->load->model('catalog/product');
-			$this->model_catalog_product->setThematicActivitiesByProductId($this->request->get['module_id'],$this->request->post['product']);
+			$this->model_catalog_product->setThematicActivitiesByProductId($module_id,$this->request->post['product']);
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
