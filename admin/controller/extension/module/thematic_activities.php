@@ -128,6 +128,22 @@ class ControllerExtensionModuleThematicActivities extends Controller {
 			$data['limit'] = 5;
 		}
 
+		if (isset($this->request->post['width'])) {
+			$data['width'] = $this->request->post['width'];
+		} elseif (!empty($module_info)) {
+			$data['width'] = $module_info['width'];
+		} else {
+			$data['width'] = 200;
+		}
+
+		if (isset($this->request->post['height'])) {
+			$data['height'] = $this->request->post['height'];
+		} elseif (!empty($module_info)) {
+			$data['height'] = $module_info['height'];
+		} else {
+			$data['height'] = 200;
+		}
+		
 		if (isset($this->request->post['status'])) {
 			$data['status'] = $this->request->post['status'];
 		} elseif (!empty($module_info)) {
@@ -150,6 +166,14 @@ class ControllerExtensionModuleThematicActivities extends Controller {
 
 		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
 			$this->error['name'] = $this->language->get('error_name');
+		}
+
+		if (!$this->request->post['width']) {
+			$this->error['width'] = $this->language->get('error_width');
+		}
+
+		if (!$this->request->post['height']) {
+			$this->error['height'] = $this->language->get('error_height');
 		}
 
 		return !$this->error;
