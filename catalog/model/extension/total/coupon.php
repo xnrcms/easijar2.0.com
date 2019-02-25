@@ -209,6 +209,8 @@ class ModelExtensionTotalCoupon extends Model {
             }
         }
 
+        $this->load->model('multiseller/seller');
+
         //找出每个商家对应的商品总额
 		$seller_price 	= [];
 	    foreach ($this->cart->getProducts() as $product) {
@@ -328,7 +330,7 @@ class ModelExtensionTotalCoupon extends Model {
 
         $results            = $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);
         $coupon             = [];
-
+ 
         foreach ($results as $key => $value)
         {
             if ($value['seller_id'] > 0 && $value['type'] == 1 && isset($seller_price[$value['seller_id']]) && ($seller_price[$value['seller_id']]['price2'] <= $value['order_total'] || $seller_price[$value['seller_id']]['price2'] <= $value['discount'])) {

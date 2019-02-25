@@ -102,6 +102,8 @@
 </footer>
 {% endif %}
 
+{{ include(helper.template('common/chat_button')) }}
+
 {% for script in scripts %}
 <script src="{{ script }}" type="text/javascript"></script>
 {% endfor %}

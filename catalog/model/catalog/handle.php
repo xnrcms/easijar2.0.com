@@ -97,7 +97,6 @@ class ModelCatalogHandle extends Model {
 
     public function del_product_status0($product_ids)
     {   
-        print_r(count($product_ids));echo '<br>';
         $delsql               = [];
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product WHERE product_id IN ('" . implode("','",$product_ids) . "')";
         $delsql[]             = "DELETE FROM " . DB_PREFIX . "product_description WHERE product_id IN ('" . implode("','",$product_ids) . "')";
@@ -730,5 +729,41 @@ class ModelCatalogHandle extends Model {
         $query = $this->db->query($sql);
 
         return $query->rows;
+    }
+
+    public function get_all_order_by_customer_id($customer_id = 0)
+    {
+        $query = $this->db->query("SELECT `order_id` FROM " . DB_PREFIX . "order WHERE customer_id = '" . (int)$customer_id . "'");
+        return $query->rows;
+    }
+
+    public function del_order_by_order_ids($order_ids)
+    {   
+        $delsql               = [];
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "order WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "order_history WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "order_product WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "order_total WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "order_variant WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "ms_order_product WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "ms_suborder WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+        $delsql[]             = "DELETE FROM " . DB_PREFIX . "ms_suborder_history WHERE order_id IN ('" . implode("','",$order_ids) . "')";
+
+        $query = $this->db->query("SELECT `order_total_id` FROM " . DB_PREFIX . "order_total WHERE order_id IN ('" . implode("','",$order_ids) . "')");
+        $totals     = $query->rows;
+
+        $totals_ids = [];
+
+        foreach ($totals as $key => $value) {
+            $totals_ids[$value['order_total_id']]   = $value['order_total_id'];
+        }
+
+        $totals_ids[0] = 0;
+
+        $delsql[]       = "DELETE FROM " . DB_PREFIX . "ms_order_total WHERE order_total_id IN ('" . implode("','",$totals_ids) . "')";
+ 
+        foreach ($delsql as $key => $value) {
+            $this->db->query($value);
+        }
     }
 }

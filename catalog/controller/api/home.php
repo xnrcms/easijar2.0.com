@@ -36,7 +36,7 @@ class ControllerApiHome extends Controller {
 		      if (is_file(DIR_IMAGE . $result['image'])) {
 		        $data['broadcast'][] = array(
 		          'title' => $result['title'],
-		          'link'  => $result['link'],
+		          'link'  => htmlspecialchars_decode($result['link']),
 		          'image' => $this->model_tool_image->resize($result['image'], $setting_info['width'], $setting_info['height'])
 		        );
 		      }
@@ -48,7 +48,7 @@ class ControllerApiHome extends Controller {
         $this->load->model('account/order');
 
 		$order_total       			= $this->model_account_order->getCustomerTotalOrders();
-	    $is_new_people 				= 0;//(int)$order_total > 0 ? 1 : 0;
+	    $is_new_people 				= (int)$order_total > 0 ? 1 : 0;
 		$data['is_new_people'] 		= $is_new_people;
 	    $data['new_people'] 		= [];
 
