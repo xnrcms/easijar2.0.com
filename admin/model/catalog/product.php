@@ -318,7 +318,7 @@ class ModelCatalogProduct extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'product_id=" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product WHERE product_id = '" . (int)$product_id . "'");
 
-		$this->cache->delete('product');
+		$this->cache->delete('product.id' . (int)$product_id);
 	}
 
 	public function getProduct($product_id) {
