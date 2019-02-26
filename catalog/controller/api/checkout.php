@@ -170,6 +170,12 @@ class ControllerApiCheckout extends Controller
         $products                    = $this->renderCartSection();
         $cart_products               = [];
         $coupon_list                 = isset($products['total_list_data']['coupon']) ? $products['total_list_data']['coupon'] : [];
+        $pcoupon                     = [];
+
+        if (isset($coupon_list[0])) {
+            $pcoupon                 = $coupon_list[0];
+            unset($coupon_list[0]);
+        }
 
         unset($products['total_list_data']);
 
@@ -180,14 +186,14 @@ class ControllerApiCheckout extends Controller
             $shipping_title  = $this->language->get('multiseller_shipping')->get('text_multiseller_shipping');
             $coupon_title    = $this->language->get('multiseller_coupon')->get('text_multiseller_coupon');
 
-            $totals         = isset($products['totals']) ? $products['totals'] : [];
-            $seller_ship    = [];
-            $ship_del       = [];
-            $ship_ototal    = [];
+            $product_totals  = isset($products['totals']) ? $products['totals'] : [];
+            $seller_ship     = [];
+            $ship_del        = [];
+            $ship_ototal     = [];
 
-            foreach ($totals as $tk => $tv) {
+            foreach ($product_totals as $tk => $tv) {
                 if (strpos('&#'.$tv['title'], '平台商品运费') >= 1 || strpos('&#'.$tv['title'], 'Platform shipping fee') >= 1) {
-                    unset($totals[$tk]);continue;
+                    unset($product_totals[$tk]);continue;
                 }
 
                 $tt                             = explode('&#', $tv['title']);
@@ -208,7 +214,7 @@ class ControllerApiCheckout extends Controller
                 if (isset($seller_ship[$value['seller_id'].'multiseller_shipping'])) {
                     $shipping           = $seller_ship[$value['seller_id'].'multiseller_shipping'];
                     $oshipping          = $ship_ototal[$value['seller_id'].'multiseller_shipping'];
-                    unset($totals[$ship_del[$value['seller_id'].'multiseller_shipping']]);
+                    unset($product_totals[$ship_del[$value['seller_id'].'multiseller_shipping']]);
                 }else{
                     $shipping           = '';
                     $oshipping          = 0;
@@ -218,7 +224,7 @@ class ControllerApiCheckout extends Controller
                 if (isset($seller_ship[$value['seller_id'].'multiseller_coupon'])) {
                     $coupon           = $seller_ship[$value['seller_id'].'multiseller_coupon'];
                     $ocoupon          = $ship_ototal[$value['seller_id'].'multiseller_coupon'];
-                    unset($totals[$ship_del[$value['seller_id'].'multiseller_coupon']]);
+                    unset($product_totals[$ship_del[$value['seller_id'].'multiseller_coupon']]);
                 }else{
                     $coupon           = '';
                     $ocoupon          = 0;
@@ -226,7 +232,15 @@ class ControllerApiCheckout extends Controller
 
                 $value['shipping']       = $shipping;
                 $value['coupon']         = !empty($coupon) ? $coupon : '';
-                $value['coupon_list']    = isset($coupon_list[$value['seller_id']]) ? $coupon_list[$value['seller_id']] : [];
+
+                if (isset($coupon_list[$value['seller_id']])) {
+                    $coupon_list         = $coupon_list[$value['seller_id']];
+                    sort($coupon_list);
+                }else{
+                    $coupon_list         = [];
+                }
+
+                $value['coupon_list']    = $coupon_list;
                 $value['seller_id']      = $value['seller_id'];
                 $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
                 
@@ -259,12 +273,13 @@ class ControllerApiCheckout extends Controller
             }
         }
 
-        sort($totals);
+        sort($product_totals);
+        sort($pcoupon);
 
-        $products['totals']                     = $totals;
+        $products['totals']                     = $product_totals;
         $products['coupon']                     = isset($seller_ship['0multiseller_coupon']) ? $seller_ship['0multiseller_coupon'] : '';
         $products['products']                   = $cart_products;
-        $products['coupon_list']                = isset($coupon_list[0]) ? $coupon_list[0] : [];
+        $products['coupon_list']                = $pcoupon;
 
         $json['cart_section']                   = $products;
 

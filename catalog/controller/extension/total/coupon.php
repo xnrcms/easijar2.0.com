@@ -61,20 +61,21 @@ class ControllerExtensionTotalCoupon extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function useCouponForApi($couponcode = '')
+	public function useCouponForApi($coupon_id = 0)
 	{
 		$this->load->language('extension/total/coupon');
 
-		$coupon_info 	= $this->model_extension_total_coupon->getCoupon($couponcode);
+		$coupon_info 	= $this->model_extension_total_coupon->getCoupon2($coupon_id);
 		$ret 			= [];
 
-		if (empty($couponcode)) {
+		/*if (empty($coupon_id)) {
 
 			$ret['error'] = $this->language->get('error_empty');
 			
-		} elseif ($coupon_info) {
+		} else*/
+		if (!empty($coupon_info)) {
 
-			$this->session->data['coupon'][$coupon_info['seller_id']] = $couponcode;
+			$this->session->data['coupon'][$coupon_info['seller_id']] = $coupon_info;
 			$ret['success'] = 'success';
 		} else {
 			$ret['error'] = $this->language->get('error_coupon');

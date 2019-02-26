@@ -303,7 +303,7 @@ class ModelExtensionTotalCoupon extends Model {
                     'seller_id'  => 0,
                     'code'       => 'multiseller_coupon',
                     'title'      => 'Platform&#0multiseller_coupon&#' . $title,
-                    'value'      => $seller_coupon,
+                    'value'      => $discount,
 					'sort_order' => $this->config->get('total_coupon_sort_order')
                 ];
 
@@ -330,7 +330,7 @@ class ModelExtensionTotalCoupon extends Model {
 
         $results            = $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);
         $coupon             = [];
- 
+
         foreach ($results as $key => $value)
         {
             if ($value['seller_id'] > 0 && $value['type'] == 1 && isset($seller_price[$value['seller_id']]) && ($seller_price[$value['seller_id']]['price2'] <= $value['order_total'] || $seller_price[$value['seller_id']]['price2'] <= $value['discount'])) {
@@ -508,9 +508,9 @@ class ModelExtensionTotalCoupon extends Model {
 
 	public function getCouponCodeByIdAndSellerId($coupon_id = 0,$seller_id = 0)
 	{
-		$query = $this->db->query("SELECT `code` FROM `" . DB_PREFIX . "coupon` WHERE coupon_id = '" . (int)$coupon_id . "' AND seller_id = '" . (int)$seller_id . "'");
+		$query = $this->db->query("SELECT `coupon_id` FROM `" . DB_PREFIX . "coupon_customer2` WHERE coupon_id = '" . (int)$coupon_id . "' AND seller_id = '" . (int)$seller_id . "' AND customer_id = '" . (int)$this->customer->getId() . "'");
 		
-		return (isset($query->row['code']) && !empty($query->row['code'])) ? $query->row['code'] : '';
+		return isset($query->row['coupon_id']) ? (int)$query->row['coupon_id'] : 0;
 	}
 
 	public function getNewPeopleCouponsTotal()

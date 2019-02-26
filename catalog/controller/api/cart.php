@@ -166,6 +166,10 @@ class ControllerApiCart extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'sku is error']));
         }
 
+        if (isset($this->session->data['coupon'])) {
+            unset($this->session->data['coupon']);
+        }
+
         $this->session->data['buy_type']        = $buy_type;
     	$product_info                           = $this->model_catalog_product->getProduct($product_id);
 
@@ -340,8 +344,8 @@ class ControllerApiCart extends Controller {
         //校验优惠券是否存在 存在获取使用码
         $this->load->model('extension/total/coupon');
         
-        $coupon = $this->model_extension_total_coupon->getCouponCodeByIdAndSellerId($req_data['coupon_id'],$req_data['seller_id']);
-        if (empty($coupon)) {
+        $coupon_id = $this->model_extension_total_coupon->getCouponCodeByIdAndSellerId($req_data['coupon_id'],$req_data['seller_id']);
+        if ($coupon_id <= 0) {
             return $this->response->setOutput($this->returnData(['msg'=>'no coupon']));
         }
 
@@ -349,7 +353,7 @@ class ControllerApiCart extends Controller {
             unset($this->session->data['coupon'][$req_data['seller_id']]);
         }
 
-        $coupon_info = $this->load->controller('extension/total/coupon/useCouponForApi',$coupon);
+        $coupon_info = $this->load->controller('extension/total/coupon/useCouponForApi',$coupon_id);
         if (isset($coupon_info['success']) && $coupon_info['success'] === 'success') {
             return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'coupon use success']));
         }else{
