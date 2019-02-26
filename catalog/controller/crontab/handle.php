@@ -14,31 +14,56 @@ class ControllerCrontabHandle extends Controller {
         $ini_time           = time();
 
         $filter_data        = [
-            'start'    => ($page - 1) * $limit,
-            'limit'    => $limit
+            'start'         => ($page - 1) * $limit,
+            'limit'         => $limit,
+            'product_id'    =>58216,
+            'language_id'   => 1
         ];
 
         if ($step == 0) {
             $this->session->data['handle_data']     = [];
             
             //统计需要处理的数据
-            $ptotals   = $this->model_catalog_handle->get_product_option_value_total();
-            $ototals   = $this->model_catalog_handle->get_options_description_total();
-            $vtotals   = $this->model_catalog_handle->get_variant_description_total(1);
-            $pdtotals  = $this->model_catalog_handle->get_product_description_totals();
+            $ptotals   = $this->model_catalog_handle->get_product_option_value_total($filter_data);
+            $ototals   = $this->model_catalog_handle->get_options_description_total($filter_data);
+            $vtotals   = $this->model_catalog_handle->get_variant_description_total($filter_data);
+            $pdtotals  = $this->model_catalog_handle->get_product_description_totals($filter_data);
 
             $this->session->data['handle_data']['ptotals']   = $ptotals;
             $this->session->data['handle_data']['ototals']   = $ototals;
             $this->session->data['handle_data']['vtotals']   = $vtotals;
             $this->session->data['handle_data']['pdtotals']  = $pdtotals;
             $this->session->data['handle_data']['data']      = ['ok'=>0];
-            
+
             $this->echo_log([
                 'handle_name'=>'处理数据准备中'
             ]);
-            //print_r($this->session->data['handle_data']);exit();
-            $this->jumpurl($this->url->link('crontab/handle','step=7'));
-        }else if ($step == 2) {//处理商品
+            //print_r($filter_data);exit();
+            $this->jumpurl($this->url->link('crontab/handle','step=16'));
+        }else if ($step == 16) {//综合处理
+            $totals        = $this->model_catalog_handle->getProductsTotals($filter_data);
+            $plist         = $this->model_catalog_handle->getProducts($filter_data);
+            
+            if (!empty($plist))
+            {
+                foreach ($plist as $product) {
+                    //单个商品逐个处理
+                    //第一步 整理商品名称并且做翻译
+                    $this->handle_product_info_for_name($product);
+                    
+                    //第二步 整理商品列表,生成子商品
+                    $this->handle_product_children($product);
+                }
+
+                $page ++;
+            }else{
+                $page   = 0;
+                $step   = 100;
+            }
+
+            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+        }
+        else if ($step == 2) {//处理商品
             echo "ok";exit();
             //需要处理的商品列表
             $product_info                   = $this->model_catalog_handle->get_product_option_value_list($filter_data);
@@ -98,7 +123,7 @@ class ControllerCrontabHandle extends Controller {
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 1) {//处理属性
-            echo "ok";exit();
+
             $option_info                    = $this->model_catalog_handle->get_options_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['ototals'] - $limit * $page);
             $remainder1                     = $this->session->data['handle_data']['ototals'] - $remainder;
@@ -123,7 +148,7 @@ class ControllerCrontabHandle extends Controller {
                 $page ++;
             }else{
                 $page = 0;
-                $step ++;
+                $step = 16;
             }
 
             $this->echo_log([
@@ -803,6 +828,71 @@ echo "ok";exit();
         return 3;
     }
 
+    private function handle_product_children($info)
+    {
+        if (!empty($info))
+        {
+            //首先获取主产品信息
+            $pinfo1                      = $this->model_catalog_handle->get_product($info['product_id']);
+            $pinfo2                      = $this->model_catalog_handle->get_product_description($info['product_id']);
+            $category                    = $this->model_catalog_handle->get_product_to_category($info['product_id']);
+            $save_data1                  = $pinfo1;//商品数据
+            $save_data2                  = $pinfo2;//商品详情数据
+            $save_data3                  = [];//分类数据
+
+            unset($save_data1['product_id']);
+            unset($save_data1['sku']);
+            unset($save_data2['language_id']);
+            unset($save_data2['product_id']);
+
+            $shop                       = [108=>1,110=>2,130=>3,112=>4,113=>5,114=>6,153=>7,184=>8];
+            $seller_id                  = 0;
+            if (!empty($category)) {
+                foreach ($category as $key => $value) {
+                    $save_data3[$value['category_id']]   = $value['category_id'];
+                    if (isset($shop[$value['category_id']])) {
+                        $seller_id  = $shop[$value['category_id']];
+                    }
+                }
+
+                sort($save_data3);
+            }
+
+            $save_data1['seller_id']  = $seller_id;
+            $this->handle_product_info($info['product_id'],$save_data1,$save_data2,$save_data3);
+        }
+    }
+
+    private function handle_product_info_for_name($info)
+    {
+        if (!empty($info))
+        {
+            $updata                         = [];
+            $updata['language_id']          = 2;
+            $updata['product_id']           = $info['product_id'];
+            $updata['name']                 = isset($info['name']) ? $this->filter_keywords($info['name']) : '';
+            $updata['tag']                  = $updata['name'];
+            $updata['meta_title']           = $updata['name'];
+            $updata['meta_description']     = $updata['name'];
+            $updata['meta_keyword']         = $updata['name'];
+            $description                    = isset($info['description']) ? $info['description'] : '';
+            $updata['description']          = str_replace(['http://v2.easijar.com','https://v2.easijar.com','http://10.5.151.185','https://10.5.151.185'],['..','..','..','..'], $description);
+
+            $this->model_catalog_handle->update_product_description($updata);
+            //print_r($updata);
+
+            //翻译入库
+            $updata['language_id']          = 1;
+            $updata['name']                 = $this->handle_translate($updata['name']);
+            $updata['tag']                  = $updata['name'];
+            $updata['meta_title']           = $updata['name'];
+            $updata['meta_description']     = $updata['name'];
+            $updata['meta_keyword']         = $updata['name'];
+            //print_r($updata);exit();
+            $this->model_catalog_handle->update_product_description($updata);
+        }
+    }
+
     private function handle_translate($str)
     {
         if (empty($str) || strlen($str) <= 0)  return '';
@@ -823,17 +913,10 @@ echo "ok";exit();
         $this->model_catalog_handle->add_ms_product_seller($product_id,$product['seller_id']);
 
         //获取seo地址
-        $seo_url    = $this->model_catalog_handle->get_seo_url($product_id);
+        $seo_url                        = $this->model_catalog_handle->get_seo_url($product_id);
 
         //获取需要处理的选项产品
         $product_option_value_lists     = $this->model_catalog_handle->get_product_option_value_lists(['product_id'=>$product_id]);
- 
-        //$product_count                  = count($product_option_value_lists);
-        //if ($product_count <= 1) return;
-        //$this->model_catalog_handle->add_product($product_count,$product_id,$product,$product_desc,$category);
-        //$products   = $this->model_catalog_handle->get_products(1927);
-
-
         $code                           = [];
         if (!empty($product_option_value_lists)) {
             foreach ($product_option_value_lists as $key => $value) {
@@ -1078,7 +1161,7 @@ echo "ok";exit();
         set_time_limit(0);
         $this->load->model('catalog/handle');
 
-        $customer_id    = 35;
+        $customer_id    = 9;
         $oids           = [];
 
         $order_ids      = $this->model_catalog_handle->get_all_order_by_customer_id($customer_id);

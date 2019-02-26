@@ -1,5 +1,43 @@
 <?php
 class ModelCatalogHandle extends Model {
+
+    public function getProducts($filter_data)
+    {
+        $fields         = format_find_field('product_id,parent_id','p');
+        $fields         .= ',' . format_find_field('name,language_id,description','pd');
+        $language_id    = isset($filter_data['language_id']) ? $filter_data['language_id'] : 0;
+        $parent_id      = isset($filter_data['parent_id']) ? $filter_data['parent_id'] : 0;
+        $product_id     = isset($filter_data['product_id']) ? $filter_data['product_id'] : 0;
+
+        $sql = "SELECT " . $fields . " FROM `oc_product` p LEFT JOIN `oc_product_description` pd ON p.product_id = pd.product_id WHERE pd.language_id = '" . (int)$language_id . "' AND p.parent_id = '" . (int)$parent_id . "' AND p.product_id > '" . $product_id . "'";
+
+        if (isset($filter_data['start']) || isset($filter_data['limit'])) {
+            if ($filter_data['start'] < 0) {
+                $filter_data['start'] = 0;
+            }
+
+            if ($filter_data['limit'] < 1) {
+                $filter_data['limit'] = 20;
+            }
+
+            $sql .= " ORDER BY product_id ASC LIMIT " . (int)$filter_data['start'] . "," . (int)$filter_data['limit'];
+        }
+
+        $query = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function getProductsTotals($filter_data)
+    {
+        $language_id    = isset($filter_data['language_id']) ? $filter_data['language_id'] : 0;
+        $parent_id      = isset($filter_data['parent_id']) ? $filter_data['parent_id'] : 0;
+        $product_id     = isset($filter_data['product_id']) ? $filter_data['product_id'] : 0;
+
+        $sql = "SELECT COUNT(*) AS total FROM " . get_tabname('product') . " p LEFT JOIN " . get_tabname('product_description') . " pd ON p.product_id = pd.product_id WHERE pd.language_id = '" . (int)$language_id . "' AND p.parent_id = '" . (int)$parent_id . "' AND p.product_id > '" . $product_id . "'";
+        $query = $this->db->query($sql);
+        return $query->row['total'];
+    }
+
     public function get_product_description_totals()
     {
         $query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_description WHERE language_id = 1");
@@ -186,9 +224,10 @@ class ModelCatalogHandle extends Model {
 
     }
 
-    public function get_product_option_value_total()
+    public function get_product_option_value_total($filter_data)
     {
-    	$query = $this->db->query("SELECT COUNT(total) AS total FROM (SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_option_value WHERE 1 GROUP BY product_id) AS tt WHERE 1");
+        $product_id     = isset($filter_data['product_id']) ? (int)$filter_data['product_id'] : 0;
+    	$query = $this->db->query("SELECT COUNT(total) AS total FROM (SELECT COUNT(*) as total FROM " . DB_PREFIX . "product_option_value WHERE product_id > " . $product_id . " GROUP BY product_id) AS tt WHERE 1");
       	return $query->row['total'];
     }
 
@@ -211,15 +250,15 @@ class ModelCatalogHandle extends Model {
       	return $query->row;
     }
 
-    public function get_options_description_total()
+    public function get_options_description_total($filter_data)
     {
-    	$query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "option_description WHERE language_id = 2 AND option_id > 12");
+    	$query = $this->db->query("SELECT COUNT(*) as total FROM " . DB_PREFIX . "option_description WHERE language_id = 2");
       	return $query->row['total'];
     }
 
     public function get_options_description_list($data)
     {
-    	$sql 	= "SELECT option_id,name FROM " . DB_PREFIX . "option_description WHERE language_id = 2 AND option_id > 12";
+    	$sql 	= "SELECT option_id,name FROM " . DB_PREFIX . "option_description WHERE language_id = 2";
 
     	if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -459,8 +498,8 @@ class ModelCatalogHandle extends Model {
 
     public function get_product_description($product_id)
     {
-    	$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_description WHERE language_id = 1 AND product_id = '" . (int)$product_id . "'");
-    	return $query->row;
+    	$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "' ORDER BY language_id ASC");
+    	return $query->rows;
     }
 
     public function add_product_to_category2($product_id,$cats)
@@ -556,15 +595,17 @@ class ModelCatalogHandle extends Model {
     		$this->add_product_to_category($child_pro_id,$category);
             $this->add_ms_product_seller($child_pro_id,$seller_id);
             $this->add_seo_url($child_pro_id,$seo_url);
+            $this->add_product_image([['product_id'=>$child_pro_id,'image'=>$product['image']]]);
 
-    		$product_desc['product_id'] 		= $child_pro_id;
+    		$product_desc[1]['product_id'] 		= $child_pro_id;
+            $product_desc[2]['product_id']      = $child_pro_id;
 
     		for ($j=1; $j <=2 ; $j++)
     		{ 
     			$insql 							= "INSERT INTO " . DB_PREFIX . "product_description SET ";
-    			$product_desc['language_id'] 	= $j;
+                $pdesc                          = isset($product_desc[$j+1]) ? $product_desc[$j+1] : [];
 
-    			foreach ($product_desc as $key => $value)
+    			foreach ($pdesc as $key => $value)
     			{
 	    			$insql 	.= $key . " = '" . $this->db->escape($value) . "',";
 	    		}

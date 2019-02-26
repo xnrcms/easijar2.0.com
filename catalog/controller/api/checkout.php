@@ -191,7 +191,7 @@ class ControllerApiCheckout extends Controller
                 }
 
                 $tt                             = explode('&#', $tv['title']);
-                if (count($tt) == 3 && (int)$tt[1] > 0 ) {
+                if (count($tt) == 3 && (int)$tt[1] >= 0 ) {
                     $seller_ship[$tt[1]]      = $tv['text'];
                     $ship_del[$tt[1]]         = $tk;
                     $ship_ototal[$tt[1]]      = $tv['ototal'];
@@ -262,6 +262,7 @@ class ControllerApiCheckout extends Controller
         sort($totals);
 
         $products['totals']                     = $totals;
+        $products['coupon']                     = isset($seller_ship['0multiseller_coupon']) ? $seller_ship['0multiseller_coupon'] : '';
         $products['products']                   = $cart_products;
         $products['coupon_list']                = isset($coupon_list[0]) ? $coupon_list[0] : [];
 
@@ -1052,6 +1053,27 @@ class ControllerApiCheckout extends Controller
                 'text'      => $this->currency->format($total['value'], $this->session->data['currency']),
                 'ototal'    => $total['value']
             );
+        }
+
+        if ( isset($total_list_data['coupon']) && !empty($total_list_data['coupon'])) {
+            foreach ($total_list_data['coupon'] as $tldkey => $tldvalue)
+            {
+                if (!empty($tldvalue)) {
+                    foreach ($tldvalue as $tldkey1 => $tldvalue1)
+                    {
+                        $discount       = sprintf("%.2f", $tldvalue1['discount']);
+
+                        if ($tldvalue1['type'] == 2) {
+                            $discount          = round($discount) . '%';
+                        } else {
+                            $discount          = $this->currency->format($discount, $this->session->data['currency']);
+                        }
+
+                        $tldvalue1['discount']              = $discount;
+                        $total_list_data['coupon'][$tldkey][$tldkey1] = $tldvalue1;
+                    }
+                }
+            }
         }
 
         return [$results,$total_list_data];

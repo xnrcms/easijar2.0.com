@@ -80,7 +80,125 @@ class ControllerApiThematicActivities extends Controller {
                 ];
             }
         }
-                wr($results['products']);
+
+        $json['product_list']        = $recommend;
+        
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
+    }
+
+    //低价包邮
+    public function cheap_mail() 
+    {   
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        $json['currency']       = $this->currency->getSymbolLeft($this->session->data['currency']);
+        $json['product_list']   = [];
+
+        $this->load->model('setting/module');
+
+        //推荐商品
+        $module_id                  = 57;
+        $setting_info               = $this->model_setting_module->getModule($module_id);
+        $setting_info['module_id']  = $module_id;
+        $setting_info['api']        = true;
+
+        $results                    = $this->load->controller('extension/module/thematic_activities', $setting_info,true);
+
+        $recommend                  = [];
+        if (isset($results['products']) && !empty($results['products'])) {
+            foreach ($results['products'] as $rval)
+            {
+                $price              = trim($rval['price'],$json['currency']);
+                $special            = !empty($rval['special']) ? trim($rval['price'],$json['currency']) : $price;
+
+                $recommend[]        = [
+                    'product_id'    => $rval['product_id'],
+                    'name'          => $rval['name'],
+                    'thumb'         => $rval['thumb'],
+                    'price'         => $special,
+                    //'special'       => $special,
+                    'rating'        => $rval['rating'],
+                    'reviews'       => $rval['reviews'],
+                ];
+            }
+        }
+
+        $json['product_list']        = $recommend;
+        
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
+    }
+
+    //折扣专区
+    public function discount_zone() 
+    {   
+        $this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        $json['currency']       = $this->currency->getSymbolLeft($this->session->data['currency']);
+        $json['product_list']   = [];
+
+        $this->load->model('setting/module');
+
+        //推荐商品
+        $module_id                  = 59;
+        $setting_info               = $this->model_setting_module->getModule($module_id);
+        $setting_info['module_id']  = $module_id;
+        $setting_info['api']        = true;
+
+        $results                    = $this->load->controller('extension/module/thematic_activities', $setting_info,true);
+
+        $recommend                  = [];
+        if (isset($results['products']) && !empty($results['products'])) {
+            foreach ($results['products'] as $rval)
+            {
+                $price              = trim($rval['price'],$json['currency']);
+                $special            = !empty($rval['special']) ? trim($rval['price'],$json['currency']) : $price;
+
+                $recommend[]        = [
+                    'product_id'    => $rval['product_id'],
+                    'name'          => $rval['name'],
+                    'thumb'         => $rval['thumb'],
+                    'price'         => $special,
+                    //'special'       => $special,
+                    'rating'        => $rval['rating'],
+                    'reviews'       => $rval['reviews'],
+                ];
+            }
+        }
+
         $json['product_list']        = $recommend;
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
