@@ -586,10 +586,16 @@ class ModelExtensionTotalCoupon extends Model {
 	private function checkProuctIsUseCoupon($product_id = 0)
 	{
 	    $this->load->model('setting/module');
-	    //低价包邮
-	    $setting_info 		= $this->model_setting_module->getModule(57);
 
-	    wr($setting_info);
+	    $checkModule 		= [57,58,59];
+	    foreach ($checkModule as $module_id)
+	    {
+		    $setting_info 		= $this->model_setting_module->getModule($module_id);
+		    if (!empty($setting_info) && isset($setting['product']) && !empty($setting['product']) && in_array($product_id, $setting['product'])) {
+		    	return true;
+		    }
+	    }
+
 	    return false;
 	}
 }

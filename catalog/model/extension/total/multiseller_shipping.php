@@ -6,7 +6,11 @@ class ModelExtensionTotalMultisellerShipping extends Model {
         'by_count'   => 3
     );
 	public function getTotal($total) {
-		if ($this->cart->hasShipping() && isset($this->session->data['shipping_address'])) {
+		if ($this->cart->hasShipping() && isset($this->session->data['shipping_address']))
+        {
+            foreach ($this->cart->getProducts() as $product) {
+                if ($this->checkProuctIsUseCoupon($product['product_id'])) return;
+            }
 
 		    $title = '';  // 运费total标题
 		    $cost = 0;  //运费金额
@@ -193,5 +197,21 @@ class ModelExtensionTotalMultisellerShipping extends Model {
         $to = $this->model_localisation_length_class->getLengthClass($unit_to);
 
         return $length * $to['value'] / $from['value'];
+    }
+
+    private function checkProuctIsUseCoupon($product_id = 0)
+    {
+        $this->load->model('setting/module');
+
+        $checkModule        = [57,58,59];
+        foreach ($checkModule as $module_id)
+        {
+            $setting_info       = $this->model_setting_module->getModule($module_id);
+            if (!empty($setting_info) && isset($setting['product']) && !empty($setting['product']) && in_array($product_id, $setting['product'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
