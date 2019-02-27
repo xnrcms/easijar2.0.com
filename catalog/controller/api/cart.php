@@ -335,9 +335,9 @@ class ControllerApiCart extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'coupon_id is error']));
         }
 
-        if (!(isset($req_data['seller_id']) && intval($req_data['seller_id']) >=1)) {
+        /*if (!(isset($req_data['seller_id']) && intval($req_data['seller_id']) >=0)) {
             return $this->response->setOutput($this->returnData(['msg'=>'seller_id is error']));
-        }
+        }*/
 
         $this->cart->setCartBuyType((isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0));
 
@@ -632,5 +632,33 @@ class ControllerApiCart extends Controller {
 
         // $total = 总金额, $totals = 费用明细
         return array($total, $totals);
+    }
+
+    public function get_cart_count()
+    {
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('checkout/cart');
+
+        $allowKey       = ['api_token'];
+        $req_data       = $this->dataFilter($allowKey);
+        $json           =  $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        $this->cart->setCartBuyType(0);
+
+        $data['cart_nums']      = $this->cart->countProducts();
+
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$data]));
     }
 }

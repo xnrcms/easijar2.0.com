@@ -73,6 +73,7 @@ class ControllerExtensionTotalCoupon extends Controller {
 			$ret['error'] = $this->language->get('error_empty');
 			
 		} else*/
+		
 		if (!empty($coupon_info)) {
 
 			$this->session->data['coupon'][$coupon_info['seller_id']] = $coupon_info;

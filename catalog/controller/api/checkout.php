@@ -274,8 +274,7 @@ class ControllerApiCheckout extends Controller
         }
 
         sort($product_totals);
-        sort($pcoupon);
-
+        
         $products['totals']                     = $product_totals;
         $products['coupon']                     = isset($seller_ship['0multiseller_coupon']) ? $seller_ship['0multiseller_coupon'] : '';
         $products['products']                   = $cart_products;
