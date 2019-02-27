@@ -191,8 +191,8 @@ class ControllerApiThematicActivities extends Controller {
                     'product_id'    => $rval['product_id'],
                     'name'          => $rval['name'],
                     'thumb'         => $rval['thumb'],
-                    'price'         => $special,
-                    //'special'       => $special,
+                    'price'         => $price,
+                    'special'       => $special,
                     'rating'        => $rval['rating'],
                     'reviews'       => $rval['reviews'],
                 ];

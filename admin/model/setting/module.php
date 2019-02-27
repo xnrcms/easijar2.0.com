@@ -8,21 +8,33 @@ class ModelSettingModule extends Model {
 	
 	public function editModule($module_id, $data) {
 		$this->db->query("UPDATE `" . DB_PREFIX . "module` SET `name` = '" . $this->db->escape((string)$data['name']) . "', `setting` = '" . $this->db->escape(json_encode($data)) . "' WHERE `module_id` = '" . (int)$module_id . "'");
+		
+		$this->cache->delete('SettingModule_id=' . (int)$module_id);
 	}
 
 	public function deleteModule($module_id) {
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "module` WHERE `module_id` = '" . (int)$module_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "layout_module` WHERE `code` LIKE '%." . (int)$module_id . "'");
+
+		$this->cache->delete('SettingModule_id=' . (int)$module_id);
 	}
 		
 	public function getModule($module_id) {
-		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "module` WHERE `module_id` = '" . (int)$module_id . "'");
+		$cache_key   = 'SettingModule_id=' . (int)$module_id . '.getModule.ByModuleId';
+        $result      = $this->cache->get($cache_key);
 
-		if ($query->row) {
-			return json_decode($query->row['setting'], true);
-		} else {
-			return array();
+        if ($result && is_array($result))  return $result;
+
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "module WHERE module_id = '" . (int)$module_id . "'");
+		
+		$setting 	= [];
+		if ($query->row)
+		{
+			$setting = !empty($query->row['setting'])?json_decode($query->row['setting'], true):[];	
+			$this->cache->set($cache_key, $setting);
 		}
+
+		return $setting;
 	}
 	
 	public function getModules() {

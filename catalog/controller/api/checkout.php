@@ -178,7 +178,7 @@ class ControllerApiCheckout extends Controller
         }
 
         unset($products['total_list_data']);
-
+        
         if ( isset($products['products']) && !empty($products['products'])) {
 
             $this->load->language('extension/total/multiseller_shipping', 'multiseller_shipping');
@@ -190,6 +190,7 @@ class ControllerApiCheckout extends Controller
             $seller_ship     = [];
             $ship_del        = [];
             $ship_ototal     = [];
+            $ship_id         = [];
 
             foreach ($product_totals as $tk => $tv) {
                 if (strpos('&#'.$tv['title'], '平台商品运费') >= 1 || strpos('&#'.$tv['title'], 'Platform shipping fee') >= 1) {
@@ -199,6 +200,7 @@ class ControllerApiCheckout extends Controller
                 $tt                             = explode('&#', $tv['title']);
                 if (count($tt) == 3 && (int)$tt[1] >= 0 ) {
                     $seller_ship[$tt[1]]      = $tv['text'];
+                    $ship_id[$tt[1]]          = $tv['total_id'];
                     $ship_del[$tt[1]]         = $tk;
                     $ship_ototal[$tt[1]]      = $tv['ototal'];
                 }
@@ -224,14 +226,17 @@ class ControllerApiCheckout extends Controller
                 if (isset($seller_ship[$value['seller_id'].'multiseller_coupon'])) {
                     $coupon           = $seller_ship[$value['seller_id'].'multiseller_coupon'];
                     $ocoupon          = $ship_ototal[$value['seller_id'].'multiseller_coupon'];
+                    $coupon_id        = $ship_id[$value['seller_id'].'multiseller_coupon'];
                     unset($product_totals[$ship_del[$value['seller_id'].'multiseller_coupon']]);
                 }else{
                     $coupon           = '';
                     $ocoupon          = 0;
+                    $coupon_id        = -1;
                 }
 
                 $value['shipping']       = $shipping;
                 $value['coupon']         = !empty($coupon) ? $coupon : '';
+                $value['coupon_id']      = $coupon_id;
 
                 if (isset($coupon_list[$value['seller_id']])) {
                     $coupon_list         = $coupon_list[$value['seller_id']];
@@ -274,9 +279,12 @@ class ControllerApiCheckout extends Controller
         }
 
         sort($product_totals);
-        
+
+        $pcoupon                                = !empty($pcoupon) ? array_values($pcoupon) : [];
+
         $products['totals']                     = $product_totals;
         $products['coupon']                     = isset($seller_ship['0multiseller_coupon']) ? $seller_ship['0multiseller_coupon'] : '';
+        $products['coupon_id']                  = isset($ship_id['0multiseller_coupon']) ? $ship_id['0multiseller_coupon'] : -1;
         $products['products']                   = $cart_products;
         $products['coupon_list']                = $pcoupon;
 
@@ -1063,6 +1071,7 @@ class ControllerApiCheckout extends Controller
 
         foreach ($totals as $total) {
             $results[] = array(
+                'total_id'  => isset($total['total_id']) ? (int)$total['total_id'] : 0,
                 'title'     => $total['title'],
                 'text'      => $this->currency->format($total['value'], $this->session->data['currency']),
                 'ototal'    => $total['value']

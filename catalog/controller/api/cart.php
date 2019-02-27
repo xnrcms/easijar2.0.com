@@ -325,7 +325,7 @@ class ControllerApiCart extends Controller {
 
         if ($req_data['coupon_id']  == '-1') {
             if (isset($this->session->data['coupon'][$req_data['seller_id']])) {
-                unset($this->session->data['coupon'][$req_data['seller_id']]);
+                $this->session->data['coupon'][$req_data['seller_id']] = [];
             }
 
             return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'coupon cancle success']));

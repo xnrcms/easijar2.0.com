@@ -4,9 +4,9 @@ class ModelExtensionTotalCoupon extends Model {
 		$status = true;
 		$coupon_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "coupon_customer2` WHERE coupon_id = '" . (int)$coupon_id . "' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW()))");
 		if ($coupon_query->num_rows) {
-			if ($coupon_query->row['order_total'] > $this->cart->getSellerTotal($coupon_query->row['seller_id'])) {
+			/*if ($coupon_query->row['order_total'] > $this->cart->getSellerTotal($coupon_query->row['seller_id'])) {
 				$status = false;
-			}
+			}*/
 
 			$coupon_total = $this->getTotalCouponHistoriesByCouponId($coupon_id);
 
@@ -193,6 +193,9 @@ class ModelExtensionTotalCoupon extends Model {
 
 	public function getTotal($total)
 	{
+		foreach ($this->cart->getProducts() as $product) {
+			if ($this->checkProuctIsUseCoupon($product['product_id'])) return [];
+		}
 		//找出每个商家对应的运费
 		$tts 			= isset($total['totals']) ? $total['totals'] : [];
 		$seller_ship    = [];
@@ -214,6 +217,7 @@ class ModelExtensionTotalCoupon extends Model {
         //找出每个商家对应的商品总额
 		$seller_price 	= [];
 	    foreach ($this->cart->getProducts() as $product) {
+
             $seller_info 	= $this->model_multiseller_seller->getSeller($product['seller_id']);
             $seller_id 		= $seller_info ? $seller_info['seller_id'] : 0;
             if ($seller_id == 0) {
@@ -254,6 +258,7 @@ class ModelExtensionTotalCoupon extends Model {
 	            		$amount_coupon += $seller_coupon;
 	            		$total['totals'][] = array(
 		                    'seller_id'  => $key,
+                    		'total_id' 	 => $this->session->data['coupon'][$key]['coupon_id'],
 		                    'code'       => 'multiseller_coupon',
 		                    'title'      => $value['seller_name'] . '&#'.$key.'multiseller_coupon&#' . $title,
 		                    'value'      => $seller_coupon,
@@ -268,12 +273,13 @@ class ModelExtensionTotalCoupon extends Model {
             }
 
             $coupon_key 		= -1;
+
             if (isset($select_coupons[0])) {
             	foreach ($select_coupons[0] as $sckey => $scvalue) {
             		if ($scvalue['order_total'] >= $total['total']) {
             			unset($select_coupons[0][$sckey]);
             		}else{
-            			if (isset($this->session->data['coupon'][0])) {
+            			if (isset($this->session->data['coupon'][0]) && !empty($this->session->data['coupon'][0])) {
             				$selected_coupon_id 	= $this->session->data['coupon'][0]['coupon_id'];
             				if ($scvalue['coupon_id'] === $selected_coupon_id) {
             					$coupon_key 	= $sckey;
@@ -281,6 +287,12 @@ class ModelExtensionTotalCoupon extends Model {
             			}
             		}
             	}
+            }
+
+            //不适用平台优惠券
+            if (isset($this->session->data['coupon'][0]) && empty($this->session->data['coupon'][0]))
+            {
+            	return $select_coupons;
             }
 
             if ($coupon_key < 0) {
@@ -298,9 +310,11 @@ class ModelExtensionTotalCoupon extends Model {
 				}
 
 				$title 				= sprintf($this->language->get('coupon')->get('text_coupon'), $select_coupons[0][$coupon_key]['coupon_id']);
+
             	$total['total'] 					-= $discount;
             	$total['totals'][] = [
                     'seller_id'  => 0,
+                    'total_id' 	 => $platform_coupon['coupon_id'],
                     'code'       => 'multiseller_coupon',
                     'title'      => 'Platform&#0multiseller_coupon&#' . $title,
                     'value'      => $discount,
@@ -567,5 +581,15 @@ class ModelExtensionTotalCoupon extends Model {
             $this->db->query($sql);
             $this->db->query("UPDATE " . DB_PREFIX . "coupon2 SET get_total = (get_total + 1) WHERE coupon_id IN ('" .implode("','",$coupon_id). "')");
         }
+	}
+
+	private function checkProuctIsUseCoupon($product_id = 0)
+	{
+	    $this->load->model('setting/module');
+	    //低价包邮
+	    $setting_info 		= $this->model_setting_module->getModule(57);
+
+	    wr($setting_info);
+	    return false;
 	}
 }
