@@ -338,6 +338,7 @@ class ModelExtensionTotalCoupon extends Model {
             'order'         => 'DESC',
             'start'         => 0,
             'limit'         => 200,
+            'status'		=> 1,
         ];
 
         $this->load->model('customercoupon/coupon');
