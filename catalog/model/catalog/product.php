@@ -641,7 +641,8 @@ class ModelCatalogProduct extends Model {
 			$rating = false;
 		}*/
 
-		$discount 		= ($special_c > 0 && $price_c >= $special_c) ? sprintf('%.2f',(($price_c - $special_c) / 100)*100) : 0;
+		$discount 		= ($special_c > 0 && $price_c >= $special_c) ? (($price_c - $special_c) / $price_c)*100 : 0;
+
         return array(
             'product_id'  => $product['product_id'],
             'thumb'       => $image,
@@ -654,7 +655,7 @@ class ModelCatalogProduct extends Model {
             'minimum'     => $product['minimum'] ?: 1,
             'sales'       => (int)$product['sales'],
 			'quantity'    => $product['quantity'],
-			'discount'    => $discount,
+			'discount'    => round($discount,0),
 			'rating'  	  => (int)$product['rating'],
 			'reviews'  	  => (int)$product['reviews'],
             'href'        => $href ?: $this->url->link('product/product', 'product_id=' . $product['product_id'])
