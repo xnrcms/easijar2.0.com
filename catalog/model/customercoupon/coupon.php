@@ -123,6 +123,10 @@ class ModelCustomercouponCoupon extends Model
             }
         }
 
+        if(isset($data['status'])){
+            $sql    .= " AND c.status < c.uses_limit";
+        }
+
         $sort_data  = [
             'c.coupon_id',
             'c.date_added',

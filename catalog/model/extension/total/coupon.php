@@ -2,7 +2,7 @@
 class ModelExtensionTotalCoupon extends Model {
 	public function getCoupon2($coupon_id,$total=0){
 		$status = true;
-		$coupon_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "coupon_customer2` WHERE coupon_id = '" . (int)$coupon_id . "' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW()))");
+		$coupon_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "coupon_customer2` WHERE coupon_id = '" . (int)$coupon_id . "' AND ((date_start = '0000-00-00' OR date_start < NOW()) AND status < uses_limit AND (date_end = '0000-00-00' OR date_end > NOW()))");
 		if ($coupon_query->num_rows) {
 			/*if ($coupon_query->row['order_total'] > $this->cart->getSellerTotal($coupon_query->row['seller_id'])) {
 				$status = false;
