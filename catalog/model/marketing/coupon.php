@@ -223,6 +223,11 @@ class ModelMarketingCoupon extends Model {
 		$this->getCoupon2($coupon_id);
 	}
 
+	public function setCouponStatus($coupon_id = 0)
+	{
+		$this->db->query("UPDATE " . DB_PREFIX . "coupon2 SET status = (status + 1) WHERE coupon_id = '" . (int)$coupon_id . "'");
+		$this->cache->delete('coupon2.coupon_id' . (int)$coupon_id);
+	}
 
 	public function checkCoupon2($coupon_ids) {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "coupon2 WHERE status = 1 AND coupon_id IN ('" . implode("','",$coupon_ids) . "')");

@@ -74,7 +74,11 @@ class ModelCheckoutOrder extends Model {
 
 		// Totals
 		if (isset($data['totals'])) {
+
+			$this->load->model('marketing/coupon');
+
 			foreach ($data['totals'] as $total) {
+				$this->setCouponStatus($total);
 				$this->db->query("INSERT INTO " . DB_PREFIX . "order_total SET order_id = '" . (int)$order_id . "', code = '" . $this->db->escape($total['code']) . "', title = '" . $this->db->escape($total['title']) . "', `value` = '" . (float)$total['value'] . "', sort_order = '" . (int)$total['sort_order'] . "'");
 			}
 		}
@@ -779,5 +783,14 @@ class ModelCheckoutOrder extends Model {
 		$ext_data 		= [];
 
 		return array_merge($order_query->row,$ext_data);
+	}
+
+	private function setCouponStatus($data = [])
+	{
+		if (!empty($data) && isset($data['code']) && $data['code'] === 'multiseller_coupon')
+		{
+			$total_id 		= isset($data['total_id']) ? (int)$data['total_id'] : 0;
+			$this->model_marketing_coupon->setCouponStatus($total_id);
+		}
 	}
 }

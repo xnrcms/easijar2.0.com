@@ -39,7 +39,7 @@ class ControllerCrontabHandle extends Controller {
                 'handle_name'=>'处理数据准备中'
             ]);
             //print_r($filter_data);exit();
-            $this->jumpurl($this->url->link('crontab/handle','step=16'));
+            $this->jumpurl($this->url->link('crontab/handle','step=1'));
         }else if ($step == 16) {//综合处理
             $totals        = $this->model_catalog_handle->getProductsTotals($filter_data);
             $plist         = $this->model_catalog_handle->getProducts($filter_data);
@@ -898,7 +898,7 @@ echo "ok";exit();
         if (empty($str) || strlen($str) <= 0)  return '';
         if ($this->string_type($str) === 1) return '';
 
-        //return 'en-'.$str;
+        return 'en-'.$str;
         //开始翻译
         $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['d'=>'en','q'=>$str,'s'=>'zh-cn']);
         return !empty($outputStr) ? ucfirst($outputStr) : $str;

@@ -597,13 +597,13 @@ class ModelCatalogHandle extends Model {
             $this->add_seo_url($child_pro_id,$seo_url);
             $this->add_product_image([['product_id'=>$child_pro_id,'image'=>$product['image']]]);
 
-    		$product_desc[1]['product_id'] 		= $child_pro_id;
-            $product_desc[2]['product_id']      = $child_pro_id;
+    		$product_desc[0]['product_id'] 		= $child_pro_id;
+            $product_desc[1]['product_id']      = $child_pro_id;
 
     		for ($j=1; $j <=2 ; $j++)
     		{ 
     			$insql 							= "INSERT INTO " . DB_PREFIX . "product_description SET ";
-                $pdesc                          = isset($product_desc[$j+1]) ? $product_desc[$j+1] : [];
+                $pdesc                          = isset($product_desc[$j-1]) ? $product_desc[$j-1] : [];
 
     			foreach ($pdesc as $key => $value)
     			{

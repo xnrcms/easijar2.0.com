@@ -587,7 +587,7 @@ class ModelExtensionTotalCoupon extends Model {
 	{
 	    $this->load->model('setting/module');
 
-	    $checkModule 		= [57,58,59];
+	    $checkModule 		= [57,58];
 	    foreach ($checkModule as $module_id)
 	    {
 		    $setting_info 		= $this->model_setting_module->getModule($module_id);
