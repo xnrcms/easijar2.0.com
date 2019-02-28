@@ -858,7 +858,11 @@ class ControllerSellerProduct extends Controller
 
         //价格合法
         if (!isset($this->request->post['price']) || $this->request->post['price'] <= 0 || $this->request->post['price'] >= 1000000 ) {
-            //$this->error['price'] = $this->language->get('error_price');
+            $this->error['price'] = $this->language->get('error_price');
+        }
+
+        if (!isset($this->request->post['quantity']) || $this->request->post['quantity'] <= 0 || $this->request->post['quantity'] >= 1000000 ) {
+            $this->error['quantity'] = $this->language->get('error_quantity');
         }
 
         if ((utf8_strlen($this->request->post['sku']) < 3) || (utf8_strlen($this->request->post['sku']) > 64)) {
@@ -904,6 +908,18 @@ class ControllerSellerProduct extends Controller
             $data['error_sku'] = $this->error['sku'];
         } else {
             $data['error_sku'] = '';
+        }
+
+        if (isset($this->error['price'])) {
+            $data['error_price'] = $this->error['price'];
+        } else {
+            $data['error_price'] = array();
+        }
+
+        if (isset($this->error['quantity'])) {
+            $data['error_quantity'] = $this->error['quantity'];
+        } else {
+            $data['error_quantity'] = array();
         }
 
         $url = '';

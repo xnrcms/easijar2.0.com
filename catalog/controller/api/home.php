@@ -74,7 +74,7 @@ class ControllerApiHome extends Controller {
 	                ];
 	            }
 	        }
-
+	        
 	        $amounts 							= [60=>60,65=>20];
 	        $country_code 						= isset($this->session->data['country_code']) ? (int)$this->session->data['country_code'] : 0;
 	        $data['new_people']['currency'] 	= $data['currency'];

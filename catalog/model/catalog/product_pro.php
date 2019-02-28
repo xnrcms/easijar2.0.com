@@ -310,6 +310,8 @@ class ModelCatalogProductPro extends ModelCatalogProduct
             }
         }
 
+        $sql    .= " AND p.thematic_activities_id = '0'";
+
         if (!empty($data['filter_price']) && count($data['filter_price']) == 2) {
             $sql .= " AND p.price > {$data['filter_price'][0]} and p.price <= {$data['filter_price'][1]}";
         }
