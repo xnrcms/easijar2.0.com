@@ -292,7 +292,7 @@ class ControllerApiCheckout extends Controller
 
         //$json['comment_section']                = $this->renderCommentSection();
         //$json['agree_section']                  = $this->renderAgreeSection();
-
+        wr($json);
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
     }
 

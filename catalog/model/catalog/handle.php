@@ -335,6 +335,11 @@ class ModelCatalogHandle extends Model {
         return $query->rows;
     }
 
+    public function set_variant_value_sort($variant_value_id = 0,$sort_order = 0)
+    {
+        $this->db->query("UPDATE `" . DB_PREFIX . "variant_value` SET sort_order = '" . $sort_order . "' WHERE variant_value_id = '" . (int)$variant_value_id . "'");
+    }
+
     public function get_variant_value_description2($name)
     {
         $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "variant_value_description WHERE language_id = 2 AND name = '" . $name . "'");

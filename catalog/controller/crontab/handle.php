@@ -626,7 +626,7 @@ echo "ok";exit();
 
             echo "ok=".$add_count;exit();
         }else if ($step == 13) {
-            $path = 'attr.xlsx';
+            $path = 'attr_sort.xlsx';
             include 'Classes/PHPExcel.php';            
             include 'Classes/PHPExcel/IOFactory.php';
 
@@ -640,6 +640,13 @@ echo "ok";exit();
 
             unset($dataArray[0]);
 
+            foreach ($dataArray as $key => $value) {
+                $variant_value_id     = (isset($value[0]) && !empty($value[0])) ? trim($value[0]) : '';
+                $variant_sort         = (isset($value[2]) && !empty($value[2])) ? trim($value[2]) : '';
+                $this->model_catalog_handle->set_variant_value_sort($variant_value_id,$variant_sort);
+            }
+
+            echo "ok";exit();
             foreach ($dataArray as $key => $value) {
                 $variant_value      = (isset($value[1]) && !empty($value[1])) ? trim($value[1]) : '';
                 $variant_zh         = (isset($value[2]) && !empty($value[2])) ? trim($value[2]) : '';
