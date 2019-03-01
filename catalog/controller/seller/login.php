@@ -88,7 +88,7 @@ class ControllerSellerLogin extends Controller {
 		}
 
 		$data['action'] = $this->url->link('seller/login');
-		$data['register'] = $this->url->link('seller/register');
+		$data['register'] = 'http://seller.easijar.com';//$this->url->link('seller/register');
 		$data['forgotten'] = $this->url->link('account/forgotten');
 
 		if (isset($this->request->post['redirect'])) {

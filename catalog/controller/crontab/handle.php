@@ -588,9 +588,9 @@ echo "ok";exit();
 
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 12) {
-            echo "ok=";exit();
+
             //$count      = $this->model_catalog_handle->get_product_count(0);
-            $list       = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>10000],0);
+            $list       = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>10000,'product_id' =>58216],0);
             $add_count  = 0;
 
             foreach ($list as $key => $value) {
@@ -604,7 +604,7 @@ echo "ok";exit();
                     continue;
                 }
 
-                $list2              = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000],$product_id);
+                $list2              = $this->model_catalog_handle->get_product_list(['start'=>0,'limit'=>1000,'product_id'=>0],$product_id);
 
                 $add_images         = [];
                 foreach ($list2 as $k => $v) {
@@ -636,7 +636,7 @@ echo "ok";exit();
             $xlsReader->setLoadSheetsOnly(true);
             $Sheets     = $xlsReader->load($path);
             //开始读取上传到服务器中的Excel文件，返回一个 二维数组
-            $dataArray = $Sheets->getSheet(2)->toArray();
+            $dataArray = $Sheets->getSheet(0)->toArray();
 
             unset($dataArray[0]);
 
@@ -898,7 +898,7 @@ echo "ok";exit();
         if (empty($str) || strlen($str) <= 0)  return '';
         if ($this->string_type($str) === 1) return '';
 
-        return 'en-'.$str;
+        //return 'en-'.$str;
         //开始翻译
         $outputStr    = $this->load->controller('extension/interface/translate/translate_aliyun', ['d'=>'en','q'=>$str,'s'=>'zh-cn']);
         return !empty($outputStr) ? ucfirst($outputStr) : $str;
