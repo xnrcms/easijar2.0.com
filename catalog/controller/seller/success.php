@@ -1,6 +1,16 @@
 <?php
 class ControllerSellerSuccess extends Controller {
 	public function index() {
+		if ($this->customer->isLogged()) {
+		    if ($this->customer->isSeller()) {
+			    $this->response->redirect($this->url->link('seller/account'));
+            }
+		}
+		else
+		{
+		    $this->response->redirect($this->url->link('seller/login'));
+		}
+		
 		$this->load->language('seller/success');
 		$this->load->language('seller/layout');
 
