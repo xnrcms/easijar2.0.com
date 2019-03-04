@@ -178,7 +178,7 @@ class ControllerApiCheckout extends Controller
         }
 
         unset($products['total_list_data']);
-        
+
         if ( isset($products['products']) && !empty($products['products'])) {
 
             $this->load->language('extension/total/multiseller_shipping', 'multiseller_shipping');
@@ -191,6 +191,7 @@ class ControllerApiCheckout extends Controller
             $ship_del        = [];
             $ship_ototal     = [];
             $ship_id         = [];
+            $product_total   = 0;
 
             foreach ($product_totals as $tk => $tv) {
                 if (strpos('&#'.$tv['title'], '平台商品运费') >= 1 || strpos('&#'.$tv['title'], 'Platform shipping fee') >= 1) {
@@ -211,23 +212,24 @@ class ControllerApiCheckout extends Controller
                 //unset($value['href']);
                 $store_shipping_text     = $value['store_name'] . ' ' . $shipping_title;
                 $store_coupon_text       = $value['store_name'] . ' ' . $coupon_title;
+                $seller_id               = (int)$value['seller_id'];
 
                 //运费
-                if (isset($seller_ship[$value['seller_id'].'multiseller_shipping'])) {
-                    $shipping           = $seller_ship[$value['seller_id'].'multiseller_shipping'];
-                    $oshipping          = $ship_ototal[$value['seller_id'].'multiseller_shipping'];
-                    unset($product_totals[$ship_del[$value['seller_id'].'multiseller_shipping']]);
+                if (isset($seller_ship[$seller_id.'multiseller_shipping'])) {
+                    $shipping           = $seller_ship[$seller_id.'multiseller_shipping'];
+                    $oshipping          = $ship_ototal[$seller_id.'multiseller_shipping'];
+                    unset($product_totals[$ship_del[$seller_id.'multiseller_shipping']]);
                 }else{
                     $shipping           = '';
                     $oshipping          = 0;
                 }
 
                 //优惠券
-                if (isset($seller_ship[$value['seller_id'].'multiseller_coupon'])) {
-                    $coupon           = $seller_ship[$value['seller_id'].'multiseller_coupon'];
-                    $ocoupon          = $ship_ototal[$value['seller_id'].'multiseller_coupon'];
-                    $coupon_id        = $ship_id[$value['seller_id'].'multiseller_coupon'];
-                    unset($product_totals[$ship_del[$value['seller_id'].'multiseller_coupon']]);
+                if (isset($seller_ship[$seller_id.'multiseller_coupon'])) {
+                    $coupon           = $seller_ship[$seller_id.'multiseller_coupon'];
+                    $ocoupon          = $ship_ototal[$seller_id.'multiseller_coupon'];
+                    $coupon_id        = $ship_id[$seller_id.'multiseller_coupon'];
+                    unset($product_totals[$ship_del[$seller_id.'multiseller_coupon']]);
                 }else{
                     $coupon           = '';
                     $ocoupon          = 0;
@@ -238,15 +240,15 @@ class ControllerApiCheckout extends Controller
                 $value['coupon']         = !empty($coupon) ? $coupon : '';
                 $value['coupon_id']      = $coupon_id;
 
-                if (isset($coupon_list[$value['seller_id']])) {
-                    $coupon_list         = $coupon_list[$value['seller_id']];
-                    sort($coupon_list);
+                if (isset($coupon_list[$seller_id])) {
+                    $ucoupon_list         = $coupon_list[$seller_id];
+                    sort($ucoupon_list);
                 }else{
-                    $coupon_list         = [];
+                    $ucoupon_list         = [];
                 }
 
-                $value['coupon_list']    = $coupon_list;
-                $value['seller_id']      = $value['seller_id'];
+                $value['coupon_list']    = $ucoupon_list;
+                $value['seller_id']      = $seller_id;
                 $value['cat_type']       = (isset($this->session->data['buy_type']) ? $this->session->data['buy_type'] : 0);
                 
                 $goods                   = isset($value['products']) ? $value['products'] : [];
@@ -266,10 +268,12 @@ class ControllerApiCheckout extends Controller
                         'price'         => $gv['price'],
                         'total'         => $gv['total'],
                         'option'        => $gv['sku'],
+                        'is_add_nums'   => !$this->checkProuctIsAddStock($gv['product_id']) ? 1 : 0
                     ];
                 }
 
                 $atotal                  = $subtotal + $oshipping - $ocoupon;
+                $product_total           += $atotal;
 
                 $value['products']       = $ggs;
                 $value['subtotal']       = $this->currency->format($subtotal, $this->session->data['currency']);
@@ -278,10 +282,19 @@ class ControllerApiCheckout extends Controller
             }
         }
 
+        if (isset($product_totals[$ship_del['0multiseller_coupon']])) {
+            unset($product_totals[$ship_del['0multiseller_coupon']]);
+        }
+
         sort($product_totals);
 
-        $pcoupon                                = !empty($pcoupon) ? array_values($pcoupon) : [];
+        if (isset($product_totals[0])) {
+            $product_totals[0]['ototal']  = $product_total;
+            $product_totals[0]['text']    = $this->currency->format($product_total, $this->session->data['currency']);
+        }
 
+        $pcoupon                                = !empty($pcoupon) ? array_values($pcoupon) : [];
+        
         $products['totals']                     = $product_totals;
         $products['coupon']                     = isset($seller_ship['0multiseller_coupon']) ? $seller_ship['0multiseller_coupon'] : '';
         $products['coupon_id']                  = isset($ship_id['0multiseller_coupon']) ? $ship_id['0multiseller_coupon'] : -1;
@@ -1352,5 +1365,21 @@ class ControllerApiCheckout extends Controller
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
+    }
+
+    private function checkProuctIsAddStock($product_id = 0)
+    {
+        $this->load->model('setting/module');
+
+        $checkModule        = [57,58];
+        foreach ($checkModule as $module_id)
+        {
+            $setting_info       = $this->model_setting_module->getModule($module_id);
+            if (!empty($setting_info) && isset($setting_info['product']) && !empty($setting_info['product']) && in_array($product_id, $setting_info['product'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

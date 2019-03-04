@@ -363,16 +363,17 @@ class ModelExtensionTotalCoupon extends Model {
             ];
         }
 
-        if (!isset($this->session->data['coupon']))
+        foreach ($seller_price as $spkey => $spvalue)
         {
-	        foreach ($seller_price as $spkey => $spvalue)
-	        {
-	            if (isset($coupon[$spkey][0])) {
-	                $this->session->data['coupon'][$spkey] = $coupon[$spkey][0];
-	            }else{
-	                $this->session->data['coupon'][$spkey] = [];
-	            }
-	        }
+        	if (isset($this->session->data['coupon'][$spkey]) /*&& !empty($this->session->data['coupon'][$spkey])*/) {
+        		continue;
+        	}
+        	
+            if (isset($coupon[$spkey][0])) {
+                $this->session->data['coupon'][$spkey] = $coupon[$spkey][0];
+            }else{
+                $this->session->data['coupon'][$spkey] = [];
+            }
         }
 
         return $coupon;
