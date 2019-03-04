@@ -208,7 +208,8 @@ class ModelMarketingCoupon extends Model {
 		return $coupon_id;
 	}
 
-	public function editCoupon2($coupon_id, $data) {
+	public function editCoupon2($coupon_id, $data)
+	{
 		$this->db->query("UPDATE " . DB_PREFIX . "coupon2 SET `name` = '" . $this->db->escape((string)$data['name']) . "', `explain` = '" . $this->db->escape((string)$data['explain']) . "', order_total = '" . (float)$data['order_total'] . "', discount = '" . (float)$data['discount'] . "', type = '" . $this->db->escape((string)$data['type']) . "', coupon_total = '" . (int)$data['coupon_total'] . "', date_start = '" . $this->db->escape((string)$data['date_start']) . "', date_end = '" . $this->db->escape((string)$data['date_end']) . "', uses_limit = '" . (int)$data['uses_limit'] . "', `status` = '" . (int)$data['status'] . "', seller_id = '" . (int)$data['seller_id'] . "', get_limit = '" . (int)$data['get_limit'] . "', uses_limit = '" . (int)$data['uses_limit'] . "', launch_scene = '" . (int)$data['launch_scene'] . "', date_modified = NOW() WHERE coupon_id = '" . (int)$coupon_id . "'");
 
 		$this->cache->delete('coupon2.coupon_id' . (int)$coupon_id);

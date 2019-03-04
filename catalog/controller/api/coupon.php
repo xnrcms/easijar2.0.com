@@ -2,6 +2,9 @@
 class ControllerApiCoupon extends Controller {
 	public function index()
 	{
+        $this->response->addHeader('Content-Type: application/json');
+        $this->load->language('extension/total/coupon');
+
 		$allowKey       = ['api_token','page','dtype','seller_id','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
@@ -61,9 +64,11 @@ class ControllerApiCoupon extends Controller {
                     $discount = $this->currency->format($value['discount'], $this->session->data['currency']);
                 }
 
+                $name                           = sprintf($this->language->get('text_coupon_explain'), $discount);
                 $value['over_time']             = $overdue;
                 $value['discount']              = $discount;
-                
+                $value['name']                  = $name;
+
 	            unset($value['type']);
 	            //unset($value['over_time']);
 	            //unset($value['total']);
@@ -87,6 +92,8 @@ class ControllerApiCoupon extends Controller {
 
 	public function lists()
 	{
+        $this->response->addHeader('Content-Type: application/json');
+
 		$allowKey       = ['api_token','seller_id','page','limit'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();
@@ -168,6 +175,8 @@ class ControllerApiCoupon extends Controller {
 
 	public function gets()
 	{
+        $this->response->addHeader('Content-Type: application/json');
+
 		$allowKey       = ['api_token','coupon_id'];
         $req_data       = $this->dataFilter($allowKey);
         $json           =  $this->returnData();

@@ -74,11 +74,10 @@ class ControllerApiHome extends Controller {
 	                ];
 	            }
 	        }
-	        
-	        $amounts 							= [60=>60,65=>20];
-	        $country_code 						= isset($this->session->data['country_code']) ? (int)$this->session->data['country_code'] : 0;
+	        $amounts 							= ['MYR'=>60,'SGD'=>20,'USD'=>15];
+	        $currency_code 						= isset($this->session->data['currency']) ? $this->session->data['currency'] : '';
 	        $data['new_people']['currency'] 	= $data['currency'];
-	        $data['new_people']['amount'] 		= isset($amounts[$country_code]) ? $amounts[$country_code] : 0;
+	        $data['new_people']['amount'] 		= isset($amounts[$currency_code]) ? $amounts[$currency_code] : 0;
 	        $data['new_people']['products'] 	= $recommend;
 	    }
 

@@ -741,14 +741,31 @@ class ControllerSellerProduct extends Controller
             return false;
         }
 
-        $json['status'] = 1;
-        $json['message'] = '';
+        $json['status']     = 0;
+        $json['message']    = '';
         $productModel = $this->loadProductModel();
         if (empty($productModel)) {
-            $json['status'] = 0;
             $json['message'] = 'Product not found';
-            $this->jsonOutput($json);
+            $this->jsonOutput($json);return false;
         } else {
+            if (empty($this->request->post) || !isset($this->request->post['products']) || empty($this->request->post['products']))
+            {
+                $json['message'] = 'Post data is error';
+                $this->jsonOutput($json);return false;
+            }
+
+            foreach ($this->request->post['products'] as $key => $value) {
+                if (!isset($value['price']) || $value['price'] <= 0 || $value['price'] >=100000) {
+                    $json['message'] = '商品ID（'.$value['product_id'].'）的价格设置异常';
+                    $this->jsonOutput($json);return false;
+                }
+
+                if (!isset($value['quantity']) || $value['quantity'] <= 0 || $value['quantity'] >=100000) {
+                    $json['message'] = '商品ID（'.$value['product_id'].'）的库存设置异常';
+                    $this->jsonOutput($json);return false;
+                }
+            }
+
             $productModel->saveVariants($this->request->post);
 
             $json['status'] = 1;

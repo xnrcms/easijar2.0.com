@@ -505,9 +505,12 @@ class ControllerSellerCoupon extends Controller {
 			$this->error['date_end'] 	= $this->language->get('error_date_end');
 		}
 
-		if ($date_end < $date_start) {
+		$this->request->post['date_start'] 	= date('Y-m-d 00:00:00',strtotime($this->request->post['date_start']));
+		$this->request->post['date_end'] 	= date('Y-m-d 23:59:59',strtotime($this->request->post['date_end']));
+
+		/*if ($date_end < $date_start) {
 			$this->error['date_end'] 	= $this->language->get('error_date_start_end');
-		}
+		}*/
 		
 		$coupon_total 		= isset($this->request->post['coupon_total']) ? (int)$this->request->post['coupon_total'] : 0;
 		$get_limit 			= isset($this->request->post['get_limit']) ? (int)$this->request->post['get_limit'] : 0;

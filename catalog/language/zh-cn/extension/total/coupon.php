@@ -13,6 +13,7 @@ $_['heading_title'] = '使用优惠券';
 // Text
 $_['text_coupon']   = '优惠码 (%s)';
 $_['text_success']  = '成功: 您的优惠券折扣已经应用 ！';
+$_['text_coupon_explain']   = '您的订单必须满%s才能使用';
 
 // Entry
 $_['entry_coupon']  = '请在这里输入您的优惠券代码';

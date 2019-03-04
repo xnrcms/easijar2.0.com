@@ -55,20 +55,22 @@ class ModelCatalogHandle extends Model {
         return $query->row;
     }
 
-    public function get_product_list($data,$parent_id = 0)
+    public function get_product_list($filter_data,$parent_id = 0)
     {
-        $sql    = "SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '1' AND parent_id = '" .$parent_id. "'";
 
-        if (isset($data['start']) || isset($data['limit'])) {
-            if ($data['start'] < 0) {
-                $data['start'] = 0;
+        $product_id     = isset($filter_data['product_id']) ? $filter_data['product_id'] : 0;
+        $sql    = "SELECT `product_id` FROM " . DB_PREFIX . "product WHERE status = '1' AND product_id > '" . $product_id . "' AND parent_id = '" .$parent_id. "'";
+
+        if (isset($filter_data['start']) || isset($filter_data['limit'])) {
+            if ($filter_data['start'] < 0) {
+                $filter_data['start'] = 0;
             }
 
-            if ($data['limit'] < 1) {
-                $data['limit'] = 20;
+            if ($filter_data['limit'] < 1) {
+                $filter_data['limit'] = 20;
             }
 
-            $sql .= " ORDER BY product_id ASC LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+            $sql .= " ORDER BY product_id ASC LIMIT " . (int)$filter_data['start'] . "," . (int)$filter_data['limit'];
         }
 
         $query = $this->db->query($sql);
@@ -331,6 +333,11 @@ class ModelCatalogHandle extends Model {
     {
         $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "variant_value_description WHERE language_id = 2 AND name = '" . $name . "'");
         return $query->rows;
+    }
+
+    public function set_variant_value_sort($variant_value_id = 0,$sort_order = 0)
+    {
+        $this->db->query("UPDATE `" . DB_PREFIX . "variant_value` SET sort_order = '" . $sort_order . "' WHERE variant_value_id = '" . (int)$variant_value_id . "'");
     }
 
     public function get_variant_value_description2($name)

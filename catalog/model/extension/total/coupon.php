@@ -592,7 +592,7 @@ class ModelExtensionTotalCoupon extends Model {
 	    foreach ($checkModule as $module_id)
 	    {
 		    $setting_info 		= $this->model_setting_module->getModule($module_id);
-		    if (!empty($setting_info) && isset($setting['product']) && !empty($setting['product']) && in_array($product_id, $setting['product'])) {
+		    if (!empty($setting_info) && isset($setting_info['product']) && !empty($setting_info['product']) && in_array($product_id, $setting_info['product'])) {
 		    	return true;
 		    }
 	    }
