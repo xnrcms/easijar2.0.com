@@ -135,8 +135,8 @@ class ModelAccountOrder extends Model {
         return $result;
     }
 
-    public function getOrderProducts($order_id) {
-
+    public function getOrderProducts($order_id)
+    {
         $cache_key      = 'order_product_' . (int)$order_id . '.getOrderProducts.by.order_id';
         $result         = $this->cache->get($cache_key);
 
@@ -427,15 +427,33 @@ class ModelAccountOrder extends Model {
     {
         $order_id       = (int)$order_id;
         $seller_id      = (int)$seller_id;
+        if ($order_id <= 0 )  return [];
 
-        if ($order_id <= 0 || $seller_id <= 0)  return [];
+        $cache_key      = 'ms_order_product_' . (int)$order_id . '_' . $seller_id . '.getOrderProductsForMs.by.order_id.seller_id';
+        $result         = $this->cache->get($cache_key);
+        if ($result && is_array($result))  return $result;
 
-        $query = $this->db->query("SELECT op.`order_product_id`,op.`product_id`, op.`name`,op.`quantity`,op.`price`,op.`total`,p.`image`,op.`sku`,op.`tax`,op.`model` FROM `" . DB_PREFIX . "order_product` op 
+        $fields         = format_find_field('order_product_id,product_id,name,quantity,price,total,image,sku,tax,model','op');
+        $fields         .= ',' .  format_find_field('seller_id','msop');
+
+        $sql    = "SELECT " . $fields . " FROM `" . DB_PREFIX . "order_product` op 
             LEFT JOIN  `" . DB_PREFIX . "ms_order_product` msop ON (op.order_product_id = msop.order_product_id) 
             LEFT JOIN  `" . DB_PREFIX . "product` p ON (p.product_id = op.product_id) 
-            WHERE msop.seller_id = '" . $seller_id . "' AND msop.order_id = '" . $order_id . "' ORDER BY op.order_product_id DESC LIMIT 0,100");
+            WHERE msop.order_id = '" . $order_id . "'";
 
-        return !empty($query->rows) ? $query->rows : [];
+        if ($seller_id > 0) {
+            $sql .= " AND msop.seller_id = '" . $seller_id . "'";
+        }
+
+        $sql .= " ORDER BY op.order_product_id DESC LIMIT 0,100";
+
+        $query = $this->db->query($sql);
+
+        $result = $query->rows;
+
+        $this->cache->set($cache_key, $result);
+
+        return $result;
     }
 
     //商家订单处理
@@ -565,13 +583,16 @@ class ModelAccountOrder extends Model {
                 $product_info                 = !empty($query->rows) ? $query->rows : [];
 
                 foreach ($product_info as $pkey => $pvalue) {
-                    $option_data                    = \Models\Product::find($pvalue['product_id'])->getVariantLabels();
-                    $opt                            = [];
-                    foreach ($option_data as $okey => $ovalue) {
-                        $opt[]      = $ovalue['name'] . ':' . $ovalue['value'];
-                    }
+                    $productModel         = \Models\Product::find($pvalue['product_id']);
+                    if (!empty($productModel)) {
+                        $option_data                    = $productModel->getVariantLabels();
+                        $opt                            = [];
+                        foreach ($option_data as $okey => $ovalue) {
+                            $opt[]      = $ovalue['name'] . ':' . $ovalue['value'];
+                        }
 
-                    $product_info[$pkey]['option']   = implode(',', $opt);
+                        $product_info[$pkey]['option']   = implode(',', $opt);
+                    }
                 }
 
                 $data[$key]['product_info']   = $product_info;

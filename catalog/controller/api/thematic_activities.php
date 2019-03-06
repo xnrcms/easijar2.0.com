@@ -195,10 +195,11 @@ class ControllerApiThematicActivities extends Controller {
                     'special'       => $special,
                     'rating'        => $rval['rating'],
                     'reviews'       => $rval['reviews'],
+                    'discount'      => $rval['discount'] > 0 ? $rval['discount'] : 0,
                 ];
             }
         }
-
+        
         $json['product_list']        = $recommend;
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));

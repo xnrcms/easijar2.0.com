@@ -210,10 +210,14 @@ class ControllerApiOreview extends Controller {
                     $price = '';
                 }
 
-                $option_data                    = \Models\Product::find($result['product_id'])->getVariantLabels();
                 $opt                            = [];
-                foreach ($option_data as $okey => $ovalue) {
-                    $opt[]      = $ovalue['name'] . ':' . $ovalue['value'];
+                $productModel                   = \Models\Product::find($product_id);
+
+                if (!empty($productModel)) {
+                    $option_data                    = $productModel->getVariantLabels();
+                    foreach ($option_data as $okey => $ovalue) {
+                        $opt[]      = $ovalue['name'] . ':' . $ovalue['value'];
+                    }
                 }
 
                 $images 						= [];

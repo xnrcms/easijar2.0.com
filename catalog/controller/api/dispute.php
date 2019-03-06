@@ -44,8 +44,7 @@ class ControllerApiDispute extends Controller {
         }
 
         $quantity           = ((int)$req_data['quantity'] <= 0 || (int)$req_data['quantity'] >= (int)$product_info['quantity']) ? (int)$product_info['quantity'] : (int)$req_data['quantity'];
-        $return_shipping    = $this->get_return_money($order_info['order_id'],$order_info['seller_id'],$product_info['quantity']);
-        $return_money       = (float)$product_info['total'] + $return_shipping;
+        $return_money       = $this->get_return_money($order_info,$product_info);
         $refund_money       = ((float)$req_data['refund_money'] <= 0 || (float)$req_data['refund_money'] >= $return_money) ? $return_money : (float)$req_data['refund_money'];
 
         $this->load->model('account/return');
@@ -316,11 +315,9 @@ class ControllerApiDispute extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
         }
 
-        $return_shipping                = $this->get_return_money($return_info['order_id'],$return_info['seller_id'],$return_info['quantity']);
-        $total                          = $product_info['total'];
         $currency_code                  = $product_info['currency_code'];
         $currency_value                 = $product_info['currency_value'];
-        $return_money                   = $total + $return_shipping;
+        $return_money                   = $this->get_return_money($return_info,$product_info);
 
         $return_info['return_money']    = $this->currency->format($return_money, $currency_code, $currency_value, $this->session->data['currency']);
         
@@ -675,14 +672,11 @@ class ControllerApiDispute extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>'fail:product info is error']));
         }
 
-        $return_shipping                = $this->get_return_money($order_info['order_id'],$order_info['seller_id'],$product_info['quantity']);
-
-        $total                          = $product_info['total'];
         $currency_code                  = $product_info['currency_code'];
         $currency_value                 = $product_info['currency_value'];
-        $return_money                   = $total + $return_shipping;
+        $return_money                   = $this->get_return_money($order_info,$product_info);
 
-        $product_info['total']          = $this->currency->format($total, $currency_code, $currency_value, $this->session->data['currency']);
+        $product_info['total']          = $this->currency->format($product_info['total'], $currency_code, $currency_value, $this->session->data['currency']);
         $product_info['return_money']   = $this->currency->format($return_money, $currency_code, $currency_value, $this->session->data['currency']);
 
         unset($product_info['currency_code']);
@@ -691,40 +685,69 @@ class ControllerApiDispute extends Controller {
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$product_info]));
     }
 
-    private function get_return_money($order_id = 0,$seller_id = 0,$quantity = 0)
+    private function get_return_money($order_info = [],$product_info = [])
     {
-        $order_id           = (int)$order_id;
-        $seller_id          = (int)$seller_id;
-        $quantity           = (int)$quantity;
+        $order_id           = isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
+        $seller_id          = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
+        $quantity           = isset($product_info['quantity']) ? (int)$product_info['quantity'] : 0;
+        $product_money      = isset($product_info['total']) ? (float)$product_info['total'] : 0;
 
         if ($order_id <= 0 || $seller_id <= 0 || $quantity <= 0)  return 0;
 
         $all_totals         = $this->model_account_order->getTotals($order_id);
         $totals             = $this->model_account_order->getTotalsForMs($order_id,$seller_id,$quantity);
         $order_products     = $this->model_account_order->getOrderProducts($order_id);
+        $ms_order_products  = $this->model_account_order->getOrderProductsForMs($order_id,0);
         
-        $money              = 0;
-        $all_quantity       = 0;
+        $money                      = 0;
+        $seller_quantity            = 0;
+        $sub_total                  = 0;
+        $seller_shipping            = 0;
+        $seller_product_shipping    = 0;
+        $seller_coupon              = 0;
+        $platform_coupon            = 0;
+        $seller_product_total       = 0;
+        $seller_use_platform        = 0;
 
-        foreach ($order_products as $key => $value) {
-            $all_quantity   += $value['quantity'];
-        }
+        foreach ($all_totals as $atkey => $atvalue)
+        {
+            //店铺小计
+            if ( $atvalue['code'] === 'total') {
+                $sub_total   = $atvalue['value'];
+            }
 
-        foreach ($all_totals as $atkey => $atvalue) {
-            if ( $atvalue['code'] === 'multiseller_coupon' && strpos($atvalue['title'],'&#0multiseller_coupon&#') !== false && $atvalue['value'] > 0) {
-                    $money    += round($atvalue['value'] / $all_quantity,2);
+            //使用店铺运费金额
+            $stitle      = '&#' . $seller_id . 'multiseller_shipping&#Multi-seller Shipping Fee';
+            if ( $atvalue['code'] === 'multiseller_shipping' && strpos($atvalue['title'],$stitle) !== false && $atvalue['value'] > 0) {
+                $seller_shipping    = $atvalue['value'];
+            }
+
+            //使用店铺优惠券金额
+            $ctitle      = '&#' . $seller_id . 'multiseller_coupon&#';
+            if ( $atvalue['code'] === 'multiseller_coupon' && strpos($atvalue['title'],$ctitle) !== false && $atvalue['value'] > 0) {
+                $seller_coupon    = $atvalue['value'];
+            }
+
+            //平台优惠券
+            $ptitle      = '&#0multiseller_coupon&#';
+            if ( $atvalue['code'] === 'multiseller_coupon' && strpos($atvalue['title'],$ptitle) !== false && $atvalue['value'] > 0) {
+                $platform_coupon    = $atvalue['value'];
             }
         }
 
-        foreach ($totals as $key => $value) {
-            if ( $value['code'] === 'multiseller_shipping') {
-                    $money    += round($value['value'] / $quantity,2);
-            }
-            if ( $value['code'] === 'multiseller_coupon') {
-                    $money    -= round($value['value'] / $quantity,2);
+        foreach ($ms_order_products as $mskey => $msvalue) {
+            if ($seller_id > 0 && (int)$msvalue['seller_id'] === $seller_id) {
+                $seller_product_total       += $msvalue['total'];
+                $seller_quantity            += $msvalue['quantity'];
             }
         }
 
-        return $money;
+        $seller_total               = $seller_product_total + $seller_shipping - $seller_coupon;
+        $seller_use_platform        = ($seller_total / $sub_total) * $platform_coupon;
+        $seller_use_all             = $seller_coupon + $seller_use_platform;
+        $seller_product_shipping    = ($seller_shipping / $seller_quantity) * $quantity;
+        $money                      = $product_money + $seller_product_shipping - ($product_money / $seller_product_total) * $seller_use_all;
+
+        return round($money,2);
     }
 }

@@ -182,6 +182,10 @@ class ControllerApiCart extends Controller {
 
     		//确定产品SKU 获取真是产品ID
     		$productModel 						= \Models\Product::find($product_id);
+            if (empty($productModel)) {
+                return $this->response->setOutput($this->returnData(['msg'=>'product model is error']));
+            }
+
 			$variants 							= $productModel->getProductVariantsDetail();
 			$skus 								= isset($variants['skus']) ? $variants['skus'] : [];
             $sku                                = !empty($req_data['sku']) ? trim($req_data['sku']) : '';
