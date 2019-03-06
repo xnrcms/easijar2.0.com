@@ -64,7 +64,8 @@ class ControllerApiCoupon extends Controller {
                     $discount = $this->currency->format($value['discount'], $this->session->data['currency']);
                 }
 
-                $name                           = sprintf($this->language->get('text_coupon_explain'), $discount);
+                $order_total                    = $this->currency->format($value['order_total'], $this->session->data['currency']);
+                $name                           = sprintf($this->language->get('text_coupon_explain'), $order_total);
                 $value['over_time']             = $overdue;
                 $value['discount']              = $discount;
                 $value['name']                  = $name;

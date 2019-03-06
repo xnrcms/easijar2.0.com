@@ -466,11 +466,34 @@ class ModelAccountOrder extends Model {
     }
 
     public function getTotalsForMs($order_id, $seller_id) {
-        $query = $this->db->query("SELECT ot.* FROM `" . DB_PREFIX . "order_total` ot
+        $cache_key   = 'order_total.id_' . (int)$order_id . '.seller_id_' . (int)$seller_id . '.getTotalsForMs.ByOrderIdAndSellerId';
+        $result      = $this->cache->get($cache_key);
+
+        if ($result && is_array($result))  return $result;
+
+        $result = $this->db->query("SELECT ot.* FROM `" . DB_PREFIX . "order_total` ot
                                     LEFT JOIN `" . DB_PREFIX . "ms_order_total` mot ON mot.order_total_id = ot.order_total_id
                                     WHERE order_id = '" . (int)$order_id . "' AND mot.seller_id = '" . (int)$seller_id . "' ORDER BY sort_order ASC");
+        $result = $result->num_rows > 0 ? $result->rows : [];
 
-        return $query->rows;
+        $this->cache->set($cache_key, $result);
+
+        return $result;
+    }
+
+    public function getTotals($order_id)
+    {
+        $cache_key   = 'order_total.id_' . (int)$order_id . '.getTotals.ByOrderId';
+        $result      = $this->cache->get($cache_key);
+
+        if ($result && is_array($result))  return $result;
+
+        $result = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_total WHERE order_id = '" . (int)$order_id . "'");
+        $result = $result->num_rows > 0 ? $result->rows : [];
+
+        $this->cache->set($cache_key, $result);
+
+        return $result;
     }
 
     public function getTotalsForMsByCode($order_ids,$code) {

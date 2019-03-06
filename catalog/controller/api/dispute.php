@@ -699,9 +699,23 @@ class ControllerApiDispute extends Controller {
 
         if ($order_id <= 0 || $seller_id <= 0 || $quantity <= 0)  return 0;
 
+        $all_totals         = $this->model_account_order->getTotals($order_id);
         $totals             = $this->model_account_order->getTotalsForMs($order_id,$seller_id,$quantity);
+        $order_products     = $this->model_account_order->getOrderProducts($order_id);
+        
+        $money              = 0;
+        $all_quantity       = 0;
 
-        $money    = 0;
+        foreach ($order_products as $key => $value) {
+            $all_quantity   += $value['quantity'];
+        }
+
+        foreach ($all_totals as $atkey => $atvalue) {
+            if ( $atvalue['code'] === 'multiseller_coupon' && strpos($atvalue['title'],'&#0multiseller_coupon&#') !== false && $atvalue['value'] > 0) {
+                    $money    += round($atvalue['value'] / $all_quantity,2);
+            }
+        }
+
         foreach ($totals as $key => $value) {
             if ( $value['code'] === 'multiseller_shipping') {
                     $money    += round($value['value'] / $quantity,2);
