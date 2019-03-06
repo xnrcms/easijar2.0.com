@@ -161,7 +161,7 @@ class ModelCatalogHandle extends Model {
     public function get_product_description_list($filter_data)
     {
         $product_id     = isset($filter_data['product_id']) ? $filter_data['product_id'] : 0;
-        $sql    = "SELECT * FROM " . DB_PREFIX . "product_description WHERE language_id = 1 AND product_id > '" . $product_id . "'";
+        $sql    = "SELECT * FROM " . DB_PREFIX . "product_description WHERE language_id = 1 AND product_id >= '" . $product_id . "'";
 
         if (isset($filter_data['start']) || isset($filter_data['limit'])) {
             if ($filter_data['start'] < 0) {
@@ -174,7 +174,7 @@ class ModelCatalogHandle extends Model {
 
             $sql .= " ORDER BY product_id ASC LIMIT " . (int)$filter_data['start'] . "," . (int)$filter_data['limit'];
         }
-        
+
         $query = $this->db->query($sql);
 
         return $query->row;

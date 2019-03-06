@@ -64,11 +64,15 @@ class ControllerApiHome extends Controller {
 	        $recommend                  = [];
 	        if (isset($results['products']) && !empty($results['products'])) {
 	            foreach ($results['products'] as $rval) {
+
+	            	$price              = trim($rval['price'],$data['currency']);
+                	$special            = !empty($rval['special']) ? trim($rval['special'],$data['currency']) : $price;
+
 	                $recommend[]        = [
 	                    'product_id'    => $rval['product_id'],
 	                    'name'          => $rval['name'],
 	                    'thumb'         => $rval['thumb'],
-	                    'price'         => trim($rval['price'],$data['currency']),
+	                    'price'         => $special,
 	                    'rating'        => $rval['rating'],
 	                    'reviews'       => $rval['reviews'],
 	                ];

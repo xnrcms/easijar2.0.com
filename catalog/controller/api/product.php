@@ -196,7 +196,7 @@ class ControllerApiProduct extends Controller {
 			$pinfo['sku'] 			= '';
 
 			//折扣率计算
-			$pinfo['discount'] 		= ($oprice > 0 && $price >= $oprice) ? (($price - $oprice) / $price)*100 : 0;
+			$pinfo['discount'] 		= round(($oprice > 0 && $price >= $oprice) ? (($price - $oprice) / $price)*100 : 0,0);
 
 			//产品属性
 			$opt 			= [];
