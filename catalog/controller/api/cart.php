@@ -105,13 +105,9 @@ class ControllerApiCart extends Controller {
             //格式化一下数组
             $products 			= $this->load->getViewData('products');
             $products           = isset($products['products']) ? $products['products'] : [];
-            /*foreach ($products as $key => $value) {
-                sort($value);
-            	$products[] 	= $value;
-            }*/
-
+            
             sort($products);
-
+            
             $data['products'] 	= $products;
 
             $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);

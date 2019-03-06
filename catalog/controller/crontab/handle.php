@@ -39,7 +39,7 @@ class ControllerCrontabHandle extends Controller {
                 'handle_name'=>'处理数据准备中'
             ]);
             //print_r($filter_data);exit();
-            $this->jumpurl($this->url->link('crontab/handle','step=1'));
+            $this->jumpurl($this->url->link('crontab/handle','step=7'));
         }else if ($step == 16) {//综合处理
             $totals        = $this->model_catalog_handle->getProductsTotals($filter_data);
             $plist         = $this->model_catalog_handle->getProducts($filter_data);
@@ -257,7 +257,7 @@ class ControllerCrontabHandle extends Controller {
             $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
         }else if ($step == 6) {
 
-            //刪除下架数据
+            /*//刪除下架数据
             $plist      = $this->model_catalog_handle->get_product_status0();
             $plist1     = $this->model_catalog_handle->get_product_status1();
             $ids        = [];
@@ -272,11 +272,11 @@ class ControllerCrontabHandle extends Controller {
 
             $ids = array_flip(array_flip($ids));
 
-            $this->model_catalog_handle->del_product_status0($ids);
+            $this->model_catalog_handle->del_product_status0($ids);*/
             echo 'del ok';exit();
         }
         else if ($step == 7) {//处理分类以及店铺绑定
-            echo "ok";exit();
+
             //分类在处理
             $info                           = $this->model_catalog_handle->get_product_description_list($filter_data);
             $remainder                      = intval($this->session->data['handle_data']['pdtotals'] - $limit * $page);

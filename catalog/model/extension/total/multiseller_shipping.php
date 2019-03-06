@@ -203,7 +203,7 @@ class ModelExtensionTotalMultisellerShipping extends Model {
     {
         $this->load->model('setting/module');
 
-        $checkModule        = [59];
+        $checkModule        = [57];
         foreach ($checkModule as $module_id)
         {
             $setting_info       = $this->model_setting_module->getModule($module_id);
@@ -211,7 +211,7 @@ class ModelExtensionTotalMultisellerShipping extends Model {
                 return true;
             }
         }
-
+        
         return false;
     }
 }

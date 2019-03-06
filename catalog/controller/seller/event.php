@@ -39,12 +39,19 @@ class ControllerSellerEvent extends Controller {
                         $products[$seller_id]['products'][]     = $product;
                     } else {
                         $store_name             = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
+
+                        $this->load->model('customercoupon/coupon');
+
+                        $filter_data            = ['customer_id'=> $this->customer->getId(),'seller_id' => $seller_id];
+                        $coupon_nums            = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
+
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
                             'store_name'    => htmlspecialchars_decode($store_name),
                             'shipping'      => 0,
                             'checked'       => (bool)(isset($product['checked']) ? $product['checked'] : 0),
                             'products'      => array($product),
+                            'coupon_nums'   => (int)$coupon_nums
                         ];
                     }
                 }

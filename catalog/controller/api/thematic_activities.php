@@ -67,7 +67,7 @@ class ControllerApiThematicActivities extends Controller {
             foreach ($results['products'] as $rval)
             {
                 $price              = trim($rval['price'],$json['currency']);
-                $special            = !empty($rval['special']) ? trim($rval['price'],$json['currency']) : $price;
+                $special            = !empty($rval['special']) ? trim($rval['special'],$json['currency']) : $price;
 
                 $recommend[]        = [
                     'product_id'    => $rval['product_id'],
@@ -80,7 +80,7 @@ class ControllerApiThematicActivities extends Controller {
                 ];
             }
         }
-
+        
         $json['product_list']        = $recommend;
         
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
@@ -126,7 +126,7 @@ class ControllerApiThematicActivities extends Controller {
             foreach ($results['products'] as $rval)
             {
                 $price              = trim($rval['price'],$json['currency']);
-                $special            = !empty($rval['special']) ? trim($rval['price'],$json['currency']) : $price;
+                $special            = !empty($rval['special']) ? trim($rval['special'],$json['currency']) : $price;
 
                 $recommend[]        = [
                     'product_id'    => $rval['product_id'],
@@ -185,7 +185,7 @@ class ControllerApiThematicActivities extends Controller {
             foreach ($results['products'] as $rval)
             {
                 $price              = trim($rval['price'],$json['currency']);
-                $special            = !empty($rval['special']) ? trim($rval['price'],$json['currency']) : $price;
+                $special            = !empty($rval['special']) ? trim($rval['special'],$json['currency']) : $price;
 
                 $recommend[]        = [
                     'product_id'    => $rval['product_id'],
