@@ -390,7 +390,7 @@ class ModelAccountOrder extends Model {
         if ( $product_id <= 0 )  return [];
 
         $fields         = format_find_field('order_id,currency_code,currency_value','o');
-        $fields         .= ',' . format_find_field('quantity,price,total,name,image,sku','op');
+        $fields         .= ',' . format_find_field('order_product_id,product_id,quantity,price,total,name,image,sku','op');
         $fields         .= ',' . format_find_field('seller_id','msop');
 
         $order_query = $this->db->query("SELECT " . $fields . " FROM `" . DB_PREFIX . "ms_order_product` msop LEFT JOIN  `" . DB_PREFIX . "order_product` op ON (op.order_product_id = msop.order_product_id) LEFT JOIN `" . DB_PREFIX . "order` o ON (o.order_id = op.order_id) WHERE msop.order_product_id = '" . $product_id . "' AND o.customer_id = '" . (int)$this->customer->getId() . "' AND o.order_status_id > '0'");

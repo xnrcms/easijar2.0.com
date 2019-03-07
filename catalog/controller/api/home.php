@@ -52,7 +52,7 @@ class ControllerApiHome extends Controller {
 		$data['is_new_people'] 		= $is_new_people;
 	    $data['new_people'] 		= [];
 
-	    if ($is_new_people == 0) {
+	    //if ($is_new_people == 0) {
 		    //新人推荐商品
 	        $module_id                  = 58;
 	        $setting_info               = $this->model_setting_module->getModule($module_id);
@@ -83,7 +83,7 @@ class ControllerApiHome extends Controller {
 	        $data['new_people']['currency'] 	= $data['currency'];
 	        $data['new_people']['amount'] 		= isset($amounts[$currency_code]) ? $amounts[$currency_code] : 0;
 	        $data['new_people']['products'] 	= $recommend;
-	    }
+	    //}
 
 	    //获取分类
 	    $module_id 					= 51;

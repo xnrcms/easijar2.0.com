@@ -691,6 +691,7 @@ class ControllerApiDispute extends Controller {
         $seller_id          = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
         $quantity           = isset($product_info['quantity']) ? (int)$product_info['quantity'] : 0;
         $product_money      = isset($product_info['total']) ? (float)$product_info['total'] : 0;
+        $product_money      = $product_money;
 
         if ($order_id <= 0 || $seller_id <= 0 || $quantity <= 0)  return 0;
 
@@ -708,24 +709,28 @@ class ControllerApiDispute extends Controller {
         $platform_coupon            = 0;
         $seller_product_total       = 0;
         $seller_use_platform        = 0;
+        $all_shipping               = 0;
+        $all_coupon                 = 0;
 
         foreach ($all_totals as $atkey => $atvalue)
         {
-            //店铺小计
-            if ( $atvalue['code'] === 'total') {
-                $sub_total   = $atvalue['value'];
+            //多店铺店铺小计
+            if ( $atvalue['code'] === 'sub_total') {
+                $sub_total   += $atvalue['value'];
             }
 
             //使用店铺运费金额
             $stitle      = '&#' . $seller_id . 'multiseller_shipping&#Multi-seller Shipping Fee';
             if ( $atvalue['code'] === 'multiseller_shipping' && strpos($atvalue['title'],$stitle) !== false && $atvalue['value'] > 0) {
                 $seller_shipping    = $atvalue['value'];
+                $sub_total          += $atvalue['value'];
             }
 
             //使用店铺优惠券金额
             $ctitle      = '&#' . $seller_id . 'multiseller_coupon&#';
             if ( $atvalue['code'] === 'multiseller_coupon' && strpos($atvalue['title'],$ctitle) !== false && $atvalue['value'] > 0) {
                 $seller_coupon    = $atvalue['value'];
+                $sub_total        -= $atvalue['value'];
             }
 
             //平台优惠券
@@ -736,7 +741,8 @@ class ControllerApiDispute extends Controller {
         }
 
         foreach ($ms_order_products as $mskey => $msvalue) {
-            if ($seller_id > 0 && (int)$msvalue['seller_id'] === $seller_id) {
+            if ($seller_id > 0 && (int)$msvalue['seller_id'] === $seller_id)
+            {
                 $seller_product_total       += $msvalue['total'];
                 $seller_quantity            += $msvalue['quantity'];
             }
@@ -746,7 +752,25 @@ class ControllerApiDispute extends Controller {
         $seller_use_platform        = ($seller_total / $sub_total) * $platform_coupon;
         $seller_use_all             = $seller_coupon + $seller_use_platform;
         $seller_product_shipping    = ($seller_shipping / $seller_quantity) * $quantity;
-        $money                      = $product_money + $seller_product_shipping - ($product_money / $seller_product_total) * $seller_use_all;
+        $money                      = $product_money + $seller_product_shipping - ($product_money / $seller_total) * $seller_use_all;
+
+
+        /*wr([
+            'product_id'=>$product_info['order_product_id'],
+            'order_id'=>$order_id,
+            'product_money'=>$product_money,
+            'seller_shipping'=>$seller_shipping,
+            'quantity'=>$quantity,
+            'seller_product_shipping'=>$seller_product_shipping,
+            'seller_total'=>$seller_total,
+            'sub_total'=>$sub_total,
+            'seller_use_platform'=>$seller_use_platform,
+            'seller_coupon'=>$seller_coupon,
+            'seller_use_all'=>$seller_use_all,
+            'seller_product_total'=>$seller_product_total,
+            'platform_coupon'=>$platform_coupon,
+            'money'=>round($money,2),
+        ]);*/
 
         return round($money,2);
     }
