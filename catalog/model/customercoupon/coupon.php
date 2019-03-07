@@ -138,8 +138,7 @@ class ModelCustomercouponCoupon extends Model
             'c.coupon_id',
             'c.date_added',
             'c.discount',
-            'over_time',
-            'is_use'
+            'over_time'
         ];
 
         if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {

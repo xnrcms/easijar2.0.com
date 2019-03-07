@@ -139,34 +139,6 @@ class ControllerApiCheckout extends Controller
         }
         $json['payment_method_section']         = $payment_option;
 
-        /*if ($this->isPaymentAddressRequired()) {
-            $payment_address_section            = $this->renderAddressSection('payment');
-            $json['payment_address_section']    = $this->renderAddressSection('payment');
-        }else{
-            $json['payment_address_section']    = [];
-        }*/
-
-        //$json['if_pickup_section']              = $this->renderIfPickupSection();
-        //$json['pickup_section']                 = $this->renderPickupSection();
-        //$json['shipping_method_section']        = $this->renderShippingMethodSection();
-        //$json['payment_method_section']         = $this->renderPaymentMethodSection();
-
-        //获取可用优惠券列表
-        /*$filter_data        = [
-            'customer_id'   => $this->customer->getId(),
-            'seller_id'     => 0,
-            'dtype'         => 0,
-            'sort'          => 'over_time',
-            'order'         => 'DESC',
-            'start'         => 0,
-            'limit'         => 200,
-        ];
-
-        $this->load->model('customercoupon/coupon');
-
-        $totals             = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
-        $results            = $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);*/
-
         $products                    = $this->renderCartSection();
         $cart_products               = [];
         $coupon_list                 = isset($products['total_list_data']['coupon']) ? $products['total_list_data']['coupon'] : [];
