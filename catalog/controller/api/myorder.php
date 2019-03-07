@@ -145,11 +145,11 @@ class ControllerApiMyorder extends Controller {
             }
         }
 
-
-        $remainder                     = intval($totals - $limit * $page);
-        $results['total_page']         = ceil($totals/$limit);
-        $results['remainder']          = $remainder >= 0 ? $remainder : 0;
-        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$results]));
+        $remainder                  = intval($totals - $limit * $page);
+        $json['total_page']         = ceil($totals/$limit);
+        $json['remainder']          = $remainder >= 0 ? $remainder : 0;
+        $json['lists']              = $results;
+        return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$json]));
 	}
 
 	public function details()
