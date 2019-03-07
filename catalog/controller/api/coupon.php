@@ -56,7 +56,7 @@ class ControllerApiCoupon extends Controller {
                 $value['discount']              = sprintf("%.2f", $value['discount']);
                 $value['store_name']            = !empty($value['store_name']) ? htmlspecialchars_decode($value['store_name']) : 'EasiJAR';
 
-		        $overdue 						= $value['over_time'] > 0 ? 1 : 0;
+		        $overdue 	= ((int)$value['over_time'] > 0 && (int)$value['uses_limit'] > (int)$value['status']) ? 1 : 0;
 
 		        if ($value['type'] == 2) {
                     $discount = '-'.round($value['discount']).'%';

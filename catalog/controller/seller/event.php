@@ -43,7 +43,7 @@ class ControllerSellerEvent extends Controller {
                         $this->load->model('marketing/coupon');
 
                         $filter_data        = ['date'=>1];
-                        $coupon_nums        = $this->model_customercoupon_coupon->getCouponsTotals($filter_data,$seller_id);
+                        $coupon_nums        = $this->model_marketing_coupon->getCouponsTotals($filter_data,$seller_id);
 
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
