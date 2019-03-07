@@ -40,10 +40,10 @@ class ControllerSellerEvent extends Controller {
                     } else {
                         $store_name             = $seller_info ? $seller_info['store_name'] : $this->config->get('config_name');
 
-                        $this->load->model('customercoupon/coupon');
+                        $this->load->model('marketing/coupon');
 
-                        $filter_data            = ['customer_id'=> $this->customer->getId(),'seller_id' => $seller_id,'status'=>1];
-                        $coupon_nums            = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
+                        $filter_data        = ['date'=>1];
+                        $coupon_nums        = $this->model_customercoupon_coupon->getCouponsTotals($filter_data,$seller_id);
 
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
