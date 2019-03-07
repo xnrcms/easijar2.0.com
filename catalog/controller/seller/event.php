@@ -42,7 +42,7 @@ class ControllerSellerEvent extends Controller {
 
                         $this->load->model('customercoupon/coupon');
 
-                        $filter_data            = ['customer_id'=> $this->customer->getId(),'seller_id' => $seller_id];
+                        $filter_data            = ['customer_id'=> $this->customer->getId(),'seller_id' => $seller_id,'status'=>1];
                         $coupon_nums            = $this->model_customercoupon_coupon->getCouponsTotalByCustomerIdForApi($filter_data);
 
                         $products[$seller_id]   = [

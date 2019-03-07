@@ -82,14 +82,21 @@ class ModelCustomercouponCoupon extends Model
         $dtype      = isset($data['dtype']) ? (int)$data['dtype'] : 0;
         $seller_id  = isset($data['seller_id']) ? (int)$data['seller_id'] : 0;
 
-        if ($dtype == 1) {
+        if ($dtype == 0) {
+            $sql    .= " AND c.seller_id >= '0'";
+        }elseif ($dtype == 1) {
             $sql    .= " AND c.seller_id = '0'";
-        }elseif ($dtype == 2) {
+        }
+        else {
             if ($seller_id > 0) {
                 $sql    .= " AND c.seller_id = '" . (int)$seller_id . "'";
             }else{
                 $sql    .= " AND c.seller_id > '0'";
             }
+        }
+
+        if(isset($data['status'])){
+            $sql    .= " AND c.status < c.uses_limit";
         }
 
         $customer_query = $this->db->query($sql) ;
