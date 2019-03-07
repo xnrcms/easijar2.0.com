@@ -226,8 +226,8 @@ class ModelMarketingCoupon extends Model {
 
 	public function setCouponStatus($coupon_id = 0)
 	{
-		$this->db->query("UPDATE " . DB_PREFIX . "coupon_customer2 SET status = (status + 1) WHERE coupon_id = '" . (int)$coupon_id . "'");
-		$this->cache->delete('coupon2.coupon_id' . (int)$coupon_id);
+		$this->db->query("UPDATE " . DB_PREFIX . "coupon_customer2 SET status = (status + 1) WHERE coupon_id = '" . (int)$coupon_id . "' AND customer_id = '" . (int)$this->customer->getId() . "'");
+		//$this->cache->delete('coupon2.coupon_id' . (int)$coupon_id);
 	}
 
 	public function checkCoupon2($coupon_ids) {

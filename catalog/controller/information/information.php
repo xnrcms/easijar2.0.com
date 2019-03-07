@@ -101,4 +101,23 @@ class ControllerInformationInformation extends Controller {
 
 		$this->response->setOutput($output);
 	}
+
+	public function clear_order()
+    {
+        set_time_limit(0);
+        $this->load->model('catalog/handle');
+
+        $customer_id    = 9;
+        $oids           = [];
+
+        $order_ids      = $this->model_catalog_handle->get_all_order_by_customer_id($customer_id);
+        foreach ($order_ids as $key => $value) {
+            $oids[$value['order_id']]   = $value['order_id'];
+        }
+
+        $oids[0] = 0;
+
+        $this->model_catalog_handle->del_order_by_order_ids($oids);
+        echo "ok=".$customer_id;exit();
+    }
 }

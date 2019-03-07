@@ -88,7 +88,7 @@ class ControllerApiCart extends Controller {
                 $data['products'][] = array(
                     'product_id'    => (int)$product['product_id'],
                     'cart_id'       => $product['cart_id'],
-                    'checked'       => (bool)$product['selected'],
+                    'checked'       => false,
                     'thumb'         => $image,
                     'name'          => $product['name'],
                     'quantity'      => $product['quantity'],
@@ -105,9 +105,9 @@ class ControllerApiCart extends Controller {
             //格式化一下数组
             $products 			= $this->load->getViewData('products');
             $products           = isset($products['products']) ? $products['products'] : [];
-            
+
             sort($products);
-            
+
             $data['products'] 	= $products;
 
             $json 		= $this->returnData(['code'=>'200','msg'=>'success','data'=>$data]);

@@ -274,7 +274,7 @@ class ControllerApiCheckout extends Controller
 
                 $atotal                  = $subtotal + $oshipping - $ocoupon;
                 $product_total           += $atotal;
-
+                
                 $value['products']       = $ggs;
                 $value['subtotal']       = $this->currency->format($subtotal, $this->session->data['currency']);
                 $value['total']          = $this->currency->format($atotal, $this->session->data['currency']);
