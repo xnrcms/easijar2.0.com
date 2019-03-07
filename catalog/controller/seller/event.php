@@ -45,10 +45,23 @@ class ControllerSellerEvent extends Controller {
                         $filter_data        = ['date'=>1];
                         $coupon_nums        = $this->model_marketing_coupon->getCouponsTotals($filter_data,$seller_id);
 
+                        //获取商品运费
+                        $this->load->model('extension/total/multiseller_shipping');
+
+                        $country_id     = isset($this->session->data['country_code']) ? get_country_code($this->session->data['country_code']) : 0;
+                        
+                        $address                    = [];
+                        $address['country_id']      = $country_id;
+                        $address['zone_id']         = 0;
+
+                        $cost           = $this->model_extension_total_multiseller_shipping->getProductsCost($seller_id,$address);
+                        $shipping       = !empty($cost) ? $this->currency->format($cost, $this->session->data['currency']) : 0;
+                        $currency_code  = $this->currency->getSymbolLeft($this->session->data['currency']);
+
                         $products[$seller_id]   = [
                             'store_id'      => $seller_info ? $seller_id : 0,
                             'store_name'    => htmlspecialchars_decode($store_name),
-                            'shipping'      => 0,
+                            'shipping'      => trim($shipping,$currency_code),
                             'checked'       => (bool)(isset($product['checked']) ? $product['checked'] : 0),
                             'products'      => array($product),
                             'coupon_nums'   => (int)$coupon_nums

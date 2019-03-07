@@ -35,8 +35,8 @@ class ControllerApiCoupon extends Controller {
         	'customer_id'	=> $this->customer->getId(),
         	'seller_id'		=> $seller_id,
         	'dtype' 		=> $dtype,
-        	'sort' 			=> 'over_time',
-        	'order' 		=> 'DESC',
+        	'sort' 			=> 'date_added',
+        	'order' 		=> 'ASC',
             'start' 		=> ($page - 1) * $limit,
             'limit' 		=> $limit,
         ];
@@ -74,14 +74,16 @@ class ControllerApiCoupon extends Controller {
 	            //unset($value['over_time']);
 	            //unset($value['total']);
 
-		        $coupon[$value['seller_id'].'_'.$overdue]['seller_id'] 	= $value['seller_id'];
-		        $coupon[$value['seller_id'].'_'.$overdue]['store_name']	= $value['store_name'];
-		        $coupon[$value['seller_id'].'_'.$overdue]['avatar']		= $value['avatar'];
-		        $coupon[$value['seller_id'].'_'.$overdue]['coupon'][] 	= $value;
+		        $coupon[$overdue.'_'.$value['seller_id']]['seller_id'] 	= $value['seller_id'];
+		        $coupon[$overdue.'_'.$value['seller_id']]['store_name']	= $value['store_name'];
+		        $coupon[$overdue.'_'.$value['seller_id']]['avatar']		= $value['avatar'];
+		        $coupon[$overdue.'_'.$value['seller_id']]['coupon'][] 	= $value;
         	}
         }
 
-        sort($coupon);
+        krsort($coupon);
+
+        $coupon     = array_values($coupon);
 
         $remainder                  = intval($totals - $limit * $page);
         $data['total_page']         = ceil($totals/$limit);

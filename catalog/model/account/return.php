@@ -32,7 +32,11 @@ class ModelAccountReturn extends Model {
 		return $query->row['total'];
 	}
 
+	public function getTotalReturnsForMs() {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . get_tabname('return') . " r LEFT JOIN " . get_tabname('order_product') . " op ON (r.product_id = op.order_product_id) LEFT JOIN " . get_tabname('ms_seller') . " ms ON (r.seller_id = ms.seller_id) WHERE r.customer_id = '" . $this->customer->getId() . "'");
 
+		return $query->row['total'];
+	}
 
 	public function getReturnsForMs($start = 0, $limit = 20)
 	{

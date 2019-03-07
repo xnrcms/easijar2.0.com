@@ -41,6 +41,7 @@ class ControllerApiMyorder extends Controller {
             
             $this->load->model('account/return');
 
+            $totals                     = $this->model_account_return->getTotalReturnsForMs();
             $result                     = $this->model_account_return->getReturnsForMs(($page - 1) * $limit, $limit);
             $results                    = [];
             $results1                   = [];
@@ -75,6 +76,7 @@ class ControllerApiMyorder extends Controller {
                 'limit'                 => $limit,
             ];
 
+            $totals                     = $this->model_account_oreview->getTotalOreviewsForMs();
             $result                     = $this->model_account_oreview->getOreviewsForMs($filter_data);
             $results                    = [];
             $results1                   = [];
@@ -104,7 +106,8 @@ class ControllerApiMyorder extends Controller {
             $this->load->model('account/order');
 
             //订单类型 0-所有订单 1-待付款 2-待发货 3-待收货 4-待评论 5-退货退款
-            $results = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * $limit, $limit);
+            $totals     = $this->model_account_order->getTotalOrdersForMs($req_data['order_type']);
+            $results    = $this->model_account_order->getOrdersForMs($req_data['order_type'],($page - 1) * $limit, $limit);
 
             $oid        = [];
             foreach ($results as $key => $value) {
@@ -142,6 +145,10 @@ class ControllerApiMyorder extends Controller {
             }
         }
 
+
+        $remainder                     = intval($totals - $limit * $page);
+        $results['total_page']         = ceil($totals/$limit);
+        $results['remainder']          = $remainder >= 0 ? $remainder : 0;
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$results]));
 	}
 
