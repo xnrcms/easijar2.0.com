@@ -15,11 +15,11 @@
     <div id="content" class="{{ class }}">{{ content_top }}
       <h1>{{ heading_title }}</h1>
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#tab-telephone" data-toggle="tab" aria-expanded="true">{{ tab_mobile }}</a></li>
-        <li><a href="#tab-email" data-toggle="tab" aria-expanded="true">{{ tab_email }}</a></li>
+        {# <li class="active"><a href="#tab-telephone" data-toggle="tab" aria-expanded="true">{{ tab_mobile }}</a></li> #}
+        <li class="active"><a href="#tab-email" data-toggle="tab" aria-expanded="true">{{ tab_email }}</a></li>
       </ul>
       <div class="tab-content mt-1">
-        <div class="tab-pane" id="tab-email">
+        <div class="tab-pane active" id="tab-email">
           <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal form-group-list">
             <input type="hidden" name="type" value="email" />
             <div class="form-group required">
@@ -36,7 +36,7 @@
             </div>
           </form>
         </div>
-        <div class="tab-pane active" id="tab-telephone">
+        {# <div class="tab-pane" id="tab-telephone">
 
           {% if module_sms_status %}
           <form action="{{ action_telephone }}" method="post" enctype="multipart/form-data" class="form-horizontal form-group-list">
@@ -94,7 +94,7 @@
           {% else %}
           <p>{{ text_cannot_telephone }}</p>
           {% endif %}
-        </div>
+        </div> #}
       </div>
 
       {{ content_bottom }}</div>

@@ -15,7 +15,7 @@
             {% if helper.is_ft() %}
             <ul class="nav nav-tabs mb-1">
               <li id="tab-email-li" class="{{ type == 'email' ? 'active' : '' }}"><a href="#tab-email" data-toggle="tab">{{ text_login_email }}</a></li>
-              <li id="tab-mobile-li" class="{{ type == 'mobile' ? 'active' : '' }}"><a href="#tab-mobile" data-toggle="tab">{{ text_login_mobile }}</a></li>
+              {# <li id="tab-mobile-li" class="{{ type == 'mobile' ? 'active' : '' }}"><a href="#tab-mobile" data-toggle="tab">{{ text_login_mobile }}</a></li> #}
             </ul>
             <div class="tab-content">
               <div class="tab-pane {{ type == 'email' ? 'active' : '' }}" id="tab-email">

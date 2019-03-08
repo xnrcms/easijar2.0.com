@@ -115,16 +115,17 @@ class ControllerApiMyorder extends Controller {
             }
 
             $ms_total                  = $this->model_account_order->getTotalsForMsByCode($oid,'multiseller_shipping');
-            $shipping                  = [];
+            $shippings                 = [];
             foreach ($ms_total as $mskey => $msval) {
-                $shipping[$msval['order_id'].'-'.$msval['seller_id']]   = $msval['value'];
+                $shippings[$msval['order_id'].'-'.$msval['seller_id']]   = $msval['value'];
             }
 
             foreach ($results as $keys =>$result)
             {
-                $shipping                  = isset($shipping[$result['oid'].'-'.$result['msid']]) ? $shipping[$result['oid'].'-'.$result['msid']] : 0;
+                $shipping                  = isset($shippings[$result['oid'].'-'.$result['msid']]) ? $shippings[$result['oid'].'-'.$result['msid']] : 0;
 
-                $results[$keys]['oid']     = $result['soid'];
+                $results[$keys]['oid']          = $result['soid'];
+                $results[$keys]['store_name']   = htmlspecialchars_decode($result['store_name']);
 
                 $results[$keys]['total']     = $this->currency->format($result['total'], $result['currency_code'], $result['currency_value'], $this->session->data['currency']);
                 $results[$keys]['shipping']  = $this->currency->format($shipping, $result['currency_code'], $result['currency_value'], $this->session->data['currency']);

@@ -154,11 +154,12 @@ class ControllerAccountRegister extends Controller {
 			$data['fullname'] = '';
 		}
 
-		if (isset($this->request->post['type'])) {
+		$data['register_type'] = 'email';
+		/*if (isset($this->request->post['type'])) {
 			$data['register_type'] = $this->request->post['type'];
 		} else {
 			$data['register_type'] = 'mobile';
-		}
+		}*/
 
 		if (isset($this->request->post['email'])) {
 			$data['email'] = $this->request->post['email'];

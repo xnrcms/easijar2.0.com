@@ -374,7 +374,14 @@ class ControllerAccountAddress extends Controller {
 
 		$this->load->model('localisation/country');
 
-		$data['countries'] = $this->model_localisation_country->getCountries();
+		$countries 			= $this->model_localisation_country->getCountries();
+		foreach ($countries as $key => $value) {
+			if ($value['country_id'] == 44) {
+				unset($countries[$key]);
+			}
+		}
+		
+		$data['countries'] = $countries;
 
 		// Custom fields
 		$data['custom_fields'] = array();

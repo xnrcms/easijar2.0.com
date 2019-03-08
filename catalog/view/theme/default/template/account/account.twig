@@ -62,12 +62,12 @@
         {% set icon_path = helper.url().fullPathLink('catalog/view/theme/default/image/account') %}
         <div class="row">
           <div class="col-sm-3"><a href="{{ order }}"><span><img src="{{ icon_path }}/order.png"></span><em>{{ text_order }}</em></a></div>
-          <div class="col-sm-3"><a href="{{ download }}"><span><img src="{{ icon_path }}/download.png"></span><em>{{ text_download }}</em></a></div>
+         {#  <div class="col-sm-3"><a href="{{ download }}"><span><img src="{{ icon_path }}/download.png"></span><em>{{ text_download }}</em></a></div> #}
           {% if reward %}
-          <div class="col-sm-3"><a href="{{ reward }}"><span><img src="{{ icon_path }}/reward.png"></span><em>{{ text_reward }}</em></a></div>
+          {# <div class="col-sm-3"><a href="{{ reward }}"><span><img src="{{ icon_path }}/reward.png"></span><em>{{ text_reward }}</em></a></div> #}
           {% endif %}
           <div class="col-sm-3"><a href="{{ return }}"><span><img src="{{ icon_path }}/return.png"></span><em>{{ text_return }}</em></a></div>
-          <div class="col-sm-3"><a href="{{ transaction }}"><span><img src="{{ icon_path }}/transaction.png"></span><em>{{ text_transaction }}</em></a></div>
+          {# <div class="col-sm-3"><a href="{{ transaction }}"><span><img src="{{ icon_path }}/transaction.png"></span><em>{{ text_transaction }}</em></a></div> #}
           <div class="col-sm-3"><a href="{{ coupons }}"><span><img src="{{ icon_path }}/coupons.png"></span><em>{{ text_coupons }}</em></a></div>
           {# {% if not tracking %}
           <div class="col-sm-3"><a href="{{ affiliate }}"><span><img src="{{ icon_path }}/affiliate.png"></span><em>{{ text_affiliate_add }}</em></a></div>

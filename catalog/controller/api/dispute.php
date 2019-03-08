@@ -697,7 +697,6 @@ class ControllerApiDispute extends Controller {
 
         $all_totals         = $this->model_account_order->getTotals($order_id);
         $totals             = $this->model_account_order->getTotalsForMs($order_id,$seller_id,$quantity);
-        $order_products     = $this->model_account_order->getOrderProducts($order_id);
         $ms_order_products  = $this->model_account_order->getOrderProductsForMs($order_id,0);
         
         $money                      = 0;

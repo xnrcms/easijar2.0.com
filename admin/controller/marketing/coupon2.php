@@ -407,7 +407,7 @@ class ControllerMarketingCoupon2 extends Controller {
 			$this->error['name'] = $this->language->get('error_name');
 		}
 
-		if ((utf8_strlen($this->request->post['explain']) < 3) || (utf8_strlen($this->request->post['explain']) > 128)) {
+		if ((utf8_strlen($this->request->post['explain']) < 3) || (utf8_strlen($this->request->post['explain']) > 500)) {
 			$this->error['explain'] = $this->language->get('error_explain');
 		}
 
