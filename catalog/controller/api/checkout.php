@@ -254,7 +254,7 @@ class ControllerApiCheckout extends Controller
             }
         }
 
-        if (isset($product_totals[$ship_del['0multiseller_coupon']])) {
+        if ( isset($ship_del['0multiseller_coupon']) && isset($product_totals[$ship_del['0multiseller_coupon']])) {
             unset($product_totals[$ship_del['0multiseller_coupon']]);
         }
 

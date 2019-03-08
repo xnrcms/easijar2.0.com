@@ -22,8 +22,8 @@ class ControllerCheckoutSuccess extends Controller {
 			unset($this->session->data['recharge']);
 			unset($this->session->data['recharges']);
 		}
-
-		if (isset($this->session->data['api_id']) && $this->session->data['api_id'] > 0) return;
+		wr("sssssssssss");
+		//if (isset($this->session->data['api_id']) && $this->session->data['api_id'] > 0) return;
 
 		$this->document->setTitle($this->language->get('heading_title'));
 

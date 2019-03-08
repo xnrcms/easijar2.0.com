@@ -25,7 +25,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
 			'app_id'               => $this->config->get('payment_alipay_app_id'),
 			'merchant_private_key' => $this->config->get('payment_alipay_merchant_private_key'),
 			'notify_url'           => HTTP_SERVER . "payment_callback/alipay",
-			'return_url'           => $this->url->link('checkout/success'),
+			'return_url'           => OPPCW_CALLBACK . "orderFinish?paycode=alipay",
 			'charset'              => "UTF-8",
 			'sign_type'            => "RSA2",
 			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",
@@ -82,43 +82,65 @@ class ControllerExtensionPaymentAlipay extends Controller {
 
 		/*$this->load->model('checkout/order');
 		$this->model_checkout_order->addOrderHistoryForMs('2018111514465212381382381', 5);*/
+		$req_data 					= array_merge($this->request->get,$this->request->post);
+		$is_app 					= isset($req_data['is_app']) ? $req_data['is_app'] : 0;
 
-		$arr = $_POST;
-		$config = array (
+		if (isset($req_data['route'])) unset($req_data['route']);
+		if (isset($req_data['paycode'])) unset($req_data['paycode']);
+		if (isset($req_data['is_app'])) unset($req_data['is_app']);
+
+		$config 					= [
 			'app_id'               => $this->config->get('payment_alipay_app_id'),
 			'merchant_private_key' => $this->config->get('payment_alipay_merchant_private_key'),
 			'notify_url'           => HTTP_SERVER . "payment_callback/alipay",
-			'return_url'           => $this->url->link('checkout/success'),
+			'return_url'           => OPPCW_CALLBACK . "orderFinish?paycode=alipay",
 			'charset'              => "UTF-8",
 			'sign_type'            => "RSA2",
 			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",
 			'alipay_public_key'    => $this->config->get('payment_alipay_alipay_public_key'),
-		);
-		$this->load->model('extension/payment/alipay');
-		//$this->logger->write('POST' . var_export($_POST,true));
-		$result = $this->model_extension_payment_alipay->check($arr, $config);
+		];
 
-		if($result) {//check successed
+		$this->load->model('extension/payment/alipay');
+
+		//$this->logger->write('POST' . var_export($_POST,true));
+		$result = $this->model_extension_payment_alipay->check($req_data, $config);
+
+		if($result)
+		{
 			$this->log('Alipay check successed');
 
-			if($_POST['trade_status'] == 'TRADE_FINISHED') {
-			}
-			else if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
-
-				$order_sn = isset($_POST['out_trade_no']) ? explode('-', $_POST['out_trade_no']) : [];
+			if ($is_app == 1 || ($is_app == 0 && $req_data['trade_status'] == 'TRADE_SUCCESS'))
+			{
+				$order_sn = isset($req_data['out_trade_no']) ? explode('-', $req_data['out_trade_no']) : [];
 				$order_sn = isset($order_sn[0]) ? $order_sn[0] : '';
-				$trade_no = isset($_POST['trade_no']) ? $_POST['trade_no'] : '';
+				$trade_no = isset($req_data['trade_no']) ? $req_data['trade_no'] : '';
 
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
 				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $trade_no);
 			}
+			/*if($req_data['trade_status'] == 'TRADE_FINISHED') {
+			}
+			else if ($req_data['trade_status'] == 'TRADE_SUCCESS') {
+
+				$order_sn = isset($req_data['out_trade_no']) ? explode('-', $req_data['out_trade_no']) : [];
+				$order_sn = isset($order_sn[0]) ? $order_sn[0] : '';
+				$trade_no = isset($req_data['trade_no']) ? $req_data['trade_no'] : '';
+
+				$this->load->model('checkout/order');
+				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
+				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $trade_no);
+			}*/
+
+			if ($is_app == 1) return ['success',$order_sn];
+
 			echo "success";	//Do not modified or deleted
 		}else {
 			$this->log('Alipay check failed');
-			//chedk failed
-			echo "fail";
+			
+			if ($is_app == 1) return 'pay fail';
 
+			echo "fail";
 		}
 	}
 
@@ -139,7 +161,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
 			'app_id'               => $this->config->get('payment_alipay_app_id'),
 			'merchant_private_key' => $this->config->get('payment_alipay_merchant_private_key'),
 			'notify_url'           => HTTP_SERVER . "payment_callback/alipay",
-			'return_url'           => $this->url->link('checkout/success'),
+			'return_url'           => OPPCW_CALLBACK . "orderFinish?paycode=alipay",
 			'charset'              => "UTF-8",
 			'sign_type'            => "RSA2",
 			'gateway_url'          => $this->config->get('payment_alipay_test') == "sandbox" ? "https://openapi.alipaydev.com/gateway.do" : "https://openapi.alipay.com/gateway.do",

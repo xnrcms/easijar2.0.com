@@ -143,7 +143,7 @@ class ControllerApiPay extends Controller {
     {
         $this->response->addHeader('Content-Type: application/json');
 
-        $allowKey       = ['api_token','checkoutId','paysign','id'];
+        $allowKey       = ['api_token','payinfo'];
         $req_data       = $this->dataFilter($allowKey);
         $data           = $this->returnData();
         $json           = [];
@@ -163,16 +163,48 @@ class ControllerApiPay extends Controller {
         if (!$this->customer->isLogged()){
             return $this->response->setOutput($this->returnData(['code'=>'201','msg'=>t('warning_login')]));
         }
-        
-        $this->request->post['checkoutId']      = isset($req_data['checkoutId']) ? $req_data['checkoutId'] : '';
-        $this->request->post['paysign']         = isset($req_data['paysign']) ? $req_data['paysign'] : '';
-        $this->request->post['id']              = isset($req_data['id']) ? $req_data['id'] : '';
-        $res                                    = $this->load->controller('extension/payment/oppcw_creditcard/callback');
+
+        $payinfo    = isset($req_data['payinfo']) && !empty($req_data['payinfo']) ? urldecode(urldecode($req_data['payinfo'])) : '';
+        $payinfo    = !empty($payinfo) ? parse_url($payinfo) : [];
+        $payinfo    = !empty($payinfo) && isset($payinfo['fragment']) ? $this->convertUrlQuery($payinfo['fragment']) : [];
+
+        $this->request->post                     = [];
+        $this->request->post['is_app']           = 1;
+        foreach ($payinfo as $key => $value) {
+            $this->request->post[$key]      = $value;
+        }
+
+        $paycdoe = isset($this->request->post['paycode']) && !empty($this->request->post['paycode']) ? $this->request->post['paycode'] : '';
+        $res     = $this->load->controller('extension/payment/'.$paycdoe.'/callback');
 
         if ( isset($res[0]) && $res[0] == 'success') {
             return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$res[1]]));
         }
 
-        return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>$res]));
+        return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>!empty($res) ? $res : 'pay fail']));
+    }
+
+    /** 
+     * Returns the url query as associative array 
+     * 
+     * @param    string    query 
+     * @return    array    params 
+     */
+    private function convertUrlQuery($query)
+    { 
+        $query      = str_replace('/orderFinish?paycode', 'paycode', $query);
+        $query      = str_replace('&?', '&', $query);
+        $$query     = urldecode($query);
+        
+        $queryParts = explode('&', $query); 
+         
+        $params = array(); 
+        foreach ($queryParts as $param) 
+        { 
+            $item = explode('=', $param); 
+            $params[$item[0]] = $item[1]; 
+        } 
+         
+        return $params; 
     }
 }

@@ -188,7 +188,7 @@ abstract class ControllerPaymentOPPCwAbstract extends OPPCw_AbstractController i
 		$payData['authentication.userId'] 		= $user_id;
 		$payData['authentication.password'] 	= $user_password;
 		$payData['authentication.entityId'] 	= $entity_id;
-
+		
 		$url 									= $url . http_build_query($payData);
 		$pay  									= curl_http($url,'','GET');
 		$pay 									= !empty($pay) ? json_decode($pay,true) : [];
