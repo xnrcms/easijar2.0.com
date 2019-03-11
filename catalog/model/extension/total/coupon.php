@@ -346,8 +346,30 @@ class ModelExtensionTotalCoupon extends Model {
         $results            = $this->model_customercoupon_coupon->getCouponsByCustomerIdForApi($filter_data);
         $coupon             = [];
 
+        //这里新人优惠券需要特殊处理
+        $currency_code      = isset($this->session->data['currency']) ? $this->session->data['currency'] : '';
+        $amounts            = [
+            'MYR'=>[54=>10,50=>20,52=>30],
+            'SGD'=>[54=>3,50=>7,52=>10],
+            'USD'=>[54=>2.5,50=>5,52=>7.5],
+        ];
+        $order_total        = [
+            'MYR'=>[54=>10,50=>200,52=>300],
+            'SGD'=>[54=>3,50=>70,52=>100],
+            'USD'=>[54=>2.5,50=>50,52=>75],
+        ];
+
         foreach ($results as $key => $value)
         {
+
+            if (isset($order_total[$currency_code])) {
+                $value['order_total']   = $this->currency->convert($order_total[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
+            }
+
+            if (isset($amounts[$currency_code])) {
+                $value['discount']   = $this->currency->convert($amounts[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
+            }
+
             if ($value['seller_id'] > 0 && $value['type'] == 1 && isset($seller_price[$value['seller_id']]) && ($seller_price[$value['seller_id']]['price2'] <= $value['order_total'] || $seller_price[$value['seller_id']]['price2'] <= $value['discount'])) {
                 unset($results[$key]);
                 continue;
@@ -575,7 +597,7 @@ class ModelExtensionTotalCoupon extends Model {
                 . (int)$value['seller_id'] . "','"
                 . (int)$value['get_limit'] . "','"
                 . (int)$value['uses_limit'] . "','"
-                . (int)$value['launch_scene'] . "',NOW(),NOW()),";
+                . (int)$value['launch_scene'] . "',NOW()+1,NOW()+1),";
             }
 
             $sql        = trim($sql,',');

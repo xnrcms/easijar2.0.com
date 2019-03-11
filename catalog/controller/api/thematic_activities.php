@@ -35,20 +35,31 @@ class ControllerApiThematicActivities extends Controller {
         $coupons                = $this->load->controller('extension/total/coupon/getNewPeopleCouponForApi');
         $coupon                 = [];
 
+        $amounts                = [
+            'MYR'=>[54=>10,50=>20,52=>30],
+            'SGD'=>[54=>3,50=>7,52=>10],
+            'USD'=>[54=>2.5,50=>5,52=>7.5],
+        ];
+        $currency_code                      = isset($this->session->data['currency']) ? $this->session->data['currency'] : '';
+
         foreach ($coupons as $key => $value)
         {
-            $discount           = sprintf("%.2f", $value['discount']);
+            /*$discount           = sprintf("%.2f", $value['discount']);
             if ($value['type'] == 2) {
                 $discount       = round($value['discount']).'%';
             } else {
                 $discount       = trim($this->currency->format($value['discount'], $this->session->data['currency']),$json['currency']);
+            }*/
+
+            if (!isset($amounts[$currency_code])) {
+                unset($coupons[$key]);continue;
             }
 
             $json['coupon_list'][]            = [
                 'coupon_id' =>$value['coupon_id'],
                 'name'      =>$value['name'],
                 'type'      =>(int)$value['type'],
-                'discount'  =>$discount,
+                'discount'  =>(string)sprintf("%.2f", $amounts[$currency_code][$value['coupon_id']]),
             ];
         }
 

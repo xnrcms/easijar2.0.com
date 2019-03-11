@@ -35,8 +35,8 @@ class ControllerApiCoupon extends Controller {
         	'customer_id'	=> $this->customer->getId(),
         	'seller_id'		=> $seller_id,
         	'dtype' 		=> $dtype,
-        	'sort' 			=> 'date_added',
-        	'order' 		=> 'ASC',
+        	'sort' 			=> 'c.date_added',
+        	'order' 		=> 'DESC',
             'start' 		=> ($page - 1) * $limit,
             'limit' 		=> $limit,
         ];
@@ -49,14 +49,37 @@ class ControllerApiCoupon extends Controller {
         $coupon 			= [];
         $seller_ids         = [];          
 
-        if (!empty($results)) {
-        	foreach ($results as $key => $value) {
+        if (!empty($results))
+        {
+            //这里新人优惠券需要特殊处理
+            $currency_code      = isset($this->session->data['currency']) ? $this->session->data['currency'] : '';
+            $amounts            = [
+                'MYR'=>[54=>10,50=>20,52=>30],
+                'SGD'=>[54=>3,50=>7,52=>10],
+                'USD'=>[54=>2.5,50=>5,52=>7.5],
+            ];
+            $order_total        = [
+                'MYR'=>[54=>10,50=>200,52=>300],
+                'SGD'=>[54=>3,50=>70,52=>100],
+                'USD'=>[54=>2.5,50=>50,52=>75],
+            ];
+
+        	foreach ($results as $key => $value)
+            {
         		$avatar                 		= !empty($value['avatar']) ? $value['avatar'] : 'no_image.png';
 		        $value['avatar']        		= $this->model_tool_image->resize($avatar, 100, 100);
                 $value['discount']              = sprintf("%.2f", $value['discount']);
                 $value['store_name']            = !empty($value['store_name']) ? htmlspecialchars_decode($value['store_name']) : 'EasiJAR';
 
 		        $overdue 	= ((int)$value['over_time'] > 0 && (int)$value['uses_limit'] > (int)$value['status']) ? 1 : 0;
+
+                if (isset($order_total[$currency_code])) {
+                    $value['order_total']   = $this->currency->convert($order_total[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
+                }
+
+                if (isset($amounts[$currency_code])) {
+                    $value['discount']      = $this->currency->convert($amounts[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
+                }
 
 		        if ($value['type'] == 2) {
                     $discount = '-'.round($value['discount']).'%';

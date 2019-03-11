@@ -427,7 +427,7 @@ class ControllerMarketingCoupon2 extends Controller {
 		if ($discount <= 0) {
 			$this->error['discount'] = $this->language->get('error_discount_'.$type);
 		}else{
-			if ((($type == 1 || $type == 3) && $discount >= $order_total) || ($type == 2 && $discount >= 100)) {
+			if ((($type == 1 || $type == 3) && $discount > $order_total) || ($type == 2 && $discount >= 100)) {
 				$this->error['discount'] = $this->language->get('error_discount_'.$type);
 			}
 		}
