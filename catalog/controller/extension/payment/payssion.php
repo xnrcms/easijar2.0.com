@@ -21,7 +21,7 @@ class ControllerExtensionPaymentPayssion extends Controller {
 		$data['amount'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
 		$data['currency'] = $order_info['currency_code'];
 		$data['description'] = $this->config->get('config_name') . ' - #' . $order_info['order_id'];
-		$data['payer_name'] = $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'];
+		$data['payer_name'] = $order_info['payment_fullname'] ;//. ' ' . $order_info['payment_lastname'];
 
 // 		if (!$order_info['payment_address_2']) {
 // 			$data['address'] = $order_info['payment_address_1'] . ', ' . $order_info['payment_city'] . ', ' . $order_info['payment_zone'];

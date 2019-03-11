@@ -274,7 +274,7 @@ class ModelExtensionTotalCoupon extends Model {
 
             $coupon_key 		= -1;
 
-            if (isset($select_coupons[0])) {
+            if (isset($select_coupons[0]) && !empty($select_coupons[0])) {
             	foreach ($select_coupons[0] as $sckey => $scvalue) {
             		if ($scvalue['order_total'] >= $total['total']) {
             			unset($select_coupons[0][$sckey]);
@@ -295,7 +295,7 @@ class ModelExtensionTotalCoupon extends Model {
             	return $select_coupons;
             }
 
-            if ($coupon_key < 0) {
+            if ($coupon_key < 0 && isset($select_coupons[0]) && !empty($select_coupons[0])) {
             	foreach ($select_coupons[0] as $sckey => $scvalue) {
             		$coupon_key 	= $sckey;break;
             	}

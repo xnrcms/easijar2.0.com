@@ -1,7 +1,8 @@
 <?php
 class ControllerExtensionTotalCoupon extends Controller {
 	public function index() {
-		if ($this->config->get('total_coupon_status')) {
+		return "";
+		/*if ($this->config->get('total_coupon_status')) {
 			$this->load->language('extension/total/coupon');
 
 			if (isset($this->session->data['coupon'])) {
@@ -25,7 +26,7 @@ class ControllerExtensionTotalCoupon extends Controller {
             $data['customer_coupons'] = $customer_coupons ? $customer_coupons : array();
 
 			return $this->load->view('extension/total/coupon', $data);
-		}
+		}*/
 	}
 
 	public function coupon() {

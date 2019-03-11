@@ -170,6 +170,7 @@ class ControllerApiProduct extends Controller {
         
 		$this->load->model('catalog/product');
 		$this->load->model('catalog/product_pro');
+		$this->load->model('tool/image');
 
 		$product_info 			= $this->model_catalog_product->getProduct($req_data['product_id']);
 
@@ -237,13 +238,21 @@ class ControllerApiProduct extends Controller {
 				$sku_stocks 					= [];
 				if (!empty($sku_products)) {
 					foreach ($sku_products as $skey => $svlaue) {
-						$sku_stocks[$svlaue['product_id']] 			= $svlaue['quantity'];
+						$sku_stocks[$svlaue['product_id']] 			= $svlaue;
 					}
 				}
 
 				$skusProductStock 		= [];
 				foreach ($skus_prodoct_ids as $spkey => $spvalue) {
-					$skusProductStock[] = ['sku'=>$spkey,'stock'=>(isset($sku_stocks[$spvalue])) ? (int)$sku_stocks[$spvalue] : 0];
+					$sku_pinfo 			= (isset($sku_stocks[$spvalue])) ? $sku_stocks[$spvalue] : [];
+					$sku_stocks 		= (isset($sku_pinfo['quantity'])) ? (int)$sku_pinfo['quantity'] : 0;
+					$sku_image 			= (isset($sku_pinfo['image'])) ? $sku_pinfo['image'] : '';
+
+					$skusProductStock[] = [
+						'sku'	=> $spkey,
+						'stock'	=> $sku_stocks,
+						'image'	=> $this->model_tool_image->resize($sku_image, 600, 600)
+					];
 				}
 
 				$skusString 					= !empty($skusArr) ? str_replace('|||', '|', implode('|', $skusArr)) : '';
@@ -274,8 +283,6 @@ class ControllerApiProduct extends Controller {
 			//所有商品ID 子产品和和主产品
 			$ppid 								= $product_info['parent_id'] > 0 ? $product_info['parent_id'] : $product_info['product_id'];
 			$product_ids 						= $this->model_catalog_product->getProductAllIdByPidOrProductId($ppid);
-
-			$this->load->model('tool/image');
 
 			//商品评论
 			$this->load->model('account/oreview');

@@ -542,7 +542,7 @@ class ControllerSellerOrder extends Controller {
 			$totals = $this->model_multiseller_order->getSubOrderTotals($this->request->get['order_id']);
 
 			foreach ($totals as $total) {
-				$tt                             = explode('&', $total['title']);
+				$tt                             = explode('&#', $total['title']);
                 if (count($tt) == 3 && (int)$tt[1] > 0 ) {
                     $title      = $tt[2];
                 }else{

@@ -422,7 +422,7 @@ class ControllerAccountOrder extends Controller {
 			{
 	            $title          = $total['title'];
 	            if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
-	                $titles     = explode('&', $title);
+	                $titles     = explode('&#', $title);
 	                $title      = $titles[0] . ' ' . $titles[2];
 	            }
 

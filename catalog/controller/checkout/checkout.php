@@ -996,7 +996,7 @@ class ControllerCheckoutCheckout extends Controller
         foreach ($totals as $total) {
             $title          = $total['title'];
             if (in_array($total['code'], ['multiseller_shipping','multiseller_coupon'])) {
-                $titles     = explode('&', $title);
+                $titles     = explode('&#', $title);
                 $title      = $titles[0] . $titles[2];
             }
             if ($total['code'] == 'shipping') continue;

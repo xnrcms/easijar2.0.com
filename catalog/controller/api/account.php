@@ -199,7 +199,7 @@ class ControllerApiAccount extends Controller {
             $this->load->language('account/edit');
 
         	if ($field 	== 'fullname') {
-                if ((utf8_strlen(trim($val)) < 2) || (utf8_strlen(trim($val)) > 10)) {
+                if ((utf8_strlen(trim($val)) < 2) || (utf8_strlen(trim($val)) > 30)) {
                     return $this->response->setOutput($this->returnData(['msg'=>$this->language->get('error_fullname')]));
                 }
         		$this->model_account_customer->editFullName($val);
