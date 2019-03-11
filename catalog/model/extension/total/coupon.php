@@ -578,10 +578,12 @@ class ModelExtensionTotalCoupon extends Model {
             
             $coupon_id 		= [];
             $coupon_id[] 	= 0;
+            $time           = time();
 
             foreach ($coupons as $value)
             {
             	$coupon_id[] 	= (int)$value['coupon_id'];
+                $tt             = date('Y-m-d H:i:s',$time++);
 
                 $sql .= "('"
                 . (int)$value['coupon_id'] . "','"
@@ -597,7 +599,7 @@ class ModelExtensionTotalCoupon extends Model {
                 . (int)$value['seller_id'] . "','"
                 . (int)$value['get_limit'] . "','"
                 . (int)$value['uses_limit'] . "','"
-                . (int)$value['launch_scene'] . "',NOW()+1,NOW()+1),";
+                . (int)$value['launch_scene'] . "','".$tt."','".$tt."'),";
             }
 
             $sql        = trim($sql,',');
