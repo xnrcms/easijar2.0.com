@@ -752,7 +752,8 @@ class ControllerSellerReturn extends Controller {
 							$rdata['currency'] 	= $currency;
 
 							$res 		= $this->load->controller('extension/payment/' . $payment_code . '/returnPay',$rdata);
-							if (empty($res) || $res == 'fail') {
+
+							if (!empty($res) && $res === 'fail') {
 								$json['error'] = $this->language->get('error_return_api');
 							}else if ($res == 'success') {
 								//设置退款数量

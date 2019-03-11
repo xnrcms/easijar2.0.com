@@ -116,6 +116,7 @@ class ControllerExtensionPaymentAlipay extends Controller {
 				$trade_no = isset($req_data['trade_no']) ? $req_data['trade_no'] : '';
 
 				$this->load->model('checkout/order');
+
 				$this->model_checkout_order->addOrderHistoryForMs($order_sn, $this->config->get('payment_alipay_order_status_id'));
 				$this->model_checkout_order->updateSubOrderPayCode($order_sn, $trade_no);
 			}
@@ -227,18 +228,23 @@ class ControllerExtensionPaymentAlipay extends Controller {
 
 		$refund_no 					= date('YmdHis',time()) . random_string(11);
 
-		$data = [
+		$postData = [
 		    'out_trade_no' => '',
-		    'trade_no' => '2018122722001400650532537314',// 支付宝交易号， 与 out_trade_no 必须二选一
-		    'refund_fee' => '0.2',
-		    'reason' => '我要退款',
+		    'trade_no' => isset($data['pay_code']) ? $data['pay_code'] : '',// 支付宝交易号， 与 out_trade_no 必须二选一
+		    'refund_fee' => isset($data['amount']) ? $data['amount'] : 0,
+		    'reason' => '用户申请退款',
 		    'refund_no' => $refund_no,
 		];
 
 		try {
-		    return Refund::run(Config::ALI_REFUND, $config, $data);
+			$returnRes 		= Refund::run(Config::ALI_REFUND, $config, $postData);
+			if ((isset($returnRes['code']) && $returnRes['code'] === '10000') || isset($returnRes['msg']) && $returnRes['msg'] === 'Success') {
+				return 'success';
+			}
 		} catch (PayException $e) {
-		    return $e->errorMessage();
+			wr(['$e->errorMessage()'=>$e->errorMessage()]);
+		    //return $e->errorMessage();
+		    return 'fail';
 		}
     }
 }
