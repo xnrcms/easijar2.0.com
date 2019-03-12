@@ -362,11 +362,11 @@ class ModelExtensionTotalCoupon extends Model {
         foreach ($results as $key => $value)
         {
 
-            if (isset($order_total[$currency_code])) {
+            if (isset($order_total[$currency_code][$value['coupon_id']])) {
                 $value['order_total']   = $this->currency->convert($order_total[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
             }
 
-            if (isset($amounts[$currency_code])) {
+            if (isset($amounts[$currency_code][$value['coupon_id']])) {
                 $value['discount']   = $this->currency->convert($amounts[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
             }
 

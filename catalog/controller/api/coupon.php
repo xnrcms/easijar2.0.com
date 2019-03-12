@@ -73,11 +73,11 @@ class ControllerApiCoupon extends Controller {
 
 		        $overdue 	= ((int)$value['over_time'] > 0 && (int)$value['uses_limit'] > (int)$value['status']) ? 1 : 0;
 
-                if (isset($order_total[$currency_code])) {
+                if (isset($order_total[$currency_code][$value['coupon_id']])) {
                     $value['order_total']   = $this->currency->convert($order_total[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
                 }
 
-                if (isset($amounts[$currency_code])) {
+                if (isset($amounts[$currency_code][$value['coupon_id']])) {
                     $value['discount']      = $this->currency->convert($amounts[$currency_code][$value['coupon_id']],$currency_code, 'CNY');
                 }
 

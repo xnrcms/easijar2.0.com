@@ -243,15 +243,18 @@ class ControllerApiProduct extends Controller {
 				}
 
 				$skusProductStock 		= [];
-				foreach ($skus_prodoct_ids as $spkey => $spvalue) {
+				foreach ($skus_prodoct_ids as $spkey => $spvalue)
+				{
 					$sku_pinfo 			= (isset($sku_stocks[$spvalue])) ? $sku_stocks[$spvalue] : [];
-					$sku_stocks 		= (isset($sku_pinfo['quantity'])) ? (int)$sku_pinfo['quantity'] : 0;
+					$sku_quantity 		= (isset($sku_pinfo['quantity'])) ? (int)$sku_pinfo['quantity'] : 0;
 					$sku_image 			= (isset($sku_pinfo['image'])) ? $sku_pinfo['image'] : '';
+					$product_id 		= (isset($sku_pinfo['product_id'])) ? (int)$sku_pinfo['product_id'] : 0;
 
 					$skusProductStock[] = [
-						'sku'	=> $spkey,
-						'stock'	=> $sku_stocks,
-						'image'	=> $this->model_tool_image->resize($sku_image, 600, 600)
+						'sku'			=> $spkey,
+						'stock'			=> $sku_quantity,
+						'product_id'	=> $product_id,
+						'image'			=> $this->model_tool_image->resize($sku_image, 600, 600)
 					];
 				}
 
