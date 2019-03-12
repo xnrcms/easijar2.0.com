@@ -17,6 +17,7 @@ class ControllerExtensionTotalTotals extends Controller
         if (empty($all_totals)) return [];
 
         $all_sub_total              = 0;
+        $seller_product_total       = 0;
         $seller_total           	= 0;
         $seller_sub_total           = 0;
         $platform_coupon            = 0;
@@ -31,7 +32,8 @@ class ControllerExtensionTotalTotals extends Controller
 
             if ($seller_id > 0 && $ms_seller_id === $seller_id)
             {
-                $seller_sub_total   += $msvalue['total'];
+                //$seller_sub_total   	+= $msvalue['total'];
+                $seller_product_total   += $msvalue['total'];
             }
 
             //计算total
@@ -42,7 +44,7 @@ class ControllerExtensionTotalTotals extends Controller
                 if ( $atvalue['code'] === 'multiseller_shipping' && strpos($atvalue['title'],$stitle) !== false && $atvalue['value'] > 0) {
                     $all_sub_total    += $atvalue['value'];
                     if ($seller_id > 0 && $ms_seller_id === $seller_id) {
-                        $seller_sub_total    += $atvalue['value'];
+                        //$seller_sub_total    += $atvalue['value'];
                         $seller_shipping     += $atvalue['value'];
                     }
                 }
@@ -52,7 +54,7 @@ class ControllerExtensionTotalTotals extends Controller
                 if ( $atvalue['code'] === 'multiseller_coupon' && strpos($atvalue['title'],$ctitle) !== false && $atvalue['value'] > 0) {
                     $all_sub_total    += $atvalue['value'];
                     if ($seller_id > 0 && $ms_seller_id === $seller_id) {
-                        $seller_sub_total    += $atvalue['value'];
+                        //$seller_sub_total    += $atvalue['value'];
                         $seller_coupon       += $atvalue['value'];
                     }
                 }
@@ -68,15 +70,19 @@ class ControllerExtensionTotalTotals extends Controller
             }
         }
 
+        $seller_sub_total 			= $seller_product_total + $seller_shipping - $seller_coupon;
         $seller_platform_coupon     = ($seller_sub_total / $all_sub_total) * $platform_coupon;
         $seller_total           	= $seller_sub_total - $seller_platform_coupon;
         
-        return [
+        $seller_totals 				= [
+        	'seller_product_total' 		=> $this->currency->format($seller_product_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
         	'seller_sub_total' 			=> $this->currency->format($seller_sub_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
             'seller_total'       		=> $this->currency->format($seller_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
             'seller_coupon'     		=> $this->currency->format($seller_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
             'seller_shipping'   		=> $this->currency->format($seller_shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
             'seller_platform_coupon'   	=> $this->currency->format($seller_platform_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
         ];
+
+        return $seller_totals;
     }
 }

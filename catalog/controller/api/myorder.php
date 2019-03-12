@@ -261,7 +261,7 @@ class ControllerApiMyorder extends Controller {
         $order_payinfo                  = $this->model_account_order->getOrderPayinfoForMs($order_info['order_sn']);
         $order_totals                   = $this->load->controller('extension/total/totals/getTotals',$order_payinfo);
 
-        $ms_total                       = $this->model_account_order->getTotalsForMs($order_id,$seller_id);
+        /*$ms_total                       = $this->model_account_order->getTotalsForMs($order_id,$seller_id);
         $shipping                       = 0;
         $coupon                         = 0;
 
@@ -274,12 +274,13 @@ class ControllerApiMyorder extends Controller {
             }
         }
 
-        $total                          = $subtotal + $shipping - $coupon;
+        $total                          = $subtotal + $shipping - $coupon;*/
 
-        $json['total']                  = $this->currency->format($total, $currency_code, $currency_value, $this->session->data['currency']);
-        $json['total_shipping']         = $this->currency->format($shipping, $currency_code, $currency_value, $this->session->data['currency']);
-        $json['total_coupon']           = $this->currency->format($coupon, $currency_code, $currency_value, $this->session->data['currency']);
-        $json['subtotal']               = $this->currency->format($subtotal, $currency_code, $currency_value, $this->session->data['currency']);
+        $json['total']                  = isset($order_totals['seller_total']) ? $order_totals['seller_total'] : '';
+        $json['total_shipping']         = isset($order_totals['seller_shipping']) ? $order_totals['seller_shipping'] : '';
+        $json['total_coupon']           = isset($order_totals['seller_coupon']) ? $order_totals['seller_coupon'] : '';
+        $json['platform_coupon']        = isset($order_totals['seller_platform_coupon']) ? $order_totals['seller_platform_coupon'] : '';
+        $json['subtotal']               = isset($order_totals['seller_product_total']) ? $order_totals['seller_product_total'] : '';
         
         if($order_info['order_status_id'] == $this->config->get('config_unpaid_status_id') && $order_info['payment_code'] != 'cod') {
             /*$this->session->data['order_id'] = $order_id;
