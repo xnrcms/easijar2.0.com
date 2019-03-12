@@ -5,12 +5,11 @@ class ControllerExtensionTotalTotals extends Controller
     {
         $order_id           = isset($order_info['order_id']) ? (int)$order_info['order_id'] : 0;
         $seller_id          = isset($order_info['seller_id']) ? (int)$order_info['seller_id'] : 0;
-        $order_sn           = isset($order_info['order_sn']) ? (int)$order_info['order_sn'] : '';
 
         if ($order_id <= 0 || $seller_id <= 0 ) return [];
 
         $this->load->model('account/order');
-        
+
         $ms_order_products  = $this->model_account_order->getOrderProductsForMs($order_id,0);
         if (empty($ms_order_products)) return [];
 
@@ -72,7 +71,6 @@ class ControllerExtensionTotalTotals extends Controller
         $seller_sub_total           = $seller_sub_total - $seller_platform_coupon;
         
         return [
-            'order_sn'          => $order_sn,
             'order_money'       => $this->currency->format($seller_sub_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
             'seller_coupon'     => $this->currency->format($seller_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
             'seller_shipping'   => $this->currency->format($seller_shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
