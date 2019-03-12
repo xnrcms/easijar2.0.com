@@ -30,10 +30,6 @@ class ControllerApiPay extends Controller {
             return $this->response->setOutput($this->returnData(['msg'=>t('error_order_info')]));
         }
 
-        $order_info                     = [];
-        $order_info['order_sn']         = $order_payinfo['order_sn'];
-        $order_info['order_money']      = $this->currency->format($order_payinfo['total'], $order_payinfo['currency_code'], $order_payinfo['currency_value'], $this->session->data['currency']);
-
         $address            = [];
         foreach ($order_payinfo as $key=>$val) {
             if (strpos($key,'payment_') === 0) {
@@ -56,6 +52,8 @@ class ControllerApiPay extends Controller {
         }
 
         $payment_option         = array_merge($selected_pay,$payment_option);
+
+        $order_info             = $payment = $this->load->controller('extension/total/totals/getTotals',$order_payinfo);
 
         $json                   = [];
         $json['order_info']     = $order_info;
