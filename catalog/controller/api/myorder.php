@@ -258,6 +258,9 @@ class ControllerApiMyorder extends Controller {
         $json['product_info'] 			= $product_info;
         $json['seller_info'] 			= $seller_info;
 
+        $order_payinfo                  = $this->model_account_order->getOrderPayinfoForMs($order_info['order_sn']);
+        $order_totals                   = $this->load->controller('extension/total/totals/getTotals',$order_payinfo);
+
         $ms_total                       = $this->model_account_order->getTotalsForMs($order_id,$seller_id);
         $shipping                       = 0;
         $coupon                         = 0;

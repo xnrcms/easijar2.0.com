@@ -54,7 +54,10 @@ class ControllerApiPay extends Controller {
         $payment_option         = array_merge($selected_pay,$payment_option);
 
         $order_info             = $this->load->controller('extension/total/totals/getTotals',$order_payinfo);
-
+        if (!empty($order_info)) {
+            $order_info                     = array_merge($order_info,$order_payinfo);
+            $order_info['order_money']      = $order_info['seller_total'];
+        }
 
         $json                   = [];
         $json['order_info']     = !empty($order_info) ? array_merge($order_info,$order_payinfo) : [];

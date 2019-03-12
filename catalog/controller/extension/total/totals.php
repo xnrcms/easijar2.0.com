@@ -17,6 +17,7 @@ class ControllerExtensionTotalTotals extends Controller
         if (empty($all_totals)) return [];
 
         $all_sub_total              = 0;
+        $seller_total           	= 0;
         $seller_sub_total           = 0;
         $platform_coupon            = 0;
         $seller_coupon              = 0;
@@ -68,13 +69,14 @@ class ControllerExtensionTotalTotals extends Controller
         }
 
         $seller_platform_coupon     = ($seller_sub_total / $all_sub_total) * $platform_coupon;
-        $seller_sub_total           = $seller_sub_total - $seller_platform_coupon;
+        $seller_total           	= $seller_sub_total - $seller_platform_coupon;
         
         return [
-            'order_money'       => $this->currency->format($seller_sub_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_coupon'     => $this->currency->format($seller_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_shipping'   => $this->currency->format($seller_shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_platform_coupon'   => $this->currency->format($seller_platform_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
+        	'seller_sub_total' 			=> $this->currency->format($seller_sub_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
+            'seller_total'       		=> $this->currency->format($seller_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
+            'seller_coupon'     		=> $this->currency->format($seller_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
+            'seller_shipping'   		=> $this->currency->format($seller_shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
+            'seller_platform_coupon'   	=> $this->currency->format($seller_platform_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
         ];
     }
 }
