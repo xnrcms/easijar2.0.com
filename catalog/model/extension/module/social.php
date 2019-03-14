@@ -23,28 +23,39 @@ class ModelExtensionModuleSocial extends Model
     {
         // for twitter
         if (strtolower($provider) == 'twitter') {
-            $social = $this->getSocialByProvider($provider);
-            $social_id = $social['client_id'];
-            $social_secret = $social['client_secret'];
-            $social_redirect = $social['redirect'];
-            $twitteroauth = new TwitterOAuth($social_id, $social_secret);
-            $request_token = $twitteroauth->oauth('oauth/request_token', ['oauth_callback' => $social_redirect]);
+            $social             = $this->getSocialByProvider($provider);
+            $social_id          = $social['client_id'];
+            $social_secret      = $social['client_secret'];
+            $social_redirect    = $social['redirect'];
+
+            if (isset($this->request->get['is_api']) && (int)$this->request->get['is_api'] === 1){
+                $social_redirect    = rtrim(OPPCW_CALLBACK,'/#/') . "/authlogin.html?provider=" . $provider;
+            }
+
+            $twitteroauth       = new TwitterOAuth($social_id, $social_secret);
+            $request_token      = $twitteroauth->oauth('oauth/request_token', ['oauth_callback' => $social_redirect]);
             if($twitteroauth->getLastHttpCode() != 200) {
                 throw new \Exception('There was a problem performing this request');
             }
-            $this->session->data['twitter_oauth_token'] = $request_token['oauth_token'];
-            $this->session->data['twitter_oauth_token_secret'] = $request_token['oauth_token_secret'];
+            $this->session->data['twitter_oauth_token']         = $request_token['oauth_token'];
+            $this->session->data['twitter_oauth_token_secret']  = $request_token['oauth_token_secret'];
             $url = $twitteroauth->url(
                 'oauth/authorize', [
                     'oauth_token' => $request_token['oauth_token']
                 ]
             );
+
+            if (isset($this->request->get['is_api']) && (int)$this->request->get['is_api'] === 1) return $url;
+
             header('location:' . $url);
             return;
         }
 
         $socialite = $this->initSocialite();
         $response = $socialite->driver($provider)->redirect();
+
+        if (isset($this->request->get['is_api']) && (int)$this->request->get['is_api'] === 1) return $response->getTargetUrl();
+
         return $response->send();
     }
 

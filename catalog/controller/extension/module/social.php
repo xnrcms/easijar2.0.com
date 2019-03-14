@@ -38,6 +38,99 @@ class ControllerExtensionModuleSocial extends Controller
         return model('extension/module/social')->redirectAuthUrl($provider);
     }
 
+    public function api_login()
+    {
+        $provider = strtolower(array_get($this->request->get, 'provider'));
+
+        $this->setProvider($provider);
+        $this->load->model('extension/module/social');
+        $this->load->model('account/customer');
+        $this->load->model('account/customer_group');
+        $this->load->language('account/login');
+
+        if ($this->customer->isLogged()) {
+            $this->session->data['associate'] = true;
+        }
+
+        if ($this->provider == 'twitter') {
+            $social     = model('extension/module/social')->getSocialByProvider($this->provider);
+            $connection = new TwitterOAuth($social['client_id'], $social['client_secret'], $this->session->data['twitter_oauth_token'], $this->session->data['twitter_oauth_token_secret']);
+            $response   = $connection->oauth(
+                'oauth/access_token', [
+                    'oauth_verifier' => $this->request->get['oauth_verifier']
+                ]
+            );
+        } else {
+            if (!isset($this->request->get['code'])) {
+                return 'empty_code';
+            }
+            
+            $response = $this->getModel()->getTokens($this->request->get['code']);
+            if (!$response) {
+                return 'invalid_code';
+            }
+        }
+
+        $socialData = $this->getSocialData($response);
+        $uid        = array_get($socialData, 'uid');
+        $unionId    = array_get($socialData, 'union_id');
+
+        if (!$uid && !$unionId) {
+            return 'invalid_access_token';
+        }
+        if ($this->getProvider() != 'twitter' && !is_object(array_get($socialData, 'user'))) {
+            return 'invalid_code';
+        }
+
+        // User exist in database
+        $customerInfo = $this->getCustomerFromAuth($socialData);
+        if ($customerInfo) {
+            $customerId = $customerInfo['customer_id'];
+            $this->saveRemoteAvatar($customerId, $socialData);
+            if ($this->validate($customerId)) {
+                $authData = $this->getAuthData($socialData);
+
+                unset($this->session->data['guest']);
+
+                // Add to activity log
+                $this->load->model('account/activity');
+
+                $activity_data = array(
+                    'customer_id' => $this->customer->getId(),
+                    'name' => $this->customer->getFullName()
+                );
+                $this->model_account_activity->addActivity('login', $activity_data);
+                $this->getModel()->updateAuthentication($authData);
+
+                if (isset($this->session->data["{$this->getLoginKey()}"]['seamless'])) {
+                    unset($this->session->data["{$this->getLoginKey()}"]['seamless']);
+                }
+
+                return 'login success';
+            } else {
+                return 'login fail';
+            }
+        }
+
+        if ($this->customer->isLogged()) {
+            $customerId = $this->customer->getId();
+            $this->createAuth($customerId, $socialData);
+        } else {
+            $customerId = $this->createCustomer($socialData);
+        }
+
+        $this->saveRemoteAvatar($customerId, $socialData);
+
+        $customerInfo = $this->getCustomerFromAuth($socialData);
+
+        if ($customerInfo && $this->validate($customerInfo['customer_id'])) {
+            $authData = $this->getAuthData($socialData);
+            $this->completeLogin($customerId, $customerInfo['email'], $authData);
+        } else {
+            return 'login fail';
+        }
+    }
+
     public function login()
     {
         $provider = strtolower(array_get($this->request->get, 'provider'));

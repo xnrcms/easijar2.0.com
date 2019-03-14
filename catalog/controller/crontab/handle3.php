@@ -10,7 +10,7 @@ class ControllerCrontabHandle3 extends Controller {
         $req_data           = array_merge($this->request->get,$this->request->post);
         $step               = (isset($req_data['step']) && (int)$req_data['step'] > 0) ? (int)$req_data['step'] : 0;
         $page               = (isset($req_data['page']) && (int)$req_data['page'] >=1) ? (int)$req_data['page'] : 1;
-        $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 100;
+        $limit              = (isset($req_data['limit']) && (int)$req_data['limit'] > 0) ? (int)$req_data['limit'] : 1000;
         $ini_time           = time();
 
         $filter_data        = [
@@ -25,45 +25,189 @@ class ControllerCrontabHandle3 extends Controller {
             //处理属性
             $total                          = $this->model_catalog_handle->getProductsTotals($filter_data);
             $products                       = $this->model_catalog_handle->getProducts($filter_data);
-            print_r($total);exit();
 
-            $remainder                      = intval($this->session->data['handle_data']['ototals'] - $limit * $page);
-            $remainder1                     = $this->session->data['handle_data']['ototals'] - $remainder;
-            $is_save                        = $remainder > 0 ? true : false;
-            $option_id                      = $option_info['option_id'];
+
+            $remainder                      = intval($total - $limit * $page);
+            $remainder1                     = $total - $remainder;
 
             if ($remainder > 0) {
 
-                if (!empty($option_info)) {
-                    //根据选项名称查找属性信息
-                    $variant_description    = $this->model_catalog_handle->get_variant_description($option_info['name']);
-                    if (!empty($variant_description)) {
-                        $variant_id         = $variant_description['variant_id'];
-                    }else{
-                        //新增属性 获取variant_id
-                        $variant_id         = $this->model_catalog_handle->add_variant(['name'=>$option_info['name']]);
+                foreach ($products as $pkey => $pvalue)
+                {
+                    $product_id             = (int)$pvalue['product_id'];
+                    //根据商品ID 获取当前商品信息
+                    
+                    //根据商品ID 获取原始商品信息
+                    $option_id              = [];
+                    $option_value_id        = [];
+                    $product_option_value   = $this->model_catalog_handle->get_product_option_value_lists2(['product_id'=>$product_id]);
+
+                    if (empty($product_option_value)) {
+                        wr(['product_id'=>$product_id],'handle_log1.txt');
+                        continue;
                     }
 
-                    $this->handle_variant($variant_id,$option_id,true);
+                    foreach ($product_option_value as $povkey => $povvalue) {
+                        $option_id[$povvalue['option_id']]                  = $povvalue['option_id'];
+                        $option_value_id[$povvalue['option_value_id']]      = $povvalue['option_value_id'];
+                    }
+
+                    $options_description_list       = $this->model_catalog_handle->get_options_description_list2($option_id);
+                    $options_value_description_list = $this->model_catalog_handle->get_options_value_description_list2($option_value_id);
+                    
+                    $option_name            = [];
+                    foreach ($options_description_list as $odlkey => $odlvalue) {
+                        $option_name[$odlvalue['name']]     = $odlvalue['name'];
+                    }
+
+                    $option_value_name      = [];
+                    foreach ($options_value_description_list as $ovdlkey => $ovdlvalue) {
+                        $option_value_name[$ovdlvalue['name']]     = $ovdlvalue['name'];
+                    }
+
+                    $variant_description_list       = $this->model_catalog_handle->get_variant_description_list2($option_name);
+                    $variant_id                     = [];
+                    $variant_id1                    = [];
+                    foreach ($variant_description_list as $vdlkey => $vdlvalue) {
+                        $variant_id[$vdlvalue['variant_id']]    = $vdlvalue['variant_id'];
+                        $variant_id1[$vdlvalue['name']]         = $vdlvalue['variant_id'];
+                    }
+
+                    $variant_value_description_list = $this->model_catalog_handle->get_variant_value_description_list2($option_value_name,$variant_id);
+
+                    $variant_value_id1              = [];
+                    $variant_value_id               = [];
+                    $variant_value_name             = [];
+                    foreach ($variant_value_description_list as $vvdlkey => $vvdlvalue) {
+                        $variant_value_id1[$vvdlvalue['variant_id']][$vvdlvalue['name']]      = $vvdlvalue['variant_value_id'];
+                        $variant_value_id[$vvdlvalue['variant_value_id']]                     = $vvdlvalue['variant_value_id'];
+                        $variant_value_name[$vvdlvalue['variant_value_id']]                   = $vvdlvalue['name'];
+                    }
+
+                    $variant_count                  = count($variant_id1);
+                    $product_variant1               = [];
+                    $variant_id2                    = [];
+
+                    foreach ($variant_id1 as $key1 => $value1) {
+                        $variant_value1     = isset($variant_value_id1[$value1]) ? $variant_value_id1[$value1] : [];
+                        $variant_id2[]      = ['variant_id'=>$value1,'variant_value'=>$variant_value1];
+                    }
+
+                    if (count($option_id) !== count($variant_id) || count($option_value_id) !== count($variant_value_id)) {
+                        print_r([
+                            'product_id'=>$product_id,
+                            'variant_value_name'=>$variant_value_name,
+                            /*'variant_id'=>$variant_id,
+                            'option_value_id'=>$option_value_id,*/
+                            'option_value_name'=>$option_value_name,
+                        ]);
+                        /*wr(['product_id'=>$product_id],'handle_log2.txt');*/exit();
+                        continue;
+                    }
+
+                    continue;
+
+                    print_r($option_value_name);exit();
+
+                    //一属性
+                    if ($variant_count == 1) {
+                        $vari1          = $variant_id2[0];
+                        $variant_id11   = $vari1['variant_id'];
+
+                        foreach ($vari1['variant_value'] as $varkey1 => $varivalue1) {
+                            $variant3           = $variant_id11 . '-' . $varivalue1;
+                            $product_variant1[]  = [$variant3];
+                        }
+                    //两属性
+                    }elseif ($variant_count == 2){
+                        $vari1      = $variant_id2[0];
+                        $vari2      = $variant_id2[1];
+                        if (isset($vari1['variant_id']) && isset($vari1['variant_value']) && !empty($vari1['variant_value']) && isset($vari2['variant_id']) && isset($vari2['variant_value']) && !empty($vari2['variant_value'])) {
+                            $variant_id11 = $vari1['variant_id'];
+                            foreach ($vari1['variant_value'] as $varkey1 => $varivalue1) {
+                                $variant3           = $variant_id11 . '-' . $varivalue1;
+                                $variant_id22       = $vari2['variant_id'];
+                                foreach ($vari2['variant_value'] as $varkey2 => $varivalue2) {
+                                    $variant4       = $variant_id22 . '-' . $varivalue2;
+                                    $product_variant1[]  = [$variant3,$variant4];
+                                }
+                            }
+                        }
+                    }else if ($variant_count == 3) {
+                        # code...
+                    }
+
+                    //获取已有属性
+                    $filter_data2        = [
+                        'start'         => 0,
+                        'limit'         => 1000,
+                        'language_id'   => 1,
+                        'parent_id'     => $product_id
+                    ];
+
+                    $products2          = $this->model_catalog_handle->getProducts($filter_data2);
+                    $all_product_id     = [];
+
+                    $all_product_id[$product_id]     = $product_id;
+                    foreach ($products2 as $p2key => $p2value) {
+                        $all_product_id[$p2value['product_id']]     = $p2value['product_id'];
+                    }
+
+                    //获取当前商品属性关联
+                    $variant2          = $this->model_catalog_handle->get_product_variants1($all_product_id);
+
+                    $variant22         = [];
+                    foreach ($variant2 as $v2key => $v2value) {
+                        $variant22[$v2value['product_id']][]    = $v2value['variant_id'] . '-' . $v2value['variant_value_id'];
+                    }
+
+                    print_r([$product_id,$product_variant1,$variant22]);exit();
+                    //对比属性
+                    foreach ($product_variant1 as $pv1key => $pv1value) {
+                        if ($this->checkArray($variant22,$pv1value)) {
+                            
+                        }else{
+                            //
+                            if (count($all_product_id) === 1) {
+                                //单品
+                                
+                            }
+                            print_r([$product_id,$pv1value,$variant22,$product_variant1]);exit();
+                        }
+                    }
+
+                    //获取属性和属性值
+                    //print_r([$variant22,$product_variant1]);
+                    //print_r($product_variant1);
+                    //exit();
                 }
 
                 $page ++;
             }else{
-                $page = 0;
-                $step = 16;
+                echo "ok";exit();
             }
 
             $this->echo_log([
-                'handle_name'=>'商品选项属性转换',
-                'handle_num1'=>$this->session->data['handle_data']['ototals'],
+                'handle_name'=>'商品属性处理',
+                'handle_num1'=>$total,
                 'handle_num2'=>$remainder1,
                 'handle_num3'=>$remainder,
-                'handle_info'=>'属性名称：'.$option_info['name'] . '(属性ID：' . $option_info['option_id'] . ')',
                 'handle_time'=>(time()-$ini_time) . '秒',
             ]);
 
-            $this->jumpurl($this->url->link('crontab/handle','step=' . $step . '&page=' . $page));
+            $this->jumpurl($this->url->link('crontab/handle3','step=' . $step . '&page=' . $page));
         }
+    }
+
+    private function checkArray($arr1,$arr2)
+    {   
+        sort($arr2);
+        foreach ($arr1 as $value) {
+            sort($value);
+            if ($arr2 === $value) return true;
+        }
+
+        return false;
     }
 
     //1:纯英文;2:纯中文;3:中英文混合

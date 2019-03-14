@@ -177,6 +177,10 @@ class ControllerApiPay extends Controller {
         }
 
         $paycdoe = isset($this->request->post['paycode']) && !empty($this->request->post['paycode']) ? $this->request->post['paycode'] : '';
+        
+        wr($payinfo);
+        return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>'pay fail==']));
+
         $res     = $this->load->controller('extension/payment/'.$paycdoe.'/callback');
 
         if ( isset($res[0]) && $res[0] == 'success') {

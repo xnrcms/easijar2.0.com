@@ -48,7 +48,7 @@ class ControllerApiCategory extends Controller {
                     $children_data[] = array(
                 		'cid'     		 => $child['category_id'],
                         'thumb'          => $image,
-                        'name'           => str_replace('&amp;', ' ', $child['name']),
+                        'name'           => htmlspecialchars_decode($child['name']),
                         'grand_children' => $grand_children_data
                     );
                 }
@@ -63,7 +63,7 @@ class ControllerApiCategory extends Controller {
             // Level 1
             $data['categories'][] = array(
                 'cid'     => $category['category_id'],
-                'name'     => str_replace('&amp;', ' ', $category['name']),
+                'name'     => htmlspecialchars_decode($category['name']),
                 'thumb'    => $image,
                 'children' => $children_data
             );

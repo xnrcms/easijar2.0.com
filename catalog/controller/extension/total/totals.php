@@ -75,12 +75,12 @@ class ControllerExtensionTotalTotals extends Controller
         $seller_total           	= $seller_sub_total - $seller_platform_coupon;
         
         $seller_totals 				= [
-        	'seller_product_total' 		=> $this->currency->format($seller_product_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-        	'seller_sub_total' 			=> $this->currency->format($seller_sub_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_total'       		=> $this->currency->format($seller_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_coupon'     		=> $this->currency->format($seller_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_shipping'   		=> $this->currency->format($seller_shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
-            'seller_platform_coupon'   	=> $this->currency->format($seller_platform_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']),
+        	'seller_product_total' 		=> $seller_product_total > 0 ? $this->currency->format($seller_product_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']) : '',
+        	'seller_sub_total' 			=> $seller_sub_total > 0 ? $this->currency->format($seller_sub_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']) : '',
+            'seller_total'       		=> $seller_total > 0 ? $this->currency->format($seller_total, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']) : '',
+            'seller_coupon'     		=> $seller_coupon > 0 ? $this->currency->format($seller_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']) : '',
+            'seller_shipping'   		=> $seller_shipping > 0 ? $this->currency->format($seller_shipping, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']) : '',
+            'seller_platform_coupon'   	=> $seller_platform_coupon > 0 ? $this->currency->format($seller_platform_coupon, $order_info['currency_code'], $order_info['currency_value'], $this->session->data['currency']) : '',
         ];
 
         return $seller_totals;

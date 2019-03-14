@@ -515,4 +515,106 @@ class ControllerApiUser extends Controller {
 		
         return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>'Code send successfully']));
 	}
+
+	//三方登录成功回调
+	public function auth_login_success()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+
+        $allowKey       = ['api_token','logininfo'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+        $json           = [];
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        $logininfo    = isset($req_data['logininfo']) && !empty($req_data['logininfo']) ? urldecode(urldecode($req_data['logininfo'])) : '';
+        $logininfo    = !empty($logininfo) ? parse_url($logininfo) : [];
+        $logininfo    = !empty($logininfo) && isset($logininfo['fragment']) ? $this->convertUrlQuery($logininfo['fragment']) : [];
+        $provider 	  = isset($logininfo['provider']) && !empty($logininfo['provider']) ? $logininfo['provider'] : '';
+        
+
+        $this->request->get                     = [];
+        $this->request->get['is_app']           = 1;
+        foreach ($logininfo as $key => $value) {
+            $this->request->get[$key]      = $value;
+        }
+
+        //$auth_login                    		= $this->load->controller('extension/module/social/api_login');
+
+        wr($this->session->data);
+        return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>'pay fail==']));
+        if ( $auth_login == 'login success') {
+            return $this->response->setOutput($this->returnData(['code'=>'200','msg'=>'success','data'=>$res[1]]));
+        }
+
+        return $this->response->setOutput($this->returnData(['code'=>'202','msg'=>!empty($res) ? $res : 'pay fail']));
+	}
+
+	//发起三方登录
+	public function auth_login()
+	{
+		$this->response->addHeader('Content-Type: application/json');
+		$this->load->language('account/login');
+
+        $allowKey       = ['api_token','provider'];
+        $req_data       = $this->dataFilter($allowKey);
+        $data           = $this->returnData();
+
+        if (!$this->checkSign($req_data)) {
+            return $this->response->setOutput($this->returnData(['code'=>'207','msg'=>'fail:sign error']));
+        }
+
+        if (!isset($req_data['api_token']) || (int)(utf8_strlen(html_entity_decode($req_data['api_token'], ENT_QUOTES, 'UTF-8'))) !== 26) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:api_token error']));
+        }
+
+        if (!(isset($this->session->data['api_id']) && (int)$this->session->data['api_id'] > 0)) {
+            return $this->response->setOutput($this->returnData(['code'=>'203','msg'=>'fail:token is error']));
+        }
+
+        $ltype 			= ['','twitter','facebook'];
+        $provider 		= (int)$req_data['provider'];
+        $provider 		= isset($ltype[$provider]) ? $ltype[$provider] : '';
+
+        if (empty($provider)) {
+            return $this->response->setOutput($this->returnData(['msg'=>'fail:provider is error']));
+        }
+
+        $this->request->get['provider'] 	= $provider;
+        $this->request->get['is_api'] 		= 1;
+        $redirect                    		= $this->load->controller('extension/module/social/redirect');
+
+        $data   = $this->returnData(['code'=>'200','msg'=>'success','data'=>['redirect'=>$redirect]]);
+
+        return $this->response->setOutput($data);
+	}
+
+	private function convertUrlQuery($query)
+    { 
+        $query      = str_replace('/otherLoginResult?provider', 'provider', $query);
+        $query      = str_replace('&?', '&', $query);
+        $$query     = urldecode($query);
+        
+        $queryParts = explode('&', $query); 
+         
+        $params = array(); 
+        foreach ($queryParts as $param) 
+        { 
+            $item = explode('=', $param); 
+            $params[$item[0]] = $item[1]; 
+        } 
+         
+        return $params; 
+    }
 }

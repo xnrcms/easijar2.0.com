@@ -687,7 +687,7 @@ class ModelCatalogHandle extends Model {
 
     public function get_product_variants1($product_ids)
     {
-        $query = $this->db->query("SELECT product_id FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')");
+        $query = $this->db->query("SELECT product_id,variant_id,variant_value_id FROM " . DB_PREFIX . "product_variant WHERE product_id IN ('" . implode("','",$product_ids) . "')");
         return $query->rows;
     }
 
@@ -815,5 +815,40 @@ class ModelCatalogHandle extends Model {
         foreach ($delsql as $key => $value) {
             $this->db->query($value);
         }
+    }
+
+    public function get_options_description_list2($option_ids)
+    {
+        $sql    = "SELECT option_id,name FROM " . DB_PREFIX . "option_description_copy WHERE language_id = 2 AND option_id IN ('" . implode("','",$option_ids) . "')";
+        $query  = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function get_options_value_description_list2($option_value_ids)
+    {
+        $sql    = "SELECT option_value_id,name FROM " . DB_PREFIX . "option_value_description_copy WHERE language_id = 2 AND option_value_id IN ('" . implode("','",$option_value_ids) . "')";
+        $query  = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function get_variant_description_list2($variant_names)
+    {
+        $sql    = "SELECT variant_id,name FROM " . DB_PREFIX . "variant_description WHERE language_id = 2 AND name IN ('" . implode("','",$variant_names) . "')";
+        $query  = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function get_variant_value_description_list2($variant_value_names,$variant_ids)
+    {
+        $sql    = "SELECT variant_value_id,variant_id,name FROM " . DB_PREFIX . "variant_value_description WHERE language_id = 2 AND name IN ('" . implode("','",$variant_value_names) . "') AND variant_id IN('" . implode("','",$variant_ids) . "')";
+        $query  = $this->db->query($sql);
+        return $query->rows;
+    }
+
+    public function get_product_option_value_lists2($data)
+    {
+        $sql    = "SELECT option_id,option_value_id FROM " . DB_PREFIX . "product_option_value_copy WHERE product_id = '" . (int)$data['product_id'] . "'";
+        $query = $this->db->query($sql);
+        return $query->rows;
     }
 }
